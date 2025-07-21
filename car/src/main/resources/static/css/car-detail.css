@@ -1,0 +1,458 @@
+.car-detail {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+@media (max-width: 768px) {
+  .car-detail {
+    padding: 0 10px;
+  }
+}
+.car-detail .main-title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  margin: 0px 0px 15px 0px;
+  white-space: nowrap;
+  color: #FA9F42;
+  /* 响应式设计：在小屏幕上改变布局 */
+}
+.car-detail .main-title-container .first-title,
+.car-detail .main-title-container .second-title {
+  display: inline-block;
+  font-weight: 560;
+}
+.car-detail .main-title-container .first-title {
+  font-size: 1.7rem;
+  margin-right: 5px;
+}
+.car-detail .main-title-container .second-title {
+  font-size: 1.7rem;
+}
+@media (max-width: 768px) {
+  .car-detail .main-title-container {
+    flex-direction: column;
+    align-items: flex-start;
+    white-space: normal;
+  }
+  .car-detail .main-title-container .first-title {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+  }
+  .car-detail .main-title-container .second-title {
+    font-size: 1.7rem;
+  }
+}
+.car-detail .car-title {
+  color: #5ACFC9;
+  text-align: left;
+  font-weight: 560;
+}
+.car-detail .price {
+  text-align: left;
+  padding-left: 2px;
+  color: #FA9F42;
+}
+.car-detail .price span {
+  font-size: 1.8rem;
+  font-weight: 540;
+  color: #FA9F42;
+}
+.car-detail .main-image {
+  position: relative;
+  padding-top: 60%;
+  /* 16:9 Aspect Ratio */
+}
+.car-detail .main-image .swiper-wrapper-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  display: flex;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.car-detail .main-image .swiper-wrapper-container .swiper-slide {
+  scroll-snap-align: start;
+  min-width: 100%;
+}
+.car-detail .main-image .swiper-wrapper-container .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+.car-detail .video-container {
+  position: relative;
+  padding-bottom: 60%;
+  /* 16:9 */
+  height: 0;
+  overflow: hidden;
+}
+.car-detail .video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.car-detail .content-frame {
+  width: 100%;
+  min-height: 300px;
+  border: none;
+  overflow: hidden;
+}
+.car-detail .thumbnail-container {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-top: 10px;
+}
+.car-detail .thumbnail-container .thumbnail {
+  width: 80px;
+  height: 60px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.car-detail .thumbnail-container .thumbnail.active {
+  border-color: #5ACFC9;
+}
+.car-detail .btn-phone {
+  background-color: #5ACFC9;
+  color: white;
+  border: none;
+  padding: 5px 20px;
+  border-radius: 5px;
+}
+.car-detail .btn-line {
+  background-color: #8AD879;
+  color: white;
+  border: none;
+  padding: 5px 20px;
+  border-radius: 5px;
+}
+.car-detail .btn-line-id {
+  background-color: #8AD879;
+  color: white;
+  border: none;
+  padding: 3px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.car-detail .btn-line-id:hover {
+  background-color: #68cd51;
+  transform: translateY(-1px);
+}
+.car-detail .btn-share-line {
+  background: none;
+  color: #6c757d;
+  border: none;
+  padding: 8px 0;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  text-decoration: none;
+}
+.car-detail .btn-share-line:hover {
+  color: #8AD879;
+  text-decoration: none;
+}
+.car-detail .btn-share-line:focus {
+  outline: none;
+  text-decoration: none;
+}
+.car-detail .btn-share-line i {
+  font-size: 1.1rem;
+}
+.car-detail .share-container {
+  text-align: right;
+  margin-top: 10px;
+}
+.car-detail .specs {
+  padding: 10px 0px 15px 5px;
+  border-radius: 5px;
+  padding-bottom: 0px;
+  overflow-x: hidden;
+}
+.car-detail .specs .row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+.car-detail .specs .col-6 {
+  padding: 0 5px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.car-detail .specs .text-muted {
+  color: #6c757d;
+  font-weight: 500;
+  display: inline-block;
+  min-width: 60px;
+}
+.car-detail .specs .spec-name {
+  font-size: 0.9rem;
+  height: 1.5rem;
+  font-weight: normal;
+  border-left: 3px solid #5ACFC9;
+  /* 新增：左侧3px主色调边框 */
+  padding-left: 0.5rem;
+  /* 增加内边距避免内容贴边 */
+  width: 100%;
+  text-align: left;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.car-detail .specs .spec-value {
+  font-size: 1.2rem;
+  height: 1.6rem;
+  font-weight: 500;
+  border-left: 3px solid #eee;
+  /* 新增：左侧3px边框色边框 */
+  padding-left: 0.5rem;
+  /* 增加内边距避免内容贴边 */
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  /* 禁止文本换行 */
+  overflow: hidden;
+  /* 隐藏溢出内容 */
+  text-overflow: ellipsis;
+  /* 溢出显示省略号 */
+}
+.car-detail .dealer-info {
+  padding: 0.6rem 1rem;
+  border-radius: 2px;
+}
+.car-detail .dealer-info div {
+  margin-bottom: 5px;
+}
+.car-detail .dealer-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  gap: 20px;
+}
+.car-detail .dealer-intro {
+  flex: 1;
+  min-width: 300px;
+  border-radius: 8px;
+  padding: 15px;
+}
+.car-detail .dealer-intro-row {
+  display: flex;
+  margin-bottom: 12px;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.car-detail .dealer-title {
+  flex: 0 0 100px;
+  font-weight: bold;
+  color: #5ACFC9;
+  text-align: left;
+}
+.car-detail .dealer-content {
+  flex: 1;
+  text-align: left;
+}
+.car-detail .dealer-cover {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.car-detail .dealer-cover img {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.car-detail .action-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+.car-detail .action-buttons .btn {
+  border-radius: 4px;
+  flex: 1;
+  color: white;
+  font-size: 1.1rem;
+  padding: 0.75rem;
+  height: 50px;
+}
+.car-detail .action-buttons .btn-primary {
+  background-color: #CD001D;
+  border-color: #CD001D;
+}
+.car-detail .action-buttons .btn-success {
+  background-color: #06C152;
+  border-color: #06C152;
+}
+@media (max-width: 768px) {
+  .car-detail .action-buttons {
+    flex-direction: column;
+    gap: 0;
+  }
+  .car-detail .action-buttons .btn {
+    margin-bottom: 10px;
+  }
+}
+.car-detail .tags {
+  padding: 15px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.car-detail .tags .badge {
+  font-size: 1rem;
+  font-weight: normal;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+.car-detail .text-left {
+  text-align: left;
+}
+.car-detail .nav-tabs {
+  border-radius: 0;
+}
+.car-detail .nav-tabs .nav-link {
+  border-radius: 0;
+  border-color: transparent;
+  color: #666666;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+}
+.car-detail .nav-tabs .nav-link:hover,
+.car-detail .nav-tabs .nav-link.active {
+  color: white;
+  background-color: #5ACFC9;
+  border-color: #5ACFC9;
+  cursor: pointer;
+}
+@media (max-width: 768px) {
+  .car-detail .nav-tabs {
+    display: flex;
+    width: 100%;
+  }
+  .car-detail .nav-tabs .nav-item {
+    flex: 1;
+    text-align: center;
+  }
+}
+.car-detail .equipment-header {
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #5ACFC9;
+  text-align: left;
+  padding-bottom: 8px;
+  position: relative;
+  margin-bottom: 15px;
+}
+.car-detail .equipment-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, #5ACFC9, rgba(90, 207, 201, 0));
+}
+.car-detail .equipment-section {
+  margin-bottom: 20px;
+}
+.car-detail .equipment-row {
+  display: flex;
+  flex-direction: column;
+  /* 小屏幕默认垂直 */
+}
+@media (min-width: 768px) {
+  .car-detail .equipment-row {
+    flex-direction: row;
+    /* 中等屏幕及以上水平 */
+  }
+}
+.car-detail .equipment-name {
+  flex: 0 0 30px;
+  font-weight: bold;
+  text-align: left;
+  min-width: 6em;
+  font-size: 1em;
+}
+.car-detail .equipment-tags {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.car-detail .equipment-tag {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0px 10px;
+}
+.car-detail .guarantee-tags {
+  margin-bottom: 20px;
+}
+.car-detail .guarantee-section {
+  display: flex;
+  flex-direction: column;
+  /* 默认垂直排列（移动端） */
+  margin-bottom: 20px;
+  text-align: left;
+}
+@media (min-width: 768px) {
+  .car-detail .guarantee-section {
+    flex-direction: row;
+    /* 中等屏幕及以上水平排列 */
+    align-items: flex-start;
+  }
+}
+.car-detail .guarantee-name {
+  flex: 0 0 auto;
+  min-width: 10em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 5px;
+  /* 移动端下方间距 */
+}
+@media (min-width: 768px) {
+  .car-detail .guarantee-name {
+    margin-bottom: 0;
+    /* 大屏幕取消下方间距 */
+  }
+}
+.car-detail .guarantee-desc {
+  flex: 1;
+}
+@media (min-width: 768px) {
+  .car-detail .guarantee-desc {
+    padding-left: 10px;
+    /* 只在大屏幕添加左边距 */
+  }
+}
+.car-detail .cursor-pointer {
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+.car-detail .cursor-pointer:hover {
+  opacity: 0.9;
+}

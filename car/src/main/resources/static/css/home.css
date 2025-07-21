@@ -1,0 +1,498 @@
+/* 首页样式 */
+.home-page {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+}
+
+/* 头部导航样式已移除，统一在 common.css 控制 */
+
+/* 第一行：轮播图 */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: 50px;
+}
+
+.hero-slider {
+    width: 100%;
+    height: 100%;
+}
+
+.hero-slide {
+    position: relative;
+    width: 100%;
+    height: 500px;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.hero-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #5ACFC9;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.hero-btn:hover {
+    background-color: #4AB8B2;
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+/* 第二行：功能区域 */
+.features-section {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 30px 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: #5ACFC9;
+    margin-bottom: 20px;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.feature-subtitle {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* 第三行：搜索框 */
+.search-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #5ACFC9 0%, #FA9F42 100%);
+    color: white;
+}
+
+.search-container {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-input-group {
+    display: flex;
+    background: white;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+.search-btn {
+    background-color: #FA9F42;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    background-color: #E88A2E;
+    color: white;
+}
+
+/* 第四行：广告位 */
+.ad-section {
+    padding: 60px 0;
+    background-color: white;
+}
+
+.ad-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    height: 300px;
+}
+
+.ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.ad-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.ad-content {
+    padding: 20px;
+}
+
+.ad-content h3 {
+    color: #5ACFC9;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.ad-content p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.ad-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* 第五行：精选店家 */
+.dealers-section {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.view-more-link {
+    color: #5ACFC9;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.view-more-link:hover {
+    color: #4AB8B2;
+    text-decoration: none;
+    transform: translateX(3px);
+}
+
+.dealers-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 0;
+}
+
+.dealer-card {
+    flex: 0 0 250px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.dealer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.dealer-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.dealer-name {
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin: 0;
+}
+
+/* 第六行：精选好车 */
+.cars-section {
+    padding: 60px 0;
+    background-color: white;
+}
+
+.cars-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 0;
+}
+
+.car-card {
+    flex: 0 0 300px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.car-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.car-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.car-model {
+    padding: 15px 15px 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.car-price {
+    padding: 0 15px 15px;
+    font-size: 1.1rem;
+    color: #FA9F42;
+    font-weight: bold;
+    margin: 0;
+}
+
+
+
+/* 第七行：页脚 */
+.footer {
+    background-color: #333;
+    color: white;
+    padding: 50px 0 20px;
+}
+
+.footer h4 {
+    color: #5ACFC9;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.footer p {
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+.footer i {
+    margin-right: 10px;
+    color: #5ACFC9;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.social-link {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-color: #5ACFC9;
+    color: white;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background-color: #4AB8B2;
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #555;
+    color: #999;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .hero-section {
+        height: 300px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .search-title {
+        font-size: 2rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .view-more-link {
+        font-size: 1rem;
+    }
+    
+    .dealers-container,
+    .cars-container {
+        padding: 0;
+    }
+    
+    .dealer-card {
+        flex: 0 0 200px;
+    }
+    
+    .car-card {
+        flex: 0 0 250px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        height: 250px;
+    }
+    
+    .hero-title {
+        font-size: 1.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .search-title {
+        font-size: 1.5rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .view-more-link {
+        font-size: 0.9rem;
+    }
+    
+    .dealers-container,
+    .cars-container {
+        padding: 0;
+    }
+    
+    .dealer-card {
+        flex: 0 0 180px;
+    }
+    
+    .car-card {
+        flex: 0 0 220px;
+    }
+}
+
+/* 隐藏滚动条但保持功能 */
+.dealers-container::-webkit-scrollbar,
+.cars-container::-webkit-scrollbar {
+    display: none;
+}
+
+.dealers-container,
+.cars-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+} 

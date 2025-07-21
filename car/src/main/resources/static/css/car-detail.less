@@ -1,0 +1,528 @@
+// 定义变量
+@primary-color: #5ACFC9;
+@danger-color: #CD001D;
+@success-color: #06C152;
+@text-muted: #6c757d;
+@border-color: #eee;
+@bg-light: #f8f9fa;
+@title-color: #FA9F42;
+@line-color: #8AD879;
+@main-title-color: #F3533A;
+
+.car-detail {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: hidden;
+
+    @media (max-width: 768px) {
+        padding: 0 10px;
+    }
+
+    .main-title-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        margin: 0px 0px 15px 0px;
+        white-space: nowrap;
+        color: @title-color;
+        
+        .first-title, .second-title {
+            display: inline-block;
+            font-weight: 560;
+        }
+        
+        .first-title {
+            font-size: 1.7rem;
+            margin-right: 5px;
+        }
+        
+        .second-title {
+            font-size: 1.7rem;
+        }
+        
+        /* 响应式设计：在小屏幕上改变布局 */
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: flex-start;
+            white-space: normal;
+            
+            .first-title {
+                font-size: 1.3rem;
+                margin-bottom: 5px;
+            }
+            
+            .second-title {
+                font-size: 1.7rem;
+            }
+        }
+    }
+
+    .car-title {
+        color: @primary-color;
+        text-align: left;
+        font-weight: 560;
+    }
+
+    .price {
+        text-align: left;
+        padding-left: 2px;
+        color: @title-color;
+
+        span {
+            font-size: 1.8rem;
+            font-weight: 540;
+            color: @title-color;
+        }
+    }
+
+    .main-image {
+        position: relative;
+        padding-top: 60%;
+        /* 16:9 Aspect Ratio */
+
+        .swiper-wrapper-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            display: flex;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+
+            .swiper-slide {
+                scroll-snap-align: start;
+                min-width: 100%;
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: fill;
+                }
+            }
+        }
+    }
+
+    .video-container {
+        position: relative;
+        padding-bottom: 60%;
+        /* 16:9 */
+        height: 0;
+        overflow: hidden;
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .content-frame {
+        width: 100%;
+        min-height: 300px;
+        border: none;
+        overflow: hidden;
+    }
+
+    .thumbnail-container {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        margin-top: 10px;
+
+        .thumbnail {
+            width: 80px;
+            height: 60px;
+            cursor: pointer;
+            border: 2px solid transparent;
+
+            &.active {
+                border-color: @primary-color;
+            }
+        }
+    }
+
+    .btn-phone {
+        background-color: @primary-color;
+        color: white;
+        border: none;
+        padding: 5px 20px;
+        border-radius: 5px;
+    }
+
+    .btn-line {
+        background-color: @line-color;
+        color: white;
+        border: none;
+        padding: 5px 20px;
+        border-radius: 5px;
+    }
+
+    .btn-line-id {
+        background-color: @line-color;
+        color: white;
+        border: none;
+        padding: 3px 12px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        
+        &:hover {
+            background-color: darken(@line-color, 10%);
+            transform: translateY(-1px);
+        }
+    }
+
+    .btn-share-line {
+        background: none;
+        color: #6c757d;
+        border: none;
+        padding: 8px 0;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        width: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        text-decoration: none;
+        
+        &:hover {
+            color: @line-color;
+            text-decoration: none;
+        }
+        
+        &:focus {
+            outline: none;
+            text-decoration: none;
+        }
+        
+        i {
+            font-size: 1.1rem;
+        }
+    }
+
+    .share-container {
+        text-align: right;
+        margin-top: 10px;
+    }
+
+    .specs {
+        padding: 10px 0px 15px 5px;
+        border-radius: 5px;
+        padding-bottom: 0px;
+        overflow-x: hidden;
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0;
+        }
+
+        .col-6 {
+            padding: 0 5px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .text-muted {
+            color: @text-muted;
+            font-weight: 500;
+            display: inline-block;
+            min-width: 60px;
+        }
+
+        .spec-name {
+            font-size: 0.9rem;
+            height: 1.5rem;
+            font-weight: normal;
+            border-left: 3px solid @primary-color;
+            /* 新增：左侧3px主色调边框 */
+            padding-left: 0.5rem;
+            /* 增加内边距避免内容贴边 */
+            width: 100%;
+            text-align: left;
+            text-wrap: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .spec-value {
+            font-size: 1.2rem;
+            height: 1.6rem;
+            font-weight: 500;
+            border-left: 3px solid @border-color;
+            /* 新增：左侧3px边框色边框 */
+            padding-left: 0.5rem;
+            /* 增加内边距避免内容贴边 */
+            width: 100%;
+            text-align: left;
+            white-space: nowrap;
+            /* 禁止文本换行 */
+            overflow: hidden;
+            /* 隐藏溢出内容 */
+            text-overflow: ellipsis;
+            /* 溢出显示省略号 */
+        }
+    }
+
+    .dealer-info {
+        // background-color: @bg-light;
+        padding: 0.6rem 1rem;
+        border-radius: 2px;
+
+        div {
+            margin-bottom: 5px;
+        }
+    }
+
+    .dealer-container {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        gap: 20px;
+    }
+
+    .dealer-intro {
+        flex: 1;
+        min-width: 300px;
+        // background-color: @bg-light;
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    .dealer-intro-row {
+        display: flex;
+        margin-bottom: 12px;
+        align-items: center;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .dealer-title {
+        flex: 0 0 100px;
+        font-weight: bold;
+        color: @primary-color;
+        text-align: left;
+    }
+
+    .dealer-content {
+        flex: 1;
+        text-align: left;
+    }
+
+    .dealer-cover {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+    }
+
+    .action-buttons {
+        margin-top: 20px;
+        display: flex;
+        gap: 15px;
+
+        .btn {
+            border-radius: 4px;
+            flex: 1;
+            color: white;
+            font-size: 1.1rem;
+            padding: 0.75rem;
+            height: 50px;
+
+            &-primary {
+                background-color: @danger-color;
+                border-color: @danger-color;
+            }
+
+            &-success {
+                background-color: @success-color;
+                border-color: @success-color;
+            }
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 0;
+
+            .btn {
+                margin-bottom: 10px;
+            }
+        }
+    }
+
+    .tags {
+        padding: 15px 0;
+        border-top: 1px solid @border-color;
+        border-bottom: 1px solid @border-color;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+
+        .badge {
+            font-size: 1rem;
+            font-weight: normal;
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .nav-tabs {
+        border-radius: 0;
+
+        .nav-link {
+            border-radius: 0;
+            border-color: transparent;
+            color: #666666;
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+
+            &:hover,
+            &.active {
+                color: white;
+                background-color: @primary-color;
+                border-color: @primary-color;
+                cursor: pointer;
+            }
+        }
+
+        @media (max-width: 768px) {
+            display: flex;
+            width: 100%;
+
+            .nav-item {
+                flex: 1;
+                text-align: center;
+            }
+        }
+    }
+
+    .equipment-header {
+        font-weight: bold;
+        font-size: 1.2em;
+        color: @primary-color;
+        text-align: left;
+        padding-bottom: 8px;
+        position: relative;
+        margin-bottom: 15px;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, @primary-color, fade(@primary-color, 0%));
+        }
+    }
+
+    .equipment-section {
+        margin-bottom: 20px;
+    }
+
+    .equipment-row {
+        display: flex;
+        flex-direction: column;
+        /* 小屏幕默认垂直 */
+    }
+
+    @media (min-width: 768px) {
+        .equipment-row {
+            flex-direction: row;
+            /* 中等屏幕及以上水平 */
+        }
+    }
+
+    .equipment-name {
+        flex: 0 0 30px;
+        font-weight: bold;
+        text-align: left;
+        min-width: 6em;
+        font-size: 1em;
+        // color: @primary-color;
+    }
+
+    .equipment-tags {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .equipment-tag {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        padding: 0px 10px;
+    }
+
+    .guarantee-tags {
+        margin-bottom: 20px;
+    }
+
+    .guarantee-section {
+        display: flex;
+        flex-direction: column; /* 默认垂直排列（移动端） */
+        margin-bottom: 20px;
+        text-align: left;
+        
+        @media (min-width: 768px) {
+            flex-direction: row; /* 中等屏幕及以上水平排列 */
+            align-items: flex-start;
+        }
+    }
+
+    .guarantee-name {
+        flex: 0 0 auto;
+        min-width: 10em;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        margin-bottom: 5px; /* 移动端下方间距 */
+        
+        @media (min-width: 768px) {
+            margin-bottom: 0; /* 大屏幕取消下方间距 */
+        }
+    }
+
+
+    .guarantee-desc {
+        flex: 1;
+        
+        @media (min-width: 768px) {
+            padding-left: 10px; /* 只在大屏幕添加左边距 */
+        }
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+        transition: opacity 0.3s;
+        
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+} 
