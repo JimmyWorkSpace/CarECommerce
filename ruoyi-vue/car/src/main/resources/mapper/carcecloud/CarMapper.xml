@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.car.mapper.carcecloud.CarMapper">
+    
+    <select id="selectCarBaseInfoBySaleId" resultType="com.ruoyi.car.dto.CarBaseInfoDto">
+        SELECT
+        cb.brand,-- 品牌
+        c.manufacture_year,-- 出厂年
+        c.displacement,-- 排气量
+        c.fuel_system,-- 燃料系统
+        c.transmission,-- 变速系统
+        c.color,-- 颜色
+        c.door_count,-- 车门数
+        c.passenger_count,-- 乘坐人数
+        cs.sale_price,-- 售价
+        cs.sale_title,-- 标题
+        cs.sale_description,-- 详情
+        cs.mileage,-- 公里数
+        cl.`name` AS location_name,-- 地点
+        cs.id_garage as garage_id,
+        -- cl.`name` AS location_name,
+		cm.model as custom_model
+        FROM
+        cars c
+        LEFT JOIN car_brand cb ON cb.id = c.id_brand
+        LEFT JOIN car_sales cs ON c.id = cs.car_id
+        LEFT JOIN car_location cl ON cs.car_location_id = cl.id
+        left join car_model cm on c.id_model = cm.id
+        WHERE
+        cs.id = #{saleId}
+        LIMIT 1;
+    </select>
+    
+    <select id="selectCarBaseInfoByUid" resultType="com.ruoyi.car.dto.CarBaseInfoDto">
+        SELECT
+        cb.brand,-- 品牌
+        c.manufacture_year,-- 出厂年
+        c.displacement,-- 排气量
+        c.fuel_system,-- 燃料系统
+        c.transmission,-- 变速系统
+        c.color,-- 颜色
+        c.door_count,-- 车门数
+        c.passenger_count,-- 乘坐人数
+        cs.sale_price,-- 售价
+        cs.sale_title,-- 标题
+        cs.sale_description,-- 详情
+        cs.mileage,-- 公里数
+        cl.`name` AS location_name,-- 地点
+        cs.id_garage as garage_id,
+        -- cl.`name` AS location_name,
+		cm.model as custom_model
+        FROM
+        cars c
+        LEFT JOIN car_brand cb ON cb.id = c.id_brand
+        LEFT JOIN car_sales cs ON c.id = cs.car_id
+        LEFT JOIN car_location cl ON cs.car_location_id = cl.id
+        left join car_model cm on c.id_model = cm.id
+        WHERE
+        cs.uid = #{uid}
+        LIMIT 1;
+    </select>
+
+    <select id="selectCarEquipmentBySaleId" resultType="com.ruoyi.car.domain.dto.CarEquipment">
+        SELECT
+        *
+        FROM
+        equipment_items ei
+        WHERE
+        ei.id IN (
+        SELECT
+        ce.equipment_item_id
+        FROM
+        car_equipments ce
+        WHERE
+        ce.car_sale_id = #{saleId})
+    </select>
+    
+    <select id="selectCarEquipmentByUid" resultType="com.ruoyi.car.domain.dto.CarEquipment">
+        SELECT
+        *
+        FROM
+        equipment_items ei
+        WHERE
+        ei.id IN (
+        SELECT
+        ce.equipment_item_id
+        FROM
+        car_equipments ce
+        WHERE
+        ce.car_sale_id = (select id from car_sales cs where cs.uid = #{uid}))
+    </select>
+
+    <select id="selectCarGuaranteeBySaleId" resultType="com.ruoyi.car.domain.dto.CarGuarantee">
+        SELECT
+        gi.*
+        FROM
+        guarantee_items gi
+        WHERE
+        gi.id IN (
+        SELECT
+        cg.guarantee_item_id
+        FROM
+        car_guarantees cg
+        WHERE
+        cg.car_sale_id = #{saleId});
+    </select>
+    
+    <select id="selectCarGuaranteeByUid" resultType="com.ruoyi.car.domain.dto.CarGuarantee">
+        SELECT
+        gi.*
+        FROM
+        guarantee_items gi
+        WHERE
+        gi.id IN (
+        SELECT
+        cg.guarantee_item_id
+        FROM
+        car_guarantees cg
+        WHERE
+        cg.car_sale_id = (select id from car_sales cs where cs.uid = #{uid}));
+    </select>
+</mapper>

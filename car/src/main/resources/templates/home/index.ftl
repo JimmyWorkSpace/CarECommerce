@@ -5,12 +5,22 @@
         <div class="hero-slider">
             <#list heroSlides as slide>
             <div class="hero-slide">
+                <#if slide.isLink == "true">
+                <a href="${slide.link}" class="hero-slide-link">
+                    <img src="${slide.image}" alt="${slide.title}" class="hero-image">
+                    <div class="hero-content">
+                        <h2 class="hero-title">${slide.title}</h2>
+                        <p class="hero-subtitle">${slide.subtitle}</p>
+                        <span class="hero-btn">了解更多</span>
+                    </div>
+                </a>
+                <#else>
                 <img src="${slide.image}" alt="${slide.title}" class="hero-image">
                 <div class="hero-content">
                     <h2 class="hero-title">${slide.title}</h2>
                     <p class="hero-subtitle">${slide.subtitle}</p>
-                    <a href="${slide.link}" class="hero-btn">了解更多</a>
                 </div>
+                </#if>
             </div>
             </#list>
         </div>
