@@ -1,8 +1,10 @@
 package com.ruoyi.framework.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTP;
@@ -101,6 +103,89 @@ public class FtpService {
             throw e;
         } finally {
             disconnect(ftpClient);
+        }
+    }
+
+    /**
+     * 上传文件到FTP服务器
+     * 
+     * @param inputStream 文件输入流
+     * @param fileName 文件名
+     * @param remoteDir 远程目录
+     * @return 上传后的文件路径
+     * @throws Exception 操作失败时抛出
+     */
+    public String uploadFile(InputStream inputStream, String fileName, String remoteDir) throws Exception {
+        FTPClient ftpClient = null;
+        String newFileName = null;
+        
+        try {
+            ftpClient = createFtpClient();
+            
+            // 确保目录存在
+            createDirectoryIfNotExists(ftpClient, remoteDir);
+            
+            // 生成新的文件名（使用UUID）
+            String fileExtension = "";
+            if (fileName.contains(".")) {
+                fileExtension = fileName.substring(fileName.lastIndexOf("."));
+            }
+            newFileName = UUID.randomUUID().toString() + fileExtension;
+            
+            // 上传文件
+            boolean success = ftpClient.storeFile(remoteDir + "/" + newFileName, inputStream);
+            if (!success) {
+                throw new IOException("文件上传失败");
+            }
+            
+            log.info("文件上传成功: {}", newFileName);
+            return newFileName;
+            
+        } catch (Exception e) {
+            log.error("文件上传失败: {}", e.getMessage(), e);
+            throw e;
+        } finally {
+            disconnect(ftpClient);
+        }
+    }
+    
+    /**
+     * 创建目录（如果不存在）
+     * 
+     * @param ftpClient FTP客户端
+     * @param dirPath 目录路径
+     * @throws IOException 操作失败时抛出
+     */
+    private void createDirectoryIfNotExists(FTPClient ftpClient, String dirPath) throws IOException {
+        String[] dirs = dirPath.split("/");
+        String currentPath = "";
+        
+        for (String dir : dirs) {
+            if (dir.isEmpty()) {
+                continue;
+            }
+            
+            currentPath += "/" + dir;
+            
+            // 检查目录是否存在
+            FTPFile[] files = ftpClient.listFiles(currentPath);
+            boolean dirExists = false;
+            
+            for (FTPFile file : files) {
+                if (file.isDirectory() && file.getName().equals(dir)) {
+                    dirExists = true;
+                    break;
+                }
+            }
+            
+            // 如果目录不存在，创建它
+            if (!dirExists) {
+                boolean success = ftpClient.makeDirectory(currentPath);
+                if (!success) {
+                    throw new IOException("创建目录失败: " + currentPath);
+                }
+                log.info("创建目录成功: {}", currentPath);
+            }
         }
     }
 }

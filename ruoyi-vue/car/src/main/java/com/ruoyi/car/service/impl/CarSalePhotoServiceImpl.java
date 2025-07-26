@@ -1,18 +1,20 @@
 package com.ruoyi.car.service.impl;
 
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ruoyi.car.domain.CarSalePhotoEntity;
 import com.ruoyi.car.domain.CarSalesEntity;
 import com.ruoyi.car.mapper.carcecloud.CarSalePhotoMapper;
 import com.ruoyi.car.service.CarSalePhotoService;
 import com.ruoyi.car.service.CarSalesService;
 import com.ruoyi.common.constant.DsConstants;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service

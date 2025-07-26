@@ -23,13 +23,13 @@ public class CarBannerEntity {
     private String linkUrl;
 
     @Column(name = "isLink")
-    private Boolean isLink;
+    private Integer isLink;
 
     @Column(name = "showOrder")
     private Integer showOrder;
 
     @Column(name = "delFlag")
-    private Boolean delFlag;
+    private Integer delFlag;
 
     @Column(name = "createTime")
     private Date createTime;
