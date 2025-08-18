@@ -110,11 +110,11 @@
 				<version>3.1.0</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<warName>ROOT</warName>
+					<warName>Admin</warName>
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>ROOT</finalName>
+		<finalName>Admin</finalName>
 	</build>
 
 </project>
