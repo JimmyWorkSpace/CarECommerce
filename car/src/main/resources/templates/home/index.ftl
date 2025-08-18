@@ -1,28 +1,34 @@
 <link href="/css/home.css" rel="stylesheet">
+<link href="/assets/swiper/css/swiper.min.css" rel="stylesheet">
+<script src="/assets/swiper/js/swiper.min.js"></script>
 <div class="home-page" id="app">
     <!-- 第一行：轮播图 -->
     <div class="hero-section">
-        <div class="hero-slider">
-            <#list heroSlides as slide>
-            <div class="hero-slide">
-                <#if slide.isLink == "true">
-                <a href="${slide.link}" class="hero-slide-link">
+        <div class="swiper hero-swiper">
+            <div class="swiper-wrapper">
+                <#list heroSlides as slide>
+                <div class="swiper-slide">
+                    <#if slide.isLink == "true">
+                    <a href="${slide.link}" class="hero-slide-link">
+                        <img src="${slide.image}" alt="${slide.title}" class="hero-image">
+                        <div class="hero-content">
+                            <h2 class="hero-title">${slide.title}</h2>
+                            <p class="hero-subtitle">${slide.subtitle}</p>
+                            <span class="hero-btn">了解更多</span>
+                        </div>
+                    </a>
+                    <#else>
                     <img src="${slide.image}" alt="${slide.title}" class="hero-image">
                     <div class="hero-content">
                         <h2 class="hero-title">${slide.title}</h2>
                         <p class="hero-subtitle">${slide.subtitle}</p>
-                        <span class="hero-btn">了解更多</span>
                     </div>
-                </a>
-                <#else>
-                <img src="${slide.image}" alt="${slide.title}" class="hero-image">
-                <div class="hero-content">
-                    <h2 class="hero-title">${slide.title}</h2>
-                    <p class="hero-subtitle">${slide.subtitle}</p>
+                    </#if>
                 </div>
-                </#if>
+                </#list>
             </div>
-            </#list>
+            <!-- 分页器 -->
+            <div class="swiper-pagination"></div>
         </div>
     </div>
 
@@ -30,7 +36,7 @@
     <div class="features-section">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-md-4 mb-4" v-for="(feature, index) in features" :key="index">
+                <div class="col-12 col-md-4 mb-3" v-for="(feature, index) in features" :key="index">
                     <div class="feature-card">
                         <div class="feature-icon">
                             <i :class="feature.icon"></i>
@@ -64,20 +70,45 @@
     <div class="ad-section">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-md-6 mb-4">
-                    <div class="ad-card">
-                        <img src="/img/ad1.jpg" alt="广告1" class="ad-image">
-                        <div class="ad-content">
-                            <h3>专业检测</h3>
-                            <p>所有车辆均经过专业检测，确保车况良好</p>
+                <#if advertisements?? && advertisements?size gt 0>
+                    <#list advertisements as ad>
+                    <div class="col-12 col-md-6 mb-4">
+                        <div class="ad-card" data-ad-id="${ad.id}">
+                            <#if ad.isLink == 1>
+                            <a href="${ad.linkUrl}" class="ad-link" target="_blank">
+                                <img src="${ad.imageUrl}" alt="${ad.title}" class="ad-image" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <#if ad.title?? && ad.title != ''>
+                                <div class="ad-title-overlay" style="display: none;">${ad.title}</div>
+                                </#if>
+                            </a>
+                            <#else>
+                            <div class="ad-content-link" onclick="showAdContent('${ad.id?string}', '${ad.title?js_string}', '${ad.content?js_string}')">
+                                <img src="${ad.imageUrl}" alt="${ad.title}" class="ad-image"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <#if ad.title?? && ad.title != ''>
+                                <div class="ad-title-overlay" style="display: none;">${ad.title}</div>
+                                </#if>
+                            </div>
+                            </#if>
                         </div>
                     </div>
-                </div>
-                <div class="col-12 col-md-6 mb-4">
-                    <div class="ad-card">
-                        <iframe src="/ad-content.html" class="ad-iframe" frameborder="0"></iframe>
+                    </#list>
+                <#else>
+                    <!-- 默认广告内容 -->
+                    <div class="col-12 col-md-6 mb-4">
+                        <div class="ad-card">
+                            <img src="/img/ad1.jpg" alt="专业检测" class="ad-image" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="ad-title-overlay" style="display: none;">专业检测</div>
+                        </div>
                     </div>
-                </div>
+                    <div class="col-12 col-md-6 mb-4">
+                        <div class="ad-card">
+                            <iframe src="/ad-content.html" class="ad-iframe" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </#if>
             </div>
         </div>
     </div>
@@ -188,17 +219,40 @@ new Vue({
             }
         },
         initHeroSlider() {
-            // 初始化轮播图
-            $('.hero-slider').slick({
-                dots: true,
-                infinite: true,
+            // 初始化Swiper轮播图
+            new Swiper('.hero-swiper', {
+                // 循环模式
+                loop: true,
+                // 自动播放
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                // 淡入淡出效果
+                effect: 'fade',
+                fadeEffect: {
+                    crossFade: true
+                },
+                // 分页器
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+
+                // 速度
                 speed: 500,
-                fade: true,
-                cssEase: 'linear',
-                autoplay: true,
-                autoplaySpeed: 5000,
-                arrows: true
             });
+        },
+
+        // 显示广告内容
+        showAdContent(adId, title, content) {
+            // 检查adId是否有效
+            if (!adId || adId === 'null' || adId === '') {
+                console.error('广告ID无效:', adId);
+                return;
+            }
+            // 打开新窗口显示广告内容页面
+            window.open('/ad-content/' + adId, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
         },
 
     }

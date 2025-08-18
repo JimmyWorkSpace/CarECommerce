@@ -17,6 +17,5 @@ public class CarceApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(CarceApplication.class, args);
-        System.out.println("二手车销售平台启动成功！");
     }
 }

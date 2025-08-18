@@ -47,7 +47,9 @@
         <!-- 头部导航 -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="/">二手车销售平台</a>
+                <a class="navbar-brand" href="/">
+                    <img src="/img/title.png" alt="二手车销售平台" class="navbar-brand-img">
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -306,8 +308,21 @@
             color: #6c757d;
         }
         
+        /* 导航栏品牌图片样式 */
+        .navbar-brand-img {
+            height: 40px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
+            .navbar-brand-img {
+                height: 35px;
+                max-width: 150px;
+            }
+            
             .cart-float-btn {
                 right: 20px;
             }

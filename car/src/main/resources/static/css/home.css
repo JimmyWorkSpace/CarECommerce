@@ -14,21 +14,64 @@
     margin-bottom: 50px;
 }
 
-.hero-slider {
+.hero-swiper {
     width: 100%;
     height: 100%;
 }
 
-.hero-slide {
+/* Swiper轮播图样式 */
+.hero-swiper .swiper-slide {
     position: relative;
     width: 100%;
     height: 500px;
 }
 
+/* Swiper分页器样式 */
+.hero-swiper .swiper-pagination,
+.hero-swiper.swiper-container-horizontal > .swiper-pagination-bullets {
+    position: absolute !important;
+    bottom: 30px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto !important;
+}
+
+.hero-swiper .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    margin: 0 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+}
+
+.hero-swiper .swiper-pagination-bullet:hover {
+    background: rgba(255, 255, 255, 0.8);
+    opacity: 1;
+}
+
+.hero-swiper .swiper-pagination-bullet-active {
+    background: white;
+    border-color: white;
+    transform: scale(1.3);
+    opacity: 1;
+}
+
+
+
+
+
 .hero-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
 }
 
 .hero-content {
@@ -97,36 +140,38 @@
 
 /* 第二行：功能区域 */
 .features-section {
-    padding: 60px 0;
-    background-color: #f8f9fa;
+    padding: 20px 0 40px 0;
+    background-color: white;
 }
 
 .feature-card {
     text-align: center;
-    padding: 30px 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 25px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     transition: all 0.3s ease;
     height: 100%;
+    border: 1px solid rgba(0,0,0,0.05);
 }
 
 .feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
 }
 
 .feature-icon {
     font-size: 3rem;
     color: #5ACFC9;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .feature-title {
     font-size: 1.5rem;
     font-weight: bold;
     color: #333;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .feature-subtitle {
@@ -189,7 +234,7 @@
 
 /* 第四行：广告位 */
 .ad-section {
-    padding: 60px 0;
+    padding: 60px 0 0 0;
     background-color: white;
 }
 
@@ -199,7 +244,8 @@
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
-    height: 300px;
+    height: 250px;
+    position: relative;
 }
 
 .ad-card:hover {
@@ -209,23 +255,31 @@
 
 .ad-image {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
+    height: 100%;
+    object-fit: fill;
 }
 
-.ad-content {
-    padding: 20px;
-}
-
-.ad-content h3 {
-    color: #5ACFC9;
+.ad-title-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 10px;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.ad-content p {
-    color: #666;
-    line-height: 1.6;
+.ad-card:hover .ad-title-overlay {
+    opacity: 1;
 }
 
 .ad-iframe {
@@ -234,10 +288,48 @@
     border: none;
 }
 
+/* 广告链接样式 */
+.ad-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+}
+
+.ad-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.ad-link .ad-image {
+    transition: transform 0.3s ease;
+}
+
+.ad-link:hover .ad-image {
+    transform: scale(1.05);
+}
+
+.ad-content-link {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.ad-content-link .ad-image {
+    transition: transform 0.3s ease;
+}
+
+.ad-content-link:hover .ad-image {
+    transform: scale(1.05);
+}
+
 /* 第五行：精选店家 */
 .dealers-section {
-    padding: 60px 0;
-    background-color: #f8f9fa;
+    padding: 60px 0 0 0;
+    background-color: white;
 }
 
 .section-header {
@@ -276,11 +368,11 @@
     gap: 20px;
     overflow-x: auto;
     scroll-behavior: smooth;
-    padding: 0;
+    padding: 20px;
 }
 
 .dealer-card {
-    flex: 0 0 250px;
+    flex: 0 0 300px;
     background: white;
     border-radius: 10px;
     overflow: hidden;
@@ -295,7 +387,7 @@
 
 .dealer-image {
     width: 100%;
-    height: 150px;
+    height: 200px;
     object-fit: cover;
 }
 
@@ -310,7 +402,7 @@
 
 /* 第六行：精选好车 */
 .cars-section {
-    padding: 60px 0;
+    padding: 60px 0 0 0;
     background-color: white;
 }
 
@@ -319,7 +411,7 @@
     gap: 20px;
     overflow-x: auto;
     scroll-behavior: smooth;
-    padding: 0;
+    padding: 20px;
 }
 
 .car-card {
@@ -431,6 +523,18 @@
         font-size: 1.2rem;
     }
     
+    /* 移动端指示器样式 */
+    .hero-swiper .swiper-pagination,
+    .hero-swiper.swiper-container-horizontal > .swiper-pagination-bullets {
+        bottom: 20px !important;
+    }
+    
+    .hero-swiper .swiper-pagination-bullet {
+        width: 10px;
+        height: 10px;
+        margin: 0 4px;
+    }
+    
     .search-title {
         font-size: 2rem;
     }
@@ -451,11 +555,11 @@
     
     .dealers-container,
     .cars-container {
-        padding: 0;
+        padding: 15px;
     }
     
     .dealer-card {
-        flex: 0 0 200px;
+        flex: 0 0 250px;
     }
     
     .car-card {
@@ -474,6 +578,18 @@
     
     .hero-subtitle {
         font-size: 1rem;
+    }
+    
+    /* 小屏幕指示器样式 */
+    .hero-swiper .swiper-pagination,
+    .hero-swiper.swiper-container-horizontal > .swiper-pagination-bullets {
+        bottom: 15px !important;
+    }
+    
+    .hero-swiper .swiper-pagination-bullet {
+        width: 8px;
+        height: 8px;
+        margin: 0 3px;
     }
     
     .search-title {
@@ -496,11 +612,11 @@
     
     .dealers-container,
     .cars-container {
-        padding: 0;
+        padding: 10px;
     }
     
     .dealer-card {
-        flex: 0 0 180px;
+        flex: 0 0 220px;
     }
     
     .car-card {
