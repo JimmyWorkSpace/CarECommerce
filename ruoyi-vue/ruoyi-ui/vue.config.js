@@ -5,7 +5,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = process.env.VUE_APP_TITLE || '胜利油田改制企业综合评价管理系统' // 网页标题
+const name = process.env.VUE_APP_TITLE || '车势后台' // 网页标题
 const CompressionPlugin = require('compression-webpack-plugin')
 
 

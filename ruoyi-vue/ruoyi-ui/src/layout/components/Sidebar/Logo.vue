@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: '胜利油田',
+      title: '车势后台',
       logo: logoImg
     }
   }

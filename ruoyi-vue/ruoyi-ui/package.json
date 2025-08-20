@@ -1,12 +1,12 @@
 {
   "name": "ruoyi",
   "version": "3.8.1",
-  "description": "胜利油田改制企业综合评价管理系统",
+  "description": "车势后台",
   "author": "若依",
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service serve",
-    "build:prod": "vue-cli-service build",
+    "build:prod": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build",
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
     "lint": "eslint --ext .js,.vue src"
