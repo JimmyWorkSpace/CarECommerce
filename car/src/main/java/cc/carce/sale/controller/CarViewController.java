@@ -26,9 +26,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import cc.carce.sale.dto.CarBaseInfoDto;
+import cc.carce.sale.entity.CarBannerEntity;
+import cc.carce.sale.entity.CarAdvertisementEntity;
+import cc.carce.sale.service.CarBannerService;
 import cc.carce.sale.service.CarDealerService;
 import cc.carce.sale.service.CarSalesService;
 import cc.carce.sale.service.CarService;
+import cc.carce.sale.service.CarAdvertisementService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
@@ -52,6 +56,12 @@ public class CarViewController {
 
 	@Resource
 	private CarDealerService carDealerService;
+	
+	@Resource
+	private CarBannerService carBannerService;
+	
+	@Resource
+	private CarAdvertisementService carAdvertisementService;
     
     /**
      * 首页
@@ -73,22 +83,38 @@ public class CarViewController {
             // 设置首页主图
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             
-            // 设置轮播图数据
+            // 获取banner数据
+            List<CarBannerEntity> banners = carBannerService.getHomeBanners();
             List<Map<String, String>> heroSlides = new ArrayList<>();
             
-            Map<String, String> slide1 = new HashMap<>();
-            slide1.put("image", "/img/swipper/slide1.jpg");
-            slide1.put("title", "精选二手车");
-            slide1.put("subtitle", "品质保证，价格实惠");
-            slide1.put("link", "/cars");
-            heroSlides.add(slide1);
-            
-            Map<String, String> slide2 = new HashMap<>();
-            slide2.put("image", "/img/swipper/slide2.jpg");
-            slide2.put("title", "专业检测");
-            slide2.put("subtitle", "每辆车都经过严格检测");
-            slide2.put("link", "/inspection");
-            heroSlides.add(slide2);
+            if (banners != null && !banners.isEmpty()) {
+                for (CarBannerEntity banner : banners) {
+                    Map<String, String> slide = new HashMap<>();
+                    slide.put("image", banner.getImageUrl());
+                    slide.put("title", "精选二手车");
+                    slide.put("subtitle", "品质保证，价格实惠");
+                    slide.put("link", banner.getIsLink() ? banner.getLinkUrl() : "#");
+                    slide.put("isLink", banner.getIsLink().toString());
+                    heroSlides.add(slide);
+                }
+            } else {
+                // 如果没有banner数据，使用默认数据
+                Map<String, String> slide1 = new HashMap<>();
+                slide1.put("image", "/img/swipper/slide1.jpg");
+                slide1.put("title", "精选二手车");
+                slide1.put("subtitle", "品质保证，价格实惠");
+                slide1.put("link", "/cars");
+                slide1.put("isLink", "true");
+                heroSlides.add(slide1);
+                
+                Map<String, String> slide2 = new HashMap<>();
+                slide2.put("image", "/img/swipper/slide2.jpg");
+                slide2.put("title", "专业检测");
+                slide2.put("subtitle", "每辆车都经过严格检测");
+                slide2.put("link", "/inspection");
+                slide2.put("isLink", "true");
+                heroSlides.add(slide2);
+            }
             
             model.addAttribute("heroSlides", heroSlides);
             
@@ -137,6 +163,10 @@ public class CarViewController {
             }
             
             model.addAttribute("dealers", dealers);
+            
+            // 获取广告数据
+            List<CarAdvertisementEntity> advertisements = carAdvertisementService.getHomeAdvertisements();
+            model.addAttribute("advertisements", advertisements);
             
             // 获取当前请求的完整URL
             String requestUrl = req.getRequestURL().toString();
@@ -444,34 +474,73 @@ public class CarViewController {
     @GetMapping("/api/pdf/inspection-report")
     @ResponseBody
     public ResponseEntity<byte[]> getInspectionReport() {
+//        try {
+//            System.out.println("开始读取PDF文件...");
+//            ClassPathResource resource = new ClassPathResource("static/检车报告.pdf");
+//            
+//            if (!resource.exists()) {
+//                System.out.println("PDF文件不存在: " + resource.getURI());
+//                return ResponseEntity.notFound().build();
+//            }
+//            
+//            System.out.println("PDF文件存在，开始读取...");
+//            InputStream inputStream = resource.getInputStream();
+//            byte[] pdfBytes = inputStream.readAllBytes();
+//            inputStream.close();
+//            
+//            System.out.println("PDF文件读取成功，大小: " + pdfBytes.length + " bytes");
+//            
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_PDF);
+//            headers.add("Content-Disposition", "inline; filename=\"检车报告.pdf\"");
+//            headers.setContentLength(pdfBytes.length);
+//            
+//            return ResponseEntity.ok()
+//                    .headers(headers)
+//                    .body(pdfBytes);
+//        } catch (IOException e) {
+//            System.out.println("读取PDF文件失败: " + e.getMessage());
+//            e.printStackTrace();
+//            return ResponseEntity.notFound().build();
+//        }
+    	return null;
+    }
+    
+    /**
+     * 获取banner数据的API接口
+     */
+    @GetMapping("/api/banners")
+    @ResponseBody
+    public List<CarBannerEntity> getBanners() {
+        return carBannerService.getHomeBanners();
+    }
+    
+    /**
+     * 获取广告数据的API接口
+     */
+    @GetMapping("/api/advertisements")
+    @ResponseBody
+    public List<CarAdvertisementEntity> getAdvertisements() {
+        return carAdvertisementService.getHomeAdvertisements();
+    }
+    
+    /**
+     * 显示广告内容页面
+     */
+    @GetMapping("/ad-content/{id}")
+    public String showAdContent(@PathVariable("id") Long id, Model model) {
         try {
-            System.out.println("开始读取PDF文件...");
-            ClassPathResource resource = new ClassPathResource("static/检车报告.pdf");
-            
-            if (!resource.exists()) {
-                System.out.println("PDF文件不存在: " + resource.getURI());
-                return ResponseEntity.notFound().build();
+            CarAdvertisementEntity advertisement = carAdvertisementService.getById(id);
+            if (advertisement != null) {
+                model.addAttribute("advertisement", advertisement);
+                model.addAttribute("title", advertisement.getTitle());
+                model.addAttribute("content", advertisement.getContent());
+            } else {
+                model.addAttribute("error", "广告不存在");
             }
-            
-            System.out.println("PDF文件存在，开始读取...");
-            InputStream inputStream = resource.getInputStream();
-            byte[] pdfBytes = inputStream.readAllBytes();
-            inputStream.close();
-            
-            System.out.println("PDF文件读取成功，大小: " + pdfBytes.length + " bytes");
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.add("Content-Disposition", "inline; filename=\"检车报告.pdf\"");
-            headers.setContentLength(pdfBytes.length);
-            
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(pdfBytes);
-        } catch (IOException e) {
-            System.out.println("读取PDF文件失败: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            model.addAttribute("error", "获取广告内容失败：" + e.getMessage());
         }
+        return "/ad-content";
     }
 } 

@@ -1,0 +1,65 @@
+ruoyi:
+  name: RuoYi
+  version: 3.8.1
+  copyrightYear: 2021
+  demoEnabled: true
+  profile: C:/Users/mingn/Documents/workspace-other/car
+  addressEnabled: false
+  captchaType: math
+server:
+  port: 8082
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 1000
+    threads:
+      max: 800
+      min-spare: 100
+logging:
+  level:
+    com.ruoyi: debug
+    org.springframework: warn
+spring:
+  messages:
+    basename: i18n/messages
+  profiles:
+    active: test
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+  devtools:
+    restart:
+      enabled: true
+  # redis:
+  #   host: localhost
+  #   port: 6379
+  #   database: 0
+  #   password: null
+  #   timeout: 10s
+  #   lettuce:
+  #     pool:
+  #       min-idle: 0
+  #       max-idle: 8
+  #       max-active: 8
+  #       max-wait: -1ms
+token:
+  header: Authorization
+  secret: abcdefghijklmnopqrstuvwxyz
+  expireTime: 30
+mybatis:
+  typeAliasesPackage: com.ruoyi.**.domain
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  configLocation: classpath:mybatis/mybatis-config.xml
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+  params: count=countSql
+swagger:
+  enabled: true
+  pathMapping: /dev-api
+xss:
+  enabled: true
+  excludes: /system/notice
+  urlPatterns: /system/*,/monitor/*,/tool/*
