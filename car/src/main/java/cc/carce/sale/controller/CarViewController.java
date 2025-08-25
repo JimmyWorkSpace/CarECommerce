@@ -74,8 +74,8 @@ public class CarViewController {
             model.addAttribute("user", user);
             
             // 设置页面标题和描述
-            model.addAttribute("title", "二手车销售平台 - 精选好车，值得信赖");
-            model.addAttribute("description", "专业的二手车销售平台，提供优质二手车信息，让您轻松找到心仪的座驾");
+            model.addAttribute("title", "二手車銷售平台 - 精選好車，值得信賴");
+            model.addAttribute("description", "專業的二手車銷售平台，提供優質二手車資訊，讓您輕鬆找到心儀的座駕");
             
             // 设置网站图标
             model.addAttribute("favicon", webUrl + "/favicon.ico");
@@ -91,8 +91,8 @@ public class CarViewController {
                 for (CarBannerEntity banner : banners) {
                     Map<String, String> slide = new HashMap<>();
                     slide.put("image", banner.getImageUrl());
-                    slide.put("title", "精选二手车");
-                    slide.put("subtitle", "品质保证，价格实惠");
+                    slide.put("title", "精選二手車");
+                    slide.put("subtitle", "品質保證，價格實惠");
                     slide.put("link", banner.getIsLink() ? banner.getLinkUrl() : "#");
                     slide.put("isLink", banner.getIsLink().toString());
                     heroSlides.add(slide);
@@ -101,16 +101,16 @@ public class CarViewController {
                 // 如果没有banner数据，使用默认数据
                 Map<String, String> slide1 = new HashMap<>();
                 slide1.put("image", "/img/swipper/slide1.jpg");
-                slide1.put("title", "精选二手车");
-                slide1.put("subtitle", "品质保证，价格实惠");
+                slide1.put("title", "精選二手車");
+                slide1.put("subtitle", "品質保證，價格實惠");
                 slide1.put("link", "/cars");
                 slide1.put("isLink", "true");
                 heroSlides.add(slide1);
                 
                 Map<String, String> slide2 = new HashMap<>();
                 slide2.put("image", "/img/swipper/slide2.jpg");
-                slide2.put("title", "专业检测");
-                slide2.put("subtitle", "每辆车都经过严格检测");
+                slide2.put("title", "專業檢測");
+                slide2.put("subtitle", "每輛車都經過嚴格檢測");
                 slide2.put("link", "/inspection");
                 slide2.put("isLink", "true");
                 heroSlides.add(slide2);
@@ -146,7 +146,7 @@ public class CarViewController {
             List<Map<String, String>> dealers = new ArrayList<>();
             
             String[] dealerNames = {
-                "台北汽车", "新北车行", "桃园汽车", "台中车行", "台南汽车", "高雄车行"
+                "台北汽車", "新北車行", "桃園汽車", "台中車行", "台南汽車", "高雄車行"
             };
             
             // 随机挑选的汽车图片
@@ -176,7 +176,7 @@ public class CarViewController {
             model.addAttribute("content", "/home/index.ftl");
             
         } catch (Exception e) {
-            model.addAttribute("error", "页面加载失败：" + e.getMessage());
+            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
         
         return "/layout/main";
@@ -265,8 +265,8 @@ public class CarViewController {
             model.addAttribute("transmissions", transmissions);
             model.addAttribute("bodyTypes", bodyTypes);
             
-            model.addAttribute("title", "我要买车 - 二手车销售平台");
-            model.addAttribute("description", "浏览精选二手车，找到您的理想座驾");
+            model.addAttribute("title", "我要買車 - 二手車銷售平台");
+            model.addAttribute("description", "瀏覽精選二手車，找到您的理想座駕");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
             model.addAttribute("content", "/buy-cars/index.ftl");
@@ -289,9 +289,9 @@ public class CarViewController {
             // 生成商城商品数据（模拟数据）
             List<Map<String, Object>> products = new ArrayList<>();
             String[] productNames = {
-                "汽车座套", "车载充电器", "行车记录仪", "汽车香水", "方向盘套", 
-                "汽车脚垫", "车载冰箱", "汽车音响", "导航仪", "汽车贴膜",
-                "轮胎", "机油", "刹车片", "雨刷器", "电瓶", "火花塞"
+                "汽車座套", "車載充電器", "行車記錄儀", "汽車香水", "方向盤套", 
+                "汽車腳墊", "車載冰箱", "汽車音響", "導航儀", "汽車貼膜",
+                "輪胎", "機油", "煞車片", "雨刷器", "電瓶", "火花塞"
             };
             
             String[] productImages = {
@@ -318,13 +318,13 @@ public class CarViewController {
                 product.put("price", prices[i]);
                 product.put("image", productImages[i]);
                 product.put("category", categories[i]);
-                product.put("description", "高品质汽车配件，提升您的驾驶体验");
+                product.put("description", "高品質汽車配件，提升您的駛駛體驗");
                 products.add(product);
             }
             
             model.addAttribute("products", products);
-            model.addAttribute("title", "商城 - 汽车配件专营店");
-            model.addAttribute("description", "专业汽车配件商城，提供优质汽车用品");
+            model.addAttribute("title", "商城 - 汽車配件專營店");
+            model.addAttribute("description", "專業汽車配件商城，提供優質汽車用品");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
             model.addAttribute("content", "/mall/index.ftl");
@@ -344,13 +344,13 @@ public class CarViewController {
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
             
-            model.addAttribute("title", "关于我们 - 二手车销售平台");
-            model.addAttribute("description", "了解我们的服务理念和团队");
+            model.addAttribute("title", "關於我們 - 二手車銷售平台");
+            model.addAttribute("description", "了解我們的服務理念和團隊");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
             model.addAttribute("content", "/about/index.ftl");
         } catch (Exception e) {
-            model.addAttribute("error", "页面加载失败：" + e.getMessage());
+            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
         return "/layout/main";
     }
@@ -365,13 +365,13 @@ public class CarViewController {
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
             
-            model.addAttribute("title", "返回URL测试 - 二手车销售平台");
-            model.addAttribute("description", "测试登录后返回URL功能");
+            model.addAttribute("title", "返回URL測試 - 二手車銷售平台");
+            model.addAttribute("description", "測試登入後返回URL功能");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
             model.addAttribute("content", "/test/return-url-test.ftl");
         } catch (Exception e) {
-            model.addAttribute("error", "页面加载失败：" + e.getMessage());
+            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
         return "/layout/main";
@@ -387,13 +387,13 @@ public class CarViewController {
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
             
-            model.addAttribute("title", "2020年 Toyota Camry 2.5L 豪华版 - 二手车销售平台");
-            model.addAttribute("description", "2020年 Toyota Camry 2.5L 豪华版，车况极佳，里程仅45,000公里");
+            model.addAttribute("title", "2020年 Toyota Camry 2.5L 豪華版 - 二手車銷售平台");
+            model.addAttribute("description", "2020年 Toyota Camry 2.5L 豪華版，車況極佳，里程僅45,000公里");
             model.addAttribute("image", "/img/car/car4.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
             model.addAttribute("content", "/car/detail-static.ftl");
         } catch (Exception e) {
-            model.addAttribute("error", "页面加载失败：" + e.getMessage());
+            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
         return "/layout/main";
@@ -461,7 +461,7 @@ public class CarViewController {
             model.addAttribute("loading", false);
         } catch (Exception e) {
             model.addAttribute("loading", false);
-            model.addAttribute("error", "获取数据失败：" + e.getMessage());
+            model.addAttribute("error", "獲取數據失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
         
@@ -536,10 +536,10 @@ public class CarViewController {
                 model.addAttribute("title", advertisement.getTitle());
                 model.addAttribute("content", advertisement.getContent());
             } else {
-                model.addAttribute("error", "广告不存在");
+                model.addAttribute("error", "廣告不存在");
             }
         } catch (Exception e) {
-            model.addAttribute("error", "获取广告内容失败：" + e.getMessage());
+            model.addAttribute("error", "獲取廣告內容失敗：" + e.getMessage());
         }
         return "/ad-content";
     }

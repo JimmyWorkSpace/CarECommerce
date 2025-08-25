@@ -24,29 +24,29 @@ public class FtpService {
         this.ftpProperties = ftpProperties;
     }
 
-    /**
-     * 创建并配置FTP客户端
-     * 
-     * @return 配置好的FTP客户端
-     * @throws IOException 连接异常时抛出
+        /**
+     * 建立並配置FTP客戶端
+     *
+     * @return 配置好的FTP客戶端
+     * @throws IOException 連接異常時拋出
      */
     private FTPClient createFtpClient() throws IOException {
         FTPClient ftpClient = new FTPClient();
-        // 设置连接超时时间
+        // 設定連接超時時間
         ftpClient.setConnectTimeout(10000);
-        // 设置数据传输超时
+        // 設定資料傳輸超時
         ftpClient.setDataTimeout(60000);
-        // 控制连接超时
+        // 控制連接超時
         ftpClient.setDefaultTimeout(10000);
         
-        log.info("正在连接FTP服务器: {}:{}", ftpProperties.getServer(), ftpProperties.getPort());
+        log.info("正在連接FTP伺服器: {}:{}", ftpProperties.getServer(), ftpProperties.getPort());
         ftpClient.connect(ftpProperties.getServer(), ftpProperties.getPort());
         
         int reply = ftpClient.getReplyCode();
         if (!FTPReply.isPositiveCompletion(reply)) {
             ftpClient.disconnect();
-            log.error("FTP服务器拒绝连接, 返回码: {}", reply);
-            throw new IOException("FTP服务器拒绝连接, 返回码: " + reply);
+            log.error("FTP伺服器拒絕連接, 返回碼: {}", reply);
+            throw new IOException("FTP伺服器拒絕連接, 返回碼: " + reply);
         }
         
         if (!ftpClient.login(ftpProperties.getUser(), ftpProperties.getPassword())) {

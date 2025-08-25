@@ -20,7 +20,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
 
 /**
- * 限流处理
+ * 限流處理
  *
  * @author ruoyi
  */
@@ -44,7 +44,7 @@ public class RateLimiterAspect
         
         try
         {
-            // 获取或创建计数器
+            // 獲取或建立計數器
             AtomicInteger counter = memoryCache.getCacheObject(combineKey);
             if (counter == null) {
                 counter = new AtomicInteger(0);
@@ -55,10 +55,10 @@ public class RateLimiterAspect
             
             if (currentCount > count)
             {
-                throw new ServiceException("访问过于频繁，请稍候再试");
+                throw new ServiceException("存取過於頻繁，請稍候再試");
             }
             
-            log.info("限制请求'{}',当前请求'{}',缓存key'{}'", count, currentCount, key);
+            log.info("限制請求'{}',當前請求'{}',快取key'{}'", count, currentCount, key);
         }
         catch (ServiceException e)
         {
@@ -66,7 +66,7 @@ public class RateLimiterAspect
         }
         catch (Exception e)
         {
-            throw new RuntimeException("服务器限流异常，请稍候再试");
+            throw new RuntimeException("伺服器限流異常，請稍候再試");
         }
     }
 

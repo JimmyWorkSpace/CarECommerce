@@ -28,7 +28,7 @@ import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.system.domain.SysOperLog;
 
 /**
- * 操作日志记录处理
+ * 操作日誌記錄處理
  * 
  * @author ruoyi
  */
@@ -39,9 +39,9 @@ public class LogAspect
     private static final Logger log = LoggerFactory.getLogger(LogAspect.class);
 
     /**
-     * 处理完请求后执行
+     * 處理完請求後執行
      *
-     * @param joinPoint 切点
+     * @param joinPoint 切點
      */
     @AfterReturning(pointcut = "@annotation(controllerLog)", returning = "jsonResult")
     public void doAfterReturning(JoinPoint joinPoint, Log controllerLog, Object jsonResult)
@@ -50,7 +50,7 @@ public class LogAspect
     }
 
     /**
-     * 拦截异常操作
+     * 攔截異常操作
      * 
      * @param joinPoint 切点
      * @param e 异常

@@ -1,39 +1,39 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="表名称" prop="tableName">
-        <el-input
-          v-model="queryParams.tableName"
-          placeholder="请输入表名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="表描述" prop="tableComment">
-        <el-input
-          v-model="queryParams.tableComment"
-          placeholder="请输入表描述"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+              <el-form-item label="表名稱" prop="tableName">
+          <el-input
+            v-model="queryParams.tableName"
+            placeholder="請輸入表名稱"
+            clearable
+            size="small"
+            @keyup.enter.native="handleQuery"
+          />
+        </el-form-item>
+        <el-form-item label="表描述" prop="tableComment">
+          <el-input
+            v-model="queryParams.tableComment"
+            placeholder="請輸入表描述"
+            clearable
+            size="small"
+            @keyup.enter.native="handleQuery"
+          />
+        </el-form-item>
+        <el-form-item label="建立時間">
+          <el-date-picker
+            v-model="dateRange"
+            size="small"
+            style="width: 240px"
+            value-format="yyyy-MM-dd"
+            type="daterange"
+            range-separator="-"
+            start-placeholder="開始日期"
+            end-placeholder="結束日期"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+          <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -56,7 +56,7 @@
           size="mini"
           @click="openImportTable"
           v-hasPermi="['tool:gen:import']"
-        >导入</el-button>
+        >匯入</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -78,20 +78,20 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['tool:gen:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="tableList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" align="center" width="55"></el-table-column>
-      <el-table-column label="序号" type="index" width="50" align="center">
+      <el-table-column label="序號" type="index" width="50" align="center">
         <template slot-scope="scope">
           <span>{{(queryParams.pageNum - 1) * queryParams.pageSize + scope.$index + 1}}</span>
         </template>
       </el-table-column>
       <el-table-column
-        label="表名称"
+        label="表名稱"
         align="center"
         prop="tableName"
         :show-overflow-tooltip="true"
@@ -105,14 +105,14 @@
         width="120"
       />
       <el-table-column
-        label="实体"
+        label="實體"
         align="center"
         prop="className"
         :show-overflow-tooltip="true"
         width="120"
       />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="160" />
-      <el-table-column label="更新时间" align="center" prop="updateTime" width="160" />
+      <el-table-column label="建立時間" align="center" prop="createTime" width="160" />
+      <el-table-column label="更新時間" align="center" prop="updateTime" width="160" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -121,21 +121,21 @@
             icon="el-icon-view"
             @click="handlePreview(scope.row)"
             v-hasPermi="['tool:gen:preview']"
-          >预览</el-button>
+          >預覽</el-button>
           <el-button
             type="text"
             size="small"
             icon="el-icon-edit"
             @click="handleEditTable(scope.row)"
             v-hasPermi="['tool:gen:edit']"
-          >编辑</el-button>
+          >編輯</el-button>
           <el-button
             type="text"
             size="small"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['tool:gen:remove']"
-          >删除</el-button>
+          >刪除</el-button>
           <el-button
             type="text"
             size="small"
@@ -149,7 +149,7 @@
             icon="el-icon-download"
             @click="handleGenTable(scope.row)"
             v-hasPermi="['tool:gen:code']"
-          >生成代码</el-button>
+          >生成代碼</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -160,7 +160,7 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-    <!-- 预览界面 -->
+    <!-- 預覽介面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body class="scrollbar">
       <el-tabs v-model="preview.activeName">
         <el-tab-pane
@@ -169,7 +169,7 @@
           :name="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
           :key="key"
         >
-          <el-link :underline="false" icon="el-icon-document-copy" v-clipboard:copy="value" v-clipboard:success="clipboardSuccess" style="float:right">复制</el-link>
+          <el-link :underline="false" icon="el-icon-document-copy" v-clipboard:copy="value" v-clipboard:success="clipboardSuccess" style="float:right">複製</el-link>
           <pre><code class="hljs" v-html="highlightedCode(value, key)"></code></pre>
         </el-tab-pane>
       </el-tabs>

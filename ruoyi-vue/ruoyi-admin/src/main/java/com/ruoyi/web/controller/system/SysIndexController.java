@@ -7,23 +7,23 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.StringUtils;
 
 /**
- * 首页
+ * 首頁
  *
  * @author ruoyi
  */
 @RestController
 public class SysIndexController
 {
-    /** 系统基础配置 */
+    /** 系統基礎配置 */
     @Autowired
     private RuoYiConfig ruoyiConfig;
 
     /**
-     * 访问首页，提示语
+     * 存取首頁，提示語
      */
     @RequestMapping("/")
     public String index()
     {
-        return StringUtils.format("欢迎使用{}后台管理框架，当前版本：v{}，请通过前端地址访问。", ruoyiConfig.getName(), ruoyiConfig.getVersion());
+        return StringUtils.format("歡迎使用{}後台管理框架，當前版本：v{}，請通過前端地址存取。", ruoyiConfig.getName(), ruoyiConfig.getVersion());
     }
 }

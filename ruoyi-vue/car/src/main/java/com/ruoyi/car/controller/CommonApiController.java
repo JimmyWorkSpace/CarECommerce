@@ -44,7 +44,7 @@ public class CommonApiController extends BaseController {
 	private CarDealerService carDealerService;
 
 	/**
-	 * 车辆分享链接生成(弃用)
+	 * 車輛分享連結生成(棄用)
 	 * @param id
 	 * @return
 	 */
@@ -55,11 +55,11 @@ public class CommonApiController extends BaseController {
 		if (uid != null) {
 			return new RedirectView(webUrl + "/" + uid);
 		}
-		return new RedirectView("/error"); // 跳转到错误页
+		        return new RedirectView("/error"); // 跳轉到錯誤頁
 	}
 
 	/**
-	 * 车辆基本信息
+	 * 車輛基本資訊
 	 * 
 	 * @param uid
 	 * @return
@@ -71,7 +71,7 @@ public class CommonApiController extends BaseController {
 	}
 
 	/**
-	 * 车辆配备
+	 * 車輛配備
 	 * 
 	 * @param uid
 	 * @return
@@ -83,7 +83,7 @@ public class CommonApiController extends BaseController {
 	}
 
 	/**
-	 * 卖家保证
+	 * 賣家保證
 	 * 
 	 * @param uid
 	 * @return
@@ -95,7 +95,7 @@ public class CommonApiController extends BaseController {
 	}
 
 	/**
-	 * 车辆卖家信息
+	 * 車輛賣家資訊
 	 * @param uid
 	 * @return
 	 */
@@ -106,7 +106,7 @@ public class CommonApiController extends BaseController {
 	}
 
 	/**
-	 * 车辆图片
+	 * 車輛圖片
 	 * @param uid
 	 * @return
 	 */
@@ -116,7 +116,7 @@ public class CommonApiController extends BaseController {
 	}
 
 	/**
-	 * 车辆视频
+	 * 車輛影片
 	 * @param uid
 	 * @return
 	 */

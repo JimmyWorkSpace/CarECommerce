@@ -9,7 +9,7 @@ import com.ruoyi.system.service.ISysMenuService;
 import com.ruoyi.system.service.ISysRoleService;
 
 /**
- * 用户权限处理
+ * 用戶權限處理
  * 
  * @author ruoyi
  */
@@ -23,15 +23,15 @@ public class SysPermissionService
     private ISysMenuService menuService;
 
     /**
-     * 获取角色数据权限
+     * 獲取角色資料權限
      * 
-     * @param user 用户信息
-     * @return 角色权限信息
+     * @param user 用戶資訊
+     * @return 角色權限資訊
      */
     public Set<String> getRolePermission(SysUser user)
     {
         Set<String> roles = new HashSet<String>();
-        // 管理员拥有所有权限
+        // 管理員擁有所有權限
         if (user.isAdmin())
         {
             roles.add("admin");
@@ -44,15 +44,15 @@ public class SysPermissionService
     }
 
     /**
-     * 获取菜单数据权限
+     * 獲取選單資料權限
      * 
-     * @param user 用户信息
-     * @return 菜单权限信息
+     * @param user 用戶資訊
+     * @return 選單權限資訊
      */
     public Set<String> getMenuPermission(SysUser user)
     {
         Set<String> perms = new HashSet<String>();
-        // 管理员拥有所有权限
+        // 管理員擁有所有權限
         if (user.isAdmin())
         {
             perms.add("*:*:*");

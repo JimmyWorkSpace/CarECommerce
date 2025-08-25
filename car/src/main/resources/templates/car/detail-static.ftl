@@ -2,10 +2,10 @@
 <div class="car-detail">
     <div class="main-title-container">
         <div class="first-title">
-            优质二手车商 /
+            優質二手車商 /
         </div>
         <div class="second-title">
-            2020年 Toyota Camry 2.5L 豪华版
+            2020年 Toyota Camry 2.5L 豪華版
         </div>
     </div>
     
@@ -37,7 +37,7 @@
         
         <!-- 右侧信息 -->
         <div class="col-md-6">
-            <h2 class="car-title">2020年 Toyota Camry 2.5L 豪华版
+            <h2 class="car-title">2020年 Toyota Camry 2.5L 豪華版
             </h2>
             <div class="price mb-3">
                 <span class="h4">$</span><span class="h4">850,000
@@ -58,20 +58,20 @@
                         <div class="spec-value">2.5L</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                        <div class="spec-name text-muted">变速箱</div>
-                        <div class="spec-value">自动</div>
+                        <div class="spec-name text-muted">變速箱</div>
+                        <div class="spec-value">自動</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">燃料</div>
                         <div class="spec-value">汽油</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                        <div class="spec-name text-muted">颜色</div>
+                        <div class="spec-name text-muted">顏色</div>
                         <div class="spec-value">白色</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                        <div class="spec-name text-muted">车门</div>
-                        <div class="spec-value">4门</div>
+                        <div class="spec-name text-muted">車門</div>
+                        <div class="spec-value">4門</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">座位</div>
@@ -88,11 +88,11 @@
                 </button>
             </div>
             <div class="dealer-info mt-3 text-left">
-                <div class="dealer-contact">聯絡人： 张经理
+                <div class="dealer-contact">聯絡人： 張經理
                 </div>
                 <div class="dealer-address">
-                    賞車地址： 台北市信义区信义路五段7号
-                    📍<a href="https://www.google.com/maps/search/?api=1&query=台北市信义区信义路五段7号" target="_blank">查看地圖</a>
+                    賞車地址： 台北市信義區信義路五段7號
+                    📍<a href="https://www.google.com/maps/search/?api=1&query=台北市信義區信義路五段7號" target="_blank">查看地圖</a>
                 </div>
             </div>
         </div>
@@ -234,15 +234,15 @@
                     <div class="dealer-intro">
                         <div class="dealer-intro-row">
                             <div class="dealer-title">店家名稱</div>
-                            <div class="dealer-content">优质二手车商</div>
+                            <div class="dealer-content">優質二手車商</div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">店家地址</div>
-                            <div class="dealer-content">台北市信义区信义路五段7号</div>
+                            <div class="dealer-content">台北市信義區信義路五段7號</div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">聯絡人</div>
-                            <div class="dealer-content">张经理</div>
+                            <div class="dealer-content">張經理</div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">店家電話</div>
@@ -271,7 +271,7 @@
                 </div>
                 <div class="content-frame">
                     <p><strong>關於我們</strong></p>
-                    <p>优质二手车商成立於2010年，專注於中高級二手車的買賣業務。我們擁有專業的車輛檢測團隊，確保每輛車都經過嚴格的安全檢查。</p>
+                    <p>優質二手車商成立於2010年，專注於中高級二手車的買賣業務。我們擁有專業的車輛檢測團隊，確保每輛車都經過嚴格的安全檢查。</p>
                     <p><strong>服務特色</strong></p>
                     <ul>
                         <li>專業車輛檢測，確保車況</li>
@@ -286,7 +286,7 @@
                     週六：09:00-17:00<br>
                     週日：10:00-16:00</p>
                     <p><strong>交通資訊</strong></p>
-                    <p>捷運信义安和站步行5分鐘即可到達，附近設有停車場，方便客戶前來賞車。</p>
+                    <p>捷運信義安和站步行5分鐘即可到達，附近設有停車場，方便客戶前來賞車。</p>
                 </div>
             </div>
         </div>

@@ -2,10 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>${title!'二手车销售平台'}</title>
-    <meta property="og:title" content="${title!'二手车销售平台'}" />
+    <title>${title!'二手車銷售平台'}</title>
+    <meta property="og:title" content="${title!'二手車銷售平台'}" />
     <meta property="og:type" content="website" />
-    <meta property="og:description" content="${description!'专业的二手车销售平台'}" />
+    <meta property="og:description" content="${description!'專業的二手車銷售平台'}" />
     <meta property="og:url" content="${url!''}" />
     <meta property="og:image" content="${image!''}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="/assets/viewer/viewer.min.css">
     
             <style>
-        /* 购物车悬浮按钮样式 */
+        /* 購物車懸浮按鈕樣式 */
         .cart-float-btn {
             position: fixed;
             right: 30px;
@@ -91,7 +91,7 @@
             }
         }
         
-        /* 已登录状态样式 */
+        /* 已登錄狀態樣式 */
         .user-status {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white !important;
@@ -109,7 +109,7 @@
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
         }
         
-        /* 登录按钮样式 */
+        /* 登錄按鈕樣式 */
         .login-btn {
             background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
             color: white !important;
@@ -128,7 +128,7 @@
             color: white !important;
         }
         
-        /* 下拉菜单样式 */
+        /* 下拉菜單樣式 */
         .dropdown-menu {
             border: none;
             border-radius: 12px;
@@ -151,7 +151,7 @@
             color: #6c757d;
         }
         
-        /* 导航栏品牌图片样式 */
+        /* 導航欄品牌圖片樣式 */
         .navbar-brand-img {
             height: 40px;
             width: auto;
@@ -159,7 +159,7 @@
             object-fit: contain;
         }
         
-        /* 响应式设计 */
+        /* 響應式設計 */
         @media (max-width: 768px) {
             .navbar-brand-img {
                 height: 35px;
@@ -202,7 +202,7 @@
     <!-- Custom CSS -->
     <script src="/assets/slick/slick.min.js"> </script>
     <script>
-        // 高亮当前页面的导航项
+        // 高亮當前頁面的導航項
         document.addEventListener('DOMContentLoaded', function() {
             const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
@@ -220,7 +220,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
                 <a class="navbar-brand" href="/">
-                    <img src="/img/title.png" alt="二手车销售平台" class="navbar-brand-img">
+                    <img src="/img/title.png" alt="二手車銷售平台" class="navbar-brand-img">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -228,38 +228,38 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/">首页</a>
+                            <a class="nav-link" href="/">首頁</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/buy-cars">买车</a>
+                            <a class="nav-link" href="/buy-cars">買車</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/mall">商城</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/about">关于</a>
+                            <a class="nav-link" href="/about">關於</a>
                         </li>
                         <#if user?? && user?has_content>
                             <li class="nav-item">
                                 <a class="nav-link" href="/cart">
                                     <i class="bi bi-cart3"></i>
-                                    购物车
+                                    購物車
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link user-status dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-circle me-1"></i>
-                                    ${user.name!'已登录'}
+                                    ${user.name!'已登錄'}
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="/logout">
-                                        <i class="bi bi-box-arrow-right me-2"></i>退出登录
+                                        <i class="bi bi-box-arrow-right me-2"></i>退出登錄
                                     </a></li>
                                 </ul>
                             </li>
                         <#else>
                             <li class="nav-item">
-                                <a class="nav-link login-btn" href="/login">登录/注册</a>
+                                <a class="nav-link login-btn" href="/login">登錄/註冊</a>
                             </li>
                         </#if>
                     </ul>
@@ -267,20 +267,20 @@
             </div>
         </nav>
         
-        <!-- 主要内容区域 -->
+        <!-- 主要內容區域 -->
         <div class="container mt-4 main-container">
             <#if content?? && content?has_content>
                 <#include "${content}">
             <#else>
                 <div class="error-container">
-                    <h2>页面内容加载失败</h2>
-                    <p>抱歉，页面内容无法正常显示。</p>
-                    <a href="/" class="btn btn-primary">返回首页</a>
+                    <h2>頁面內容加載失敗</h2>
+                    <p>抱歉，頁面內容無法正常顯示。</p>
+                    <a href="/" class="btn btn-primary">返回首頁</a>
                 </div>
             </#if>
         </div>
         
-        <!-- 购物车悬浮按钮 -->
+        <!-- 購物車懸浮按鈕 -->
         <#if user?? && user?has_content>
         <div class="cart-float-btn" id="cartFloatBtn">
             <div class="cart-icon">
@@ -293,7 +293,7 @@
 
         
         <script>
-            // 购物车功能
+            // 購物車功能
             let cart = JSON.parse(localStorage.getItem('cart') || '[]');
             
             function updateCartCount() {
@@ -319,11 +319,11 @@
                 }
                 localStorage.setItem('cart', JSON.stringify(cart));
                 updateCartCount();
-                showToast('商品已添加到购物车');
+                showToast('商品已添加到購物車');
             }
             
             function showToast(message) {
-                // 创建toast提示
+                // 創建toast提示
                 const toast = document.createElement('div');
                 toast.className = 'toast-notification';
                 toast.textContent = message;
@@ -334,11 +334,11 @@
                 }, 2000);
             }
             
-            // 页面加载完成后的初始化
+            // 頁面加載完成後的初始化
             document.addEventListener('DOMContentLoaded', function() {
                 updateCartCount();
                 
-                // 购物车按钮点击事件
+                // 購物車按鈕點擊事件
                 const cartFloatBtn = document.getElementById('cartFloatBtn');
                 if (cartFloatBtn) {
                     cartFloatBtn.addEventListener('click', function() {

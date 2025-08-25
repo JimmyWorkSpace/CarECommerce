@@ -4,7 +4,7 @@
             <div class="col-12">
                 <h2 class="cart-title">
                     <i class="bi bi-cart3 me-3"></i>
-                    购物车
+                    購物車
                 </h2>
                 
                 <#if message??>
@@ -15,59 +15,59 @@
                     </div>
                 </#if>
                 
-                <!-- 购物车商品容器 -->
+                <!-- 購物車商品容器 -->
                 <div id="cartItemsContainer">
-                    <!-- 购物车商品将通过JavaScript动态加载 -->
+                    <!-- 購物車商品將通過JavaScript動態加載 -->
                 </div>
                 
-                <!-- 购物车统计和操作 -->
+                <!-- 購物車統計和操作 -->
                 <div class="cart-summary" id="cartSummary" style="display: none;">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="cart-actions">
                                 <button class="btn btn-outline-secondary" onclick="clearCart()">
                                     <i class="bi bi-trash me-2"></i>
-                                    清空购物车
+                                    清空購物車
                                 </button>
                                 <a href="/mall" class="btn btn-outline-primary">
                                     <i class="bi bi-arrow-left me-2"></i>
-                                    继续购物
+                                    繼續購物
                                 </a>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="cart-total-section">
                                 <div class="total-row">
-                                    <span>商品总数：</span>
+                                    <span>商品總數：</span>
                                     <span><strong id="totalItems">0</strong></span>
                                 </div>
                                 <div class="total-row">
-                                    <span>总数量：</span>
+                                    <span>總數量：</span>
                                     <span><strong id="totalQuantity">0</strong></span>
                                 </div>
                                 <div class="total-row total-price">
-                                    <span>总计：</span>
+                                    <span>總計：</span>
                                     <span><strong id="totalPrice">¥0</strong></span>
                                 </div>
                                 <button class="btn btn-success btn-lg checkout-btn" onclick="checkout()">
                                     <i class="bi bi-credit-card me-2"></i>
-                                    立即结算
+                                    立即結算
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- 空购物车提示 -->
+                <!-- 空購物車提示 -->
                 <div class="empty-cart" id="emptyCart" style="display: none;">
                     <div class="empty-cart-icon">
                         <i class="bi bi-cart-x"></i>
                     </div>
-                    <h4>购物车是空的</h4>
-                    <p class="text-muted">您还没有添加任何商品到购物车</p>
+                    <h4>購物車是空的</h4>
+                    <p class="text-muted">您還沒有添加任何商品到購物車</p>
                     <a href="/mall" class="btn btn-primary">
                         <i class="bi bi-shop me-2"></i>
-                        去商城逛逛
+                        去商城逻逻
                     </a>
                 </div>
             </div>
@@ -76,7 +76,7 @@
 </div>
 
 <script>
-// 从localStorage读取购物车数据
+// 從localStorage讀取購物車數據
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
 function renderCartItems() {
@@ -138,7 +138,7 @@ function renderCartItems() {
     
     container.innerHTML = html;
     
-    // 更新统计信息
+    // 更新統計信息
     document.getElementById('totalItems').textContent = cart.length;
     document.getElementById('totalQuantity').textContent = totalQuantity;
     document.getElementById('totalPrice').textContent = '¥' + totalPrice;
@@ -159,7 +159,7 @@ function updateQuantity(productId, quantity) {
 }
 
 function removeItem(productId) {
-    if (confirm('确定要移除这个商品吗？')) {
+    if (confirm('確定要移除這個商品嗎？')) {
         cart = cart.filter(item => item.id !== productId);
         localStorage.setItem('cart', JSON.stringify(cart));
         renderCartItems();
@@ -167,7 +167,7 @@ function removeItem(productId) {
 }
 
 function clearCart() {
-    if (confirm('确定要清空购物车吗？')) {
+    if (confirm('確定要清空購物車嗎？')) {
         cart = [];
         localStorage.setItem('cart', JSON.stringify(cart));
         renderCartItems();
@@ -175,15 +175,15 @@ function clearCart() {
 }
 
 function checkout() {
-    if (confirm('确定要提交订单吗？')) {
+    if (confirm('確定要提交訂單嗎？')) {
         cart = [];
         localStorage.setItem('cart', JSON.stringify(cart));
         renderCartItems();
-        alert('订单提交成功！');
+        alert('訂單提交成功！');
     }
 }
 
-// 页面加载时渲染购物车
+// 頁面加載時渲染購物車
 document.addEventListener('DOMContentLoaded', function() {
     renderCartItems();
 });

@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    欢迎
+    歡迎
   </div>
 </template>
 

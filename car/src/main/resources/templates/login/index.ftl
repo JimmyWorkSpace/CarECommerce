@@ -5,7 +5,7 @@
                 <div class="card-header bg-primary text-white text-center">
                     <h4 class="mb-0">
                         <i class="bi bi-person-circle me-2"></i>
-                        用户登录
+                        用戶登錄
                     </h4>
                 </div>
                 <div class="card-body p-4">
@@ -17,44 +17,44 @@
                     </#if>
                     
                     <form action="/login" method="post">
-                        <!-- 隐藏的返回URL字段 -->
+                        <!-- 隱藏的返回 URL 字段 -->
                         <input type="hidden" name="returnUrl" value="${returnUrl!''}">
                         
                         <div class="mb-3">
                             <label for="username" class="form-label">
-                                <i class="bi bi-person me-2"></i>用户名
+                                <i class="bi bi-person me-2"></i>用戶名
                             </label>
                             <input type="text" class="form-control" id="username" name="username" 
-                                   placeholder="请输入用户名" required>
+                                   placeholder="請輸入用戶名" required>
                         </div>
                         
                         <div class="mb-3">
                             <label for="password" class="form-label">
-                                <i class="bi bi-lock me-2"></i>密码
+                                <i class="bi bi-lock me-2"></i>密碼
                             </label>
                             <input type="password" class="form-control" id="password" name="password" 
-                                   placeholder="请输入密码" required>
+                                   placeholder="請輸入密碼" required>
                         </div>
                         
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="rememberMe">
                             <label class="form-check-label" for="rememberMe">
-                                记住我
+                                記住我
                             </label>
                         </div>
                         
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>
-                                登录
+                                登錄
                             </button>
                         </div>
                     </form>
                     
                     <div class="text-center mt-3">
                         <small class="text-muted">
-                            还没有账号？ 
-                            <a href="#" class="text-decoration-none">立即注册</a>
+                            還沒有帳號？ 
+                            <a href="#" class="text-decoration-none">立即註冊</a>
                         </small>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
             <div class="text-center mt-3">
                 <a href="/" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>
-                    返回首页
+                    返回首頁
                 </a>
             </div>
         </div>

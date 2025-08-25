@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * 轮播图维护Controller
+ * 輪播圖維護Controller
  * 
  * @author ruoyi
  */
@@ -38,7 +38,7 @@ public class CarBannerController extends BaseController {
     private String imagePrefix;
 
     /**
-     * 查询轮播图列表
+     * 查詢輪播圖列表
      */
     @PreAuthorize("@ss.hasPermi('car:banner:list')")
     @GetMapping("/list")
@@ -49,19 +49,19 @@ public class CarBannerController extends BaseController {
     }
 
     /**
-     * 导出轮播图列表
+     * 匯出輪播圖列表
      */
     @PreAuthorize("@ss.hasPermi('car:banner:export')")
-    @Log(title = "轮播图", businessType = BusinessType.EXPORT)
+    @Log(title = "輪播圖", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CarBannerEntity carBanner) {
         List<CarBannerEntity> list = carBannerService.selectAllBanners();
         ExcelUtil<CarBannerEntity> util = new ExcelUtil<CarBannerEntity>(CarBannerEntity.class);
-        util.exportExcel(response, list, "轮播图数据");
+        util.exportExcel(response, list, "輪播圖資料");
     }
 
     /**
-     * 获取轮播图详细信息
+     * 獲取輪播圖詳細資訊
      */
     @PreAuthorize("@ss.hasPermi('car:banner:query')")
     @GetMapping(value = "/{id}")
@@ -70,30 +70,30 @@ public class CarBannerController extends BaseController {
     }
 
     /**
-     * 新增轮播图
+     * 新增輪播圖
      */
     @PreAuthorize("@ss.hasPermi('car:banner:add')")
-    @Log(title = "轮播图", businessType = BusinessType.INSERT)
+    @Log(title = "輪播圖", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody CarBannerEntity carBanner) {
         return toAjax(carBannerService.insertBanner(carBanner));
     }
 
     /**
-     * 修改轮播图
+     * 修改輪播圖
      */
     @PreAuthorize("@ss.hasPermi('car:banner:edit')")
-    @Log(title = "轮播图", businessType = BusinessType.UPDATE)
+    @Log(title = "輪播圖", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody CarBannerEntity carBanner) {
         return toAjax(carBannerService.updateBanner(carBanner));
     }
 
     /**
-     * 删除轮播图
+     * 刪除輪播圖
      */
     @PreAuthorize("@ss.hasPermi('car:banner:remove')")
-    @Log(title = "轮播图", businessType = BusinessType.DELETE)
+    @Log(title = "輪播圖", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         int result = 0;
@@ -104,49 +104,49 @@ public class CarBannerController extends BaseController {
     }
     
     /**
-     * 上传图片
+     * 上傳圖片
      */
     @PreAuthorize("@ss.hasPermi('car:banner:upload')")
     @PostMapping("/upload")
     public AjaxResult uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             if (file.isEmpty()) {
-                return error("请选择要上传的文件");
+                return error("請選擇要上傳的檔案");
             }
             
-            // 检查文件类型
+            // 檢查檔案類型
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null || !isImageFile(originalFilename)) {
-                return error("只能上传图片文件");
+                return error("只能上傳圖片檔案");
             }
             
-            // 上传到FTP服务器
+            // 上傳到FTP伺服器
             InputStream inputStream = file.getInputStream();
             String fileName = ftpService.uploadFile(inputStream, originalFilename, "/img/car_sale/banner");
             
-            // 返回完整的图片URL
+            // 返回完整的圖片URL
             String imageUrl = imagePrefix + "/img/car_sale/banner/" + fileName;
             
-            return AjaxResult.success("上传成功", imageUrl);
+            return AjaxResult.success("上傳成功", imageUrl);
             
         } catch (Exception e) {
-            logger.error("图片上传失败", e);
-            return error("图片上传失败：" + e.getMessage());
+            logger.error("圖片上傳失敗", e);
+            return error("圖片上傳失敗：" + e.getMessage());
         }
     }
     
     /**
-     * 更新轮播图排序
+     * 更新輪播圖排序
      */
     @PreAuthorize("@ss.hasPermi('car:banner:edit')")
-    @Log(title = "轮播图排序", businessType = BusinessType.UPDATE)
+    @Log(title = "輪播圖排序", businessType = BusinessType.UPDATE)
     @PutMapping("/order")
     public AjaxResult updateOrder(@RequestBody List<CarBannerEntity> banners) {
         return toAjax(carBannerService.updateBannerOrder(banners));
     }
     
     /**
-     * 检查是否为图片文件
+     * 檢查是否為圖片檔案
      */
     private boolean isImageFile(String fileName) {
         String[] allowedExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"};

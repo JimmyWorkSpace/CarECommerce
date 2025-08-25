@@ -1,25 +1,25 @@
-<!-- 错误页面 -->
+<!-- 錯誤頁面 -->
 <div class="error-page">
     <div class="error-container">
         <div class="error-icon">
             <i class="bi bi-exclamation-triangle"></i>
         </div>
-        <h1 class="error-title">页面加载失败</h1>
+        <h1 class="error-title">頁面加載失敗</h1>
         <p class="error-message">
             <#if error?? && error?has_content>
                 ${error}
             <#else>
-                抱歉，页面内容无法正常显示。
+                抱歉，頁面內容無法正常顯示。
             </#if>
         </p>
         <div class="error-actions">
             <a href="/" class="btn btn-primary">
                 <i class="bi bi-house"></i>
-                返回首页
+                返回首頁
             </a>
             <button onclick="history.back()" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i>
-                返回上页
+                返回上頁
             </button>
         </div>
     </div>

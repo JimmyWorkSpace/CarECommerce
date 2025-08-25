@@ -3,7 +3,7 @@ package com.ruoyi.common.core.text;
 import com.ruoyi.common.utils.StringUtils;
 
 /**
- * 字符串格式化
+ * 字串格式化
  * 
  * @author ruoyi
  */
@@ -14,18 +14,18 @@ public class StrFormatter
     public static final char C_DELIM_START = '{';
     public static final char C_DELIM_END = '}';
 
-    /**
-     * 格式化字符串<br>
-     * 此方法只是简单将占位符 {} 按照顺序替换为参数<br>
-     * 如果想输出 {} 使用 \\转义 { 即可，如果想输出 {} 之前的 \ 使用双转义符 \\\\ 即可<br>
+        /**
+     * 格式化字串<br>
+     * 此方法只是簡單將佔位符 {} 按照順序替換為參數<br>
+     * 如果想輸出 {} 使用 \\轉義 { 即可，如果想輸出 {} 之前的 \ 使用雙轉義符 \\\\ 即可<br>
      * 例：<br>
      * 通常使用：format("this is {} for {}", "a", "b") -> this is a for b<br>
-     * 转义{}： format("this is \\{} for {}", "a", "b") -> this is \{} for a<br>
-     * 转义\： format("this is \\\\{} for {}", "a", "b") -> this is \a for b<br>
-     * 
-     * @param strPattern 字符串模板
-     * @param argArray 参数列表
-     * @return 结果
+     * 轉義{}： format("this is \\{} for {}", "a", "b") -> this is \{} for a<br>
+     * 轉義\： format("this is \\\\{} for {}", "a", "b") -> this is \a for b<br>
+     *
+     * @param strPattern 字串模板
+     * @param argArray 參數列表
+     * @return 結果
      */
     public static String format(final String strPattern, final Object... argArray)
     {
@@ -35,7 +35,7 @@ public class StrFormatter
         }
         final int strPatternLength = strPattern.length();
 
-        // 初始化定义好的长度以获得更好的性能
+        // 初始化定義好的長度以獲得更好的效能
         StringBuilder sbuf = new StringBuilder(strPatternLength + 50);
 
         int handledPosition = 0;

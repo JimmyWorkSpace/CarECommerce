@@ -1,6 +1,6 @@
-<!-- 商城页面 -->
+<!-- 商城頁面 -->
 <div class="mall-container">
-    <!-- 商品分类过滤 -->
+    <!-- 商品分類過濾 -->
     <div class="filter-section">
         <div class="filter-buttons">
             <button class="filter-btn active" data-category="all">
@@ -9,28 +9,28 @@
             </button>
             <button class="filter-btn" data-category="engine">
                 <i class="bi bi-gear"></i>
-                发动机配件
+                發動機配件
             </button>
             <button class="filter-btn" data-category="brake">
                 <i class="bi bi-disc"></i>
-                制动系统
+                制動系統
             </button>
             <button class="filter-btn" data-category="suspension">
                 <i class="bi bi-arrow-up-down"></i>
-                悬挂系统
+                懸挂系統
             </button>
             <button class="filter-btn" data-category="electrical">
                 <i class="bi bi-lightning"></i>
-                电气系统
+                電氣系統
             </button>
             <button class="filter-btn" data-category="exterior">
                 <i class="bi bi-car-front"></i>
-                外观配件
+                外觀配件
             </button>
         </div>
     </div>
     
-    <!-- 商品网格 -->
+    <!-- 商品網格 -->
     <div class="products-grid" id="productsGrid">
         <#list products as product>
         <div class="product-card" data-category="${product.category!'all'}">
@@ -45,7 +45,7 @@
                                 image: '${product.image}'
                             })">
                         <i class="bi bi-cart-plus"></i>
-                        加入购物车
+                        加入購物車
                     </button>
                 </div>
             </div>
@@ -61,18 +61,18 @@
         </#list>
     </div>
     
-    <!-- 分页 -->
+    <!-- 分頁 -->
     <div class="pagination-container">
-        <nav aria-label="商品分页">
+        <nav aria-label="商品分頁">
             <ul class="pagination justify-content-center">
                 <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一頁</a>
                 </li>
                 <li class="page-item active"><a class="page-link" href="#">1</a></li>
                 <li class="page-item"><a class="page-link" href="#">2</a></li>
                 <li class="page-item"><a class="page-link" href="#">3</a></li>
                 <li class="page-item">
-                    <a class="page-link" href="#">下一页</a>
+                    <a class="page-link" href="#">下一頁</a>
                 </li>
             </ul>
         </nav>
@@ -80,21 +80,21 @@
 </div>
 
 <script>
-// 商品分类过滤功能
+// 商品分類過濾功能
 document.addEventListener('DOMContentLoaded', function() {
     const filterButtons = document.querySelectorAll('.filter-btn');
     const productCards = document.querySelectorAll('.product-card');
     
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // 移除所有按钮的active类
+            // 移除所有按鈕的active類
             filterButtons.forEach(btn => btn.classList.remove('active'));
-            // 添加当前按钮的active类
+            // 添加當前按鈕的active類
             this.classList.add('active');
             
             const selectedCategory = this.getAttribute('data-category');
             
-            // 过滤商品
+            // 過濾商品
             productCards.forEach(card => {
                 const cardCategory = card.getAttribute('data-category');
                 

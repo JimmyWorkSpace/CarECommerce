@@ -18,7 +18,7 @@ import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.system.service.ISysMenuService;
 
 /**
- * 登录验证
+ * 登入驗證
  * 
  * @author ruoyi
  */
@@ -35,10 +35,10 @@ public class SysLoginController
     private SysPermissionService permissionService;
 
     /**
-     * 登录方法
+     * 登入方法
      * 
-     * @param loginBody 登录信息
-     * @return 结果
+     * @param loginBody 登入資訊
+     * @return 結果
      */
     @PostMapping("/login")
     public AjaxResult login(@RequestBody LoginBody loginBody)
@@ -52,9 +52,9 @@ public class SysLoginController
     }
 
     /**
-     * 获取用户信息
+     * 獲取用戶資訊
      * 
-     * @return 用户信息
+     * @return 用戶資訊
      */
     @GetMapping("getInfo")
     public AjaxResult getInfo()
@@ -62,7 +62,7 @@ public class SysLoginController
         SysUser user = SecurityUtils.getLoginUser().getUser();
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(user);
-        // 权限集合
+        // 權限集合
         Set<String> permissions = permissionService.getMenuPermission(user);
         AjaxResult ajax = AjaxResult.success();
         ajax.put("user", user);
@@ -72,9 +72,9 @@ public class SysLoginController
     }
 
     /**
-     * 获取路由信息
+     * 獲取路由資訊
      * 
-     * @return 路由信息
+     * @return 路由資訊
      */
     @GetMapping("getRouters")
     public AjaxResult getRouters()

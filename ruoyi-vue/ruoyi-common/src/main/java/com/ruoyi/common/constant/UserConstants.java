@@ -1,45 +1,45 @@
 package com.ruoyi.common.constant;
 
 /**
- * 用户常量信息
+ * 用戶常量資訊
  * 
  * @author ruoyi
  */
 public class UserConstants
 {
     /**
-     * 平台内系统用户的唯一标志
+     * 平台內系統用戶的唯一標誌
      */
     public static final String SYS_USER = "SYS_USER";
 
-    /** 正常状态 */
+    /** 正常狀態 */
     public static final String NORMAL = "0";
 
-    /** 异常状态 */
+    /** 異常狀態 */
     public static final String EXCEPTION = "1";
 
-    /** 用户封禁状态 */
+    /** 用戶封禁狀態 */
     public static final String USER_DISABLE = "1";
 
-    /** 角色封禁状态 */
+    /** 角色封禁狀態 */
     public static final String ROLE_DISABLE = "1";
 
-    /** 部门正常状态 */
+    /** 部門正常狀態 */
     public static final String DEPT_NORMAL = "0";
 
-    /** 部门停用状态 */
+    /** 部門停用狀態 */
     public static final String DEPT_DISABLE = "1";
 
-    /** 字典正常状态 */
+    /** 字典正常狀態 */
     public static final String DICT_NORMAL = "0";
 
-    /** 是否为系统默认（是） */
+    /** 是否為系統預設（是） */
     public static final String YES = "Y";
 
-    /** 是否菜单外链（是） */
+    /** 是否選單外鏈（是） */
     public static final String YES_FRAME = "0";
 
-    /** 是否菜单外链（否） */
+    /** 是否選單外鏈（否） */
     public static final String NO_FRAME = "1";
 
     /** 菜单类型（目录） */

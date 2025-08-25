@@ -53,10 +53,10 @@
     <div class="search-section">
         <div class="container">
             <div class="search-container">
-                <h2 class="search-title">寻找您的理想座驾</h2>
+                <h2 class="search-title">尋找您的理想座駕</h2>
                 <div class="search-box">
                     <div class="search-input-group">
-                        <input type="text" class="form-control search-input" placeholder="输入车型、品牌或关键词..." v-model="searchKeyword">
+                        <input type="text" class="form-control search-input" placeholder="輸入車型、品牌或關鍵詞..." v-model="searchKeyword">
                         <button class="btn search-btn" @click="performSearch">
                             <i class="bi bi-search"></i>
                         </button>
@@ -100,7 +100,7 @@
                         <div class="ad-card">
                             <img src="/img/ad1.jpg" alt="专业检测" class="ad-image" 
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                            <div class="ad-title-overlay" style="display: none;">专业检测</div>
+                            <div class="ad-title-overlay" style="display: none;">專業檢測</div>
                         </div>
                     </div>
                     <div class="col-12 col-md-6 mb-4">
@@ -117,7 +117,7 @@
     <div class="dealers-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">精选店家</h2>
+                <h2 class="section-title">精選店家</h2>
                 <a href="/dealers" class="view-more-link">查看更多 <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="dealers-container">
@@ -135,7 +135,7 @@
     <div class="cars-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">精选好车</h2>
+                <h2 class="section-title">精選好車</h2>
                 <a href="/buy-cars" class="view-more-link">查看更多 <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="cars-container">
@@ -155,19 +155,19 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 col-md-4 mb-4">
-                    <h4>联系我们</h4>
-                    <p><i class="bi bi-telephone"></i> 客服热线：400-123-4567</p>
-                    <p><i class="bi bi-envelope"></i> 邮箱：service@carce.cc</p>
-                    <p><i class="bi bi-geo-alt"></i> 地址：台北市信义区信义路五段7号</p>
+                    <h4>聯繫我們</h4>
+                    <p><i class="bi bi-telephone"></i> 客服熱線：400-123-4567</p>
+                    <p><i class="bi bi-envelope"></i> 郵箱：service@carce.cc</p>
+                    <p><i class="bi bi-geo-alt"></i> 地址：台北市信義區信義路五段7號</p>
                 </div>
                 <div class="col-12 col-md-4 mb-4">
-                    <h4>服务时间</h4>
-                    <p>周一至周五：9:00-18:00</p>
-                    <p>周六至周日：10:00-17:00</p>
-                    <p>节假日：10:00-16:00</p>
+                    <h4>服務時間</h4>
+                    <p>週一至週五：9:00-18:00</p>
+                    <p>週六至週日：10:00-17:00</p>
+                    <p>節假日：10:00-16:00</p>
                 </div>
                 <div class="col-12 col-md-4 mb-4">
-                    <h4>关注我们</h4>
+                    <h4>關注我們</h4>
                     <div class="social-links">
                         <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
                         <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
@@ -177,7 +177,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 二手车销售平台. 保留所有权利.</p>
+                <p>&copy; 2024 二手車銷售平台. 保留所有權利.</p>
             </div>
         </div>
     </footer>
@@ -191,18 +191,18 @@ new Vue({
         features: [
             {
                 icon: 'bi bi-shield-check',
-                title: '品质保证',
-                subtitle: '所有车辆均经过专业检测，确保车况良好'
+                title: '品質保證',
+                subtitle: '所有車輛均經過專業檢測，確保車況良好'
             },
             {
                 icon: 'bi bi-currency-dollar',
-                title: '价格透明',
-                subtitle: '明码标价，无隐藏费用，让您购车更放心'
+                title: '價格透明',
+                subtitle: '明碼標價，無隱藏費用，讓您購車更放心'
             },
             {
                 icon: 'bi bi-headset',
-                title: '专业服务',
-                subtitle: '专业团队为您提供全程购车服务'
+                title: '專業服務',
+                subtitle: '專業團隊為您提供全程購車服務'
             }
         ],
 
@@ -214,16 +214,16 @@ new Vue({
     methods: {
         performSearch() {
             if (this.searchKeyword.trim()) {
-                // 执行搜索逻辑
-                console.log('搜索关键词:', this.searchKeyword);
+                // 執行搜尋邏輯
+                console.log('搜尋關鍵詞:', this.searchKeyword);
             }
         },
         initHeroSlider() {
-            // 初始化Swiper轮播图
+            // 初始化Swiper輪播圖
             new Swiper('.hero-swiper', {
-                // 循环模式
+                // 循環模式
                 loop: true,
-                // 自动播放
+                // 自動播放
                 autoplay: {
                     delay: 5000,
                     disableOnInteraction: false,
@@ -233,7 +233,7 @@ new Vue({
                 fadeEffect: {
                     crossFade: true
                 },
-                // 分页器
+                // 分頁器
                 pagination: {
                     el: '.swiper-pagination',
                     clickable: true,
@@ -244,14 +244,14 @@ new Vue({
             });
         },
 
-        // 显示广告内容
+        // 顯示廣告內容
         showAdContent(adId, title, content) {
-            // 检查adId是否有效
+            // 檢查adId是否有效
             if (!adId || adId === 'null' || adId === '') {
-                console.error('广告ID无效:', adId);
+                console.error('廣告ID無效:', adId);
                 return;
             }
-            // 打开新窗口显示广告内容页面
+            // 打開新窗口顯示廣告內容頁面
             window.open('/ad-content/' + adId, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
         },
 
