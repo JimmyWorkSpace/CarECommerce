@@ -294,10 +294,16 @@ public class CarViewController {
                 "輪胎", "機油", "煞車片", "雨刷器", "電瓶", "火花塞"
             };
             
+//            String[] productImages = {
+//                "/img/car/car4.jpg", "/img/car/car5.jpg", "/img/car/car6.jpg", "/img/car/car7.jpg", "/img/car/car8.jpg", "/img/car/car9.jpg",
+//                "/img/car/car10.jpg", "/img/car/car11.jpg", "/img/car/car12.jpg", "/img/car/car13.jpg", "/img/car/car14.jpg", "/img/car/car15.jpg",
+//                "/img/car/car16.jpg", "/img/car/car4.jpg", "/img/car/car5.jpg", "/img/car/car6.jpg"
+//            };
             String[] productImages = {
-                "/img/car/car4.jpg", "/img/car/car5.jpg", "/img/car/car6.jpg", "/img/car/car7.jpg", "/img/car/car8.jpg", "/img/car/car9.jpg",
-                "/img/car/car10.jpg", "/img/car/car11.jpg", "/img/car/car12.jpg", "/img/car/car13.jpg", "/img/car/car14.jpg", "/img/car/car15.jpg",
-                "/img/car/car16.jpg", "/img/car/car4.jpg", "/img/car/car5.jpg", "/img/car/car6.jpg"
+            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
+            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
+            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
+            		"/img/car/car6.jpg"
             };
             
             int[] prices = {
