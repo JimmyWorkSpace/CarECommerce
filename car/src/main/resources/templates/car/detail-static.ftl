@@ -19,9 +19,9 @@
                 </div>
                 <div class="thumbnail-container">
                     <img src="/img/car/car4.jpg" class="thumbnail active" alt="缩略图">
-                    <img src="/img/car/car5.jpg" class="thumbnail" alt="缩略图">
+                    <img src="/img/car/car4.jpg" class="thumbnail" alt="缩略图">
                     <img src="/img/car/car6.jpg" class="thumbnail" alt="缩略图">
-                    <img src="/img/car/car7.jpg" class="thumbnail" alt="缩略图">
+                    <img src="/img/car/car6.jpg" class="thumbnail" alt="缩略图">
                     <img src="/img/car/car8.jpg" class="thumbnail" alt="缩略图">
                 </div>
             </div>
