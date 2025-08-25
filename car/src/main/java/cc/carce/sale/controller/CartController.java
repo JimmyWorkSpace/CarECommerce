@@ -55,8 +55,8 @@ public class CartController {
         model.addAttribute("totalPrice", totalPrice);
         
         // 设置页面标题和描述
-        model.addAttribute("title", "购物车 - 二手车销售平台");
-        model.addAttribute("description", "查看和管理您的购物车商品");
+        model.addAttribute("title", "購物車 - 二手車銷售平台");
+        model.addAttribute("description", "查看和管理您的購物車商品");
         model.addAttribute("url", req.getRequestURL().toString());
         model.addAttribute("image", "/img/swipper/slide1.jpg");
         
@@ -178,6 +178,6 @@ public class CartController {
         // 这里可以添加结算逻辑
         // 暂时只是清空购物车
         session.removeAttribute("cart");
-        return "redirect:/cart?message=订单提交成功！";
+        return "redirect:/cart?message=訂單提交成功！";
     }
 } 

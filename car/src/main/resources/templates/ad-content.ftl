@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title!'广告详情'}</title>
+    <title>${title!'廣告詳情'}</title>
     <style>
         body {
             font-family: 'Microsoft YaHei', Arial, sans-serif;
@@ -80,19 +80,19 @@
     
     <#if error??>
         <div class="error-message">
-            <h2>错误</h2>
+            <h2>錯誤</h2>
             <p>${error}</p>
         </div>
     <#else>
         <div class="ad-content-container">
             <div class="ad-header">
-                <h1 class="ad-title">${title!'广告详情'}</h1>
+                <h1 class="ad-title">${title!'廣告詳情'}</h1>
             </div>
             <div class="ad-body">
                 <#if content??>
                     ${content}
                 <#else>
-                    <p>暂无内容</p>
+                    <p>暫無內容</p>
                 </#if>
             </div>
         </div>

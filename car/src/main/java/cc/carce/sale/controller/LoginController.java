@@ -29,8 +29,8 @@ public class LoginController {
         }
         
         // 设置页面标题和描述
-        model.addAttribute("title", "登录/注册 - 二手车销售平台");
-        model.addAttribute("description", "用户登录和注册页面");
+        model.addAttribute("title", "登入/註冊 - 二手車銷售平台");
+        model.addAttribute("description", "用戶登入和註冊頁面");
         model.addAttribute("url", req.getRequestURL().toString());
         model.addAttribute("image", "/img/swipper/slide1.jpg");
         
@@ -74,9 +74,9 @@ public class LoginController {
         }
         
         // 登录失败，返回登录页面
-        model.addAttribute("error", "登录失败，请检查用户名和密码");
-        model.addAttribute("title", "登录/注册 - 二手车销售平台");
-        model.addAttribute("description", "用户登录和注册页面");
+        model.addAttribute("error", "登入失敗，請檢查用戶名和密碼");
+        model.addAttribute("title", "登入/註冊 - 二手車銷售平台");
+        model.addAttribute("description", "用戶登入和註冊頁面");
         model.addAttribute("content", "/login/index.ftl");
         
         return "/layout/main";
