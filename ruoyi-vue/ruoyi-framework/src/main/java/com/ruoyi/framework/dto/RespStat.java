@@ -5,7 +5,7 @@ import lombok.Data;
 public enum RespStat {
   SUCCESS("1"),
   /**
-   * 失败标记
+ * 失敗標記
    */
   FAIL("0");
 

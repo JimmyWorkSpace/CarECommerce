@@ -56,13 +56,13 @@ public class SyncImageDataTask {
 
               carSalePhotoService.deleteAndBatchInsert(carSaleIdLong, images);
             }catch(Exception ex){
-              log.warn("图片信息同步，获取到非正常的id：", carSaleId);
+              log.warn("圖片資訊同步，獲取到非正常的id：", carSaleId);
             }
           }
         }
     } catch (Exception e) {
-      log.error("从ftp获取图片信息失败", e);
+                  log.error("從ftp獲取圖片資訊失敗", e);
     }
-    System.out.println("开始同步图片数据");
+          System.out.println("開始同步圖片資料");
   }
 }

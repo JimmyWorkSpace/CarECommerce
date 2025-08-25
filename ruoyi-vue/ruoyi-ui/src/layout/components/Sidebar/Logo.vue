@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: '车势后台',
+      title: '車勢後台',
       logo: logoImg
     }
   }

@@ -21,22 +21,22 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 /**
- * token验证处理
+ * token驗證處理
  *
  * @author ruoyi
  */
 @Component
 public class TokenService
 {
-    // 令牌自定义标识
+    // 令牌自定義標識
     @Value("${token.header}")
     private String header;
 
-    // 令牌秘钥
+    // 令牌秘鑰
     @Value("${token.secret}")
     private String secret;
 
-    // 令牌有效期（默认30分钟）
+    // 令牌有效期（預設30分鐘）
     @Value("${token.expireTime}")
     private int expireTime;
 

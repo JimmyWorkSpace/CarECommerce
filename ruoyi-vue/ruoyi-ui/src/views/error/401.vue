@@ -6,14 +6,14 @@
     <el-row>
       <el-col :span="12">
         <h1 class="text-jumbo text-ginormous">
-          401错误!
+          401錯誤!
         </h1>
-        <h2>您没有访问权限！</h2>
-        <h6>对不起，您没有访问权限，请不要进行非法操作！您可以返回主页面</h6>
+        <h2>您沒有存取權限！</h2>
+        <h6>對不起，您沒有存取權限，請不要進行非法操作！您可以返回主頁面</h6>
         <ul class="list-unstyled">
           <li class="link-type">
             <router-link to="/">
-              回首页
+              回首頁
             </router-link>
           </li>
         </ul>

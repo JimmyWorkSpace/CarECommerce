@@ -143,29 +143,25 @@
                     <!-- 车辆网格 -->
                     <div class="cars-grid">
                         <#list cars as car>
-                        <div class="car-card">
-                            <div class="car-image-container">
-                                <img src="${car.image}" alt="${car.title}" class="car-image">
-                                <div class="car-badge">${car.year}</div>
-                            </div>
-                            <div class="car-info">
-                                <h3 class="car-title">${car.title}</h3>
-                                <div class="car-details">
-                                    <span class="car-mileage"><i class="bi bi-speedometer2"></i> ${car.mileage} km</span>
-                                    <span class="car-fuel"><i class="bi bi-fuel-pump"></i> ${car.fuelType}</span>
-                                    <span class="car-transmission"><i class="bi bi-gear"></i> ${car.transmission}</span>
+                        <a href="/static-demo" class="car-card-link">
+                            <div class="car-card">
+                                <div class="car-image-container">
+                                    <img src="${car.image}" alt="${car.title}" class="car-image">
+                                    <div class="car-badge">${car.year}</div>
                                 </div>
-                                <div class="car-price">
-                                    <span class="price-amount">$${car.price?string("###,###")}</span>
-                                </div>
-                                <div class="car-actions">
-                                    <a href="/static-demo" class="btn btn-outline-primary btn-sm">查看詳情</a>
-                                    <button class="btn btn-outline-secondary btn-sm">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
+                                <div class="car-info">
+                                    <h3 class="car-title">${car.title}</h3>
+                                    <div class="car-details">
+                                        <span class="car-mileage"><i class="bi bi-speedometer2"></i> ${car.mileage} km</span>
+                                        <span class="car-fuel"><i class="bi bi-fuel-pump"></i> ${car.fuelType}</span>
+                                        <span class="car-transmission"><i class="bi bi-gear"></i> ${car.transmission}</span>
+                                    </div>
+                                    <div class="car-price">
+                                        <span class="price-amount">$${car.price?string("###,###")}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                         </#list>
                     </div>
 

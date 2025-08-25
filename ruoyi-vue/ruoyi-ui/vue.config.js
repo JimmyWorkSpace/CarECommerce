@@ -5,29 +5,29 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = process.env.VUE_APP_TITLE || '车势后台' // 网页标题
+const name = process.env.VUE_APP_TITLE || '車勢後台' // 網頁標題
 const CompressionPlugin = require('compression-webpack-plugin')
 
 
-const port = process.env.port || process.env.npm_config_port || 80 // 端口
+const port = process.env.port || process.env.npm_config_port || 80 // 埠
 
-// vue.config.js 配置说明
-//官方vue.config.js 参考文档 https://cli.vuejs.org/zh/config/#css-loaderoptions
-// 这里只列一部分，具体配置参考文档
+// vue.config.js 配置說明
+//官方vue.config.js 參考文檔 https://cli.vuejs.org/zh/config/#css-loaderoptions
+// 這裡只列一部分，具體配置參考文檔
 module.exports = {
-  // 部署生产环境和开发环境下的URL。
-  // 默认情况下，Vue CLI 会假设你的应用是被部署在一个域名的根路径上
-  // 例如 https://www.ruoyi.vip/。如果应用被部署在一个子路径上，你就需要用这个选项指定这个子路径。例如，如果你的应用被部署在 https://www.ruoyi.vip/admin/，则设置 baseUrl 为 /admin/。
+  // 部署生產環境和開發環境下的URL。
+  // 預設情況下，Vue CLI 會假設你的應用是被部署在一個域名的根路徑上
+  // 例如 https://www.ruoyi.vip/。如果應用被部署在一個子路徑上，你就需要用這個選項指定這個子路徑。例如，如果你的應用被部署在 https://www.ruoyi.vip/admin/，則設定 baseUrl 為 /admin/。
   publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
-  // 在npm run build 或 yarn build 时 ，生成文件的目录名称（要和baseUrl的生产环境路径一致）（默认dist）
+  // 在npm run build 或 yarn build 時 ，生成檔案的目錄名稱（要和baseUrl的生產環境路徑一致）（預設dist）
   outputDir: 'dist',
-  // 用于放置生成的静态资源 (js、css、img、fonts) 的；（项目打包之后，静态资源会放在这个文件夹下）
+  // 用於放置生成的靜態資源 (js、css、img、fonts) 的；（專案打包之後，靜態資源會放在這個資料夾下）
   assetsDir: 'static',
-  // 是否开启eslint保存检测，有效值：ture | false | 'error'
+  // 是否開啟eslint儲存檢測，有效值：ture | false | 'error'
   lintOnSave: process.env.NODE_ENV === 'development',
-  // 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
+  // 如果你不需要生產環境的 source map，可以將其設定為 false 以加速生產環境建構。
   productionSourceMap: false,
-  // webpack-dev-server 相关配置
+  // webpack-dev-server 相關配置
   devServer: {
     host: '0.0.0.0',
     port: port,

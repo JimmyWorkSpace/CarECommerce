@@ -90,6 +90,6 @@ public class OgController {
     if (uid != null) {
       return new RedirectView(webUrl + "/" + uid);
     }
-    return new RedirectView("/error"); // 跳转到错误页
+            return new RedirectView("/error"); // 跳轉到錯誤頁
   }
 }

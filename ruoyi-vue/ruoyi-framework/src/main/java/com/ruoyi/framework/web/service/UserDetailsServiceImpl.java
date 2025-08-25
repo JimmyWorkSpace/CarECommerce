@@ -15,7 +15,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysUserService;
 
 /**
- * 用户验证处理
+ * 用戶驗證處理
  *
  * @author ruoyi
  */
@@ -36,18 +36,18 @@ public class UserDetailsServiceImpl implements UserDetailsService
         SysUser user = userService.selectUserByUserName(username);
         if (StringUtils.isNull(user))
         {
-            log.info("登录用户：{} 不存在.", username);
-            throw new ServiceException("登录用户：" + username + " 不存在");
+            log.info("登入用戶：{} 不存在.", username);
+            throw new ServiceException("登入用戶：" + username + " 不存在");
         }
         else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
-            log.info("登录用户：{} 已被删除.", username);
-            throw new ServiceException("对不起，您的账号：" + username + " 已被删除");
+            log.info("登入用戶：{} 已被刪除.", username);
+            throw new ServiceException("對不起，您的帳號：" + username + " 已被刪除");
         }
         else if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
         {
-            log.info("登录用户：{} 已被停用.", username);
-            throw new ServiceException("对不起，您的账号：" + username + " 已停用");
+            log.info("登入用戶：{} 已被停用.", username);
+            throw new ServiceException("對不起，您的帳號：" + username + " 已停用");
         }
 
         return createLoginUser(user);

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import com.ruoyi.common.utils.poi.ExcelHandlerAdapter;
 
 /**
- * 自定义导出Excel数据注解
+ * 自定義匯出Excel資料註解
  * 
  * @author ruoyi
  */
@@ -17,12 +17,12 @@ import com.ruoyi.common.utils.poi.ExcelHandlerAdapter;
 public @interface Excel
 {
     /**
-     * 导出时在excel中排序
+     * 匯出時在excel中排序
      */
     public int sort() default Integer.MAX_VALUE;
 
     /**
-     * 导出到Excel中的名字.
+     * 匯出到Excel中的名字.
      */
     public String name() default "";
 
