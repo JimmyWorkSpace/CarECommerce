@@ -241,7 +241,7 @@ public class CarViewController {
                 car.put("fuelType", fuelTypes[i % fuelTypes.length]);
                 car.put("transmission", transmissions[i % transmissions.length]);
                 car.put("bodyType", bodyTypes[i % bodyTypes.length]);
-                car.put("image", "/img/car/car" + ((i % 12) + 4) + ".jpg");
+                car.put("image", "/img/car/car6.jpg");
                 car.put("title", brands[brandIndex] + " " + models[modelIndex] + " " + (2018 + (i % 7)));
                 
                 cars.add(car);
