@@ -1,13 +1,13 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">车势后台</h3>
+      <h3 class="title">車勢後台</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
           type="text"
           auto-complete="off"
-          placeholder="账号"
+          placeholder="帳號"
         >
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
         </el-input>
@@ -17,7 +17,7 @@
           v-model="loginForm.password"
           type="password"
           auto-complete="off"
-          placeholder="密码"
+          placeholder="密碼"
           @keyup.enter.native="handleLogin"
         >
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
@@ -27,7 +27,7 @@
         <el-input
           v-model="loginForm.code"
           auto-complete="off"
-          placeholder="验证码"
+          placeholder="驗證碼"
           style="width: 63%"
           @keyup.enter.native="handleLogin"
         >
@@ -37,7 +37,7 @@
           <img :src="codeUrl" @click="getCode" class="login-code-img"/>
         </div>
       </el-form-item>
-      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">記住密碼</el-checkbox>
       <el-form-item style="width:100%;">
         <el-button
           :loading="loading"
@@ -50,7 +50,7 @@
           <span v-else>登 录 中...</span>
         </el-button>
         <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/register'">立即注册</router-link>
+          <router-link class="link-type" :to="'/register'">立即註冊</router-link>
         </div>
       </el-form-item>
     </el-form>
@@ -80,17 +80,17 @@ export default {
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", message: "请输入您的账号" }
+          { required: true, trigger: "blur", message: "請輸入您的帳號" }
         ],
         password: [
-          { required: true, trigger: "blur", message: "请输入您的密码" }
+          { required: true, trigger: "blur", message: "請輸入您的密碼" }
         ],
-        code: [{ required: true, trigger: "change", message: "请输入验证码" }]
+        code: [{ required: true, trigger: "change", message: "請輸入驗證碼" }]
       },
       loading: false,
-      // 验证码开关
+      // 驗證碼開關
       captchaOnOff: true,
-      // 注册开关
+      // 註冊開關
       register: false,
       redirect: undefined
     };
