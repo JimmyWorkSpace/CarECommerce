@@ -1,11 +1,17 @@
 package cc.carce.sale.service;
 
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
 import cc.carce.sale.entity.CarSalesEntity;
+import cc.carce.sale.form.CarSalesSearchForm;
 import cc.carce.sale.mapper.carcecloud.CarSalesMapper;
 import cn.hutool.core.util.StrUtil;
-import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
 @Service
@@ -62,5 +68,17 @@ public class CarSalesService {
 		Example example = new Example(CarSalesEntity.class);
 		example.createCriteria().andEqualTo("id", carSaleId);
 		return carSalesMapper.selectOneByExample(example);
+	}
+
+	public PageInfo<CarSalesEntity> getRecommendCarsSalesByPage(CarSalesSearchForm form) {
+		Example example = new Example(CarSalesEntity.class);
+		example.createCriteria().andGreaterThan("recommendedValue", 0L);
+		example.orderBy("recommendedValue").desc();
+		PageInfo<CarSalesEntity> pi = PageHelper
+				.startPage(form.getPageNum(), form.getPageSize())
+				.doSelectPageInfo(() -> {
+			carSalesMapper.selectOneByExample(example);
+		});
+		return pi;
 	}
 }

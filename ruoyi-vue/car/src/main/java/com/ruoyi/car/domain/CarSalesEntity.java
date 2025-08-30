@@ -125,4 +125,7 @@ public class CarSalesEntity {
 
     @Column(name = "second_warning_issued_at")
     private Date secondWarningIssuedAt;
+    
+    @Column(name = "recommended_value")
+    private Long recommendedValue;
 }
