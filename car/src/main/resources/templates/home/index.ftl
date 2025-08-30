@@ -6,26 +6,35 @@
     <div class="hero-section">
         <div class="swiper hero-swiper">
             <div class="swiper-wrapper">
-                <#list heroSlides as slide>
-                <div class="swiper-slide">
-                    <#if slide.isLink == "true">
-                    <a href="${slide.link}" class="hero-slide-link">
-                        <img src="${slide.image}" alt="${slide.title}" class="hero-image">
-                        <div class="hero-content">
-                            <h2 class="hero-title">${slide.title}</h2>
-                            <p class="hero-subtitle">${slide.subtitle}</p>
+                <!-- 使用 Vue.js 动态展示轮播图数据 -->
+                <div class="swiper-slide" v-for="(banner, index) in banners" :key="banner.id">
+                    <!-- 链接类型轮播图 -->
+                    <a v-if="banner.isLink && banner.linkUrl" :href="banner.linkUrl" class="hero-slide-link">
+                        <img :src="banner.imageUrl" :alt="banner.title || '轮播图' + (index + 1)" class="hero-image">
+                        <div class="hero-content" v-if="banner.title">
+                            <h2 class="hero-title" v-text="banner.title"></h2>
+                            <p class="hero-subtitle" v-if="banner.subtitle" v-text="banner.subtitle"></p>
                             <span class="hero-btn">了解更多</span>
                         </div>
                     </a>
-                    <#else>
-                    <img src="${slide.image}" alt="${slide.title}" class="hero-image">
-                    <div class="hero-content">
-                        <h2 class="hero-title">${slide.title}</h2>
-                        <p class="hero-subtitle">${slide.subtitle}</p>
-                    </div>
-                    </#if>
+                    <!-- 非链接类型轮播图 -->
+                    <template v-else>
+                        <img :src="banner.imageUrl" :alt="banner.title || '轮播图' + (index + 1)" class="hero-image">
+                        <div class="hero-content" v-if="banner.title">
+                            <h2 class="hero-title" v-text="banner.title"></h2>
+                            <p class="hero-subtitle" v-if="banner.subtitle" v-text="banner.subtitle"></p>
+                        </div>
+                    </template>
                 </div>
-                </#list>
+                
+                <!-- 当没有轮播图数据时显示默认内容 -->
+                <div class="swiper-slide" v-if="!banners || banners.length === 0">
+                    <img src="/img/default-hero.jpg" alt="默认轮播图" class="hero-image">
+                    <div class="hero-content">
+                        <h2 class="hero-title">歡迎來到二手車銷售平台</h2>
+                        <p class="hero-subtitle">尋找您的理想座駕</p>
+                    </div>
+                </div>
             </div>
             <!-- 分页器 -->
             <div class="swiper-pagination"></div>
@@ -70,36 +79,30 @@
     <div class="ad-section">
         <div class="container">
             <div class="row">
-                <#if advertisements?? && advertisements?size gt 0>
-                    <#list advertisements as ad>
-                    <div class="col-12 col-md-6 mb-4">
-                        <div class="ad-card" data-ad-id="${ad.id}">
-                            <#if ad.isLink == 1>
-                            <a href="${ad.linkUrl}" class="ad-link" target="_blank">
-                                <img src="${ad.imageUrl}" alt="${ad.title}" class="ad-image" 
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <#if ad.title?? && ad.title != ''>
-                                <div class="ad-title-overlay" style="display: none;">${ad.title}</div>
-                                </#if>
-                            </a>
-                            <#else>
-                            <div class="ad-content-link" onclick="showAdContent('${ad.id?string}', '${ad.title?js_string}', '${ad.content?js_string}')">
-                                <img src="${ad.imageUrl}" alt="${ad.title}" class="ad-image"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <#if ad.title?? && ad.title != ''>
-                                <div class="ad-title-overlay" style="display: none;">${ad.title}</div>
-                                </#if>
-                            </div>
-                            </#if>
+                <!-- 使用 Vue.js 动态展示广告数据 -->
+                <div class="col-12 col-md-6 mb-4" v-for="(ad, index) in advertisements" :key="ad.id">
+                    <div class="ad-card" :data-ad-id="ad.id">
+                        <!-- 链接类型广告 -->
+                        <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
+                            <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
+                                 @error="handleImageError($event, ad.title)">
+                            <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                        </a>
+                        <!-- 内容类型广告 -->
+                        <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                            <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
+                                 @error="handleImageError($event, ad.title)">
+                            <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
                         </div>
                     </div>
-                    </#list>
-                <#else>
-                    <!-- 默认广告内容 -->
+                </div>
+                
+                <!-- 当没有广告数据时显示默认内容 -->
+                <template v-if="!advertisements || advertisements.length === 0">
                     <div class="col-12 col-md-6 mb-4">
                         <div class="ad-card">
                             <img src="/img/ad1.jpg" alt="专业检测" class="ad-image" 
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                 @error="handleImageError($event, '專業檢測')">
                             <div class="ad-title-overlay" style="display: none;">專業檢測</div>
                         </div>
                     </div>
@@ -108,7 +111,7 @@
                             <iframe src="/ad-content.html" class="ad-iframe" frameborder="0"></iframe>
                         </div>
                     </div>
-                </#if>
+                </template>
             </div>
         </div>
     </div>
@@ -188,6 +191,9 @@ new Vue({
     el: '#app',
     data: {
         searchKeyword: '',
+        advertisements: [],
+        banners: [],
+        heroSwiper: null,
         features: [
             {
                 icon: 'bi bi-shield-check',
@@ -209,9 +215,45 @@ new Vue({
 
     },
     mounted() {
-        this.initHeroSlider();
+        this.getAdvertisement();
+        this.getBanner();
     },
     methods: {
+        getBanner(){
+            let _this = this;
+            $.ajax({
+                url: '/api/banner/list',
+                method: 'GET',
+                success: (data) => {
+                    _this.banners = data.data;
+                    console.log(data);
+                    // 数据加载完成后重新初始化 Swiper
+                    _this.$nextTick(() => {
+                        _this.initHeroSlider();
+                    });
+                },
+                error: (error) => {
+                    console.log(error);
+                    // 加载失败时也初始化 Swiper，显示默认内容
+                    _this.$nextTick(() => {
+                        _this.initHeroSlider();
+                    });
+                }
+            });
+        },
+        getAdvertisement(){
+            let _this = this;
+            $.ajax({
+                url: '/api/advertisement/list',
+                method: 'GET',
+                success: (data) => {
+                    _this.advertisements = data.data;
+                },
+                error: (error) => {
+                    console.log(error);
+                }
+            });
+        },
         performSearch() {
             if (this.searchKeyword.trim()) {
                 // 執行搜尋邏輯
@@ -219,8 +261,13 @@ new Vue({
             }
         },
         initHeroSlider() {
+            // 銷毀之前的 Swiper 實例（如果存在）
+            if (this.heroSwiper) {
+                this.heroSwiper.destroy(true, true);
+            }
+            
             // 初始化Swiper輪播圖
-            new Swiper('.hero-swiper', {
+            this.heroSwiper = new Swiper('.hero-swiper', {
                 // 循環模式
                 loop: true,
                 // 自動播放
@@ -253,6 +300,14 @@ new Vue({
             }
             // 打開新窗口顯示廣告內容頁面
             window.open('/ad-content/' + adId, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+        },
+
+        // 處理圖片加載失敗
+        handleImageError(event, title) {
+            event.target.style.display = 'none';
+            if (event.target.nextElementSibling) {
+                event.target.nextElementSibling.style.display = 'block';
+            }
         },
 
     }

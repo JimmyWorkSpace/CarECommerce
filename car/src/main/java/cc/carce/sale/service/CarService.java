@@ -8,8 +8,11 @@ import cc.carce.sale.entity.CarSalePhotoEntity;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.entity.dto.CarEquipment;
 import cc.carce.sale.entity.dto.CarGuarantee;
+import cc.carce.sale.form.CarSalesSearchForm;
 import cc.carce.sale.mapper.carcecloud.CarMapper;
 import cn.hutool.core.collection.CollUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -160,6 +163,41 @@ public class CarService {
 			log.error("从ftp获取图片信息失败", e);
 		}
 		return new ArrayList<>();
+	}
+
+	/**
+	 * 分页查询车辆列表
+	 * @param pageNum 页码
+	 * @param pageSize 每页大小
+	 * @return 分页结果
+	 */
+	public PageInfo<CarEntity> getCarsByPage(int pageNum, int pageSize) {
+		// 使用PageHelper进行分页
+		PageHelper.startPage(pageNum, pageSize);
+		
+		// 查询所有车辆数据
+		List<CarEntity> cars = carMapper.selectAll();
+		
+		// 返回分页信息
+		return new PageInfo<>(cars);
+	}
+
+	/**
+	 * 根据条件分页查询车辆列表
+	 * @param pageNum 页码
+	 * @param pageSize 每页大小
+	 * @param carEntity 查询条件
+	 * @return 分页结果
+	 */
+	public PageInfo<CarEntity> getCarsByPageWithCondition(int pageNum, int pageSize, CarEntity carEntity) {
+		// 使用PageHelper进行分页
+		PageHelper.startPage(pageNum, pageSize);
+		
+		// 根据条件查询车辆数据
+		List<CarEntity> cars = carMapper.select(carEntity);
+		
+		// 返回分页信息
+		return new PageInfo<>(cars);
 	}
 
 }

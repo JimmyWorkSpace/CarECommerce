@@ -36,10 +36,14 @@ import cc.carce.sale.service.CarAdvertisementService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * 汽车详情页面控制器
  */
+@Api(tags = "汽车视图控制器", description = "处理汽车相关页面展示")
 @Controller
 @CrossOrigin()
 @RequestMapping("/")
@@ -66,6 +70,7 @@ public class CarViewController {
     /**
      * 首页
      */
+    @ApiOperation(value = "首页展示", notes = "显示首页内容，包括Banner、精选好车、店家和广告")
     @GetMapping("/")
     public String homePage(Model model, HttpServletRequest req) {
         try {

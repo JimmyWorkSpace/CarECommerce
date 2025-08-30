@@ -29,6 +29,9 @@ public class CarSalePhotoEntity {
   @Column(name = "photo_order")
   private Integer photoOrder;
 
+  @Column(name = "is_thumb_do")
+  private Integer isThumbDo;
+
   @Column(name = "c_dt")
   private Date cDt;
 }

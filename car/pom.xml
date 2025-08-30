@@ -23,6 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tk.mybatis.version>2.1.5</tk.mybatis.version>
         <hutool.version>5.8.25</hutool.version>
+        <pagehelper.boot.version>1.4.1</pagehelper.boot.version>
     </properties>
 
     <dependencies>
@@ -101,7 +102,12 @@
             <version>1.2.20</version>
         </dependency>
         
-
+<!-- pagehelper 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.boot.version}</version>
+            </dependency>
 
 
 
@@ -117,6 +123,20 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>3.9.0</version>
+        </dependency>
+
+        <!-- PageHelper 分页插件 -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+
+        <!-- Swagger 依赖 -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
     
