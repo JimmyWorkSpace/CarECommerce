@@ -81,4 +81,16 @@ mybatis:
   typeAliasesPackage: cc.carce.sale.entity
   mapperLocations: classpath*:mapper/**/*Mapper.xml
   configLocation: classpath:mybatis/mybatis-config.xml
+  
+ecpay:
+  service-url: https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5
+  return-url: https://www.weisliu.com/ecpay/return          # ✅ 支付結果回調
+  store-callback-url: https://www.weisliu.com/shipping/storeCallback  # ✅ 超商門市回調
+  client-back-url: https://www.weisliu.com/checkout/success
+  map-url: https://logistics-stage.ecpay.com.tw/Express/map   # ✅ 新增物流門市地圖 API
+  hash-key: 1g0h0vxYukFihTZX
+  hash-iv: pW1pnfGdkQYuKbBQ
+  merchant-id: 3014517
+  logistics-url: https://logistics-stage.ecpay.com.tw   # 🔹 測試物流 API
+
 
