@@ -62,4 +62,22 @@ public class TestController {
         
         return "redirect:/test";
     }
+    
+    /**
+     * 短信验证码登录测试页面
+     */
+    @GetMapping("/test/sms-test")
+    public String smsTestPage(Model model, HttpServletRequest req) {
+        // 检查用户登录状态
+        Object user = req.getSession().getAttribute("user");
+        model.addAttribute("user", user);
+        
+        model.addAttribute("title", "短信验证码登录测试 - 二手车销售平台");
+        model.addAttribute("description", "测试短信验证码登录功能");
+        model.addAttribute("url", req.getRequestURL().toString());
+        model.addAttribute("image", "/img/swipper/slide1.jpg");
+        model.addAttribute("content", "/test/sms-test.ftl");
+        
+        return "/layout/main";
+    }
 } 

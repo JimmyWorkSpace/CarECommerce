@@ -1,4 +1,4 @@
-<div class="login-container">
+<div class="login-container" id="app">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8 col-xl-6">
             <div class="card shadow-lg">
@@ -16,31 +16,30 @@
                         </div>
                     </#if>
                     
-                    <form action="/login" method="post">
+                    <form action="/login" method="post" id="loginForm" <#noparse>@submit.prevent="handleSubmit"</#noparse>>
                         <!-- 隱藏的返回 URL 字段 -->
                         <input type="hidden" name="returnUrl" value="${returnUrl!''}">
                         
                         <div class="mb-3">
-                            <label for="username" class="form-label">
-                                <i class="bi bi-person me-2"></i>用戶名
+                            <label for="phoneNumber" class="form-label">
+                                <i class="bi bi-phone me-2"></i>手機號碼
                             </label>
-                            <input type="text" class="form-control" id="username" name="username" 
-                                   placeholder="請輸入用戶名" required>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
+                                   placeholder="請輸入手機號碼" required <#noparse>v-model.trim="phoneNumber" @input="onPhoneInput"</#noparse>>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="password" class="form-label">
-                                <i class="bi bi-lock me-2"></i>密碼
+                            <label for="smsCode" class="form-label">
+                                <i class="bi bi-shield-check me-2"></i>短信驗證碼
                             </label>
-                            <input type="password" class="form-control" id="password" name="password" 
-                                   placeholder="請輸入密碼" required>
-                        </div>
-                        
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">
-                                記住我
-                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="smsCode" name="smsCode" 
+                                       placeholder="請輸入驗證碼" required maxlength="6" <#noparse>v-model.trim="smsCode" @input="onCodeInput"</#noparse>>
+                                <button type="button" class="btn btn-outline-primary" id="sendSmsBtn" <#noparse>:disabled="countdown>0" @click="sendSms"</#noparse>>
+                                    <span id="sendSmsText"><#noparse>{{ countdown>0 ? `${countdown}秒後重發` : '發送驗證碼' }}</#noparse></span>
+                                </button>
+                            </div>
+                            <div class="form-text">驗證碼將發送到您的手機，有效期5分鐘</div>
                         </div>
                         
                         <div class="d-grid gap-2">
@@ -216,4 +215,88 @@
         font-size: 1.25rem;
     }
 }
-</style> 
+</style>
+
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        phoneNumber: '',
+        smsCode: '',
+        countdown: 0,
+        countdownTimer: null,
+        returnUrl: '${returnUrl!''}'
+    },
+    methods: {
+        isValidPhone(phone) {
+            return /^1[3-9]\d{9}$/.test(phone);
+        },
+        isValidCode(code) {
+            return /^\d{6}$/.test(code);
+        },
+        onPhoneInput(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            this.phoneNumber = value;
+        },
+        onCodeInput(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            this.smsCode = value;
+        },
+        startCountdown() {
+            this.countdown = 60;
+            if (this.countdownTimer) {
+                clearInterval(this.countdownTimer);
+            }
+            this.countdownTimer = setInterval(() => {
+                this.countdown--;
+                if (this.countdown <= 0) {
+                    clearInterval(this.countdownTimer);
+                    this.countdownTimer = null;
+                    this.countdown = 0;
+                }
+            }, 1000);
+        },
+        async sendSms() {
+            const phone = this.phoneNumber.trim();
+            if (!this.isValidPhone(phone)) {
+                alert('請輸入正確的手機號碼格式');
+                return;
+            }
+            try {
+                const res = await axios.post('/api/sms/send', { phoneNumber: phone });
+                const data = res.data;
+                if (data.success) {
+                    this.startCountdown();
+                    alert('驗證碼已發送，請查看控制台輸出');
+                } else {
+                    alert(data.message || '發送失敗，請稍後重試');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('發送失敗，請稍後重試');
+            }
+        },
+        handleSubmit() {
+            const phone = this.phoneNumber.trim();
+            const code = this.smsCode.trim();
+            if (!this.isValidPhone(phone)) {
+                alert('請輸入正確的手機號碼格式');
+                return;
+            }
+            if (!this.isValidCode(code)) {
+                alert('請輸入6位數字驗證碼');
+                return;
+            }
+            // 手动提交表单，保留原有後端處理
+            const form = document.getElementById('loginForm');
+            form.submit();
+        }
+    }
+});
+</script>

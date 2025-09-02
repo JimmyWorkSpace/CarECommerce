@@ -88,40 +88,40 @@ public class CarViewController {
             // 设置首页主图
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             
-            // 获取banner数据
-            List<CarBannerEntity> banners = carBannerService.getHomeBanners();
-            List<Map<String, String>> heroSlides = new ArrayList<>();
-            
-            if (banners != null && !banners.isEmpty()) {
-                for (CarBannerEntity banner : banners) {
-                    Map<String, String> slide = new HashMap<>();
-                    slide.put("image", banner.getImageUrl());
-                    slide.put("title", "精選二手車");
-                    slide.put("subtitle", "品質保證，價格實惠");
-                    slide.put("link", banner.getIsLink() ? banner.getLinkUrl() : "#");
-                    slide.put("isLink", banner.getIsLink().toString());
-                    heroSlides.add(slide);
-                }
-            } else {
-                // 如果没有banner数据，使用默认数据
-                Map<String, String> slide1 = new HashMap<>();
-                slide1.put("image", "/img/swipper/slide1.jpg");
-                slide1.put("title", "精選二手車");
-                slide1.put("subtitle", "品質保證，價格實惠");
-                slide1.put("link", "/cars");
-                slide1.put("isLink", "true");
-                heroSlides.add(slide1);
-                
-                Map<String, String> slide2 = new HashMap<>();
-                slide2.put("image", "/img/swipper/slide2.jpg");
-                slide2.put("title", "專業檢測");
-                slide2.put("subtitle", "每輛車都經過嚴格檢測");
-                slide2.put("link", "/inspection");
-                slide2.put("isLink", "true");
-                heroSlides.add(slide2);
-            }
-            
-            model.addAttribute("heroSlides", heroSlides);
+//            // 获取banner数据
+//            List<CarBannerEntity> banners = carBannerService.getHomeBanners();
+//            List<Map<String, String>> heroSlides = new ArrayList<>();
+//            
+//            if (banners != null && !banners.isEmpty()) {
+//                for (CarBannerEntity banner : banners) {
+//                    Map<String, String> slide = new HashMap<>();
+//                    slide.put("image", banner.getImageUrl());
+//                    slide.put("title", "精選二手車");
+//                    slide.put("subtitle", "品質保證，價格實惠");
+//                    slide.put("link", banner.getIsLink() ? banner.getLinkUrl() : "#");
+//                    slide.put("isLink", banner.getIsLink().toString());
+//                    heroSlides.add(slide);
+//                }
+//            } else {
+//                // 如果没有banner数据，使用默认数据
+//                Map<String, String> slide1 = new HashMap<>();
+//                slide1.put("image", "/img/swipper/slide1.jpg");
+//                slide1.put("title", "精選二手車");
+//                slide1.put("subtitle", "品質保證，價格實惠");
+//                slide1.put("link", "/cars");
+//                slide1.put("isLink", "true");
+//                heroSlides.add(slide1);
+//                
+//                Map<String, String> slide2 = new HashMap<>();
+//                slide2.put("image", "/img/swipper/slide2.jpg");
+//                slide2.put("title", "專業檢測");
+//                slide2.put("subtitle", "每輛車都經過嚴格檢測");
+//                slide2.put("link", "/inspection");
+//                slide2.put("isLink", "true");
+//                heroSlides.add(slide2);
+//            }
+//            
+//            model.addAttribute("heroSlides", heroSlides);
             
             // 设置精选好车数据
             List<Map<String, String>> cars = new ArrayList<>();
@@ -413,7 +413,7 @@ public class CarViewController {
     /**
      * 跳转到汽车详情页面
      */
-    @GetMapping("/{uid}")
+     @GetMapping("/{uid}")
     public String carDetail(Model model, @PathVariable("uid") String uid, HttpServletRequest req) {
         // 排除静态资源路径
         if (uid.contains(".") || uid.startsWith("ad-") || uid.startsWith("img/") || uid.startsWith("css/") || uid.startsWith("js/")) {

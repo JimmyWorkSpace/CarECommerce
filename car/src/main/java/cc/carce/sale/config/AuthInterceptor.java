@@ -1,5 +1,6 @@
 package cc.carce.sale.config;
 
+import cn.dev33.satoken.stp.StpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpSession;
 
 /**
  * 自定义认证拦截器
- * 替代Sa-Token的功能，处理用户登录状态
+ * 兼容Sa-Token和Session的用户登录状态
  */
 @Component
 @Slf4j
@@ -24,24 +25,21 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HttpSession session = request.getSession();
         
-        // 检查用户是否已登录
+        // 检查用户是否已登录（优先检查Sa-Token）
+        boolean isLoggedIn = StpUtil.isLogin();
         Object user = session.getAttribute("user");
         
-        // 只在开发环境中自动设置登录状态
-//        if (user == null && ("dev".equals(activeProfile) || "test".equals(activeProfile))) {
-//            // 创建一个模拟用户对象
-//            UserInfo testUser = new UserInfo();
-//            testUser.setId(1L);
-//            testUser.setUsername("test_user");
-//            testUser.setNickname("测试用户");
-//            testUser.setEmail("test@example.com");
-//            testUser.setPhone("13800138000");
-//            
-//            // 将用户信息存储到session中
-//            session.setAttribute("user", testUser);
-//            
-//            log.info("开发环境自动设置用户登录状态 - 用户ID: {}, 用户名: {}", testUser.getId(), testUser.getUsername());
-//        }
+        // 如果Sa-Token显示已登录但session中没有用户信息，尝试从Sa-Token获取
+        if (isLoggedIn && user == null) {
+            try {
+                Object loginId = StpUtil.getLoginId();
+                if (loginId != null) {
+                    log.info("Sa-Token检测到用户已登录，登录ID: {}", loginId);
+                }
+            } catch (Exception e) {
+                log.warn("Sa-Token状态异常", e);
+            }
+        }
         
         return true;
     }
