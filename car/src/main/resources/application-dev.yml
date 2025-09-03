@@ -46,3 +46,14 @@ spring:
       test-on-return: false
       # 连接超时配置
 #      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000;druid.stat.logSlowSql=true;druid.connectionTimeout=30000;druid.validationQueryTimeout=10000
+
+# 绿界支付配置
+ecpay:
+  # 测试环境配置
+  production: false
+  merchant-id: "2000132"  # 测试商户编号
+  hash-key: "5294y06JbISpM5x9"  # 测试HashKey
+  hash-iv: "v77hoKGq4kWxNNIS"   # 测试HashIV
+  return-url: "http://localhost:8080/api/payment/return"
+  notify-url: "http://localhost:8080/api/payment/callback"
+  client-back-url: "http://localhost:8080/payment/result"
