@@ -31,7 +31,7 @@ public class ECPayController {
         try {
             // 检查用户登录状态
             if (!StpUtil.isLogin()) {
-                return R.fail("請先登錄");
+                return R.fail("請先登錄", null);
             }
             
             Long userId = StpUtil.getLoginIdAsLong();
@@ -41,11 +41,11 @@ public class ECPayController {
             
             // 参数验证
             if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-                return R.fail("支付金額必須大於0");
+                return R.fail("支付金額必須大於0", null);
             }
             
             if (itemName == null || itemName.trim().isEmpty()) {
-                return R.fail("商品名稱不能為空");
+                return R.fail("商品名稱不能為空", null);
             }
             
             if (description == null || description.trim().isEmpty()) {
@@ -58,7 +58,7 @@ public class ECPayController {
             
         } catch (Exception e) {
             log.error("创建支付订单异常", e);
-            return R.fail("創建支付訂單異常: " + e.getMessage());
+            return R.fail("創建支付訂單異常: " + e.getMessage(), null);
         }
     }
     
@@ -70,7 +70,7 @@ public class ECPayController {
         try {
             // 检查用户登录状态
             if (!StpUtil.isLogin()) {
-                return R.fail("請先登錄");
+                return R.fail("請先登錄", null);
             }
             
             Long userId = StpUtil.getLoginIdAsLong();
@@ -81,7 +81,7 @@ public class ECPayController {
             if (result.isSuccess() && result.getData() != null) {
                 // 检查订单所属用户
                 if (!result.getData().getUserId().equals(userId)) {
-                    return R.fail("無權限查看此訂單");
+                    return R.fail("無權限查看此訂單", null);
                 }
             }
             
@@ -89,7 +89,7 @@ public class ECPayController {
             
         } catch (Exception e) {
             log.error("查询支付订单状态异常", e);
-            return R.fail("查詢支付訂單狀態異常");
+            return R.fail("查詢支付訂單狀態異常", null);
         }
     }
     
@@ -101,7 +101,7 @@ public class ECPayController {
         try {
             // 检查用户登录状态
             if (!StpUtil.isLogin()) {
-                return R.fail("請先登錄");
+                return R.fail("請先登錄", null);
             }
             
             Long userId = StpUtil.getLoginIdAsLong();
@@ -112,7 +112,7 @@ public class ECPayController {
             
         } catch (Exception e) {
             log.error("取消支付订单异常", e);
-            return R.fail("取消支付訂單異常");
+            return R.fail("取消支付訂單異常", null);
         }
     }
     

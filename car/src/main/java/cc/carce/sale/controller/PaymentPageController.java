@@ -26,6 +26,7 @@ public class PaymentPageController {
     public String showPaymentPage(@RequestParam(required = false) String itemName,
                                  @RequestParam(required = false) BigDecimal amount,
                                  @RequestParam(required = false) String description,
+                                 @RequestParam(required = false) String cartData,
                                  Model model,
                                  HttpSession session) {
         
@@ -36,14 +37,29 @@ public class PaymentPageController {
             return "redirect:/login?returnUrl=/payment/index";
         }
         
+        // 获取当前环境配置
+        String activeProfile = System.getProperty("spring.profiles.active");
+        if (activeProfile == null) {
+            activeProfile = "dev"; // 默认使用dev环境
+        }
+        
+        // 如果是dev或test环境，金额固定为1
+        BigDecimal finalAmount = amount;
+        if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
+            finalAmount = BigDecimal.ONE;
+            log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", amount);
+        }
+        
         // 设置页面数据
         model.addAttribute("itemName", itemName != null ? itemName : "汽车商品");
-        model.addAttribute("amount", amount != null ? amount : BigDecimal.ZERO);
+        model.addAttribute("amount", finalAmount != null ? finalAmount : BigDecimal.ZERO);
         model.addAttribute("description", description != null ? description : "");
+        model.addAttribute("cartData", cartData);
         model.addAttribute("userInfo", userInfo);
+        model.addAttribute("isDevOrTest", "dev".equals(activeProfile) || "test".equals(activeProfile));
         
-        log.info("用户访问支付页面，用户ID: {}, 商品: {}, 金额: {}", 
-                userInfo.getId(), itemName, amount);
+        log.info("用户访问支付页面，用户ID: {}, 商品: {}, 金额: {}, 环境: {}", 
+                userInfo.getId(), itemName, finalAmount, activeProfile);
         
         return "payment/index";
     }

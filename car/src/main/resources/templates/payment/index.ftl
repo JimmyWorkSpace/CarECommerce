@@ -68,6 +68,49 @@
             color: #28a745;
             margin-top: 10px;
         }
+        
+        .cart-items-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .cart-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .cart-item-info {
+            flex: 1;
+        }
+        
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .cart-item-price {
+            font-weight: 600;
+            color: #e74c3c;
+        }
     </style>
 </head>
 <body>
@@ -76,6 +119,14 @@
             <div class="payment-header">
                 <h2><i class="bi bi-credit-card"></i> 支付订单</h2>
                 <p class="text-muted">请选择支付方式并完成支付</p>
+                
+                <!-- 环境提示 -->
+                <#if isDevOrTest?? && isDevOrTest>
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>测试环境提示：</strong>当前为开发/测试环境，支付金额固定为1元
+                </div>
+                </#if>
             </div>
             
             <div class="payment-form">
@@ -100,6 +151,16 @@
                         <textarea class="form-control" id="description" name="description" 
                                   rows="3" placeholder="请输入订单描述（可选）">${description!''}</textarea>
                     </div>
+                    
+                    <!-- 购物车商品列表 -->
+                    <#if cartData?? && cartData != ''>
+                    <div class="form-group">
+                        <label class="form-label">购物车商品</label>
+                        <div class="cart-items-list" id="cartItemsList">
+                            <!-- 商品列表将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                    </#if>
                     
                     <div class="payment-methods">
                         <label class="form-label">选择支付方式</label>
@@ -157,6 +218,9 @@
     <script src="/js/axios.min.js"></script>
     <script>
         $(document).ready(function() {
+            // 初始化购物车商品列表
+            initCartItemsList();
+            
             // 支付方式选择
             $('.payment-method-item').click(function() {
                 $('.payment-method-item').removeClass('selected');
@@ -268,6 +332,39 @@
             function hideMessages() {
                 $('#errorMessage').hide();
                 $('#successMessage').hide();
+            }
+            
+            // 初始化购物车商品列表
+            function initCartItemsList() {
+                const cartData = '${cartData!""}';
+                if (cartData) {
+                    try {
+                        const cartItems = JSON.parse(decodeURIComponent(cartData));
+                        if (cartItems && cartItems.items && cartItems.items.length > 0) {
+                            const cartListContainer = $('#cartItemsList');
+                            cartListContainer.empty();
+                            
+                            cartItems.items.forEach(item => {
+                                const cartItemHtml = `
+                                    <div class="cart-item">
+                                        <div class="cart-item-info">
+                                            <div class="cart-item-name">${item.productName}</div>
+                                            <div class="cart-item-details">
+                                                数量: ${item.productAmount} × ¥${parseFloat(item.productPrice).toFixed(2)}
+                                            </div>
+                                        </div>
+                                        <div class="cart-item-price">
+                                            ¥${parseFloat(item.subtotal).toFixed(2)}
+                                        </div>
+                                    </div>
+                                `;
+                                cartListContainer.append(cartItemHtml);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('解析购物车数据失败:', error);
+                    }
+                }
             }
             
             // 初始化

@@ -37,6 +37,19 @@ public class ECPayService {
     @Transactional
     public R<Map<String, String>> createPayment(Long userId, BigDecimal amount, String itemName, String description) {
         try {
+            // 获取当前环境配置
+            String activeProfile = System.getProperty("spring.profiles.active");
+            if (activeProfile == null) {
+                activeProfile = "dev"; // 默认使用dev环境
+            }
+            
+            // 如果是dev或test环境，金额固定为1
+            BigDecimal finalAmount = amount;
+            if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
+                finalAmount = BigDecimal.ONE;
+                log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", amount);
+            }
+            
             // 生成商户订单号
             String merchantTradeNo = generateMerchantTradeNo();
             
@@ -44,7 +57,7 @@ public class ECPayService {
             PaymentOrderEntity paymentOrder = new PaymentOrderEntity();
             paymentOrder.setMerchantTradeNo(merchantTradeNo);
             paymentOrder.setUserId(userId);
-            paymentOrder.setTotalAmount(amount);
+            paymentOrder.setTotalAmount(finalAmount);
             paymentOrder.setItemName(itemName);
             paymentOrder.setTradeDesc(description);
             paymentOrder.setPaymentStatus(PaymentOrderEntity.PaymentStatus.PENDING.getCode());
@@ -55,26 +68,26 @@ public class ECPayService {
             // 保存到数据库
             int result = paymentOrderMapper.insert(paymentOrder);
             if (result <= 0) {
-                log.error("保存支付订单失败，用户ID: {}, 金额: {}", userId, amount);
-                return R.fail("創建支付訂單失敗");
+                log.error("保存支付订单失败，用户ID: {}, 金额: {}", userId, finalAmount);
+                return R.fail("創建支付訂單失敗", null);
             }
             
             // 构建绿界支付参数
             Map<String, String> paymentParams = ecPayUtils.buildPaymentParams(
                 merchantTradeNo,
                 description,
-                amount.intValue(),
+                finalAmount.intValue(),
                 itemName
             );
             
-            log.info("创建支付订单成功，商户订单号: {}, 用户ID: {}, 金额: {}", 
-                    merchantTradeNo, userId, amount);
+            log.info("创建支付订单成功，商户订单号: {}, 用户ID: {}, 金额: {}, 环境: {}", 
+                    merchantTradeNo, userId, finalAmount, activeProfile);
             
             return R.ok(paymentParams);
             
         } catch (Exception e) {
             log.error("创建支付订单异常", e);
-            return R.fail("創建支付訂單異常: " + e.getMessage());
+            return R.fail("創建支付訂單異常: " + e.getMessage(), null);
         }
     }
     
@@ -161,14 +174,14 @@ public class ECPayService {
         try {
             PaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
             if (paymentOrder == null) {
-                return R.fail("支付訂單不存在");
+                return R.fail("支付訂單不存在", null);
             }
             
             return R.ok(paymentOrder);
             
         } catch (Exception e) {
             log.error("查询支付订单状态异常", e);
-            return R.fail("查詢支付訂單狀態異常");
+            return R.fail("查詢支付訂單狀態異常", null);
         }
     }
     
@@ -180,17 +193,17 @@ public class ECPayService {
         try {
             PaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
             if (paymentOrder == null) {
-                return R.fail("支付訂單不存在");
+                return R.fail("支付訂單不存在", null);
             }
             
             // 检查订单所属用户
             if (!paymentOrder.getUserId().equals(userId)) {
-                return R.fail("無權限操作此訂單");
+                return R.fail("無權限操作此訂單", null);
             }
             
             // 检查订单状态
             if (!PaymentOrderEntity.PaymentStatus.PENDING.getCode().equals(paymentOrder.getPaymentStatus())) {
-                return R.fail("訂單狀態不允許取消");
+                return R.fail("訂單狀態不允許取消", null);
             }
             
             // 更新订单状态为已取消
@@ -206,12 +219,12 @@ public class ECPayService {
                 log.info("支付订单取消成功，商户订单号: {}", merchantTradeNo);
                 return R.ok(true);
             } else {
-                return R.fail("取消支付訂單失敗");
+                return R.fail("取消支付訂單失敗", null);
             }
             
         } catch (Exception e) {
             log.error("取消支付订单异常", e);
-            return R.fail("取消支付訂單異常");
+            return R.fail("取消支付訂單異常", null);
         }
     }
     

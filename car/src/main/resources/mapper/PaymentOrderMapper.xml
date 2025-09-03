@@ -31,7 +31,7 @@
 
     <!-- 插入支付订单 -->
     <insert id="insert" parameterType="cc.carce.sale.entity.PaymentOrderEntity" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO payment_order (
+        INSERT INTO car_payment_order (
             merchant_trade_no, ecpay_trade_no, user_id, total_amount, item_name, trade_desc,
             payment_type, payment_status, ecpay_status, ecpay_status_desc, error_message,
             create_time, update_time, del_flag
@@ -45,35 +45,35 @@
     <!-- 根据ID查询支付订单 -->
     <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM payment_order
+        FROM car_payment_order
         WHERE id = #{id} AND del_flag = 0
     </select>
 
     <!-- 根据商户订单号查询支付订单 -->
     <select id="selectByMerchantTradeNo" parameterType="java.lang.String" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM payment_order
+        FROM car_payment_order
         WHERE merchant_trade_no = #{merchantTradeNo} AND del_flag = 0
     </select>
 
     <!-- 根据绿界支付交易号查询支付订单 -->
     <select id="selectByEcpayTradeNo" parameterType="java.lang.String" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM payment_order
+        FROM car_payment_order
         WHERE ecpay_trade_no = #{ecpayTradeNo} AND del_flag = 0
     </select>
 
     <!-- 根据用户ID查询支付订单列表 -->
     <select id="selectByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM payment_order
+        FROM car_payment_order
         WHERE user_id = #{userId} AND del_flag = 0
         ORDER BY create_time DESC
     </select>
 
     <!-- 更新支付订单 -->
     <update id="updateById" parameterType="cc.carce.sale.entity.PaymentOrderEntity">
-        UPDATE payment_order
+        UPDATE car_payment_order
         <set>
             <if test="ecpayTradeNo != null">ecpay_trade_no = #{ecpayTradeNo},</if>
             <if test="paymentStatus != null">payment_status = #{paymentStatus},</if>
@@ -89,7 +89,7 @@
 
     <!-- 更新支付状态 -->
     <update id="updatePaymentStatus">
-        UPDATE payment_order
+        UPDATE car_payment_order
         SET payment_status = #{paymentStatus},
             ecpay_status = #{ecpayStatus},
             ecpay_status_desc = #{ecpayStatusDesc},
@@ -101,14 +101,14 @@
     <!-- 根据支付状态查询订单列表 -->
     <select id="selectByPaymentStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM payment_order
+        FROM car_payment_order
         WHERE payment_status = #{paymentStatus} AND del_flag = 0
         ORDER BY create_time DESC
     </select>
 
     <!-- 删除支付订单（逻辑删除） -->
     <update id="deleteById" parameterType="java.lang.Long">
-        UPDATE payment_order
+        UPDATE car_payment_order
         SET del_flag = 1, update_time = NOW()
         WHERE id = #{id}
     </update>

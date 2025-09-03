@@ -57,3 +57,4 @@ ecpay:
   return-url: "http://localhost:8080/api/payment/return"
   notify-url: "http://localhost:8080/api/payment/callback"
   client-back-url: "http://localhost:8080/payment/result"
+  result-url: "http://localhost:8080/payment/result"

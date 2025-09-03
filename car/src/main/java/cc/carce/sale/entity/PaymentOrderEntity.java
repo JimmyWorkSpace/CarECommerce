@@ -9,7 +9,7 @@ import java.util.Date;
  * 支付订单实体
  */
 @Data
-@Table(name = "payment_order")
+@Table(name = "car_payment_order")
 public class PaymentOrderEntity {
     
     @Id
@@ -117,15 +117,15 @@ public class PaymentOrderEntity {
         FAILED(2, "支付失败"),
         CANCELLED(3, "已取消");
         
-        private final int code;
+        private final Integer code;
         private final String description;
         
-        PaymentStatus(int code, String description) {
+        PaymentStatus(Integer code, String description) {
             this.code = code;
             this.description = description;
         }
         
-        public int getCode() {
+        public Integer getCode() {
             return code;
         }
         
@@ -133,9 +133,9 @@ public class PaymentOrderEntity {
             return description;
         }
         
-        public static PaymentStatus fromCode(int code) {
+        public static PaymentStatus fromCode(Integer code) {
             for (PaymentStatus status : values()) {
-                if (status.code == code) {
+                if (status.code.equals(code)) {
                     return status;
                 }
             }

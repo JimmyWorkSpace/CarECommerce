@@ -528,8 +528,45 @@ new Vue({
         
         // 结算
         async checkout() {
-            // 这里可以实现结算逻辑
-            alert('结算功能开发中...');
+            if (this.cartItems.length === 0) {
+                if (window.showErrorMessage) {
+                    window.showErrorMessage('購物車是空的，無法結算');
+                } else {
+                    this.error = '購物車是空的，無法結算';
+                }
+                return;
+            }
+            
+            try {
+                // 构建结算数据
+                const checkoutData = {
+                    items: this.cartItems.map(item => ({
+                        id: item.id,
+                        productId: item.productId,
+                        productName: item.productName,
+                        productAmount: item.productAmount,
+                        productPrice: item.productPrice,
+                        subtotal: item.subtotal
+                    })),
+                    totalAmount: this.totalPrice,
+                    totalQuantity: this.totalQuantity
+                };
+                
+                // 跳转到支付页面
+                const queryParams = new URLSearchParams({
+                    itemName: `購物車商品 (${this.cartItems.length}件)`,
+                    amount: this.totalPrice,
+                    description: `購買${this.cartItems.length}件商品，總計${this.totalPrice}元`,
+                    cartData: JSON.stringify(checkoutData)
+                });
+                
+                window.location.href = `/payment/index?${queryParams.toString()}`;
+                
+            } catch (error) {
+                console.error('結算失敗:', error);
+                const errorMessage = window.handleApiError ? window.handleApiError(error, '結算失敗，請稍後重試') : '結算失敗，請稍後重試';
+                this.error = errorMessage;
+            }
         },
         
         // 格式化价格
