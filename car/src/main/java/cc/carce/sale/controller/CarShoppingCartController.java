@@ -224,8 +224,19 @@ public class CarShoppingCartController {
 	 */
 	private Long getUserIdFromUser(Object user) {
 		try {
-			// 这里需要根据实际的用户对象结构来获取用户ID
-			// 假设用户对象有getId()方法
+			// 检查是否是AuthInterceptor.UserInfo类型
+			if (user instanceof cc.carce.sale.config.AuthInterceptor.UserInfo) {
+				cc.carce.sale.config.AuthInterceptor.UserInfo userInfo = (cc.carce.sale.config.AuthInterceptor.UserInfo) user;
+				return userInfo.getId();
+			}
+			
+			// 检查是否是CarUserEntity类型
+			if (user instanceof cc.carce.sale.entity.CarUserEntity) {
+				cc.carce.sale.entity.CarUserEntity carUser = (cc.carce.sale.entity.CarUserEntity) user;
+				return carUser.getId();
+			}
+			
+			// 使用反射作为后备方案
 			if (user != null && user.getClass().getMethod("getId") != null) {
 				return (Long) user.getClass().getMethod("getId").invoke(user);
 			}

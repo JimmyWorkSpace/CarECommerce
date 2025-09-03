@@ -1,83 +1,95 @@
 package cc.carce.sale.controller;
 
-import cc.carce.sale.config.AuthInterceptor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import cc.carce.sale.common.RedisUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 测试控制器 - 用于验证登录状态
+ * 测试控制器
+ * 用于测试Redis配置
  */
-@Controller
+@Api(tags = "测试接口")
+@RestController
+@RequestMapping("/api/test")
 public class TestController {
 
+    @Autowired(required = false)
+    private RedisUtil redisUtil;
+
     /**
-     * 测试页面 - 显示当前登录状态
+     * 测试Redis连接
      */
-    @GetMapping("/test")
-    public String testPage(Model model, HttpServletRequest req) {
-        HttpSession session = req.getSession();
-        Object user = session.getAttribute("user");
+    @ApiOperation(value = "测试Redis连接", notes = "测试Redis是否正常工作")
+    @GetMapping("/redis")
+    public Map<String, Object> testRedis() {
+        Map<String, Object> result = new HashMap<>();
         
-        model.addAttribute("user", user);
-        model.addAttribute("title", "测试页面 - 登录状态");
-        model.addAttribute("description", "测试用户登录状态");
-        model.addAttribute("url", req.getRequestURL().toString());
-        model.addAttribute("image", "/img/swipper/slide1.jpg");
-        model.addAttribute("content", "/test/index.ftl");
+        try {
+            if (redisUtil != null) {
+                // 测试Redis写入
+                redisUtil.set("test:key", "Hello Redis!");
+                // 测试Redis读取
+                Object value = redisUtil.get("test:key");
+                
+                result.put("success", true);
+                result.put("message", "Redis连接正常");
+                result.put("data", value);
+            } else {
+                result.put("success", false);
+                result.put("message", "Redis未配置或不可用");
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Redis连接失败: " + e.getMessage());
+            result.put("error", e.toString());
+        }
         
-        return "/layout/main";
+        return result;
     }
 
     /**
-     * 手动设置登录状态
+     * 测试Redis基本操作
      */
-    @GetMapping("/test/login")
-    public String testLogin(HttpServletRequest req) {
-        HttpSession session = req.getSession();
+    @ApiOperation(value = "测试Redis基本操作", notes = "测试Redis的增删改查操作")
+    @GetMapping("/redis/operations")
+    public Map<String, Object> testRedisOperations() {
+        Map<String, Object> result = new HashMap<>();
         
-        // 创建测试用户
-        AuthInterceptor.UserInfo testUser = new AuthInterceptor.UserInfo();
-        testUser.setId(999L);
-        testUser.setUsername("manual_test_user");
-        testUser.setNickname("手动测试用户");
-        testUser.setEmail("manual@test.com");
-        testUser.setPhone("13900139000");
+        try {
+            if (redisUtil != null) {
+                // 测试字符串操作
+                redisUtil.set("test:string", "测试字符串", 60);
+                Object stringValue = redisUtil.get("test:string");
+                
+                // 测试Hash操作
+                redisUtil.hset("test:hash", "field1", "value1");
+                Object hashValue = redisUtil.hget("test:hash", "field1");
+                
+                // 测试过期时间
+                long expire = redisUtil.getExpire("test:string");
+                
+                result.put("success", true);
+                result.put("message", "Redis操作测试成功");
+                result.put("data", new HashMap<String, Object>() {{
+                    put("string", stringValue);
+                    put("hash", hashValue);
+                    put("expire", expire);
+                }});
+            } else {
+                result.put("success", false);
+                result.put("message", "Redis未配置或不可用");
+            }
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Redis操作测试失败: " + e.getMessage());
+            result.put("error", e.toString());
+        }
         
-        session.setAttribute("user", testUser);
-        
-        return "redirect:/test";
-    }
-
-    /**
-     * 清除登录状态
-     */
-    @GetMapping("/test/logout")
-    public String testLogout(HttpServletRequest req) {
-        HttpSession session = req.getSession();
-        session.removeAttribute("user");
-        
-        return "redirect:/test";
-    }
-    
-    /**
-     * 短信验证码登录测试页面
-     */
-    @GetMapping("/test/sms-test")
-    public String smsTestPage(Model model, HttpServletRequest req) {
-        // 检查用户登录状态
-        Object user = req.getSession().getAttribute("user");
-        model.addAttribute("user", user);
-        
-        model.addAttribute("title", "短信验证码登录测试 - 二手车销售平台");
-        model.addAttribute("description", "测试短信验证码登录功能");
-        model.addAttribute("url", req.getRequestURL().toString());
-        model.addAttribute("image", "/img/swipper/slide1.jpg");
-        model.addAttribute("content", "/test/sms-test.ftl");
-        
-        return "/layout/main";
+        return result;
     }
 } 

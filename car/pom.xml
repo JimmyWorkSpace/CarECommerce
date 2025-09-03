@@ -52,6 +52,12 @@
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-spring-boot-starter</artifactId>
             <version>${tk.mybatis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Lombok -->
@@ -99,7 +105,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.2.20</version>
+            <version>1.2.8</version>
         </dependency>
         
 <!-- pagehelper 分页插件 -->
@@ -139,6 +145,25 @@
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-spring-boot-starter</artifactId>
             <version>1.37.0</version>
+        </dependency>
+        
+        <!-- Redis 依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        
+        <!-- Sa-Token Redis 集成 -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis</artifactId>
+            <version>1.37.0</version>
+        </dependency>
+        
+        <!-- Apache Commons Pool2 连接池支持 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
         </dependency>
     </dependencies>
     

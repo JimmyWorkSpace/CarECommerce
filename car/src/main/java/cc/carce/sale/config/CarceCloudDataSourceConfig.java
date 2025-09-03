@@ -1,6 +1,7 @@
 package cc.carce.sale.config;
 
 import javax.sql.DataSource;
+
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -13,6 +14,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+
+import com.alibaba.druid.pool.DruidDataSource;
+
 import tk.mybatis.spring.annotation.MapperScan;
 
 @Configuration
@@ -23,7 +27,9 @@ public class CarceCloudDataSourceConfig {
 	@ConfigurationProperties(prefix = "spring.datasource.carcecloud")
 	@Primary
 	public DataSource carceCloudDataSource() {
-		return DataSourceBuilder.create().build();
+		return DataSourceBuilder.create()
+				.type(DruidDataSource.class)
+				.build();
 	}
 
 	@Bean(name = "carceCloudSqlSessionFactory")

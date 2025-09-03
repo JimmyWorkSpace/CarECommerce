@@ -5,6 +5,7 @@
                 <h2 class="cart-title">
                     <i class="bi bi-cart3 me-3"></i>
                     購物車
+                    <button class="btn btn-sm btn-outline-info ms-3" @click="testAPI">测试API</button>
                 </h2>
                 
                 <!-- 加载状态 -->
@@ -49,14 +50,14 @@
                             <div class="col-md-3">
                                 <div class="quantity-controls">
                                     <button class="btn btn-sm btn-outline-secondary quantity-btn" 
-                                            @click="updateQuantity(item.id, item.productAmount - 1)"
+                                            @click="decreaseQuantity(item.id)"
                                             :disabled="item.productAmount <= 1">
-                                        <i class="bi bi-dash"></i>
+                                        <strong>-</strong>
                                     </button>
                                     <span class="quantity-display">{{ item.productAmount }}</span>
                                     <button class="btn btn-sm btn-outline-secondary quantity-btn" 
-                                            @click="updateQuantity(item.id, item.productAmount + 1)">
-                                        <i class="bi bi-plus"></i>
+                                            @click="increaseQuantity(item.id)">
+                                        <strong>+</strong>
                                     </button>
                                 </div>
                             </div>
@@ -178,9 +179,9 @@
 }
 
 .cart-item-price {
-    color: #666;
-    margin-bottom: 0;
+    font-size: 1.1rem;
     font-weight: 600;
+    color: #e74c3c;
 }
 
 .quantity-controls {
@@ -197,48 +198,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #5ACFC9;
-    color: #5ACFC9;
-    background: white;
-    transition: all 0.3s ease;
-}
-
-.quantity-btn:hover:not(:disabled) {
-    background: #5ACFC9;
-    color: white;
-    transform: scale(1.1);
-}
-
-.quantity-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    font-weight: bold;
 }
 
 .quantity-display {
-    font-weight: 600;
-    font-size: 1.1rem;
     min-width: 40px;
     text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
 }
 
 .item-total {
     text-align: center;
-    color: #5ACFC9;
     font-size: 1.1rem;
+    color: #e74c3c;
 }
 
 .remove-btn {
-    border-radius: 50%;
     width: 35px;
     height: 35px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.remove-btn:hover {
-    transform: scale(1.1);
 }
 
 .cart-summary {
@@ -253,84 +235,71 @@
 .cart-actions {
     display: flex;
     gap: 1rem;
-    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.cart-total-section {
+    text-align: right;
 }
 
 .total-row {
     display: flex;
     justify-content: space-between;
     margin-bottom: 0.5rem;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .total-price {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #5ACFC9;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #e74c3c;
     border-top: 1px solid #e9ecef;
     padding-top: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
 }
 
 .checkout-btn {
-    width: 100%;
     margin-top: 1rem;
-    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
-    border: none;
-    transition: all 0.3s ease;
-}
-
-.checkout-btn:hover {
-    background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
-    transform: translateY(-2px);
+    width: 100%;
 }
 
 .empty-cart {
     text-align: center;
     padding: 4rem 2rem;
     background: white;
+    border: 1px solid #e9ecef;
     border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 2rem;
 }
 
 .empty-cart-icon {
     font-size: 4rem;
-    color: #ccc;
+    color: #6c757d;
     margin-bottom: 1rem;
 }
 
 .empty-cart h4 {
-    color: #666;
+    color: #333;
     margin-bottom: 0.5rem;
 }
 
 .empty-cart p {
+    color: #6c757d;
     margin-bottom: 2rem;
 }
 
-/* 响应式设计 */
 @media (max-width: 768px) {
-    .cart-item-card {
-        padding: 1rem;
-    }
-    
-    .quantity-controls {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    
-    .quantity-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 0.8rem;
+    .cart-item-card .row > div {
+        margin-bottom: 1rem;
     }
     
     .cart-actions {
-        flex-direction: column;
+        justify-content: center;
     }
     
-    .cart-summary {
-        padding: 1.5rem;
+    .cart-total-section {
+        text-align: center;
+        margin-top: 1rem;
     }
 }
 </style>
@@ -340,7 +309,7 @@ new Vue({
     el: '#app',
     data: {
         cartItems: [],
-        loading: true,
+        loading: false,
         error: '',
         message: ''
     },
@@ -357,57 +326,132 @@ new Vue({
         }
     },
     mounted() {
-        this.loadCart();
+        console.log('购物车页面Vue实例已挂载');
+        // 延迟加载，避免与主布局的初始化冲突
+        setTimeout(() => {
+            this.loadCart();
+        }, 100);
     },
     methods: {
         // 加载购物车数据
         async loadCart() {
+            // 防止重复调用
+            if (this.loading) {
+                console.log('购物车正在加载中，跳过重复调用');
+                return;
+            }
+            
             try {
+                console.log('开始加载购物车数据...');
                 this.loading = true;
                 this.error = '';
                 
                 const response = await axios.get('/api/shopping-cart/list');
+                console.log('购物车API响应:', response);
                 const data = response.data;
+                console.log('购物车数据:', data);
                 
                 if (data.success) {
                     this.cartItems = data.data || [];
+                    console.log('购物车数据加载成功，商品数量:', this.cartItems.length);
+                    console.log('购物车商品详情:', this.cartItems);
+                    // 更新全局购物车数量
+                    this.updateGlobalCartCount();
                 } else {
+                    // 检查是否是未登录错误
+                    if (data.message && (data.message.includes('未登录') || data.message.includes('用户未登录'))) {
+                        console.log('用户未登录，跳转到登录页面');
+                        // 保存当前页面URL，登录后可以跳转回来
+                        const currentUrl = window.location.pathname + window.location.search;
+                        localStorage.setItem('redirectAfterLogin', currentUrl);
+                        // 跳转到登录页面
+                        window.location.href = '/login';
+                        return; // 已处理未登录状态，不显示错误信息
+                    }
                     this.error = data.message || '获取购物车失败';
+                    console.error('购物车数据加载失败:', data.message);
                 }
             } catch (error) {
                 console.error('加载购物车失败:', error);
-                this.error = '网络错误，请稍后重试';
+                console.error('错误详情:', error.response?.data || error.message);
+                console.error('错误状态码:', error.response?.status);
+                // 使用通用错误处理函数
+                const errorMessage = window.handleApiError ? window.handleApiError(error, '网络错误，请稍后重试') : '网络错误，请稍后重试';
+                this.error = errorMessage;
             } finally {
+                console.log('购物车加载完成，loading状态设置为false');
                 this.loading = false;
+                console.log('当前购物车状态 - loading:', this.loading, 'cartItems数量:', this.cartItems.length, 'error:', this.error);
+            }
+        },
+        
+        // 减少商品数量
+        async decreaseQuantity(id) {
+            const item = this.cartItems.find(item => item.id === id);
+            if (item && item.productAmount > 1) {
+                await this.updateQuantity(id, item.productAmount - 1);
+            }
+        },
+        
+        // 增加商品数量
+        async increaseQuantity(id) {
+            const item = this.cartItems.find(item => item.id === id);
+            if (item) {
+                await this.updateQuantity(id, item.productAmount + 1);
             }
         },
         
         // 更新商品数量
-        async updateQuantity(id, quantity) {
-            if (quantity <= 0) {
+        async updateQuantity(id, newQuantity) {
+            console.log('准备更新商品数量，ID: ' + id + ', 新数量: ' + newQuantity);
+            
+            if (newQuantity <= 0) {
+                console.log('数量为0或负数，移除商品');
                 await this.removeItem(id);
                 return;
             }
             
             try {
-                const response = await axios.put(`/api/shopping-cart/update/${id}`, {
-                    quantity: quantity
+                const url = '/api/shopping-cart/update/' + id;
+                console.log('发送更新请求到: ' + url + ', 数量: ' + newQuantity);
+                
+                const response = await axios.put(url, {
+                    quantity: newQuantity
                 });
                 
                 const data = response.data;
+                console.log('更新响应:', data);
+                
                 if (data.success) {
-                    this.message = '更新数量成功';
+                    // 使用通用成功消息显示函数
+                    if (window.showSuccessMessage) {
+                        window.showSuccessMessage('更新数量成功');
+                    } else {
+                        this.message = '更新数量成功';
+                    }
                     // 更新本地数据
                     const item = this.cartItems.find(item => item.id === id);
                     if (item) {
-                        item.productAmount = quantity;
+                        item.productAmount = newQuantity;
+                        console.log('商品 ' + id + ' 数量已更新为: ' + newQuantity);
                     }
+                    // 更新全局购物车数量
+                    this.updateGlobalCartCount();
                 } else {
-                    this.error = data.message || '更新数量失败';
+                    // 使用通用错误消息显示函数
+                    if (window.showErrorMessage) {
+                        window.showErrorMessage(data.message || '更新数量失败');
+                    } else {
+                        this.error = data.message || '更新数量失败';
+                    }
+                    console.error('更新数量失败:', data.message);
                 }
             } catch (error) {
                 console.error('更新数量失败:', error);
-                this.error = '网络错误，请稍后重试';
+                console.error('错误详情:', error.response?.data || error.message);
+                // 使用通用错误处理函数
+                const errorMessage = window.handleApiError ? window.handleApiError(error, '网络错误，请稍后重试') : '网络错误，请稍后重试';
+                this.error = errorMessage;
             }
         },
         
@@ -418,25 +462,38 @@ new Vue({
             }
             
             try {
-                const response = await axios.delete(`/api/shopping-cart/remove/${id}`);
+                const response = await axios.delete('/api/shopping-cart/remove/' + id);
                 
                 const data = response.data;
                 if (data.success) {
-                    this.message = '移除商品成功';
-                    // 从本地数据中移除
+                    // 从本地数组中移除
                     this.cartItems = this.cartItems.filter(item => item.id !== id);
+                    // 更新全局购物车数量
+                    this.updateGlobalCartCount();
+                    // 显示成功消息
+                    if (window.showSuccessMessage) {
+                        window.showSuccessMessage('商品已移除');
+                    } else {
+                        this.message = '商品已移除';
+                    }
                 } else {
-                    this.error = data.message || '移除商品失败';
+                    // 显示错误消息
+                    if (window.showErrorMessage) {
+                        window.showErrorMessage(data.message || '移除商品失败');
+                    } else {
+                        this.error = data.message || '移除商品失败';
+                    }
                 }
             } catch (error) {
                 console.error('移除商品失败:', error);
-                this.error = '网络错误，请稍后重试';
+                const errorMessage = window.handleApiError ? window.handleApiError(error, '网络错误，请稍后重试') : '网络错误，请稍后重试';
+                this.error = errorMessage;
             }
         },
         
         // 清空购物车
         async clearCart() {
-            if (!confirm('確定要清空購物車嗎？')) {
+            if (!confirm('確定要清空整個購物車嗎？')) {
                 return;
             }
             
@@ -445,32 +502,34 @@ new Vue({
                 
                 const data = response.data;
                 if (data.success) {
-                    this.message = '清空購物車成功';
                     this.cartItems = [];
+                    // 更新全局购物车数量
+                    this.updateGlobalCartCount();
+                    // 显示成功消息
+                    if (window.showSuccessMessage) {
+                        window.showSuccessMessage('購物車已清空');
+                    } else {
+                        this.message = '購物車已清空';
+                    }
                 } else {
-                    this.error = data.message || '清空購物車失败';
+                    // 显示错误消息
+                    if (window.showErrorMessage) {
+                        window.showErrorMessage(data.message || '清空購物車失敗');
+                    } else {
+                        this.error = data.message || '清空購物車失敗';
+                    }
                 }
             } catch (error) {
-                console.error('清空購物車失败:', error);
-                this.error = '网络错误，请稍后重试';
+                console.error('清空購物車失敗:', error);
+                const errorMessage = window.handleApiError ? window.handleApiError(error, '网络错误，请稍后重试') : '网络错误，请稍后重试';
+                this.error = errorMessage;
             }
         },
         
         // 结算
         async checkout() {
-            if (!confirm('確定要提交訂單嗎？')) {
-                return;
-            }
-            
-            try {
-                // 这里可以调用结算接口
-                // 暂时直接清空购物车
-                await this.clearCart();
-                this.message = '訂單提交成功！';
-            } catch (error) {
-                console.error('结算失败:', error);
-                this.error = '结算失败，请稍后重试';
-            }
+            // 这里可以实现结算逻辑
+            alert('结算功能开发中...');
         },
         
         // 格式化价格
@@ -480,7 +539,49 @@ new Vue({
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
+        },
+        
+        // 测试API调用
+        async testAPI() {
+            console.log('开始测试API...');
+            try {
+                // 测试购物车列表API
+                const listResponse = await axios.get('/api/shopping-cart/list');
+                console.log('购物车列表API响应:', listResponse.data);
+                
+                // 如果有商品，测试更新数量API
+                if (listResponse.data.success && listResponse.data.data && listResponse.data.data.length > 0) {
+                    const firstItem = listResponse.data.data[0];
+                    console.log('测试商品:', firstItem);
+                    
+                    const updateResponse = await axios.put('/api/shopping-cart/update/' + firstItem.id, {
+                        quantity: firstItem.productAmount + 1
+                    });
+                    console.log('更新数量API响应:', updateResponse.data);
+                }
+            } catch (error) {
+                console.error('API测试失败:', error);
+                console.error('错误详情:', error.response?.data || error.message);
+            }
+        },
+        
+        // 跳转到登录页面
+        redirectToLogin() {
+            console.log('跳转到登录页面...');
+            // 保存当前页面URL，登录后可以跳转回来
+            const currentUrl = window.location.pathname + window.location.search;
+            localStorage.setItem('redirectAfterLogin', currentUrl);
+            // 跳转到登录页面
+            window.location.href = '/login';
+        },
+        
+        // 更新全局购物车数量
+        updateGlobalCartCount() {
+            if (window.cartManager && window.cartManager.updateCartCount) {
+                window.cartManager.updateCartCount();
+            }
         }
     }
 });
-</script> 
+</script>
+

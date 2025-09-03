@@ -169,10 +169,6 @@ public class CarViewController {
             
             model.addAttribute("dealers", dealers);
             
-            // 获取广告数据
-            List<CarAdvertisementEntity> advertisements = carAdvertisementService.getHomeAdvertisements();
-            model.addAttribute("advertisements", advertisements);
-            
             // 获取当前请求的完整URL
             String requestUrl = req.getRequestURL().toString();
             model.addAttribute("url", requestUrl);
@@ -413,7 +409,7 @@ public class CarViewController {
     /**
      * 跳转到汽车详情页面
      */
-     @GetMapping("/{uid}")
+     @GetMapping("/detail/{uid}")
     public String carDetail(Model model, @PathVariable("uid") String uid, HttpServletRequest req) {
         // 排除静态资源路径
         if (uid.contains(".") || uid.startsWith("ad-") || uid.startsWith("img/") || uid.startsWith("css/") || uid.startsWith("js/")) {
@@ -515,6 +511,43 @@ public class CarViewController {
 //            return ResponseEntity.notFound().build();
 //        }
     	return null;
+    }
+    
+    /**
+     * 跳转到购物车页面
+     */
+    @ApiOperation(value = "购物车页面", notes = "显示用户购物车内容")
+    @GetMapping("/cart")
+    public String cartPage(Model model, HttpServletRequest req) {
+        try {
+            // 检查用户登录状态
+            Object user = req.getSession().getAttribute("user");
+            model.addAttribute("user", user);
+            
+            // 设置页面标题和描述
+            model.addAttribute("title", "購物車 - 二手車銷售平台");
+            model.addAttribute("description", "查看和管理您的購物車商品");
+            
+            // 设置网站图标
+            model.addAttribute("favicon", webUrl + "/favicon.ico");
+            
+            // 设置购物车页面内容
+            model.addAttribute("content", "/cart/index.ftl");
+            
+            // 获取当前请求的完整URL
+            String requestUrl = req.getRequestURL().toString();
+            model.addAttribute("url", requestUrl);
+            
+            // 添加一些必要的属性，避免模板中的变量未定义错误
+            model.addAttribute("id", ""); // 添加空的id属性
+            model.addAttribute("image", "/img/swipper/slide1.jpg"); // 添加默认图片
+            
+        } catch (Exception e) {
+            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
+            model.addAttribute("content", "/error/index.ftl");
+        }
+        
+        return "/layout/main";
     }
     
     /**

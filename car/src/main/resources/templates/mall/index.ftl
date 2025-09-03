@@ -554,6 +554,9 @@ new Vue({
                     setTimeout(() => {
                         this.message = '';
                     }, 3000);
+                    
+                    // 更新全局购物车数量
+                    this.updateGlobalCartCount();
                 } else {
                     this.error = data.message || '添加到購物車失敗';
                 }
@@ -577,6 +580,16 @@ new Vue({
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             });
+        },
+        
+        // 更新全局购物车数量
+        updateGlobalCartCount() {
+            // 触发全局购物车数量更新
+            if (window.cartManager) {
+                window.cartManager.refreshCartCount();
+            }
+            // 同时触发自定义事件
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
         }
     }
 });
