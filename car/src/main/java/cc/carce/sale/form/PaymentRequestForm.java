@@ -1,8 +1,6 @@
 package cc.carce.sale.form;
 
-import java.math.BigDecimal;
-
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -24,8 +22,8 @@ public class PaymentRequestForm {
      * 支付金额
      */
     @NotNull(message = "支付金额不能为空")
-    @DecimalMin(value = "0.01", message = "支付金额必须大于0")
-    private BigDecimal amount;
+    @Min(value = 1, message = "支付金额必须大于0")
+    private Integer amount;
     
     /**
      * 订单描述

@@ -76,6 +76,18 @@ public class CarProductsService {
     }
     
     /**
+     * 根据ID查询商品
+     */
+    public CarProductsEntity getProductById(Long productId) {
+        try {
+            return carProductsMapper.selectByPrimaryKey(productId);
+        } catch (Exception e) {
+            log.error("查询商品失败，商品ID：{}", productId, e);
+            return null;
+        }
+    }
+    
+    /**
      * 根据分类获取商品
      */
     public List<Map<String, Object>> getProductsByCategory(String category) {

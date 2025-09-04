@@ -1,6 +1,5 @@
 package cc.carce.sale.controller;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -43,12 +42,16 @@ public class ECPayController extends BaseController{
             
             UserInfo user = getSessionUser();
             
-            BigDecimal amount = new BigDecimal(request.get("amount").toString());
+            Integer amount = Integer.valueOf(request.get("amount").toString());
             String itemName = (String) request.get("itemName");
             String description = (String) request.get("description");
+            String receiverName = (String) request.get("receiverName");
+            String receiverMobile = (String) request.get("receiverMobile");
+            String receiverAddress = (String) request.get("receiverAddress");
+            String cartData = (String) request.get("cartData");
             
             // 参数验证
-            if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            if (amount == null || amount <= 0) {
                 return R.fail("支付金額必須大於0", null);
             }
             
@@ -56,13 +59,27 @@ public class ECPayController extends BaseController{
                 return R.fail("商品名稱不能為空", null);
             }
             
+            if (receiverName == null || receiverName.trim().isEmpty()) {
+                return R.fail("收件人姓名不能為空", null);
+            }
+            
+            if (receiverMobile == null || receiverMobile.trim().isEmpty()) {
+                return R.fail("收件人手機號不能為空", null);
+            }
+            
+            if (receiverAddress == null || receiverAddress.trim().isEmpty()) {
+                return R.fail("收件人地址不能為空", null);
+            }
+            
             if (description == null || description.trim().isEmpty()) {
                 description = "购买商品：" + itemName;
             }
             
-            log.info("用户创建支付订单，用户ID: {}, 金额: {}, 商品: {}", user.getId(), amount, itemName);
+            log.info("用户创建支付订单，用户ID: {}, 金额: {}, 商品: {}, 收件人: {}", 
+                    user.getId(), amount, itemName, receiverName);
             
-            return ecPayService.createPayment(user.getId(), amount, itemName, description);
+            return ecPayService.createPaymentWithOrder(user.getId(), amount, itemName, description, 
+                    receiverName, receiverMobile, receiverAddress, cartData);
             
         } catch (Exception e) {
             log.error("创建支付订单异常", e);

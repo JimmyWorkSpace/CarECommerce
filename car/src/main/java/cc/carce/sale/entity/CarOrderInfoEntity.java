@@ -33,8 +33,8 @@ public class CarOrderInfoEntity {
     /**
      * 总价格
      */
-    @Column(name = "totalPrice", columnDefinition = "DECIMAL(10,2) COMMENT '总价格'")
-    private BigDecimal totalPrice;
+    @Column(name = "totalPrice", columnDefinition = "INT(11) COMMENT '总价格'")
+    private Integer totalPrice;
 
     /**
      * 删除标记 1 是 0 否

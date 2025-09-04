@@ -1,6 +1,5 @@
 package cc.carce.sale.controller;
 
-import java.math.BigDecimal;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -30,7 +29,7 @@ public class PaymentPageController extends BaseController {
 	 */
 	@GetMapping("/index")
 	public String showPaymentPageGet(@RequestParam(required = false) String itemName,
-			@RequestParam(required = false) BigDecimal amount, @RequestParam(required = false) String description,
+			@RequestParam(required = false) Integer amount, @RequestParam(required = false) String description,
 			@RequestParam(required = false) String cartData, Model model, HttpSession session) {
 
 		// 检查用户登录状态
@@ -42,7 +41,7 @@ public class PaymentPageController extends BaseController {
 
 		// 设置页面数据
 		model.addAttribute("itemName", itemName != null ? itemName : "汽车商品");
-		model.addAttribute("amount", amount != null ? amount : BigDecimal.ZERO);
+		model.addAttribute("amount", amount != null ? amount : 0);
 		model.addAttribute("description", description != null ? description : "");
 		model.addAttribute("cartData", cartData);
 		model.addAttribute("userInfo", userInfo);
@@ -80,10 +79,10 @@ public class PaymentPageController extends BaseController {
 			activeProfile = "dev"; // 默认使用dev环境
 		}
 
-		// 如果是dev或test环境，金额固定为0.01
-		BigDecimal finalAmount = paymentRequest.getAmount();
+		// 如果是dev或test环境，金额固定为1元
+		Integer finalAmount = paymentRequest.getAmount();
 		if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
-			finalAmount = new BigDecimal("1");
+			finalAmount = 1;
 			log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", paymentRequest.getAmount());
 		}
 

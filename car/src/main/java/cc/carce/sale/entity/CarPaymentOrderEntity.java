@@ -2,7 +2,6 @@ package cc.carce.sale.entity;
 
 import lombok.Data;
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -39,8 +38,8 @@ public class CarPaymentOrderEntity {
     /**
      * 订单金额
      */
-    @Column(name = "total_amount", nullable = false, columnDefinition = "DECIMAL(10,2) COMMENT '订单金额'")
-    private BigDecimal totalAmount;
+    @Column(name = "total_amount", nullable = false, columnDefinition = "INT(11) COMMENT '订单金额'")
+    private Integer totalAmount;
     
     /**
      * 商品名称

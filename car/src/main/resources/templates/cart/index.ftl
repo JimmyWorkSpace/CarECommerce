@@ -32,12 +32,36 @@
                 
                 <!-- 購物車商品容器 -->
                 <div v-if="!loading && cartItems.length > 0" id="cartItemsContainer">
+                    <!-- 全选/取消全选 -->
+                    <div class="cart-select-all mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                                   :checked="isAllSelected" 
+                                   @change="toggleSelectAll" 
+                                   id="selectAll">
+                            <label class="form-check-label" for="selectAll">
+                                <strong>全选</strong>
+                            </label>
+                        </div>
+                    </div>
+                    
                     <div v-for="item in cartItems" :key="item.id" class="cart-item-card">
                         <div class="row align-items-center">
+                            <div class="col-md-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           :checked="item.selected" 
+                                           @change="toggleItemSelection(item.id)"
+                                           :id="'item-' + item.id">
+                                    <label class="form-check-label" :for="'item-' + item.id">
+                                        <!-- 隐藏的label，只用于复选框功能 -->
+                                    </label>
+                                </div>
+                            </div>
                             <div class="col-md-2">
                                 <img :src="item.productImage" :alt="item.productName" class="cart-item-image">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <h5 class="cart-item-name">{{ item.productName }}</h5>
                                 <p class="cart-item-details">
                                     <span class="badge bg-secondary me-2">{{ item.brandName }} {{ item.modelName }}</span>
@@ -97,16 +121,22 @@
                                     <span><strong>{{ cartItems.length }}</strong></span>
                                 </div>
                                 <div class="total-row">
-                                    <span>總數量：</span>
-                                    <span><strong>{{ totalQuantity }}</strong></span>
+                                    <span>已選商品：</span>
+                                    <span><strong>{{ selectedItemsCount }}</strong></span>
+                                </div>
+                                <div class="total-row">
+                                    <span>已選數量：</span>
+                                    <span><strong>{{ selectedQuantity }}</strong></span>
                                 </div>
                                 <div class="total-row total-price">
-                                    <span>總計：</span>
-                                    <span><strong>¥{{ formatPrice(totalPrice) }}</strong></span>
+                                    <span>已選總計：</span>
+                                    <span><strong>¥{{ formatPrice(selectedTotalPrice) }}</strong></span>
                                 </div>
-                                <button class="btn btn-success btn-lg checkout-btn" @click="checkout">
+                                <button class="btn btn-success btn-lg checkout-btn" 
+                                        @click="checkout" 
+                                        :disabled="selectedItemsCount === 0">
                                     <i class="bi bi-credit-card me-2"></i>
-                                    立即結算
+                                    結算選中商品 ({{ selectedItemsCount }}件)
                                 </button>
                             </div>
                         </div>
@@ -324,6 +354,30 @@ new Vue({
                 const amount = item.productAmount || 0;
                 return total + (price * amount);
             }, 0);
+        },
+        // 选中的商品数量
+        selectedItemsCount() {
+            return this.cartItems.filter(item => item.selected).length;
+        },
+        // 选中商品的总数量
+        selectedQuantity() {
+            return this.cartItems
+                .filter(item => item.selected)
+                .reduce((total, item) => total + (item.productAmount || 0), 0);
+        },
+        // 选中商品的总价格
+        selectedTotalPrice() {
+            return this.cartItems
+                .filter(item => item.selected)
+                .reduce((total, item) => {
+                    const price = item.productPrice || 0;
+                    const amount = item.productAmount || 0;
+                    return total + (price * amount);
+                }, 0);
+        },
+        // 是否全选
+        isAllSelected() {
+            return this.cartItems.length > 0 && this.cartItems.every(item => item.selected);
         }
     },
     mounted() {
@@ -353,7 +407,10 @@ new Vue({
                 console.log('购物车数据:', data);
                 
                 if (data.success) {
-                    this.cartItems = data.data || [];
+                    this.cartItems = (data.data || []).map(item => ({
+                        ...item,
+                        selected: true // 默认选中所有商品
+                    }));
                     console.log('购物车数据加载成功，商品数量:', this.cartItems.length);
                     console.log('购物车商品详情:', this.cartItems);
                     // 更新全局购物车数量
@@ -527,21 +584,39 @@ new Vue({
             }
         },
         
+        // 切换全选状态
+        toggleSelectAll() {
+            const isAllSelected = this.isAllSelected;
+            this.cartItems.forEach(item => {
+                item.selected = !isAllSelected;
+            });
+        },
+        
+        // 切换单个商品选择状态
+        toggleItemSelection(itemId) {
+            const item = this.cartItems.find(item => item.id === itemId);
+            if (item) {
+                item.selected = !item.selected;
+            }
+        },
+        
         // 结算
         async checkout() {
-            if (this.cartItems.length === 0) {
+            const selectedItems = this.cartItems.filter(item => item.selected);
+            
+            if (selectedItems.length === 0) {
                 if (window.showErrorMessage) {
-                    window.showErrorMessage('購物車是空的，無法結算');
+                    window.showErrorMessage('請選擇要結算的商品');
                 } else {
-                    this.error = '購物車是空的，無法結算';
+                    this.error = '請選擇要結算的商品';
                 }
                 return;
             }
             
             try {
-                // 构建结算数据
+                // 构建结算数据，只包含选中的商品
                 const checkoutData = {
-                    items: this.cartItems.map(item => ({
+                    items: selectedItems.map(item => ({
                         id: item.id,
                         productId: item.productId,
                         productName: item.productName,
@@ -549,8 +624,8 @@ new Vue({
                         productPrice: item.productPrice,
                         subtotal: item.subtotal
                     })),
-                    totalAmount: this.totalPrice,
-                    totalQuantity: this.totalQuantity
+                    totalAmount: this.selectedTotalPrice,
+                    totalQuantity: this.selectedQuantity
                 };
                 
                 // 创建表单并提交到支付页面
@@ -560,9 +635,9 @@ new Vue({
                 
                 // 添加支付参数
                 const formData = {
-                    itemName: `購物車商品 (${this.cartItems.length}件)`,
-                    amount: this.totalPrice,
-                    description: `購買${this.cartItems.length}件商品，總計${this.totalPrice}元`,
+                    itemName: `購物車商品 (${selectedItems.length}件)`,
+                    amount: this.selectedTotalPrice,
+                    description: `購買${selectedItems.length}件商品，總計${this.selectedTotalPrice}元`,
                     cartData: JSON.stringify(checkoutData)
                 };
                 

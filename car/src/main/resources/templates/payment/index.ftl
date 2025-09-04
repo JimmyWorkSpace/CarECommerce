@@ -152,6 +152,25 @@
                                   rows="3" placeholder="请输入订单描述（可选）">${description!''}</textarea>
                     </div>
                     
+                    <!-- 收件人信息 -->
+                    <div class="form-group">
+                        <label for="receiverName">收件人姓名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="receiverName" name="receiverName" 
+                               placeholder="请输入收件人姓名" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="receiverMobile">收件人手机号 <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" id="receiverMobile" name="receiverMobile" 
+                               placeholder="请输入收件人手机号" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="receiverAddress">收件人地址 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="receiverAddress" name="receiverAddress" 
+                                  rows="3" placeholder="请输入详细的收件人地址" required></textarea>
+                    </div>
+                    
                     <!-- 隐藏的购物车数据字段 -->
                     <input type="hidden" id="cartData" name="cartData" value="${cartData!''}">
                     
@@ -165,31 +184,28 @@
                     </div>
                     </#if>
                     
-                    <div class="payment-methods">
-                        <label class="form-label">选择支付方式</label>
-                        <div class="payment-method-item selected" data-method="ALL">
-                            <div class="d-flex align-items-center">
-                                <input type="radio" name="paymentMethod" value="ALL" checked class="me-2">
-                                <i class="bi bi-credit-card-2-front me-2"></i>
-                                <span>全部支付方式</span>
-                            </div>
-                            <small class="text-muted">包含信用卡、ATM、超商等</small>
-                        </div>
-                    </div>
                     
                     <div class="payment-summary">
-                        <h5>支付摘要</h5>
+                        <h5>订单摘要</h5>
                         <div class="row">
                             <div class="col-6">商品名称：</div>
                             <div class="col-6" id="summaryItemName">${itemName!''}</div>
                         </div>
                         <div class="row">
                             <div class="col-6">支付金额：</div>
-                            <div class="col-6">NT$ <span id="summaryAmount">${amount!0}</span></div>
+                            <div class="col-6">¥ <span id="summaryAmount">${amount!0}</span></div>
                         </div>
                         <div class="row">
-                            <div class="col-6">支付方式：</div>
-                            <div class="col-6" id="summaryPaymentMethod">全部支付方式</div>
+                            <div class="col-6">收件人：</div>
+                            <div class="col-6" id="summaryReceiverName">-</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">联系电话：</div>
+                            <div class="col-6" id="summaryReceiverMobile">-</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">收货地址：</div>
+                            <div class="col-6" id="summaryReceiverAddress">-</div>
                         </div>
                     </div>
                     
@@ -225,19 +241,20 @@
             // 初始化购物车商品列表
             initCartItemsList();
             
-            // 支付方式选择
-            $('.payment-method-item').click(function() {
-                $('.payment-method-item').removeClass('selected');
-                $(this).addClass('selected');
-                $(this).find('input[type="radio"]').prop('checked', true);
+            // 收件人信息输入监听
+            $('#receiverName, #receiverMobile, #receiverAddress').on('input', function() {
                 updateSummary();
             });
             
             // 更新摘要
             function updateSummary() {
-                const selectedMethod = $('input[name="paymentMethod"]:checked').val();
-                const methodText = selectedMethod === 'ALL' ? '全部支付方式' : selectedMethod;
-                $('#summaryPaymentMethod').text(methodText);
+                const receiverName = $('#receiverName').val() || '-';
+                const receiverMobile = $('#receiverMobile').val() || '-';
+                const receiverAddress = $('#receiverAddress').val() || '-';
+                
+                $('#summaryReceiverName').text(receiverName);
+                $('#summaryReceiverMobile').text(receiverMobile);
+                $('#summaryReceiverAddress').text(receiverAddress);
             }
             
             // 表单提交
@@ -247,6 +264,9 @@
                 const amount = parseFloat($('#amount').val());
                 const itemName = $('#itemName').val();
                 const description = $('#description').val();
+                const receiverName = $('#receiverName').val();
+                const receiverMobile = $('#receiverMobile').val();
+                const receiverAddress = $('#receiverAddress').val();
                 
                 if (!amount || amount <= 0) {
                     showError('支付金額必須大於0');
@@ -258,6 +278,21 @@
                     return;
                 }
                 
+                if (!receiverName || receiverName.trim() === '') {
+                    showError('收件人姓名不能為空');
+                    return;
+                }
+                
+                if (!receiverMobile || receiverMobile.trim() === '') {
+                    showError('收件人手機號不能為空');
+                    return;
+                }
+                
+                if (!receiverAddress || receiverAddress.trim() === '') {
+                    showError('收件人地址不能為空');
+                    return;
+                }
+                
                 // 显示加载状态
                 showLoading(true);
                 hideMessages();
@@ -266,7 +301,11 @@
                 axios.post('/api/payment/create', {
                     amount: amount,
                     itemName: itemName,
-                    description: description || '购买商品：' + itemName
+                    description: description || '购买商品：' + itemName,
+                    receiverName: receiverName,
+                    receiverMobile: receiverMobile,
+                    receiverAddress: receiverAddress,
+                    cartData: $('#cartData').val()
                 })
                 .then(function(response) {
                     if (response.data.code === 1) {

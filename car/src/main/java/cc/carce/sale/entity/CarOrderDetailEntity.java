@@ -63,12 +63,12 @@ public class CarOrderDetailEntity {
     /**
      * 单价
      */
-    @Column(name = "productPrice", columnDefinition = "DECIMAL(10,2) COMMENT '单价'")
-    private BigDecimal productPrice;
+    @Column(name = "productPrice", columnDefinition = "INT(11) COMMENT '单价'")
+    private Integer productPrice;
 
     /**
      * 总价。冗余，单价乘以数量
      */
-    @Column(name = "totalPrice", columnDefinition = "DECIMAL(10,2) COMMENT '总价。冗余，单价乘以数量'")
-    private BigDecimal totalPrice;
+    @Column(name = "totalPrice", columnDefinition = "INT(11) COMMENT '总价。冗余，单价乘以数量'")
+    private Integer totalPrice;
 }

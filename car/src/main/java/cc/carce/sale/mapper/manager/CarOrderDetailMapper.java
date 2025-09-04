@@ -50,7 +50,7 @@ public interface CarOrderDetailMapper extends Mapper<CarOrderDetailEntity> {
     /**
      * 更新产品价格
      */
-    int updateProductPrice(@Param("id") Long id, @Param("productPrice") java.math.BigDecimal productPrice);
+    int updateProductPrice(@Param("id") Long id, @Param("productPrice") Integer productPrice);
     
     /**
      * 删除订单详情（逻辑删除）

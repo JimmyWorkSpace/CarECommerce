@@ -41,7 +41,7 @@ public class CarOrderInfoService {
             String orderNo = generateOrderNo();
             
             // 计算总价格
-            BigDecimal totalPrice = calculateTotalPrice(orderDetails);
+            Integer totalPrice = calculateTotalPrice(orderDetails);
             
             // 创建订单主表
             CarOrderInfoEntity orderInfo = new CarOrderInfoEntity();
@@ -65,7 +65,7 @@ public class CarOrderInfoService {
                 detail.setDelFlag(false);
                 detail.setCreateTime(new Date());
                 detail.setShowOrder(0);
-                detail.setTotalPrice(detail.getProductPrice().multiply(new BigDecimal(detail.getProductAmount())));
+                detail.setTotalPrice(detail.getProductPrice() * detail.getProductAmount());
                 carOrderDetailMapper.insert(detail);
             }
             
@@ -239,11 +239,11 @@ public class CarOrderInfoService {
     /**
      * 计算总价格
      */
-    private BigDecimal calculateTotalPrice(List<CarOrderDetailEntity> orderDetails) {
-        BigDecimal total = BigDecimal.ZERO;
+    private Integer calculateTotalPrice(List<CarOrderDetailEntity> orderDetails) {
+        int total = 0;
         for (CarOrderDetailEntity detail : orderDetails) {
-            BigDecimal itemTotal = detail.getProductPrice().multiply(new BigDecimal(detail.getProductAmount()));
-            total = total.add(itemTotal);
+            int itemTotal = detail.getProductPrice() * detail.getProductAmount();
+            total += itemTotal;
         }
         return total;
     }

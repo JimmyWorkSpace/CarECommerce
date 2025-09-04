@@ -29,7 +29,7 @@ public class CarOrderDetailService {
      */
     @Transactional
     public CarOrderDetailEntity createOrderDetail(Long orderId, Long productId, String productName, 
-                                                Integer productAmount, BigDecimal productPrice) {
+                                                Integer productAmount, Integer productPrice) {
         try {
             CarOrderDetailEntity orderDetail = new CarOrderDetailEntity();
             orderDetail.setOrderId(orderId);
@@ -37,7 +37,7 @@ public class CarOrderDetailService {
             orderDetail.setProductName(productName);
             orderDetail.setProductAmount(productAmount);
             orderDetail.setProductPrice(productPrice);
-            orderDetail.setTotalPrice(productPrice.multiply(new BigDecimal(productAmount)));
+            orderDetail.setTotalPrice(productPrice * productAmount);
             orderDetail.setDelFlag(false);
             orderDetail.setCreateTime(new Date());
             orderDetail.setShowOrder(0);
@@ -142,7 +142,7 @@ public class CarOrderDetailService {
                 // 重新计算总价
                 CarOrderDetailEntity detail = carOrderDetailMapper.selectById(detailId);
                 if (detail != null) {
-                    BigDecimal newTotalPrice = detail.getProductPrice().multiply(new BigDecimal(productAmount));
+                    Integer newTotalPrice = detail.getProductPrice() * productAmount;
                     detail.setTotalPrice(newTotalPrice);
                     carOrderDetailMapper.updateById(detail);
                 }
@@ -161,14 +161,14 @@ public class CarOrderDetailService {
      * 更新产品价格
      */
     @Transactional
-    public boolean updateProductPrice(Long detailId, BigDecimal productPrice) {
+    public boolean updateProductPrice(Long detailId, Integer productPrice) {
         try {
             int result = carOrderDetailMapper.updateProductPrice(detailId, productPrice);
             if (result > 0) {
                 // 重新计算总价
                 CarOrderDetailEntity detail = carOrderDetailMapper.selectById(detailId);
                 if (detail != null) {
-                    BigDecimal newTotalPrice = productPrice.multiply(new BigDecimal(detail.getProductAmount()));
+                    Integer newTotalPrice = productPrice * detail.getProductAmount();
                     detail.setTotalPrice(newTotalPrice);
                     carOrderDetailMapper.updateById(detail);
                 }
@@ -246,21 +246,21 @@ public class CarOrderDetailService {
     /**
      * 计算订单详情总金额
      */
-    public BigDecimal calculateOrderDetailsTotal(Long orderId) {
+    public Integer calculateOrderDetailsTotal(Long orderId) {
         try {
             List<CarOrderDetailEntity> details = getOrderDetailsByOrderId(orderId);
-            BigDecimal total = BigDecimal.ZERO;
+            int total = 0;
             
             for (CarOrderDetailEntity detail : details) {
                 if (detail.getTotalPrice() != null) {
-                    total = total.add(detail.getTotalPrice());
+                    total += detail.getTotalPrice();
                 }
             }
             
             return total;
         } catch (Exception e) {
             log.error("计算订单详情总金额失败，订单ID：{}", orderId, e);
-            return BigDecimal.ZERO;
+            return 0;
         }
     }
 }

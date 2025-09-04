@@ -69,10 +69,6 @@ public class CarOrderDetailController extends BaseController {
                 return R.fail("产品数量必须大于0", null);
             }
             
-            if (request.getProductPrice() == null || request.getProductPrice().compareTo(BigDecimal.ZERO) <= 0) {
-                return R.fail("产品价格必须大于0", null);
-            }
-            
             // 检查订单是否存在且属于当前用户
             CarOrderInfoEntity order = carOrderInfoService.getOrderById(request.getOrderId());
             if (order == null) {
@@ -240,7 +236,7 @@ public class CarOrderDetailController extends BaseController {
             orderDetail.setProductName(request.getProductName());
             orderDetail.setProductAmount(request.getProductAmount());
             orderDetail.setProductPrice(request.getProductPrice());
-            orderDetail.setTotalPrice(request.getProductPrice().multiply(new BigDecimal(request.getProductAmount())));
+            orderDetail.setTotalPrice(request.getProductPrice() * request.getProductAmount());
             
             boolean result = carOrderDetailService.updateOrderDetail(orderDetail);
             
@@ -306,7 +302,7 @@ public class CarOrderDetailController extends BaseController {
      * 更新产品价格
      */
     @PostMapping("/{id}/price")
-    public R<Boolean> updateProductPrice(@PathVariable Long id, @RequestParam BigDecimal productPrice, HttpServletRequest req) {
+    public R<Boolean> updateProductPrice(@PathVariable Long id, @RequestParam Integer productPrice, HttpServletRequest req) {
         try {
             // 检查用户登录状态
             if (!isLogin()) {
@@ -318,7 +314,7 @@ public class CarOrderDetailController extends BaseController {
                 return R.fail("用户信息获取失败", null);
             }
             
-            if (productPrice == null || productPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            if (productPrice == null || productPrice <= 0) {
                 return R.fail("产品价格必须大于0", false);
             }
             
@@ -456,7 +452,7 @@ public class CarOrderDetailController extends BaseController {
      * 计算订单详情总金额
      */
     @GetMapping("/total/order/{orderId}")
-    public R<BigDecimal> calculateOrderDetailsTotal(@PathVariable Long orderId, HttpServletRequest req) {
+    public R<Integer> calculateOrderDetailsTotal(@PathVariable Long orderId, HttpServletRequest req) {
         try {
             // 检查用户登录状态
             if (!isLogin()) {
@@ -471,20 +467,20 @@ public class CarOrderDetailController extends BaseController {
             // 检查订单是否属于当前用户
             CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
             if (order == null) {
-                return R.fail("订单不存在", BigDecimal.ZERO);
+                return R.fail("订单不存在", 0);
             }
             
             if (!order.getUserId().equals(user.getId())) {
-                return R.fail("无权限查看此订单", BigDecimal.ZERO);
+                return R.fail("无权限查看此订单", 0);
             }
             
-            BigDecimal total = carOrderDetailService.calculateOrderDetailsTotal(orderId);
+            Integer total = carOrderDetailService.calculateOrderDetailsTotal(orderId);
             
             return R.ok("计算订单详情总金额成功", total);
             
         } catch (Exception e) {
             log.error("计算订单详情总金额失败，订单ID：{}", orderId, e);
-            return R.fail("计算订单详情总金额失败：" + e.getMessage(), BigDecimal.ZERO);
+            return R.fail("计算订单详情总金额失败：" + e.getMessage(), 0);
         }
     }
 
@@ -496,7 +492,7 @@ public class CarOrderDetailController extends BaseController {
         private Long productId;
         private String productName;
         private Integer productAmount;
-        private BigDecimal productPrice;
+        private Integer productPrice;
 
         // Getters and Setters
         public Long getOrderId() {
@@ -531,11 +527,11 @@ public class CarOrderDetailController extends BaseController {
             this.productAmount = productAmount;
         }
 
-        public BigDecimal getProductPrice() {
+        public Integer getProductPrice() {
             return productPrice;
         }
 
-        public void setProductPrice(BigDecimal productPrice) {
+        public void setProductPrice(Integer productPrice) {
             this.productPrice = productPrice;
         }
     }
@@ -546,7 +542,7 @@ public class CarOrderDetailController extends BaseController {
     public static class UpdateOrderDetailRequest {
         private String productName;
         private Integer productAmount;
-        private BigDecimal productPrice;
+        private Integer productPrice;
 
         // Getters and Setters
         public String getProductName() {
@@ -565,11 +561,11 @@ public class CarOrderDetailController extends BaseController {
             this.productAmount = productAmount;
         }
 
-        public BigDecimal getProductPrice() {
+        public Integer getProductPrice() {
             return productPrice;
         }
 
-        public void setProductPrice(BigDecimal productPrice) {
+        public void setProductPrice(Integer productPrice) {
             this.productPrice = productPrice;
         }
     }

@@ -1,19 +1,24 @@
 package cc.carce.sale.service;
 
-import cc.carce.sale.common.ECPayUtils;
-import cc.carce.sale.common.R;
-import cc.carce.sale.config.ECPayConfig;
-import cc.carce.sale.entity.CarPaymentOrderEntity;
-import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import cc.carce.sale.common.ECPayUtils;
+import cc.carce.sale.common.R;
+import cc.carce.sale.config.ECPayConfig;
+import cc.carce.sale.entity.CarOrderDetailEntity;
+import cc.carce.sale.entity.CarOrderInfoEntity;
+import cc.carce.sale.entity.CarPaymentOrderEntity;
+import cc.carce.sale.entity.CarProductsEntity;
+import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 绿界支付服务
@@ -31,11 +36,20 @@ public class ECPayService {
     @Resource
     private CarPaymentOrderMapper paymentOrderMapper;
     
+    @Resource
+    private CarOrderInfoService carOrderInfoService;
+    
+    @Resource
+    private CarOrderDetailService carOrderDetailService;
+    
+    @Resource
+    private CarProductsService carProductsService;
+    
     /**
      * 创建支付订单
      */
     @Transactional
-    public R<Map<String, String>> createPayment(Long userId, BigDecimal amount, String itemName, String description) {
+    public R<Map<String, String>> createPayment(Long userId, Integer amount, String itemName, String description) {
         try {
             // 获取当前环境配置
             String activeProfile = System.getProperty("spring.profiles.active");
@@ -43,12 +57,7 @@ public class ECPayService {
                 activeProfile = "dev"; // 默认使用dev环境
             }
             
-            // 如果是dev或test环境，金额固定为0.01
-            BigDecimal finalAmount = amount;
-            if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
-                finalAmount = new BigDecimal("30");
-                log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", amount);
-            }
+            Integer finalAmount = amount;
             
             // 生成商户订单号
             String merchantTradeNo = generateMerchantTradeNo();
@@ -76,7 +85,7 @@ public class ECPayService {
             Map<String, String> paymentParams = ecPayUtils.buildPaymentParams(
                 merchantTradeNo,
                 description,
-                finalAmount.intValue(),
+                finalAmount,
                 itemName
             );
             
@@ -236,5 +245,118 @@ public class ECPayService {
         String timestamp = String.format("%tY%<tm%<td%<tH%<tM%<tS", new Date());
         String random = String.format("%04d", (int)(Math.random() * 10000));
         return timestamp + random;
+    }
+    
+    /**
+     * 创建支付订单并创建业务订单
+     */
+    @Transactional
+    public R<Map<String, String>> createPaymentWithOrder(Long userId, Integer amount, String itemName, 
+            String description, String receiverName, String receiverMobile, String receiverAddress, String cartData) {
+        try {
+            // 获取当前环境配置
+            String activeProfile = System.getProperty("spring.profiles.active");
+            if (activeProfile == null) {
+                activeProfile = "dev"; // 默认使用dev环境
+            }
+            
+            // 如果是dev或test环境，金额固定为1元
+            Integer finalAmount = amount;
+            if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
+                finalAmount = 1;
+                log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", amount);
+            }
+            
+            // 生成商户订单号
+            String merchantTradeNo = generateMerchantTradeNo();
+            
+            // 解析购物车数据并重新计算金额
+            List<CarOrderDetailEntity> orderDetails = new ArrayList<>();
+            int totalAmount = 0;
+            if (cartData != null && !cartData.trim().isEmpty()) {
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    Map<String, Object> cartDataMap = objectMapper.readValue(cartData, Map.class);
+                    List<Map<String, Object>> items = (List<Map<String, Object>>) cartDataMap.get("items");
+                    
+                    if (items != null) {
+                        for (Map<String, Object> item : items) {
+                            Long productId = Long.valueOf(item.get("productId").toString());
+                            Integer productAmount = Integer.valueOf(item.get("productAmount").toString());
+                            
+                            // 从products表查询market_price
+                            CarProductsEntity product = carProductsService.getProductById(productId);
+                            if (product == null) {
+                                log.error("商品不存在，商品ID：{}", productId);
+                                return R.fail("商品不存在，商品ID：" + productId, null);
+                            }
+                            
+                            // 使用market_price作为商品价格
+                            int productPrice = product.getMarketPrice().intValue();
+                            int itemTotal = productPrice * productAmount;
+                            totalAmount += itemTotal;
+                            
+                            CarOrderDetailEntity detail = new CarOrderDetailEntity();
+                            detail.setProductId(productId);
+                            detail.setProductName((String) item.get("productName"));
+                            detail.setProductAmount(productAmount);
+                            detail.setProductPrice(productPrice);
+                            orderDetails.add(detail);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("解析购物车数据失败", e);
+                    return R.fail("購物車數據解析失敗", null);
+                }
+            }
+            
+            // 使用重新计算的金额
+            finalAmount = totalAmount;
+            
+            // 创建业务订单
+            CarOrderInfoEntity orderInfo = carOrderInfoService.createOrder(
+                userId, receiverName, receiverMobile, receiverAddress, orderDetails);
+            
+            if (orderInfo == null) {
+                log.error("创建业务订单失败，用户ID: {}", userId);
+                return R.fail("創建訂單失敗", null);
+            }
+            
+            // 创建支付订单记录
+            CarPaymentOrderEntity paymentOrder = new CarPaymentOrderEntity();
+            paymentOrder.setMerchantTradeNo(merchantTradeNo);
+            paymentOrder.setUserId(userId);
+            paymentOrder.setTotalAmount(finalAmount);
+            paymentOrder.setItemName(itemName);
+            paymentOrder.setTradeDesc(description);
+            paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.PENDING.getCode());
+            paymentOrder.setCreateTime(new Date());
+            paymentOrder.setUpdateTime(new Date());
+            paymentOrder.setDelFlag(false);
+            
+            // 保存支付订单到数据库
+            int result = paymentOrderMapper.insert(paymentOrder);
+            if (result <= 0) {
+                log.error("保存支付订单失败，用户ID: {}, 金额: {}", userId, finalAmount);
+                return R.fail("創建支付訂單失敗", null);
+            }
+            
+            // 构建绿界支付参数
+            Map<String, String> paymentParams = ecPayUtils.buildPaymentParams(
+                merchantTradeNo,
+                description,
+                finalAmount,
+                itemName
+            );
+            
+            log.info("支付订单创建成功，商户订单号: {}, 用户ID: {}, 金额: {}", 
+                    merchantTradeNo, userId, finalAmount);
+            
+            return R.ok("支付訂單創建成功", paymentParams);
+            
+        } catch (Exception e) {
+            log.error("创建支付订单异常", e);
+            return R.fail("創建支付訂單異常: " + e.getMessage(), null);
+        }
     }
 }
