@@ -143,25 +143,44 @@
                     <!-- 车辆网格 -->
                     <div class="cars-grid">
                         <#list cars as car>
-                        <a href="/static-demo" class="car-card-link">
-                            <div class="car-card">
-                                <div class="car-image-container">
-                                    <img src="${car.image}" alt="${car.title}" class="car-image">
-                                    <div class="car-badge">${car.year}</div>
+                        <div class="car-card">
+                            <div class="car-image-container">
+                                <img src="${car.image}" alt="${car.title}" class="car-image">
+                                <div class="car-badge">${car.year}</div>
+                            </div>
+                            <div class="car-info">
+                                <div class="car-price-section">
+                                    <span class="price-amount">$${car.price?string("###,###")}</span>
                                 </div>
-                                <div class="car-info">
-                                    <h3 class="car-title">${car.title}</h3>
-                                    <div class="car-details">
-                                        <span class="car-mileage"><i class="bi bi-speedometer2"></i> ${car.mileage} km</span>
-                                        <span class="car-fuel"><i class="bi bi-fuel-pump"></i> ${car.fuelType}</span>
-                                        <span class="car-transmission"><i class="bi bi-gear"></i> ${car.transmission}</span>
+                                <h3 class="car-title">${car.title}</h3>
+                                <div class="car-specs">
+                                    <div class="spec-item">
+                                        <div class="spec-content">
+                                            <div class="spec-label">燃料类型</div>
+                                            <div class="spec-value">${car.fuelType}</div>
+                                        </div>
                                     </div>
-                                    <div class="car-price">
-                                        <span class="price-amount">$${car.price?string("###,###")}</span>
+                                    <div class="spec-item">
+                                        <div class="spec-content">
+                                            <div class="spec-label">里程</div>
+                                            <div class="spec-value">${car.mileage} km</div>
+                                        </div>
                                     </div>
+                                    <div class="spec-item">
+                                        <div class="spec-content">
+                                            <div class="spec-label">变速箱</div>
+                                            <div class="spec-value">${car.transmission}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="car-actions">
+                                    <a href="/static-demo" class="view-details-btn">
+                                        查看详情
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
                                 </div>
                             </div>
-                        </a>
+                        </div>
                         </#list>
                     </div>
 
