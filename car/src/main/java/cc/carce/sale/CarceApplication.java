@@ -16,5 +16,6 @@ public class CarceApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(CarceApplication.class, args);
+
     }
 }

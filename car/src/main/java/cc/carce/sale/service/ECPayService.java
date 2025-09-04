@@ -3,8 +3,8 @@ package cc.carce.sale.service;
 import cc.carce.sale.common.ECPayUtils;
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.ECPayConfig;
-import cc.carce.sale.entity.PaymentOrderEntity;
-import cc.carce.sale.mapper.PaymentOrderMapper;
+import cc.carce.sale.entity.CarPaymentOrderEntity;
+import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +29,7 @@ public class ECPayService {
     private ECPayUtils ecPayUtils;
     
     @Resource
-    private PaymentOrderMapper paymentOrderMapper;
+    private CarPaymentOrderMapper paymentOrderMapper;
     
     /**
      * 创建支付订单
@@ -43,10 +43,10 @@ public class ECPayService {
                 activeProfile = "dev"; // 默认使用dev环境
             }
             
-            // 如果是dev或test环境，金额固定为1
+            // 如果是dev或test环境，金额固定为0.01
             BigDecimal finalAmount = amount;
             if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
-                finalAmount = BigDecimal.ONE;
+                finalAmount = new BigDecimal("30");
                 log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", amount);
             }
             
@@ -54,13 +54,13 @@ public class ECPayService {
             String merchantTradeNo = generateMerchantTradeNo();
             
             // 创建支付订单记录
-            PaymentOrderEntity paymentOrder = new PaymentOrderEntity();
+            CarPaymentOrderEntity paymentOrder = new CarPaymentOrderEntity();
             paymentOrder.setMerchantTradeNo(merchantTradeNo);
             paymentOrder.setUserId(userId);
             paymentOrder.setTotalAmount(finalAmount);
             paymentOrder.setItemName(itemName);
             paymentOrder.setTradeDesc(description);
-            paymentOrder.setPaymentStatus(PaymentOrderEntity.PaymentStatus.PENDING.getCode());
+            paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.PENDING.getCode());
             paymentOrder.setCreateTime(new Date());
             paymentOrder.setUpdateTime(new Date());
             paymentOrder.setDelFlag(false);
@@ -115,20 +115,20 @@ public class ECPayService {
             }
             
             // 查询支付订单
-            PaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
+            CarPaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
             if (paymentOrder == null) {
                 log.error("未找到对应的支付订单，商户订单号: {}", merchantTradeNo);
                 return "0|ErrorMessage";
             }
             
             // 检查是否已经处理过
-            if (PaymentOrderEntity.PaymentStatus.SUCCESS.getCode().equals(paymentOrder.getPaymentStatus())) {
+            if (CarPaymentOrderEntity.PaymentStatus.SUCCESS.getCode().equals(paymentOrder.getPaymentStatus())) {
                 log.info("支付订单已处理，商户订单号: {}", merchantTradeNo);
                 return "1|OK";
             }
             
             // 更新支付状态
-            PaymentOrderEntity.PaymentStatus paymentStatus = PaymentOrderEntity.PaymentStatus.SUCCESS;
+            CarPaymentOrderEntity.PaymentStatus paymentStatus = CarPaymentOrderEntity.PaymentStatus.SUCCESS;
             String ecpayStatus = "SUCCESS";
             String ecpayStatusDesc = "支付成功";
             
@@ -170,9 +170,9 @@ public class ECPayService {
     /**
      * 查询支付订单状态
      */
-    public R<PaymentOrderEntity> queryPaymentStatus(String merchantTradeNo) {
+    public R<CarPaymentOrderEntity> queryPaymentStatus(String merchantTradeNo) {
         try {
-            PaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
+            CarPaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
             if (paymentOrder == null) {
                 return R.fail("支付訂單不存在", null);
             }
@@ -191,7 +191,7 @@ public class ECPayService {
     @Transactional
     public R<Boolean> cancelPayment(String merchantTradeNo, Long userId) {
         try {
-            PaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
+            CarPaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
             if (paymentOrder == null) {
                 return R.fail("支付訂單不存在", null);
             }
@@ -202,14 +202,14 @@ public class ECPayService {
             }
             
             // 检查订单状态
-            if (!PaymentOrderEntity.PaymentStatus.PENDING.getCode().equals(paymentOrder.getPaymentStatus())) {
+            if (!CarPaymentOrderEntity.PaymentStatus.PENDING.getCode().equals(paymentOrder.getPaymentStatus())) {
                 return R.fail("訂單狀態不允許取消", null);
             }
             
             // 更新订单状态为已取消
             int result = paymentOrderMapper.updatePaymentStatus(
                 paymentOrder.getId(),
-                PaymentOrderEntity.PaymentStatus.CANCELLED.getCode(),
+                CarPaymentOrderEntity.PaymentStatus.CANCELLED.getCode(),
                 "CANCELLED",
                 "用户取消",
                 null

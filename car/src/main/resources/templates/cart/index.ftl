@@ -305,6 +305,7 @@
 </style>
 
 <script>
+<#noparse>
 new Vue({
     el: '#app',
     data: {
@@ -552,15 +553,31 @@ new Vue({
                     totalQuantity: this.totalQuantity
                 };
                 
-                // 跳转到支付页面
-                const queryParams = new URLSearchParams({
+                // 创建表单并提交到支付页面
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/payment/index';
+                
+                // 添加支付参数
+                const formData = {
                     itemName: `購物車商品 (${this.cartItems.length}件)`,
                     amount: this.totalPrice,
                     description: `購買${this.cartItems.length}件商品，總計${this.totalPrice}元`,
                     cartData: JSON.stringify(checkoutData)
+                };
+                
+                // 创建隐藏的input字段
+                Object.entries(formData).forEach(([key, value]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
                 });
                 
-                window.location.href = `/payment/index?${queryParams.toString()}`;
+                // 提交表单
+                document.body.appendChild(form);
+                form.submit();
                 
             } catch (error) {
                 console.error('結算失敗:', error);
@@ -620,5 +637,6 @@ new Vue({
         }
     }
 });
+</#noparse>
 </script>
 

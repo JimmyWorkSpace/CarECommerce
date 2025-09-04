@@ -124,7 +124,7 @@
                 <#if isDevOrTest?? && isDevOrTest>
                 <div class="alert alert-warning" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>测试环境提示：</strong>当前为开发/测试环境，支付金额固定为1元
+                    <strong>测试环境提示：</strong>当前为开发/测试环境，支付金额固定为0.01元
                 </div>
                 </#if>
             </div>
@@ -151,6 +151,9 @@
                         <textarea class="form-control" id="description" name="description" 
                                   rows="3" placeholder="请输入订单描述（可选）">${description!''}</textarea>
                     </div>
+                    
+                    <!-- 隐藏的购物车数据字段 -->
+                    <input type="hidden" id="cartData" name="cartData" value="${cartData!''}">
                     
                     <!-- 购物车商品列表 -->
                     <#if cartData?? && cartData != ''>
@@ -217,6 +220,7 @@
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/axios.min.js"></script>
     <script>
+        <#noparse>
         $(document).ready(function() {
             // 初始化购物车商品列表
             initCartItemsList();
@@ -336,10 +340,10 @@
             
             // 初始化购物车商品列表
             function initCartItemsList() {
-                const cartData = '${cartData!""}';
-                if (cartData) {
+                const cartData = $('#cartData').val();
+                if (cartData && cartData.trim() !== '') {
                     try {
-                        const cartItems = JSON.parse(decodeURIComponent(cartData));
+                        const cartItems = JSON.parse(cartData);
                         if (cartItems && cartItems.items && cartItems.items.length > 0) {
                             const cartListContainer = $('#cartItemsList');
                             cartListContainer.empty();
@@ -356,13 +360,14 @@
                                         <div class="cart-item-price">
                                             ¥${parseFloat(item.subtotal).toFixed(2)}
                                         </div>
-                                    </div>
+                        </div>
                                 `;
                                 cartListContainer.append(cartItemHtml);
                             });
                         }
                     } catch (error) {
                         console.error('解析购物车数据失败:', error);
+                        console.error('购物车数据内容:', cartData);
                     }
                 }
             }
@@ -370,6 +375,7 @@
             // 初始化
             updateSummary();
         });
+        </#noparse>
     </script>
 </body>
 </html>

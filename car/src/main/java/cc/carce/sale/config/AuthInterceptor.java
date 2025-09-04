@@ -1,14 +1,22 @@
 package cc.carce.sale.config;
 
-import cn.dev33.satoken.stp.StpUtil;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import cc.carce.sale.common.JwtUtils;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONUtil;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 自定义认证拦截器
@@ -21,32 +29,25 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
 
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        HttpSession session = request.getSession();
-        
-        // 检查用户是否已登录（优先检查Sa-Token）
-        boolean isLoggedIn = StpUtil.isLogin();
-        Object user = session.getAttribute("user");
-        
-        // 如果Sa-Token显示已登录但session中没有用户信息，尝试从Sa-Token获取
-        if (isLoggedIn && user == null) {
-            try {
-                Object loginId = StpUtil.getLoginId();
-                if (loginId != null) {
-                    log.info("Sa-Token检测到用户已登录，登录ID: {}", loginId);
-                }
-            } catch (Exception e) {
-                log.warn("Sa-Token状态异常", e);
-            }
+    	List<Cookie> cookies = CollUtil.newArrayList(request.getCookies());
+    	Cookie tokenCookie = cookies.stream().filter(c -> c.getName().equals("token")).findFirst().orElse(null);
+        if (tokenCookie != null && JwtUtils.verify(tokenCookie.getValue())) {
+        	String userJson = redisTemplate.opsForValue().get("TOKEN:" + tokenCookie.getValue());
+        	UserInfo sessionUser = JSONUtil.toBean(userJson, UserInfo.class);
+        	request.getSession().setAttribute("user", sessionUser);
+        	request.setAttribute("sessionUser", sessionUser);
         }
-        
         return true;
     }
     
     /**
      * 用户信息类
      */
+    @Data
     public static class UserInfo {
         private Long id;
         private String username;
@@ -54,66 +55,6 @@ public class AuthInterceptor implements HandlerInterceptor {
         private String name;
         private String email;
         private String phone;
-        
-        // Getters and Setters
-        public Long getId() {
-            return id;
-        }
-        
-        public void setId(Long id) {
-            this.id = id;
-        }
-        
-        public String getUsername() {
-            return username;
-        }
-        
-        public void setUsername(String username) {
-            this.username = username;
-        }
-        
-        public String getNickname() {
-            return nickname;
-        }
-        
-        public void setNickname(String nickname) {
-            this.nickname = nickname;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public void setName(String name) {
-            this.name = name;
-        }
-        
-        public String getEmail() {
-            return email;
-        }
-        
-        public void setEmail(String email) {
-            this.email = email;
-        }
-        
-        public String getPhone() {
-            return phone;
-        }
-        
-        public void setPhone(String phone) {
-            this.phone = phone;
-        }
-        
-        @Override
-        public String toString() {
-            return "UserInfo{" +
-                    "id=" + id +
-                    ", username='" + username + '\'' +
-                    ", nickname='" + nickname + '\'' +
-                    ", name='" + name + '\'' +
-                    ", email='" + email + '\'' +
-                    ", phone='" + phone + '\'' +
-                    '}';
-        }
+        private String token;
     }
 } 

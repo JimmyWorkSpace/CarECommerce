@@ -1,16 +1,23 @@
 package cc.carce.sale.controller;
 
-import cc.carce.sale.common.R;
-import cc.carce.sale.entity.PaymentOrderEntity;
-import cc.carce.sale.service.ECPayService;
-import cn.dev33.satoken.stp.StpUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import java.math.BigDecimal;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.util.Map;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import cc.carce.sale.common.R;
+import cc.carce.sale.config.AuthInterceptor.UserInfo;
+import cc.carce.sale.entity.CarPaymentOrderEntity;
+import cc.carce.sale.service.ECPayService;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 绿界支付控制器
@@ -18,7 +25,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/payment")
-public class ECPayController {
+public class ECPayController extends BaseController{
     
     @Resource
     private ECPayService ecPayService;
@@ -30,11 +37,12 @@ public class ECPayController {
     public R<Map<String, String>> createPayment(@RequestBody Map<String, Object> request) {
         try {
             // 检查用户登录状态
-            if (!StpUtil.isLogin()) {
+            if (!isLogin()) {
                 return R.fail("請先登錄", null);
             }
             
-            Long userId = StpUtil.getLoginIdAsLong();
+            UserInfo user = getSessionUser();
+            
             BigDecimal amount = new BigDecimal(request.get("amount").toString());
             String itemName = (String) request.get("itemName");
             String description = (String) request.get("description");
@@ -52,9 +60,9 @@ public class ECPayController {
                 description = "购买商品：" + itemName;
             }
             
-            log.info("用户创建支付订单，用户ID: {}, 金额: {}, 商品: {}", userId, amount, itemName);
+            log.info("用户创建支付订单，用户ID: {}, 金额: {}, 商品: {}", user.getId(), amount, itemName);
             
-            return ecPayService.createPayment(userId, amount, itemName, description);
+            return ecPayService.createPayment(user.getId(), amount, itemName, description);
             
         } catch (Exception e) {
             log.error("创建支付订单异常", e);
@@ -66,21 +74,21 @@ public class ECPayController {
      * 查询支付订单状态
      */
     @GetMapping("/status/{merchantTradeNo}")
-    public R<PaymentOrderEntity> queryPaymentStatus(@PathVariable String merchantTradeNo) {
+    public R<CarPaymentOrderEntity> queryPaymentStatus(@PathVariable String merchantTradeNo) {
         try {
             // 检查用户登录状态
-            if (!StpUtil.isLogin()) {
+            if (!isLogin()) {
                 return R.fail("請先登錄", null);
             }
             
-            Long userId = StpUtil.getLoginIdAsLong();
+            UserInfo user = getSessionUser();
             
             // 查询订单状态
-            R<PaymentOrderEntity> result = ecPayService.queryPaymentStatus(merchantTradeNo);
+            R<CarPaymentOrderEntity> result = ecPayService.queryPaymentStatus(merchantTradeNo);
             
             if (result.isSuccess() && result.getData() != null) {
                 // 检查订单所属用户
-                if (!result.getData().getUserId().equals(userId)) {
+                if (!result.getData().getUserId().equals(user.getId())) {
                     return R.fail("無權限查看此訂單", null);
                 }
             }
@@ -100,15 +108,15 @@ public class ECPayController {
     public R<Boolean> cancelPayment(@PathVariable String merchantTradeNo) {
         try {
             // 检查用户登录状态
-            if (!StpUtil.isLogin()) {
+            if (!isLogin()) {
                 return R.fail("請先登錄", null);
             }
             
-            Long userId = StpUtil.getLoginIdAsLong();
+            UserInfo user = getSessionUser();
             
-            log.info("用户取消支付订单，用户ID: {}, 商户订单号: {}", userId, merchantTradeNo);
+            log.info("用户取消支付订单，用户ID: {}, 商户订单号: {}", user.getId(), merchantTradeNo);
             
-            return ecPayService.cancelPayment(merchantTradeNo, userId);
+            return ecPayService.cancelPayment(merchantTradeNo, user.getId());
             
         } catch (Exception e) {
             log.error("取消支付订单异常", e);

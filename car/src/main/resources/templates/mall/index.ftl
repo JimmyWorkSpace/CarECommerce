@@ -39,6 +39,12 @@
                 <i class="bi bi-car-front"></i>
                 外觀配件
             </button>
+            <button class="filter-btn" 
+                    :class="{ active: selectedCategory === 'tools' }"
+                    @click="filterByCategory('tools')">
+                <i class="bi bi-tools"></i>
+                工具設備
+            </button>
         </div>
     </div>
     
@@ -69,9 +75,9 @@
         <div v-for="product in filteredProducts" 
              :key="product.id" 
              class="product-card" 
-             :data-category="product.category || 'all'">
+             :data-category="product.category || 'other'">
             <div class="product-image">
-                <img :src="product.image" :alt="product.name">
+                <img :src="product.image" :alt="product.name" @error="handleImageError">
                 <div class="product-overlay">
                     <button class="btn btn-primary add-to-cart-btn" 
                             @click="addToCart(product)"
@@ -88,11 +94,13 @@
                 <div class="product-meta">
                     <span v-if="product.brand" class="badge bg-secondary me-2">{{ product.brand }}</span>
                     <span v-if="product.model" class="badge bg-info me-2">{{ product.model }}</span>
-                    <span v-if="product.year" class="badge bg-warning me-2">{{ product.year }}年</span>
+                    <span v-if="product.source" class="badge bg-warning me-2">{{ product.source }}</span>
                 </div>
                 <div class="product-price">
                     <span class="price-symbol">¥</span>
                     <span class="price-amount">{{ formatPrice(product.price) }}</span>
+                    <span v-if="product.marketPrice && product.marketPrice > product.price" 
+                          class="market-price">¥{{ formatPrice(product.marketPrice) }}</span>
                 </div>
             </div>
         </div>
@@ -304,6 +312,14 @@
     font-weight: 700;
 }
 
+.market-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+    margin-left: 10px;
+    font-weight: 400;
+}
+
 .pagination-container {
     margin-top: 40px;
 }
@@ -414,9 +430,16 @@ new Vue({
                 this.loading = true;
                 this.error = '';
                 
-                // 这里可以调用后端API获取商品数据
-                // 暂时使用模拟数据
-                await this.loadMockProducts();
+                // 调用后端API获取商品数据
+                const response = await axios.get('/api/products/list');
+                
+                if (response.data.success) {
+                    this.products = response.data.data || [];
+                    this.filteredProducts = [...this.products];
+                    this.calculatePagination();
+                } else {
+                    this.error = response.data.message || '加载商品失败';
+                }
                 
             } catch (error) {
                 console.error('加载商品失败:', error);
@@ -426,98 +449,41 @@ new Vue({
             }
         },
         
-        // 加载模拟商品数据
-        async loadMockProducts() {
-            // 模拟API调用延迟
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            this.products = [
-                {
-                    id: 1,
-                    name: '丰田凯美瑞 2.0L 豪华版',
-                    description: '2019年款，行驶里程5万公里，车况良好，无重大事故',
-                    price: 150000,
-                    image: '/img/car/car4.jpg',
-                    category: 'exterior',
-                    brand: '丰田',
-                    model: '凯美瑞',
-                    year: 2019
-                },
-                {
-                    id: 2,
-                    name: '本田雅阁 2.4L 尊贵版',
-                    description: '2020年款，行驶里程3万公里，保养记录完整',
-                    price: 200000,
-                    image: '/img/car/car6.jpg',
-                    category: 'engine',
-                    brand: '本田',
-                    model: '雅阁',
-                    year: 2020
-                },
-                {
-                    id: 3,
-                    name: '日产天籁 2.0L 舒适版',
-                    description: '2018年款，行驶里程7万公里，车况稳定',
-                    price: 120000,
-                    image: '/img/car/car8.jpg',
-                    category: 'suspension',
-                    brand: '日产',
-                    model: '天籁',
-                    year: 2018
-                },
-                {
-                    id: 4,
-                    name: '大众帕萨特 1.8T 豪华版',
-                    description: '2019年款，行驶里程4万公里，动力强劲',
-                    price: 180000,
-                    image: '/img/car/car9.jpg',
-                    category: 'brake',
-                    brand: '大众',
-                    model: '帕萨特',
-                    year: 2019
-                },
-                {
-                    id: 5,
-                    name: '别克君威 2.0T 精英版',
-                    description: '2020年款，行驶里程2万公里，配置丰富',
-                    price: 160000,
-                    image: '/img/car/car10.jpg',
-                    category: 'electrical',
-                    brand: '别克',
-                    model: '君威',
-                    year: 2020
-                },
-                {
-                    id: 6,
-                    name: '马自达阿特兹 2.5L 运动版',
-                    description: '2019年款，行驶里程6万公里，操控出色',
-                    price: 140000,
-                    image: '/img/car/car11.jpg',
-                    category: 'suspension',
-                    brand: '马自达',
-                    model: '阿特兹',
-                    year: 2019
-                }
-            ];
-            
-            this.filteredProducts = [...this.products];
-            this.calculatePagination();
-        },
-        
         // 按分类过滤商品
-        filterByCategory(category) {
-            this.selectedCategory = category;
-            this.currentPage = 1;
-            
-            if (category === 'all') {
-                this.filteredProducts = [...this.products];
-            } else {
-                this.filteredProducts = this.products.filter(product => 
-                    product.category === category
-                );
+        async filterByCategory(category) {
+            try {
+                this.selectedCategory = category;
+                this.currentPage = 1;
+                
+                if (category === 'all') {
+                    this.filteredProducts = [...this.products];
+                } else {
+                    // 调用API获取分类商品
+                    const response = await axios.get(`/api/products/category?category=` + category);
+                    if (response.data.success) {
+                        this.filteredProducts = response.data.data || [];
+                    } else {
+                        // 如果API调用失败，使用本地过滤
+                        this.filteredProducts = this.products.filter(product => 
+                            product.category === category
+                        );
+                    }
+                }
+                
+                this.calculatePagination();
+                
+            } catch (error) {
+                console.error('过滤商品失败:', error);
+                // 使用本地过滤作为备选方案
+                if (category === 'all') {
+                    this.filteredProducts = [...this.products];
+                } else {
+                    this.filteredProducts = this.products.filter(product => 
+                        product.category === category
+                    );
+                }
+                this.calculatePagination();
             }
-            
-            this.calculatePagination();
         },
         
         // 计算分页
@@ -580,6 +546,12 @@ new Vue({
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             });
+        },
+        
+        // 处理图片加载失败
+        handleImageError(event) {
+            // 设置默认图片
+            event.target.src = '/img/car/car6.jpg';
         },
         
         // 更新全局购物车数量

@@ -1,12 +1,14 @@
 package cc.carce.sale.service;
 
-import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.util.RandomUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
+import cn.hutool.core.util.RandomUtil;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 短信验证码服务
@@ -15,11 +17,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class SmsService {
     
+    @Autowired
+    private Environment environment;
+    
     // 存储验证码的Map，key为手机号，value为验证码和过期时间
     private static final Map<String, SmsCode> SMS_CODE_MAP = new ConcurrentHashMap<>();
     
     // 验证码有效期（分钟）
     private static final int CODE_EXPIRE_MINUTES = 5;
+    
+    // 开发环境固定验证码
+    private static final String DEV_FIXED_CODE = "123456";
     
     /**
      * 发送短信验证码
@@ -27,8 +35,27 @@ public class SmsService {
      * @return 验证码
      */
     public String sendSmsCode(String phoneNumber) {
-        // 生成6位数字验证码
-        String code = RandomUtil.randomNumbers(6);
+        String code;
+        
+        // 检查当前环境，如果是dev或test环境，使用固定验证码
+        String[] activeProfiles = environment.getActiveProfiles();
+        boolean isDevOrTest = false;
+        
+        for (String profile : activeProfiles) {
+            if ("dev".equals(profile) || "test".equals(profile)) {
+                isDevOrTest = true;
+                break;
+            }
+        }
+        
+        if (isDevOrTest) {
+            // 开发环境使用固定验证码
+            code = DEV_FIXED_CODE;
+            log.info("=== 开发环境：使用固定验证码 {} ===", code);
+        } else {
+            // 生产环境生成随机验证码
+            code = RandomUtil.randomNumbers(6);
+        }
         
         // 计算过期时间
         long expireTime = System.currentTimeMillis() + CODE_EXPIRE_MINUTES * 60 * 1000;
@@ -41,6 +68,11 @@ public class SmsService {
         log.info("手机号: {}", phoneNumber);
         log.info("验证码: {}", code);
         log.info("有效期: {} 分钟", CODE_EXPIRE_MINUTES);
+        if (isDevOrTest) {
+            log.info("环境: 开发环境 (固定验证码)");
+        } else {
+            log.info("环境: 生产环境 (随机验证码)");
+        }
         log.info("========================");
         
         return code;

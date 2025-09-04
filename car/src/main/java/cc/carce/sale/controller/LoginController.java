@@ -1,19 +1,27 @@
 package cc.carce.sale.controller;
 
-import cc.carce.sale.entity.CarUserEntity;
-import cc.carce.sale.service.CarUserService;
-import cc.carce.sale.service.SmsService;
-import cn.dev33.satoken.stp.StpUtil;
-import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import cc.carce.sale.common.JwtUtils;
+import cc.carce.sale.config.AuthInterceptor.UserInfo;
+import cc.carce.sale.entity.CarUserEntity;
+import cc.carce.sale.service.CarUserService;
+import cc.carce.sale.service.SmsService;
+import cn.hutool.json.JSONUtil;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 登录控制器
@@ -27,6 +35,9 @@ public class LoginController {
 
     @Resource
     private CarUserService carUserService;
+    
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
 
     /**
      * 显示登录页面
@@ -59,6 +70,7 @@ public class LoginController {
                        @RequestParam String smsCode,
                        @RequestParam(required = false) String returnUrl,
                        HttpSession session,
+                       HttpServletResponse response,
                        Model model) {
         
         try {
@@ -88,8 +100,8 @@ public class LoginController {
                 return getLoginPage(model);
             }
             
-            // 使用Sa-Token进行登录
-            StpUtil.login(user.getId());
+            String token = JwtUtils.generateToken(user.getPhoneNumber());
+            // 保存到 Redis，过期时间与 JWT 保持一致（1小时）
             
             // 将用户信息存储到session中（兼容现有代码）
             cc.carce.sale.config.AuthInterceptor.UserInfo sessionUser = new cc.carce.sale.config.AuthInterceptor.UserInfo();
@@ -99,9 +111,16 @@ public class LoginController {
             sessionUser.setName(user.getNickName());
             sessionUser.setEmail(user.getPhoneNumber() + "@example.com");
             sessionUser.setPhone(user.getPhoneNumber());
-            
+            sessionUser.setToken(token);
             session.setAttribute("user", sessionUser);
             
+            Cookie cookie = new Cookie("token", token);
+            cookie.setHttpOnly(true);   // 防止前端JS读取（安全）
+            cookie.setPath("/");        // 整个网站都有效
+            cookie.setMaxAge(60 * 60);  // 1小时有效
+            response.addCookie(cookie);
+            
+            redisTemplate.opsForValue().set("TOKEN:" + token, JSONUtil.toJsonStr(sessionUser), 1, TimeUnit.HOURS);
             log.info("用户登录成功: ID={}, 手机号={}", user.getId(), user.getPhoneNumber());
             
             // 如果有返回URL且是GET请求的页面，则跳转回去
@@ -163,7 +182,14 @@ public class LoginController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         // 使用Sa-Token登出
-        StpUtil.logout();
+        if(session.getAttribute("user") != null) {
+        	try {
+        		UserInfo sessionUser = JSONUtil.toBean(session.getAttribute("user").toString(), UserInfo.class);
+        		redisTemplate.delete("TOKEN:" + sessionUser.getToken());
+        	}catch(Exception ex) {
+        		log.error("从session中读取用户信息失败", ex);
+        	}
+        }
         
         // 清除session中的用户信息
         session.removeAttribute("user");

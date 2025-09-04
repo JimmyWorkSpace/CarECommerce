@@ -162,9 +162,14 @@
                 </a>
                 <#else>
                 <!-- 支付失败或取消 -->
-                <a href="/payment/index?itemName=${paymentOrder.itemName!''}&amount=${paymentOrder.totalAmount!0}" class="btn btn-primary">
-                    <i class="bi bi-credit-card me-2"></i>重新支付
-                </a>
+                <form method="POST" action="/payment/index" style="display: inline;">
+                    <input type="hidden" name="itemName" value="${paymentOrder.itemName!''}">
+                    <input type="hidden" name="amount" value="${paymentOrder.totalAmount!0}">
+                    <input type="hidden" name="description" value="重新支付：${paymentOrder.itemName!''}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-credit-card me-2"></i>重新支付
+                    </button>
+                </form>
                 <a href="/cart" class="btn btn-outline-secondary">
                     <i class="bi bi-cart me-2"></i>返回购物车
                 </a>

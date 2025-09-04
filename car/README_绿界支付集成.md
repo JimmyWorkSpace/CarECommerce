@@ -72,12 +72,29 @@
 ecpay:
   # 测试环境配置
   production: false
-  merchant-id: "2000132"  # 测试商户编号
-  hash-key: "5294y06JbISpM5x9"  # 测试HashKey
-  hash-iv: "v77hoKGq4kWxNNIS"   # 测试HashIV
+  merchant-id: "2000132"  # 官方测试商户编号
+  hash-key: "5294y06JbISpM5x9"  # 官方测试HashKey
+  hash-iv: "v77hoKGq4kWxNNIS"   # 官方测试HashIV
   return-url: "http://localhost:8080/api/payment/return"
   notify-url: "http://localhost:8080/api/payment/callback"
   client-back-url: "http://localhost:8080/payment/result"
+  result-url: "http://localhost:8080/payment/result"
+```
+
+#### 测试环境 (application-test.yml)
+
+```yaml
+# 绿界支付配置
+ecpay:
+  # 测试环境配置
+  production: false
+  merchant-id: "2000132"  # 官方测试商户编号
+  hash-key: "5294y06JbISpM5x9"  # 官方测试HashKey
+  hash-iv: "v77hoKGq4kWxNNIS"   # 官方测试HashIV
+  return-url: "https://sale.carce.cc/api/payment/return"
+  notify-url: "https://sale.carce.cc/api/payment/callback"
+  client-back-url: "https://sale.carce.cc/payment/result"
+  result-url: "https://sale.carce.cc/payment/result"
 ```
 
 #### 生产环境 (application-prod.yml)
@@ -93,6 +110,7 @@ ecpay:
   return-url: "https://yourdomain.com/api/payment/return"
   notify-url: "https://yourdomain.com/api/payment/callback"
   client-back-url: "https://yourdomain.com/payment/result"
+  result-url: "https://yourdomain.com/payment/result"
 ```
 
 ### 3. 数据库配置
@@ -268,9 +286,9 @@ function submitToECPay(paymentParams) {
 ### 1. 测试环境
 
 - **服务器地址：** `https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5`
-- **商户编号：** `2000132`
-- **HashKey：** `5294y06JbISpM5x9`
-- **HashIV：** `v77hoKGq4kWxNNIS`
+- **商户编号：** `2000132` (官方测试商户编号)
+- **HashKey：** `5294y06JbISpM5x9` (官方测试HashKey)
+- **HashIV：** `v77hoKGq4kWxNNIS` (官方测试HashIV)
 
 ### 2. 测试卡号
 
@@ -279,6 +297,8 @@ function submitToECPay(paymentParams) {
 - **信用卡：** 4000-0000-0000-0002
 - **有效期限：** 任意未来日期
 - **安全码：** 任意3位数字
+
+**注意：** 在开发/测试环境下，系统会自动将支付金额固定为0.01元，无论用户输入多少金额。
 
 ### 3. 测试流程
 

@@ -47,7 +47,7 @@ import io.swagger.annotations.ApiParam;
 @Controller
 @CrossOrigin()
 @RequestMapping("/")
-public class CarViewController {
+public class CarViewController extends BaseController {
 	
 	@Value("${carce.webUrl}")
 	private String webUrl;
@@ -287,49 +287,7 @@ public class CarViewController {
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
             
-            // 生成商城商品数据（模拟数据）
-            List<Map<String, Object>> products = new ArrayList<>();
-            String[] productNames = {
-                "汽車座套", "車載充電器", "行車記錄儀", "汽車香水", "方向盤套", 
-                "汽車腳墊", "車載冰箱", "汽車音響", "導航儀", "汽車貼膜",
-                "輪胎", "機油", "煞車片", "雨刷器", "電瓶", "火花塞"
-            };
-            
-//            String[] productImages = {
-//                "/img/car/car4.jpg", "/img/car/car5.jpg", "/img/car/car6.jpg", "/img/car/car7.jpg", "/img/car/car8.jpg", "/img/car/car9.jpg",
-//                "/img/car/car10.jpg", "/img/car/car11.jpg", "/img/car/car12.jpg", "/img/car/car13.jpg", "/img/car/car14.jpg", "/img/car/car15.jpg",
-//                "/img/car/car16.jpg", "/img/car/car4.jpg", "/img/car/car5.jpg", "/img/car/car6.jpg"
-//            };
-            String[] productImages = {
-            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
-            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
-            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
-            		"/img/car/car6.jpg"
-            };
-            
-            int[] prices = {
-                299, 89, 599, 129, 159, 399, 899, 1299, 799, 599, 899, 299, 199, 89, 599, 89
-            };
-            
-            // 商品分类
-            String[] categories = {
-                "exterior", "electrical", "electrical", "exterior", "exterior", 
-                "exterior", "electrical", "electrical", "electrical", "exterior",
-                "brake", "engine", "brake", "exterior", "electrical", "engine"
-            };
-            
-            for (int i = 0; i < productNames.length; i++) {
-                Map<String, Object> product = new HashMap<>();
-                product.put("id", "product_" + (i + 1));
-                product.put("name", productNames[i]);
-                product.put("price", prices[i]);
-                product.put("image", productImages[i]);
-                product.put("category", categories[i]);
-                product.put("description", "高品質汽車配件，提升您的駛駛體驗");
-                products.add(product);
-            }
-            
-            model.addAttribute("products", products);
+            // 设置页面基本信息
             model.addAttribute("title", "商城 - 汽車配件專營店");
             model.addAttribute("description", "專業汽車配件商城，提供優質汽車用品");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
@@ -550,23 +508,6 @@ public class CarViewController {
         return "/layout/main";
     }
     
-    /**
-     * 获取banner数据的API接口
-     */
-    @GetMapping("/api/banners")
-    @ResponseBody
-    public List<CarBannerEntity> getBanners() {
-        return carBannerService.getHomeBanners();
-    }
-    
-    /**
-     * 获取广告数据的API接口
-     */
-    @GetMapping("/api/advertisements")
-    @ResponseBody
-    public List<CarAdvertisementEntity> getAdvertisements() {
-        return carAdvertisementService.getHomeAdvertisements();
-    }
     
     /**
      * 显示广告内容页面

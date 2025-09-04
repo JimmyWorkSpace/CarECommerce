@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import cc.carce.sale.common.R;
-import cc.carce.sale.config.AuthInterceptor;
-import cc.carce.sale.entity.PaymentOrderEntity;
+import cc.carce.sale.config.AuthInterceptor.UserInfo;
+import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.service.ECPayService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 @RequestMapping("/payment")
-public class PaymentResultController {
+public class PaymentResultController extends BaseController {
     
     @Resource
     private ECPayService ecPayService;
@@ -35,7 +35,7 @@ public class PaymentResultController {
                                    HttpSession session) {
         
         // 检查用户登录状态
-        AuthInterceptor.UserInfo userInfo = (AuthInterceptor.UserInfo) session.getAttribute("userInfo");
+        UserInfo userInfo = getSessionUser();
         if (userInfo == null) {
             log.warn("未登录用户尝试访问支付结果页面");
             return "redirect:/login?returnUrl=/payment/result";
@@ -44,10 +44,10 @@ public class PaymentResultController {
         try {
             if (merchantTradeNo != null && !merchantTradeNo.trim().isEmpty()) {
                 // 查询支付订单状态
-            	R<PaymentOrderEntity> result = ecPayService.queryPaymentStatus(merchantTradeNo);
+            	R<CarPaymentOrderEntity> result = ecPayService.queryPaymentStatus(merchantTradeNo);
                 
                 if (result.isSuccess() && result.getData() != null) {
-                    PaymentOrderEntity paymentOrder = result.getData();
+                    CarPaymentOrderEntity paymentOrder = result.getData();
                     
                     // 检查订单所属用户
                     if (!paymentOrder.getUserId().equals(userInfo.getId())) {
