@@ -1,5 +1,7 @@
 package cc.carce.sale.service;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -7,8 +9,10 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
+import cc.carce.sale.dto.CarListDto;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.form.CarSalesSearchForm;
+import cc.carce.sale.mapper.carcecloud.CarMapper;
 import cc.carce.sale.mapper.carcecloud.CarSalesMapper;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +25,9 @@ public class CarSalesService {
 
 	@Resource
 	private CarSalesMapper carSalesMapper;
+	
+	@Resource
+	private CarMapper carMapper;
 
 	/**
 	 * 根据id获取uid,  如果uid为空则生成一个
@@ -77,8 +84,20 @@ public class CarSalesService {
 		PageInfo<CarSalesEntity> pi = PageHelper
 				.startPage(form.getPageNum(), form.getPageSize())
 				.doSelectPageInfo(() -> {
-			carSalesMapper.selectOneByExample(example);
+			carSalesMapper.selectByExample(example);
 		});
 		return pi;
+	}
+	
+	/**
+	 * 分页查询车辆列表
+	 * @param form 搜索条件
+	 * @return 分页结果
+	 */
+	public PageInfo<CarListDto> getCarListByPage(CarSalesSearchForm form) {
+		return PageHelper.startPage(form.getPageNum(), form.getPageSize())
+		.doSelectPageInfo(() -> {
+			carMapper.selectCarListWithCover(form);
+		});
 	}
 }

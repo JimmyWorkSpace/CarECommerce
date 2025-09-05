@@ -93,20 +93,25 @@
         
         /* 已登錄狀態樣式 */
         .user-status {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: transparent;
             color: white !important;
-            border-radius: 20px;
-            padding: 8px 16px !important;
+            border-radius: 25px;
+            padding: 10px 20px !important;
             font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            font-size: 0.95rem;
             transition: all 0.3s ease;
+            border: none;
         }
         
         .user-status:hover {
-            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+            background: rgba(255, 255, 255, 0.1);
+            color: #f8f9fa !important;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+        
+        .user-status i {
+            margin-right: 8px;
+            font-size: 1.1rem;
         }
         
         /* 登錄按鈕樣式 */
@@ -159,6 +164,24 @@
             object-fit: contain;
         }
         
+        /* 導航欄字體樣式 */
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #f8f9fa !important;
+            transform: translateY(-1px);
+        }
+        
+        .navbar-nav .nav-item.active .nav-link {
+            color: #f8f9fa !important;
+            font-weight: 700;
+        }
+        
         /* 響應式設計 */
         @media (max-width: 768px) {
             .navbar-brand-img {
@@ -184,8 +207,12 @@
             
             .user-status,
             .login-btn {
-                padding: 6px 12px !important;
-                font-size: 0.8rem;
+                padding: 8px 16px !important;
+                font-size: 0.85rem;
+            }
+            
+            .user-status i {
+                font-size: 1rem;
             }
         }
         </style>
@@ -254,6 +281,10 @@
                                     ${user.name!'已登錄'}
                                 </a>
                                 <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/my-order/index">
+                                        <i class="bi bi-list-ul me-2"></i>我的訂單
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/logout">
                                         <i class="bi bi-box-arrow-right me-2"></i>退出登錄
                                     </a></li>

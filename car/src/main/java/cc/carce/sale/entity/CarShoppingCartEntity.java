@@ -28,7 +28,7 @@ public class CarShoppingCartEntity {
     private Integer productAmount;
 
     @Column(name = "productPrice", columnDefinition = "DECIMAL(10,2) COMMENT '加购时的产品价格'")
-    private BigDecimal productPrice;
+    private Integer productPrice;
 
     @Column(name = "productName", columnDefinition = "VARCHAR(255) COMMENT '产品名称'")
     private String productName;

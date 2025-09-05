@@ -1,5 +1,6 @@
 package cc.carce.sale.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
+import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.service.ECPayService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +35,7 @@ public class ECPayController extends BaseController{
      * 创建支付订单
      */
     @PostMapping("/create")
-    public R<Map<String, String>> createPayment(@RequestBody Map<String, Object> request) {
+    public R<Map<String, String>> createPayment(@RequestBody CreatePaymentForm form) {
         try {
             // 检查用户登录状态
             if (!isLogin()) {
@@ -42,44 +44,35 @@ public class ECPayController extends BaseController{
             
             UserInfo user = getSessionUser();
             
-            Integer amount = Integer.valueOf(request.get("amount").toString());
-            String itemName = (String) request.get("itemName");
-            String description = (String) request.get("description");
-            String receiverName = (String) request.get("receiverName");
-            String receiverMobile = (String) request.get("receiverMobile");
-            String receiverAddress = (String) request.get("receiverAddress");
-            String cartData = (String) request.get("cartData");
-            
             // 参数验证
-            if (amount == null || amount <= 0) {
+            if (form.getAmount() == null || form.getAmount() <= 0) {
                 return R.fail("支付金額必須大於0", null);
             }
             
-            if (itemName == null || itemName.trim().isEmpty()) {
+            if (form.getItemName() == null || form.getItemName().trim().isEmpty()) {
                 return R.fail("商品名稱不能為空", null);
             }
             
-            if (receiverName == null || receiverName.trim().isEmpty()) {
+            if (form.getReceiverName() == null || form.getReceiverName().trim().isEmpty()) {
                 return R.fail("收件人姓名不能為空", null);
             }
             
-            if (receiverMobile == null || receiverMobile.trim().isEmpty()) {
+            if (form.getReceiverMobile() == null || form.getReceiverMobile().trim().isEmpty()) {
                 return R.fail("收件人手機號不能為空", null);
             }
             
-            if (receiverAddress == null || receiverAddress.trim().isEmpty()) {
+            if (form.getReceiverAddress() == null || form.getReceiverAddress().trim().isEmpty()) {
                 return R.fail("收件人地址不能為空", null);
             }
             
-            if (description == null || description.trim().isEmpty()) {
-                description = "购买商品：" + itemName;
+            if (form.getDescription() == null || form.getDescription().trim().isEmpty()) {
+                form.setDescription("购买商品：" + form.getItemName());
             }
             
             log.info("用户创建支付订单，用户ID: {}, 金额: {}, 商品: {}, 收件人: {}", 
-                    user.getId(), amount, itemName, receiverName);
+                    user.getId(), form.getAmount(), form.getItemName(), form.getReceiverName());
             
-            return ecPayService.createPaymentWithOrder(user.getId(), amount, itemName, description, 
-                    receiverName, receiverMobile, receiverAddress, cartData);
+            return ecPayService.createPaymentWithOrder(user.getId(), form);
             
         } catch (Exception e) {
             log.error("创建支付订单异常", e);
@@ -167,6 +160,24 @@ public class ECPayController extends BaseController{
         } catch (Exception e) {
             log.error("处理绿界支付回调异常", e);
             return "0|ErrorMessage";
+        }
+    }
+    
+    /**
+     * 获取支付配置信息
+     */
+    @GetMapping("/config")
+    public R<Map<String, Object>> getPaymentConfig() {
+        try {
+            Map<String, Object> config = new HashMap<>();
+            config.put("isProduction", ecPayService.isProductionEnvironment());
+            config.put("serverUrl", ecPayService.getPaymentServerUrl());
+            config.put("environment", ecPayService.getCurrentEnvironment());
+            
+            return R.ok("获取支付配置成功", config);
+        } catch (Exception e) {
+            log.error("获取支付配置异常", e);
+            return R.fail("获取支付配置异常: " + e.getMessage(), null);
         }
     }
     

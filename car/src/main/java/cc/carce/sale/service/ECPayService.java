@@ -17,6 +17,8 @@ import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarProductsEntity;
+import cc.carce.sale.form.CartItem;
+import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +46,9 @@ public class ECPayService {
     
     @Resource
     private CarProductsService carProductsService;
+    
+    @Resource
+    private CarShoppingCartService carShoppingCartService;
     
     /**
      * 创建支付订单
@@ -159,6 +164,24 @@ public class ECPayService {
                 log.info("支付订单状态更新成功，商户订单号: {}, 状态: {}", 
                         merchantTradeNo, paymentStatus.getDescription());
                 
+                // 更新业务订单状态为已支付
+                try {
+                    // 根据支付订单中的业务订单号查找业务订单
+                    if (paymentOrder.getMerchantTradeNo() != null) {
+                        CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(paymentOrder.getMerchantTradeNo());
+                        if (orderInfo != null) {
+                            carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAID.getCode());
+                            log.info("业务订单状态更新为已支付，订单号: {}", orderInfo.getOrderNo());
+                        } else {
+                            log.warn("未找到对应的业务订单，订单号: {}", paymentOrder.getMerchantTradeNo());
+                        }
+                    } else {
+                        log.warn("支付订单中未保存业务订单号，商户订单号: {}", merchantTradeNo);
+                    }
+                } catch (Exception e) {
+                    log.error("更新业务订单状态失败，商户订单号: {}", merchantTradeNo, e);
+                }
+                
                 // 这里可以添加其他业务逻辑，比如：
                 // 1. 更新商品库存
                 // 2. 发送支付成功通知
@@ -238,6 +261,31 @@ public class ECPayService {
     }
     
     /**
+     * 检查是否为生产环境
+     */
+    public boolean isProductionEnvironment() {
+        return ecPayConfig.isProduction();
+    }
+    
+    /**
+     * 获取支付服务器地址
+     */
+    public String getPaymentServerUrl() {
+        return ecPayConfig.getCurrentServerUrl();
+    }
+    
+    /**
+     * 获取当前环境名称
+     */
+    public String getCurrentEnvironment() {
+        String activeProfile = System.getProperty("spring.profiles.active");
+        if (activeProfile == null) {
+            activeProfile = "dev";
+        }
+        return activeProfile;
+    }
+    
+    /**
      * 生成商户订单号
      */
     private String generateMerchantTradeNo() {
@@ -251,8 +299,7 @@ public class ECPayService {
      * 创建支付订单并创建业务订单
      */
     @Transactional
-    public R<Map<String, String>> createPaymentWithOrder(Long userId, Integer amount, String itemName, 
-            String description, String receiverName, String receiverMobile, String receiverAddress, String cartData) {
+    public R<Map<String, String>> createPaymentWithOrder(Long userId, CreatePaymentForm form) {
         try {
             // 获取当前环境配置
             String activeProfile = System.getProperty("spring.profiles.active");
@@ -261,10 +308,10 @@ public class ECPayService {
             }
             
             // 如果是dev或test环境，金额固定为1元
-            Integer finalAmount = amount;
+            Integer finalAmount = form.getAmount();
             if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
                 finalAmount = 1;
-                log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", amount);
+                log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", form.getAmount());
             }
             
             // 生成商户订单号
@@ -273,40 +320,34 @@ public class ECPayService {
             // 解析购物车数据并重新计算金额
             List<CarOrderDetailEntity> orderDetails = new ArrayList<>();
             int totalAmount = 0;
-            if (cartData != null && !cartData.trim().isEmpty()) {
+            if (form.getCartData() != null && !form.getCartData().isEmpty()) {
                 try {
-                    com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                    Map<String, Object> cartDataMap = objectMapper.readValue(cartData, Map.class);
-                    List<Map<String, Object>> items = (List<Map<String, Object>>) cartDataMap.get("items");
-                    
-                    if (items != null) {
-                        for (Map<String, Object> item : items) {
-                            Long productId = Long.valueOf(item.get("productId").toString());
-                            Integer productAmount = Integer.valueOf(item.get("productAmount").toString());
-                            
-                            // 从products表查询market_price
-                            CarProductsEntity product = carProductsService.getProductById(productId);
-                            if (product == null) {
-                                log.error("商品不存在，商品ID：{}", productId);
-                                return R.fail("商品不存在，商品ID：" + productId, null);
-                            }
-                            
-                            // 使用market_price作为商品价格
-                            int productPrice = product.getMarketPrice().intValue();
-                            int itemTotal = productPrice * productAmount;
-                            totalAmount += itemTotal;
-                            
-                            CarOrderDetailEntity detail = new CarOrderDetailEntity();
-                            detail.setProductId(productId);
-                            detail.setProductName((String) item.get("productName"));
-                            detail.setProductAmount(productAmount);
-                            detail.setProductPrice(productPrice);
-                            orderDetails.add(detail);
+                    for (CartItem cartItem : form.getCartData()) {
+                        Long productId = cartItem.getProductId();
+                        Integer productAmount = cartItem.getProductAmount();
+                        
+                        // 从products表查询market_price
+                        CarProductsEntity product = carProductsService.getProductById(productId);
+                        if (product == null) {
+                            log.error("商品不存在，商品ID：{}", productId);
+                            return R.fail("商品不存在，商品ID：" + productId, null);
                         }
+                        
+                        // 使用market_price作为商品价格
+                        int productPrice = product.getMarketPrice().intValue();
+                        int itemTotal = productPrice * productAmount;
+                        totalAmount += itemTotal;
+                        
+                        CarOrderDetailEntity detail = new CarOrderDetailEntity();
+                        detail.setProductId(productId);
+                        detail.setProductName(cartItem.getProductName());
+                        detail.setProductAmount(productAmount);
+                        detail.setProductPrice(productPrice);
+                        orderDetails.add(detail);
                     }
                 } catch (Exception e) {
-                    log.error("解析购物车数据失败", e);
-                    return R.fail("購物車數據解析失敗", null);
+                    log.error("处理购物车数据失败", e);
+                    return R.fail("購物車數據處理失敗", null);
                 }
             }
             
@@ -315,11 +356,21 @@ public class ECPayService {
             
             // 创建业务订单
             CarOrderInfoEntity orderInfo = carOrderInfoService.createOrder(
-                userId, receiverName, receiverMobile, receiverAddress, orderDetails);
+                userId, form.getReceiverName(), form.getReceiverMobile(), form.getReceiverAddress(), orderDetails);
             
             if (orderInfo == null) {
                 log.error("创建业务订单失败，用户ID: {}", userId);
                 return R.fail("創建訂單失敗", null);
+            }
+            
+            // 删除购物车中已下单的商品
+            if (form.getCartData() != null && !form.getCartData().isEmpty()) {
+                for (CartItem cartItem : form.getCartData()) {
+                    // 这里需要根据购物车ID删除，但CartItem中没有ID
+                    // 我们需要通过productId和userId来删除购物车商品
+                    carShoppingCartService.removeFromCartByProductId(userId, cartItem.getProductId());
+                }
+                log.info("已删除购物车中的商品，用户ID: {}, 订单号: {}", userId, orderInfo.getOrderNo());
             }
             
             // 创建支付订单记录
@@ -327,12 +378,14 @@ public class ECPayService {
             paymentOrder.setMerchantTradeNo(merchantTradeNo);
             paymentOrder.setUserId(userId);
             paymentOrder.setTotalAmount(finalAmount);
-            paymentOrder.setItemName(itemName);
-            paymentOrder.setTradeDesc(description);
+            paymentOrder.setItemName(form.getItemName());
+            paymentOrder.setTradeDesc(form.getDescription());
             paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.PENDING.getCode());
             paymentOrder.setCreateTime(new Date());
             paymentOrder.setUpdateTime(new Date());
             paymentOrder.setDelFlag(false);
+            // 保存业务订单号，用于支付回调时查找业务订单
+            paymentOrder.setEcpayTradeNo(orderInfo.getOrderNo());
             
             // 保存支付订单到数据库
             int result = paymentOrderMapper.insert(paymentOrder);
@@ -344,9 +397,9 @@ public class ECPayService {
             // 构建绿界支付参数
             Map<String, String> paymentParams = ecPayUtils.buildPaymentParams(
                 merchantTradeNo,
-                description,
+                form.getDescription(),
                 finalAmount,
-                itemName
+                form.getItemName()
             );
             
             log.info("支付订单创建成功，商户订单号: {}, 用户ID: {}, 金额: {}", 

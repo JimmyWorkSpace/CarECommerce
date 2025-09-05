@@ -117,6 +117,29 @@ public class CarShoppingCartService {
 	}
 	
 	/**
+	 * 根据用户ID和商品ID从购物车移除商品
+	 */
+	public boolean removeFromCartByProductId(Long userId, Long productId) {
+		try {
+			CarShoppingCartEntity query = new CarShoppingCartEntity();
+			query.setUserId(userId);
+			query.setProductId(productId);
+			query.setDelFlag(false);
+			
+			List<CarShoppingCartEntity> cartItems = carShoppingCartMapper.select(query);
+			if (!cartItems.isEmpty()) {
+				CarShoppingCartEntity cartItem = cartItems.get(0);
+				cartItem.setDelFlag(true);
+				return carShoppingCartMapper.updateByPrimaryKey(cartItem) > 0;
+			}
+			return true; // 如果商品不在购物车中，认为删除成功
+		} catch (Exception e) {
+			log.error("根据商品ID移除购物车商品失败", e);
+			return false;
+		}
+	}
+	
+	/**
 	 * 清空用户购物车
 	 */
 	public boolean clearUserCart(Long userId) {

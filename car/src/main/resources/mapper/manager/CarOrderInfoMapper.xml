@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.carce.sale.mapper.manager.CarOrderInfoMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="cc.carce.sale.entity.CarOrderInfoEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="orderNo" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="userId" property="userId" jdbcType="BIGINT"/>
+        <result column="totalPrice" property="totalPrice" jdbcType="INTEGER"/>
+        <result column="delFlag" property="delFlag" jdbcType="BOOLEAN"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="showOrder" property="showOrder" jdbcType="INTEGER"/>
+        <result column="orderStatus" property="orderStatus" jdbcType="INTEGER"/>
+        <result column="receiverAddress" property="receiverAddress" jdbcType="VARCHAR"/>
+        <result column="receiverName" property="receiverName" jdbcType="VARCHAR"/>
+        <result column="receiverMobile" property="receiverMobile" jdbcType="VARCHAR"/>
+        <result column="logicNumber" property="logicNumber" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 基础列名 -->
+    <sql id="Base_Column_List">
+        id, orderNo, userId, totalPrice, delFlag, createTime, showOrder, 
+        orderStatus, receiverAddress, receiverName, receiverMobile, logicNumber
+    </sql>
+
+    <!-- 插入订单信息 -->
+    <insert id="insert" parameterType="cc.carce.sale.entity.CarOrderInfoEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO car_order_info (
+            orderNo, userId, totalPrice, delFlag, createTime, showOrder,
+            orderStatus, receiverAddress, receiverName, receiverMobile, logicNumber
+        ) VALUES (
+            #{orderNo}, #{userId}, #{totalPrice}, #{delFlag}, #{createTime}, #{showOrder},
+            #{orderStatus}, #{receiverAddress}, #{receiverName}, #{receiverMobile}, #{logicNumber}
+        )
+    </insert>
+
+    <!-- 根据ID查询订单信息 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_info
+        WHERE id = #{id} AND delFlag = 0
+    </select>
+
+    <!-- 根据订单号查询订单信息 -->
+    <select id="selectByOrderNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_info
+        WHERE orderNo = #{orderNo} AND delFlag = 0
+    </select>
+
+    <!-- 根据用户ID查询订单列表 -->
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_info
+        WHERE userId = #{userId} AND delFlag = 0
+        ORDER BY createTime DESC
+    </select>
+
+    <!-- 根据订单状态查询订单列表 -->
+    <select id="selectByOrderStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_info
+        WHERE orderStatus = #{orderStatus} AND delFlag = 0
+        ORDER BY createTime DESC
+    </select>
+
+    <!-- 根据用户ID和订单状态查询订单列表 -->
+    <select id="selectByUserIdAndStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_info
+        WHERE userId = #{userId} AND orderStatus = #{orderStatus} AND delFlag = 0
+        ORDER BY createTime DESC
+    </select>
+
+    <!-- 更新订单信息 -->
+    <update id="updateById" parameterType="cc.carce.sale.entity.CarOrderInfoEntity">
+        UPDATE car_order_info
+        <set>
+            <if test="orderNo != null">orderNo = #{orderNo},</if>
+            <if test="userId != null">userId = #{userId},</if>
+            <if test="totalPrice != null">totalPrice = #{totalPrice},</if>
+            <if test="delFlag != null">delFlag = #{delFlag},</if>
+            <if test="showOrder != null">showOrder = #{showOrder},</if>
+            <if test="orderStatus != null">orderStatus = #{orderStatus},</if>
+            <if test="receiverAddress != null">receiverAddress = #{receiverAddress},</if>
+            <if test="receiverName != null">receiverName = #{receiverName},</if>
+            <if test="receiverMobile != null">receiverMobile = #{receiverMobile},</if>
+            <if test="logicNumber != null">logicNumber = #{logicNumber},</if>
+        </set>
+        WHERE id = #{id} AND delFlag = 0
+    </update>
+
+    <!-- 更新订单状态 -->
+    <update id="updateOrderStatus">
+        UPDATE car_order_info
+        SET orderStatus = #{orderStatus}
+        WHERE id = #{id} AND delFlag = 0
+    </update>
+
+    <!-- 更新物流信息 -->
+    <update id="updateLogisticsInfo">
+        UPDATE car_order_info
+        SET logicNumber = #{logicNumber},
+            receiverName = #{receiverName},
+            receiverMobile = #{receiverMobile},
+            receiverAddress = #{receiverAddress}
+        WHERE id = #{id} AND delFlag = 0
+    </update>
+
+    <!-- 删除订单（逻辑删除） -->
+    <update id="deleteById" parameterType="java.lang.Long">
+        UPDATE car_order_info
+        SET delFlag = 1
+        WHERE id = #{id}
+    </update>
+
+    <!-- 统计用户订单数量 -->
+    <select id="countByUserId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM car_order_info
+        WHERE userId = #{userId} AND delFlag = 0
+    </select>
+
+</mapper>

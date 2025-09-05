@@ -34,7 +34,7 @@ public class CarShoppingCartDto {
     /**
      * 产品价格
      */
-    private BigDecimal productPrice;
+    private Integer productPrice;
     
     /**
      * 产品名称
@@ -94,15 +94,15 @@ public class CarShoppingCartDto {
     /**
      * 小计金额
      */
-    private BigDecimal subtotal;
+    private Integer subtotal;
     
     /**
      * 计算小计金额
      */
-    public BigDecimal getSubtotal() {
+    public Integer getSubtotal() {
         if (productPrice != null && productAmount != null) {
-            return productPrice.multiply(new BigDecimal(productAmount));
+            return productPrice.intValue() * productAmount.intValue();
         }
-        return BigDecimal.ZERO;
+        return 0;
     }
 }
