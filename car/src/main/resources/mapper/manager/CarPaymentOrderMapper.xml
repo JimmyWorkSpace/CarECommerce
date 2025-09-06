@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.carce.sale.mapper.manager.CarPaymentOrderMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="cc.carce.sale.entity.CarPaymentOrderEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="merchant_trade_no" property="merchantTradeNo" jdbcType="VARCHAR"/>
+        <result column="ecpay_trade_no" property="ecpayTradeNo" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="total_amount" property="totalAmount" jdbcType="DECIMAL"/>
+        <result column="item_name" property="itemName" jdbcType="VARCHAR"/>
+        <result column="trade_desc" property="tradeDesc" jdbcType="VARCHAR"/>
+        <result column="payment_type" property="paymentType" jdbcType="VARCHAR"/>
+        <result column="payment_status" property="paymentStatus" jdbcType="TINYINT"/>
+        <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP"/>
+        <result column="ecpay_status" property="ecpayStatus" jdbcType="VARCHAR"/>
+        <result column="ecpay_status_desc" property="ecpayStatusDesc" jdbcType="VARCHAR"/>
+        <result column="error_message" property="errorMessage" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="del_flag" property="delFlag" jdbcType="BIT"/>
+    </resultMap>
+
+    <!-- 基础字段 -->
+    <sql id="Base_Column_List">
+        id, merchant_trade_no, ecpay_trade_no, user_id, total_amount, item_name, trade_desc,
+        payment_type, payment_status, payment_time, ecpay_status, ecpay_status_desc, error_message,
+        create_time, update_time, del_flag
+    </sql>
+
+    <!-- 插入支付订单 -->
+    <insert id="insert" parameterType="cc.carce.sale.entity.CarPaymentOrderEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO car_payment_order (
+            merchant_trade_no, ecpay_trade_no, user_id, total_amount, item_name, trade_desc,
+            payment_type, payment_status, ecpay_status, ecpay_status_desc, error_message,
+            create_time, update_time, del_flag
+        ) VALUES (
+            #{merchantTradeNo}, #{ecpayTradeNo}, #{userId}, #{totalAmount}, #{itemName}, #{tradeDesc},
+            #{paymentType}, #{paymentStatus}, #{ecpayStatus}, #{ecpayStatusDesc}, #{errorMessage},
+            NOW(), NOW(), 0
+        )
+    </insert>
+
+    <!-- 根据ID查询支付订单 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_payment_order
+        WHERE id = #{id} AND del_flag = 0
+    </select>
+
+    <!-- 根据商户订单号查询支付订单 -->
+    <select id="selectByMerchantTradeNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_payment_order
+        WHERE merchant_trade_no = #{merchantTradeNo} AND del_flag = 0
+    </select>
+
+    <!-- 根据绿界支付交易号查询支付订单 -->
+    <select id="selectByEcpayTradeNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_payment_order
+        WHERE ecpay_trade_no = #{ecpayTradeNo} AND del_flag = 0
+    </select>
+
+    <!-- 根据用户ID查询支付订单列表 -->
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_payment_order
+        WHERE user_id = #{userId} AND del_flag = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 更新支付订单 -->
+    <update id="updateById" parameterType="cc.carce.sale.entity.CarPaymentOrderEntity">
+        UPDATE car_payment_order
+        <set>
+            <if test="ecpayTradeNo != null">ecpay_trade_no = #{ecpayTradeNo},</if>
+            <if test="paymentStatus != null">payment_status = #{paymentStatus},</if>
+            <if test="paymentTime != null">payment_time = #{paymentTime},</if>
+            <if test="ecpayStatus != null">ecpay_status = #{ecpayStatus},</if>
+            <if test="ecpayStatusDesc != null">ecpay_status_desc = #{ecpayStatusDesc},</if>
+            <if test="errorMessage != null">error_message = #{errorMessage},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新支付状态 -->
+    <update id="updatePaymentStatus">
+        UPDATE car_payment_order
+        SET payment_status = #{paymentStatus},
+            ecpay_status = #{ecpayStatus},
+            ecpay_status_desc = #{ecpayStatusDesc},
+            <if test="paymentTime != null">payment_time = #{paymentTime},</if>
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据支付状态查询订单列表 -->
+    <select id="selectByPaymentStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_payment_order
+        WHERE payment_status = #{paymentStatus} AND del_flag = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 删除支付订单（逻辑删除） -->
+    <update id="deleteById" parameterType="java.lang.Long">
+        UPDATE car_payment_order
+        SET del_flag = 1, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

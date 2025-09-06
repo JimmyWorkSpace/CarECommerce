@@ -54,6 +54,21 @@ public class CarService {
 		result.setSaleDescription(imageService.replaceImagePrefixInHtml(result.getSaleDescription()));
 		return result;
 	}
+	
+	public List<String> getImagesBySaleId(Long saleId) {
+		CarSalesEntity cs = carSalesService.getById(saleId);
+		try {
+			if(cs != null) {
+				List<CarSalePhotoEntity> photos = carSalePhotoService.getByCarSalesId(cs.getId());
+//				String dir = "/img/car_sale/" + cs.getId() + "/img";
+//				List<String> images = ftpService.listFiles(dir);
+				return photos.stream().map(img -> imageService.replaceImagePrefix(img.getPhotoUrl())).collect(Collectors.toList());
+			}
+		} catch (Exception e) {
+			log.error("从ftp获取图片信息失败", e);
+		}
+		return new ArrayList<>();
+	}
 
 	/**
 	 * 获取车辆配置信息

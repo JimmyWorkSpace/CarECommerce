@@ -1,11 +1,12 @@
 <link href="/css/car-detail.css" rel="stylesheet">
-<div class="car-detail">
+
+<div class="car-detail" id="app">
     <div class="main-title-container">
         <div class="first-title">
             優質二手車商 /
         </div>
         <div class="second-title">
-            2020年 Toyota Camry 2.5L 豪華版
+            {{ carInfo.saleTitle || (carInfo.manufactureYear + '年 ' + carInfo.brand + ' ' + carInfo.customModel) || '車輛詳情' }}
         </div>
     </div>
     
@@ -15,11 +16,11 @@
         <div class="col-md-6">
             <div class="swiper-wrapper-container">
                 <div class="swiper-container">
-                    <img style="width:100%;aspect-ratio: 3/2;" class="swiper_image" src="/img/car/car4.jpg" alt="汽车图片">
+                    <img style="width:100%;aspect-ratio: 3/2;" class="swiper_image" :src="carInfo.coverImage || '/img/car/car4.jpg'" :alt="carInfo.saleTitle || '汽车图片'">
                 </div>
                 <div class="thumbnail-container">
-                    <img src="/img/car/car4.jpg" class="thumbnail active" alt="缩略图">
-                    <img src="/img/car/car4.jpg" class="thumbnail" alt="缩略图">
+                    <img :src="carInfo.coverImage || '/img/car/car4.jpg'" class="thumbnail active" alt="缩略图">
+                    <img :src="carInfo.coverImage || '/img/car/car4.jpg'" class="thumbnail" alt="缩略图">
                     <img src="/img/car/car6.jpg" class="thumbnail" alt="缩略图">
                     <img src="/img/car/car6.jpg" class="thumbnail" alt="缩略图">
                     <img src="/img/car/car8.jpg" class="thumbnail" alt="缩略图">
@@ -28,8 +29,8 @@
             <!-- Line分享按钮 -->
             <div class="share-container">
                 <div class="line-it-button" data-lang="zh_Hant" data-type="share-a" data-env="REAL"
-                    data-og-url="https://sale.carce.cc/car/preview/static-demo"
-                    data-url="https://sale.carce.cc/static-demo"
+                    data-og-url="https://sale.carce.cc/car/detail/{{ saleId }}"
+                    data-url="https://sale.carce.cc/detail/{{ saleId }}"
                     data-color="default" data-size="large"
                     data-count="false" data-ver="3" style="display: none;"></div>
             </div>
@@ -37,59 +38,60 @@
         
         <!-- 右侧信息 -->
         <div class="col-md-6">
-            <h2 class="car-title">2020年 Toyota Camry 2.5L 豪華版
+            <h2 class="car-title">
+                {{ carInfo.saleTitle || (carInfo.manufactureYear + '年 ' + carInfo.brand + ' ' + carInfo.customModel) || '車輛詳情' }}
             </h2>
             <div class="price mb-3">
-                <span class="h4">$</span><span class="h4">850,000
+                <span class="h4">$</span><span class="h4">
+                    {{ carInfo.salePrice ? formatPrice(carInfo.salePrice) : '面議' }}
                 </span>
             </div>
             <div class="specs mb-3">
                 <div class="row">
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">年份</div>
-                        <div class="spec-value">2020</div>
+                        <div class="spec-value">{{ carInfo.manufactureYear || '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">里程</div>
-                        <div class="spec-value">45,000 km</div>
+                        <div class="spec-value">{{ carInfo.mileage ? formatMileage(carInfo.mileage) + ' km' : '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">排量</div>
-                        <div class="spec-value">2.5L</div>
+                        <div class="spec-value">{{ carInfo.displacement || '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">變速箱</div>
-                        <div class="spec-value">自動</div>
+                        <div class="spec-value">{{ carInfo.transmission || '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">燃料</div>
-                        <div class="spec-value">汽油</div>
+                        <div class="spec-value">{{ carInfo.fuelSystem || '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">顏色</div>
-                        <div class="spec-value">白色</div>
+                        <div class="spec-value">{{ carInfo.color || '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">車門</div>
-                        <div class="spec-value">4門</div>
+                        <div class="spec-value">{{ carInfo.doorCount ? carInfo.doorCount + '門' : '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                         <div class="spec-name text-muted">座位</div>
-                        <div class="spec-value">5座</div>
+                        <div class="spec-value">{{ carInfo.passengerCount ? carInfo.passengerCount + '座' : '--' }}</div>
                     </div>
                 </div>
             </div>
             <div class="action-buttons">
-                <button class="btn btn-report" onclick="openReportModal()">
+                <button class="btn btn-report" @click="openReportModal">
                     <i class="bi bi-file-earmark-text"></i> 檢車報告
                 </button>
-                <button class="btn btn-appointment" onclick="openAppointmentModal()">
+                <button class="btn btn-appointment" @click="openAppointmentModal">
                     <i class="bi bi-calendar-check"></i> 預約看車
                 </button>
             </div>
             <div class="dealer-info mt-3 text-left">
-                <div class="dealer-contact">聯絡人： 張經理
-                </div>
+                <div class="dealer-contact">聯絡人： 張經理</div>
                 <div class="dealer-address">
                     賞車地址： 台北市信義區信義路五段7號
                     📍<a href="https://www.google.com/maps/search/?api=1&query=台北市信義區信義路五段7號" target="_blank">查看地圖</a>
@@ -102,14 +104,14 @@
     <div class="tabs">
         <ul class="nav nav-tabs car-detail-tabs">
             <li class="nav-item">
-                <a class="nav-link active" href="#equipment-tab">車輛配備</a>
+                <a class="nav-link" :class="{ active: activeTab === 'equipment' }" @click="setActiveTab('equipment')">車輛配備</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#dealer-tab">店家介紹</a>
+                <a class="nav-link" :class="{ active: activeTab === 'dealer' }" @click="setActiveTab('dealer')">店家介紹</a>
             </li>
         </ul>
         <div class="tab-content p-3 border border-top-0 rounded-bottom">
-            <div id="equipment-tab" class="tab-pane active">
+            <div v-show="activeTab === 'equipment'" class="tab-pane">
                 <div class="equipment-header">
                     車輛配備
                 </div>
@@ -205,31 +207,34 @@
                     車輛描述
                 </div>
                 <div class="content-frame">
-                    <p>這是一輛2020年出廠的Toyota Camry 2.5L豪華版，車況極佳，里程僅45,000公里。</p>
-                    <p><strong>車況特點：</strong></p>
-                    <ul>
-                        <li>原廠保養，定期維護</li>
-                        <li>無重大事故，車身完整</li>
-                        <li>內裝乾淨，座椅無磨損</li>
-                        <li>引擎運轉順暢，變速箱正常</li>
-                        <li>空調系統良好，音響系統完整</li>
-                    </ul>
-                    <p><strong>配備特色：</strong></p>
-                    <ul>
-                        <li>2.5L直列四缸引擎，動力充沛</li>
-                        <li>8速手自排變速箱，換檔順暢</li>
-                        <li>雙區恆溫空調系統</li>
-                        <li>全景天窗，採光良好</li>
-                        <li>真皮座椅，舒適度佳</li>
-                        <li>倒車影像系統，安全便利</li>
-                        <li>藍牙音響系統，娛樂功能完整</li>
-                    </ul>
-                    <p><strong>適合對象：</strong></p>
-                    <p>適合家庭使用，商務代步，長途旅行等各種用途。車況良好，值得信賴。</p>
+                    <div v-if="carInfo.saleDescription" v-html="carInfo.saleDescription"></div>
+                    <div v-else>
+                        <p>這是一輛{{ carInfo.manufactureYear || '' }}年 {{ carInfo.brand || '' }} {{ carInfo.customModel || '' }}，車況極佳{{ carInfo.mileage ? '，里程僅' + formatMileage(carInfo.mileage) + '公里' : '' }}。</p>
+                        <p><strong>車況特點：</strong></p>
+                        <ul>
+                            <li>原廠保養，定期維護</li>
+                            <li>無重大事故，車身完整</li>
+                            <li>內裝乾淨，座椅無磨損</li>
+                            <li>引擎運轉順暢，變速箱正常</li>
+                            <li>空調系統良好，音響系統完整</li>
+                        </ul>
+                        <p><strong>配備特色：</strong></p>
+                        <ul>
+                            <li v-if="carInfo.displacement">{{ carInfo.displacement }}引擎，動力充沛</li>
+                            <li v-if="carInfo.transmission">{{ carInfo.transmission }}變速箱，換檔順暢</li>
+                            <li>雙區恆溫空調系統</li>
+                            <li>全景天窗，採光良好</li>
+                            <li>真皮座椅，舒適度佳</li>
+                            <li>倒車影像系統，安全便利</li>
+                            <li>藍牙音響系統，娛樂功能完整</li>
+                        </ul>
+                        <p><strong>適合對象：</strong></p>
+                        <p>適合家庭使用，商務代步，長途旅行等各種用途。車況良好，值得信賴。</p>
+                    </div>
                 </div>
             </div>
             
-            <div id="dealer-tab" class="tab-pane">
+            <div v-show="activeTab === 'dealer'" class="tab-pane">
                 <div class="dealer-container">
                     <div class="dealer-intro">
                         <div class="dealer-intro-row">
@@ -356,7 +361,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="submitAppointment()">
+                <button type="button" class="btn btn-primary" @click="submitAppointment">
                     <i class="bi bi-check-circle me-2"></i>提交預約
                 </button>
             </div>
@@ -427,143 +432,172 @@
 </div>
 
 <script>
-// 简单的Tab切换功能
-document.addEventListener('DOMContentLoaded', function() {
-    // 只选择详情页内的tab导航，避免与主布局的导航冲突
-    const tabLinks = document.querySelectorAll('.car-detail-tabs .nav-link');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    
-    tabLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // 移除所有active类
-            tabLinks.forEach(l => l.classList.remove('active'));
-            tabPanes.forEach(p => p.classList.remove('active'));
-            
-            // 添加active类到当前tab
-            this.classList.add('active');
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            if (targetElement) {
-                targetElement.classList.add('active');
+new Vue({
+    el: '#app',
+    data: {
+        carInfo: <#if carInfoJson??>${carInfoJson}<#else>{
+            saleTitle: '',
+            brand: '',
+            customModel: '',
+            manufactureYear: '',
+            salePrice: null,
+            mileage: null,
+            displacement: '',
+            transmission: '',
+            fuelSystem: '',
+            color: '',
+            doorCount: null,
+            passengerCount: null,
+            saleDescription: '',
+            coverImage: ''
+        }</#if>,
+        saleId: <#if saleId??>${saleId}<#else>null</#if>,
+        activeTab: 'equipment',
+        loading: false
+    },
+    mounted() {
+        console.log('车辆详情页Vue实例已挂载');
+        this.initializePage();
+    },
+    methods: {
+        // 初始化页面
+        initializePage() {
+            // 设置默认日期为明天
+            const appointmentDateInput = document.getElementById('appointmentDate');
+            if (appointmentDateInput) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                appointmentDateInput.value = tomorrow.toISOString().split('T')[0];
             }
-        });
-    });
-    
-    // 缩略图点击切换
-    const thumbnails = document.querySelectorAll('.thumbnail');
-    const mainImage = document.querySelector('.swiper_image');
-    
-    if (thumbnails.length > 0 && mainImage) {
-        thumbnails.forEach(thumb => {
-            thumb.addEventListener('click', function() {
-                // 移除所有active类
-                thumbnails.forEach(t => t.classList.remove('active'));
-                // 添加active类到当前缩略图
-                this.classList.add('active');
-                // 更新主图片
-                mainImage.src = this.src;
-            });
-        });
-    }
-    
-    // 设置默认日期为明天
-    const appointmentDateInput = document.getElementById('appointmentDate');
-    if (appointmentDateInput) {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        appointmentDateInput.value = tomorrow.toISOString().split('T')[0];
+            
+            // 初始化缩略图点击事件
+            this.initializeThumbnails();
+        },
+        
+        // 初始化缩略图
+        initializeThumbnails() {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const mainImage = document.querySelector('.swiper_image');
+            
+            if (thumbnails.length > 0 && mainImage) {
+                thumbnails.forEach(thumb => {
+                    thumb.addEventListener('click', function() {
+                        // 移除所有active类
+                        thumbnails.forEach(t => t.classList.remove('active'));
+                        // 添加active类到当前缩略图
+                        this.classList.add('active');
+                        // 更新主图片
+                        mainImage.src = this.src;
+                    });
+                });
+            }
+        },
+        
+        // 设置活动标签页
+        setActiveTab(tab) {
+            this.activeTab = tab;
+        },
+        
+        // 格式化价格
+        formatPrice(price) {
+            if (!price) return '0';
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        },
+        
+        // 格式化里程
+        formatMileage(mileage) {
+            if (!mileage) return '0';
+            return mileage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        },
+        
+        // 打开检车报告弹窗
+        openReportModal() {
+            const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+            modal.show();
+        },
+        
+        // 打开预约弹窗
+        openAppointmentModal() {
+            // 检查用户是否登录
+            const userNameDisplay = document.getElementById('appointmentNameDisplay');
+            if (!userNameDisplay) {
+                console.error('找不到用户名称显示元素');
+                return;
+            }
+            
+            const isLoggedIn = !userNameDisplay.querySelector('.text-danger');
+            
+            if (!isLoggedIn) {
+                // 未登录，显示提示并跳转到登录页
+                if (confirm('您尚未登录，是否跳转到登录页面？')) {
+                    // 获取当前页面URL作为返回地址
+                    const currentUrl = window.location.pathname + window.location.search;
+                    window.location.href = '/login?returnUrl=' + encodeURIComponent(currentUrl);
+                }
+                return;
+            }
+            
+            // 已登录，打开预约弹窗
+            const modal = new bootstrap.Modal(document.getElementById('appointmentModal'));
+            modal.show();
+        },
+        
+        // 提交预约
+        submitAppointment() {
+            const form = document.getElementById('appointmentForm');
+            if (!form) {
+                console.error('找不到预约表单');
+                return;
+            }
+            
+            // 验证表单
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // 获取表单数据
+            const appointmentData = {
+                date: document.getElementById('appointmentDate')?.value || '',
+                time: document.getElementById('appointmentTime')?.value || '',
+                phone: document.getElementById('appointmentPhone')?.value || '',
+                name: document.getElementById('appointmentNameDisplay')?.textContent?.trim() || '',
+                note: document.getElementById('appointmentNote')?.value || '',
+                carTitle: this.carInfo.saleTitle || (this.carInfo.manufactureYear + '年 ' + this.carInfo.brand + ' ' + this.carInfo.customModel) || '車輛詳情'
+            };
+            
+            // 模拟提交预约
+            console.log('预约数据:', appointmentData);
+            
+            // 关闭预约弹窗
+            const appointmentModalElement = document.getElementById('appointmentModal');
+            if (appointmentModalElement) {
+                const appointmentModal = bootstrap.Modal.getInstance(appointmentModalElement);
+                if (appointmentModal) {
+                    appointmentModal.hide();
+                }
+            }
+            
+            // 显示成功提示
+            const successModalElement = document.getElementById('successModal');
+            if (successModalElement) {
+                const successModal = new bootstrap.Modal(successModalElement);
+                successModal.show();
+            }
+            
+            // 重置表单
+            form.reset();
+            
+            // 设置默认日期为明天
+            const appointmentDateInput = document.getElementById('appointmentDate');
+            if (appointmentDateInput) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                appointmentDateInput.value = tomorrow.toISOString().split('T')[0];
+            }
+        }
     }
 });
-
-// 检车报告功能
-function openReportModal() {
-    const modal = new bootstrap.Modal(document.getElementById('reportModal'));
-    modal.show();
-}
-
-// 预约相关功能
-function openAppointmentModal() {
-    // 检查用户是否登录
-    const userNameDisplay = document.getElementById('appointmentNameDisplay');
-    if (!userNameDisplay) {
-        console.error('找不到用户名称显示元素');
-        return;
-    }
-    
-    const isLoggedIn = !userNameDisplay.querySelector('.text-danger');
-    
-    if (!isLoggedIn) {
-        // 未登录，显示提示并跳转到登录页
-        if (confirm('您尚未登录，是否跳转到登录页面？')) {
-            // 获取当前页面URL作为返回地址
-            const currentUrl = window.location.pathname + window.location.search;
-            window.location.href = '/login?returnUrl=' + encodeURIComponent(currentUrl);
-        }
-        return;
-    }
-    
-    // 已登录，打开预约弹窗
-    const modal = new bootstrap.Modal(document.getElementById('appointmentModal'));
-    modal.show();
-}
-
-function submitAppointment() {
-    const form = document.getElementById('appointmentForm');
-    if (!form) {
-        console.error('找不到预约表单');
-        return;
-    }
-    
-    const formData = new FormData(form);
-    
-    // 验证表单
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    
-    // 获取表单数据
-    const appointmentData = {
-        date: document.getElementById('appointmentDate')?.value || '',
-        time: document.getElementById('appointmentTime')?.value || '',
-        phone: document.getElementById('appointmentPhone')?.value || '',
-        name: document.getElementById('appointmentNameDisplay')?.textContent?.trim() || '',
-        note: document.getElementById('appointmentNote')?.value || '',
-        carTitle: '2020年 Toyota Camry 2.5L 豪华版'
-    };
-    
-    // 模拟提交预约
-    console.log('预约数据:', appointmentData);
-    
-    // 关闭预约弹窗
-    const appointmentModalElement = document.getElementById('appointmentModal');
-    if (appointmentModalElement) {
-        const appointmentModal = bootstrap.Modal.getInstance(appointmentModalElement);
-        if (appointmentModal) {
-            appointmentModal.hide();
-        }
-    }
-    
-    // 显示成功提示
-    const successModalElement = document.getElementById('successModal');
-    if (successModalElement) {
-        const successModal = new bootstrap.Modal(successModalElement);
-        successModal.show();
-    }
-    
-    // 重置表单
-    form.reset();
-    
-    // 设置默认日期为明天
-    const appointmentDateInput = document.getElementById('appointmentDate');
-    if (appointmentDateInput) {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        appointmentDateInput.value = tomorrow.toISOString().split('T')[0];
-    }
-}
 </script>
 
 <style>
@@ -709,10 +743,8 @@ function submitAppointment() {
         font-size: 0.9rem;
     }
     
-
-    
     .modal-xl {
         max-width: 95%;
     }
 }
-</style> 
+</style>

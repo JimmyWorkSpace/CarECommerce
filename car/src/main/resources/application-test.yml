@@ -22,3 +22,15 @@ spring:
       jdbc-url: jdbc:mariadb://localhost:4416/ruoyi_car?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
       username: root
       password: "Wbf6XkTS3h55MC88eSRr"
+
+# 绿界支付配置
+ecpay:
+  # 测试环境配置
+  production: false
+  merchant-id: "2000132"  # 官方测试商户编号
+  hash-key: "5294y06JbISpM5x9"  # 官方测试HashKey
+  hash-iv: "v77hoKGq4kWxNNIS"   # 官方测试HashIV
+  return-url: "https://sale.carce.cc/api/payment/return"
+  notify-url: "https://sale.carce.cc/api/payment/callback"
+  client-back-url: "https://sale.carce.cc/payment/result"
+  result-url: "https://sale.carce.cc/payment/result"

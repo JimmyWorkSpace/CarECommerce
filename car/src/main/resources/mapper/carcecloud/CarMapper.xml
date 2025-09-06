@@ -27,7 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN car_brand cb ON cb.id = c.id_brand
         LEFT JOIN car_sales cs ON c.id = cs.car_id
         left join car_model cm on c.id_model = cm.id
-        WHERE
+        where
         cs.id = #{saleId}
         LIMIT 1;
     </select>
@@ -118,5 +118,80 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         car_guarantees cg
         WHERE
         cg.car_sale_id = (select id from car_sales cs where cs.uid = #{uid}));
+    </select>
+    
+    <!-- 车辆列表查询，包含封面图片 -->
+    <select id="selectCarListWithCover" resultType="cc.carce.sale.dto.CarListDto">
+        SELECT
+        cs.id,
+        cs.uid,
+        cs.car_id as carId,
+        cb.brand,
+        COALESCE(cm.model, c.custom_model) as model,
+        c.manufacture_year as manufactureYear,
+        cs.sale_price as salePrice,
+        cs.sale_title as saleTitle,
+        cs.sale_description as saleDescription,
+        cs.mileage,
+        c.transmission,
+        c.fuel_system as fuelSystem,
+        c.color,
+        cs.car_location_city as locationName,
+        csp.photo_url as coverImage,
+        cs.status,
+        cs.id_garage as garageId
+        FROM
+        car_sales cs
+        LEFT JOIN cars c ON c.id = cs.car_id
+        LEFT JOIN car_brand cb ON cb.id = c.id_brand
+        LEFT JOIN car_model cm ON cm.id = c.id_model
+        LEFT JOIN car_sale_photos csp ON csp.car_sales_id = cs.id AND csp.is_cover = 1
+        WHERE
+        cs.is_visible = 1
+        <if test="brand != null and brand != ''">
+            AND cb.brand = #{brand}
+        </if>
+        <if test="model != null and model != ''">
+            AND (cm.model = #{model} OR c.custom_model = #{model})
+        </if>
+        <if test="year != null">
+            AND c.manufacture_year = #{year}
+        </if>
+        <if test="priceMin != null">
+            AND cs.sale_price >= #{priceMin}
+        </if>
+        <if test="priceMax != null">
+            AND cs.sale_price &lt;= #{priceMax}
+        </if>
+        <if test="fuelType != null and fuelType != ''">
+            AND c.fuel_system = #{fuelType}
+        </if>
+        <if test="transmission != null and transmission != ''">
+            AND c.transmission = #{transmission}
+        </if>
+        <if test="mileage != null">
+            AND cs.mileage &lt;= #{mileage}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (cs.sale_title LIKE CONCAT('%', #{keyword}, '%') 
+                 OR cs.sale_description LIKE CONCAT('%', #{keyword}, '%')
+                 OR cb.brand LIKE CONCAT('%', #{keyword}, '%')
+                 OR cm.model LIKE CONCAT('%', #{keyword}, '%')
+                 OR c.custom_model LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <choose>
+            <when test="sortBy == 'price-low'">
+                ORDER BY cs.sale_price ASC
+            </when>
+            <when test="sortBy == 'price-high'">
+                ORDER BY cs.sale_price DESC
+            </when>
+            <when test="sortBy == 'year-new'">
+                ORDER BY c.manufacture_year DESC
+            </when>
+            <otherwise>
+                ORDER BY cs.c_dt DESC
+            </otherwise>
+        </choose>
     </select>
 </mapper>

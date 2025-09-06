@@ -1,114 +1,140 @@
 <!-- 商城頁面 -->
-<div class="mall-container">
+<div class="mall-container" id="app">
     <!-- 商品分類過濾 -->
     <div class="filter-section">
         <div class="filter-buttons">
-            <button class="filter-btn active" data-category="all">
+            <button class="filter-btn" 
+                    :class="{ active: selectedCategory === 'all' }"
+                    @click="filterByCategory('all')">
                 <i class="bi bi-grid-3x3-gap"></i>
                 全部商品
             </button>
-            <button class="filter-btn" data-category="engine">
+            <button class="filter-btn" 
+                    :class="{ active: selectedCategory === 'engine' }"
+                    @click="filterByCategory('engine')">
                 <i class="bi bi-gear"></i>
                 發動機配件
             </button>
-            <button class="filter-btn" data-category="brake">
+            <button class="filter-btn" 
+                    :class="{ active: selectedCategory === 'brake' }"
+                    @click="filterByCategory('brake')">
                 <i class="bi bi-disc"></i>
                 制動系統
             </button>
-            <button class="filter-btn" data-category="suspension">
+            <button class="filter-btn" 
+                    :class="{ active: selectedCategory === 'suspension' }"
+                    @click="filterByCategory('suspension')">
                 <i class="bi bi-arrow-up-down"></i>
                 懸挂系統
             </button>
-            <button class="filter-btn" data-category="electrical">
+            <button class="filter-btn" 
+                    :class="{ active: selectedCategory === 'electrical' }"
+                    @click="filterByCategory('electrical')">
                 <i class="bi bi-lightning"></i>
                 電氣系統
             </button>
-            <button class="filter-btn" data-category="exterior">
+            <button class="filter-btn" 
+                    :class="{ active: selectedCategory === 'exterior' }"
+                    @click="filterByCategory('exterior')">
                 <i class="bi bi-car-front"></i>
                 外觀配件
+            </button>
+            <button class="filter-btn" 
+                    :class="{ active: selectedCategory === 'tools' }"
+                    @click="filterByCategory('tools')">
+                <i class="bi bi-tools"></i>
+                工具設備
             </button>
         </div>
     </div>
     
+    <!-- 加载状态 -->
+    <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">載入中...</span>
+        </div>
+        <p class="mt-3 text-muted">正在載入商品...</p>
+    </div>
+    
+    <!-- 错误提示 -->
+    <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ error }}
+        <button type="button" class="btn-close" @click="error = ''"></button>
+    </div>
+    
+    <!-- 成功提示 -->
+    <div v-if="message" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" @click="message = ''"></button>
+    </div>
+    
     <!-- 商品網格 -->
-    <div class="products-grid" id="productsGrid">
-        <#list products as product>
-        <div class="product-card" data-category="${product.category!'all'}">
+    <div v-if="!loading" class="products-grid">
+        <div v-for="product in filteredProducts" 
+             :key="product.id" 
+             class="product-card" 
+             :data-category="product.category || 'other'">
             <div class="product-image">
-                <img src="${product.image}" alt="${product.name}">
+                <img :src="product.image" :alt="product.name" @error="handleImageError">
                 <div class="product-overlay">
                     <button class="btn btn-primary add-to-cart-btn" 
-                            onclick="addToCart({
-                                id: '${product.id}',
-                                name: '${product.name}',
-                                price: ${product.price},
-                                image: '${product.image}'
-                            })">
-                        <i class="bi bi-cart-plus"></i>
-                        加入購物車
+                            @click="addToCart(product)"
+                            :disabled="addingToCart === product.id">
+                        <i v-if="addingToCart !== product.id" class="bi bi-cart-plus"></i>
+                        <span v-else class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        {{ addingToCart === product.id ? '添加中...' : '加入購物車' }}
                     </button>
                 </div>
             </div>
             <div class="product-info">
-                <h5 class="product-name">${product.name}</h5>
-                <p class="product-description">${product.description}</p>
+                <h5 class="product-name">{{ product.name }}</h5>
+                <p class="product-description">{{ product.description }}</p>
+                <div class="product-meta">
+                    <span v-if="product.brand" class="badge bg-secondary me-2">{{ product.brand }}</span>
+                    <span v-if="product.model" class="badge bg-info me-2">{{ product.model }}</span>
+                    <span v-if="product.source" class="badge bg-warning me-2">{{ product.source }}</span>
+                </div>
                 <div class="product-price">
                     <span class="price-symbol">¥</span>
-                    <span class="price-amount">${product.price}</span>
+                    <span class="price-amount">{{ formatPrice(product.price) }}</span>
+                    <span v-if="product.marketPrice && product.marketPrice > product.price" 
+                          class="market-price">¥{{ formatPrice(product.marketPrice) }}</span>
                 </div>
             </div>
         </div>
-        </#list>
+    </div>
+    
+    <!-- 空状态 -->
+    <div v-if="!loading && filteredProducts.length === 0" class="text-center py-5">
+        <div class="empty-state">
+            <i class="bi bi-search display-1 text-muted"></i>
+            <h4 class="mt-3 text-muted">沒有找到相關商品</h4>
+            <p class="text-muted">請嘗試其他分類或關鍵詞</p>
+        </div>
     </div>
     
     <!-- 分頁 -->
-    <div class="pagination-container">
+    <div v-if="!loading && totalPages > 1" class="pagination-container">
         <nav aria-label="商品分頁">
             <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一頁</a>
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                    <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">上一頁</a>
                 </li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">下一頁</a>
+                <li v-for="page in visiblePages" 
+                    :key="page" 
+                    class="page-item" 
+                    :class="{ active: page === currentPage }">
+                    <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                </li>
+                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                    <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">下一頁</a>
                 </li>
             </ul>
         </nav>
     </div>
 </div>
-
-<script>
-// 商品分類過濾功能
-document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const productCards = document.querySelectorAll('.product-card');
-    
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // 移除所有按鈕的active類
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            // 添加當前按鈕的active類
-            this.classList.add('active');
-            
-            const selectedCategory = this.getAttribute('data-category');
-            
-            // 過濾商品
-            productCards.forEach(card => {
-                const cardCategory = card.getAttribute('data-category');
-                
-                if (selectedCategory === 'all' || cardCategory === selectedCategory) {
-                    card.style.display = 'block';
-                    card.style.animation = 'fadeIn 0.5s ease-in-out';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
-});
-</script>
 
 <style>
 .mall-container {
@@ -227,10 +253,15 @@ document.addEventListener('DOMContentLoaded', function() {
     box-shadow: 0 4px 12px rgba(90, 207, 201, 0.3);
 }
 
-.add-to-cart-btn:hover {
+.add-to-cart-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(90, 207, 201, 0.4);
+}
+
+.add-to-cart-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .add-to-cart-btn i {
@@ -255,6 +286,14 @@ document.addEventListener('DOMContentLoaded', function() {
     line-height: 1.4;
 }
 
+.product-meta {
+    margin-bottom: 15px;
+}
+
+.product-meta .badge {
+    font-size: 0.75rem;
+}
+
 .product-price {
     display: flex;
     align-items: baseline;
@@ -271,6 +310,14 @@ document.addEventListener('DOMContentLoaded', function() {
     color: #5ACFC9;
     font-size: 1.5rem;
     font-weight: 700;
+}
+
+.market-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+    margin-left: 10px;
+    font-weight: 400;
 }
 
 .pagination-container {
@@ -290,6 +337,14 @@ document.addEventListener('DOMContentLoaded', function() {
 .pagination .page-link:hover {
     color: #4AB8B2;
     border-color: #4AB8B2;
+}
+
+.empty-state {
+    padding: 2rem;
+}
+
+.empty-state i {
+    color: #ccc;
 }
 
 /* 动画效果 */
@@ -336,4 +391,178 @@ document.addEventListener('DOMContentLoaded', function() {
         font-size: 1.3rem;
     }
 }
-</style> 
+</style>
+
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        products: [],
+        filteredProducts: [],
+        selectedCategory: 'all',
+        loading: true,
+        error: '',
+        message: '',
+        addingToCart: null,
+        currentPage: 1,
+        pageSize: 12,
+        totalPages: 1
+    },
+    computed: {
+        visiblePages() {
+            const pages = [];
+            const start = Math.max(1, this.currentPage - 2);
+            const end = Math.min(this.totalPages, this.currentPage + 2);
+            
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+            return pages;
+        }
+    },
+    mounted() {
+        this.loadProducts();
+    },
+    methods: {
+        // 加载商品数据
+        async loadProducts() {
+            try {
+                this.loading = true;
+                this.error = '';
+                
+                // 调用后端API获取商品数据
+                const response = await axios.get('/api/products/list');
+                
+                if (response.data.success) {
+                    this.products = response.data.data || [];
+                    this.filteredProducts = [...this.products];
+                    this.calculatePagination();
+                } else {
+                    this.error = response.data.message || '加载商品失败';
+                }
+                
+            } catch (error) {
+                console.error('加载商品失败:', error);
+                this.error = '加载商品失败，请稍后重试';
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        // 按分类过滤商品
+        async filterByCategory(category) {
+            try {
+                this.selectedCategory = category;
+                this.currentPage = 1;
+                
+                if (category === 'all') {
+                    this.filteredProducts = [...this.products];
+                } else {
+                    // 调用API获取分类商品
+                    const response = await axios.get(`/api/products/category?category=` + category);
+                    if (response.data.success) {
+                        this.filteredProducts = response.data.data || [];
+                    } else {
+                        // 如果API调用失败，使用本地过滤
+                        this.filteredProducts = this.products.filter(product => 
+                            product.category === category
+                        );
+                    }
+                }
+                
+                this.calculatePagination();
+                
+            } catch (error) {
+                console.error('过滤商品失败:', error);
+                // 使用本地过滤作为备选方案
+                if (category === 'all') {
+                    this.filteredProducts = [...this.products];
+                } else {
+                    this.filteredProducts = this.products.filter(product => 
+                        product.category === category
+                    );
+                }
+                this.calculatePagination();
+            }
+        },
+        
+        // 计算分页
+        calculatePagination() {
+            this.totalPages = Math.ceil(this.filteredProducts.length / this.pageSize);
+            this.currentPage = Math.min(this.currentPage, this.totalPages);
+        },
+        
+        // 切换页面
+        changePage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
+            }
+        },
+        
+        // 添加到购物车
+        async addToCart(product) {
+            try {
+                this.addingToCart = product.id;
+                
+                const cartItem = {
+                    productId: product.id,
+                    productAmount: 1,
+                    productPrice: product.price,
+                    productName: product.name
+                };
+                
+                const response = await axios.post('/api/shopping-cart/add', cartItem);
+                const data = response.data;
+                
+                if (data.success) {
+                    this.message = '成功添加到購物車！';
+                    // 3秒后自动清除消息
+                    setTimeout(() => {
+                        this.message = '';
+                    }, 3000);
+                    
+                    // 更新全局购物车数量
+                    this.updateGlobalCartCount();
+                } else {
+                    this.error = data.message || '添加到購物車失敗';
+                }
+                
+            } catch (error) {
+                console.error('添加到購物車失敗:', error);
+                if (error.response && error.response.data) {
+                    this.error = error.response.data.message || '添加到購物車失敗';
+                } else {
+                    this.error = '网络错误，请稍后重试';
+                }
+            } finally {
+                this.addingToCart = null;
+            }
+        },
+        
+        // 格式化价格
+        formatPrice(price) {
+            if (!price) return '0';
+            return parseFloat(price).toLocaleString('zh-CN', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        },
+        
+        // 处理图片加载失败
+        handleImageError(event) {
+            // 设置默认图片
+            event.target.src = '/img/car/car6.jpg';
+        },
+        
+        // 更新全局购物车数量
+        updateGlobalCartCount() {
+            // 触发全局购物车数量更新
+            if (window.cartManager) {
+                window.cartManager.refreshCartCount();
+            }
+            // 同时触发自定义事件
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
+        }
+    }
+});
+</script> 

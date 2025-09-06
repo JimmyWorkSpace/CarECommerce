@@ -6,11 +6,24 @@ carce:
     port: 21
     user: cloud
     password: 7b2s2Oh&5
+
+# 绿界支付配置 - 生产环境
+ecpay:
+  # 生产环境配置
+  production: true
+  merchant-id: "YOUR_PRODUCTION_MERCHANT_ID"  # 请替换为实际的生产环境商户编号
+  hash-key: "YOUR_PRODUCTION_HASH_KEY"        # 请替换为实际的生产环境HashKey
+  hash-iv: "YOUR_PRODUCTION_HASH_IV"          # 请替换为实际的生产环境HashIV
+  return-url: "https://sale.carce.cc/api/payment/return"
+  notify-url: "https://sale.carce.cc/api/payment/callback"
+  client-back-url: "https://sale.carce.cc/payment/result"
+  result-url: "https://sale.carce.cc/payment/result"
+
 spring:
   datasource:
     carcecloud:
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: org.mariadb.jdbc.Driver
-      jdbc-url: jdbc:mariadb://192.168.42.209:3306/carce_cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+      url: jdbc:mariadb://192.168.42.209:3306/carce_cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
       username: cloud
       password: "cV2ws835!"

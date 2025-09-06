@@ -40,35 +40,37 @@ body .navbar.navbar-expand-lg.navbar-dark.bg-primary {
 body .navbar .navbar-brand {
     font-size: 1.6rem !important;
     font-weight: 700 !important;
-    color: black !important;
+    color: white !important;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 body .navbar .navbar-brand:hover {
-    color: #333 !important;
+    color: #f8f9fa !important;
     transform: scale(1.02);
 }
 
 body .navbar .navbar-nav .nav-link {
     font-size: 0.95rem !important;
-    font-weight: 400 !important;
-    color: black !important;
+    font-weight: 600 !important;
+    color: white !important;
     padding: 0.75rem 1.2rem !important;
     transition: all 0.3s ease;
     position: relative;
 }
 
 body .navbar .navbar-nav .nav-link:hover {
-    color: #333 !important;
-    background-color: rgba(0, 0, 0, 0.1);
+    color: #f8f9fa !important;
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
+    transform: translateY(-1px);
 }
 
 body .navbar .navbar-nav .nav-item.active .nav-link {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
-    color: black !important;
+    color: #f8f9fa !important;
+    font-weight: 700 !important;
 }
 
 /* 登录/注册按钮样式 */
@@ -95,13 +97,13 @@ body .navbar .navbar-nav .login-btn:hover {
 
 /* 已登录状态样式 */
 body .navbar .navbar-nav .user-status {
-    color: #5ACFC9 !important;
+    color: white !important;
     font-weight: 600;
     padding: 0.6rem 1.2rem !important;
     margin-left: 15px;
-    background-color: rgba(90, 207, 201, 0.1);
+    background-color: transparent;
     border-radius: 20px;
-    border: 1px solid rgba(90, 207, 201, 0.2);
+    border: none;
 }
 
 body .navbar .navbar-toggler {

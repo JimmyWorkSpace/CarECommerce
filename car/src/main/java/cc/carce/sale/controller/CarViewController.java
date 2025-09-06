@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -19,19 +21,27 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cc.carce.sale.common.R;
+import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.CarBaseInfoDto;
 import cc.carce.sale.entity.CarBannerEntity;
+import cc.carce.sale.entity.CarPaymentOrderEntity;
+import cc.carce.sale.form.PaymentRequestForm;
 import cc.carce.sale.entity.CarAdvertisementEntity;
 import cc.carce.sale.service.CarBannerService;
 import cc.carce.sale.service.CarDealerService;
 import cc.carce.sale.service.CarSalesService;
 import cc.carce.sale.service.CarService;
+import cc.carce.sale.service.ECPayService;
 import cc.carce.sale.service.CarAdvertisementService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
@@ -39,15 +49,17 @@ import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 汽车详情页面控制器
  */
 @Api(tags = "汽车视图控制器", description = "处理汽车相关页面展示")
+@Slf4j
 @Controller
 @CrossOrigin()
 @RequestMapping("/")
-public class CarViewController {
+public class CarViewController extends BaseController {
 	
 	@Value("${carce.webUrl}")
 	private String webUrl;
@@ -66,6 +78,9 @@ public class CarViewController {
 	
 	@Resource
 	private CarAdvertisementService carAdvertisementService;
+	
+	@Resource
+    private ECPayService ecPayService;
     
     /**
      * 首页
@@ -88,40 +103,40 @@ public class CarViewController {
             // 设置首页主图
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             
-            // 获取banner数据
-            List<CarBannerEntity> banners = carBannerService.getHomeBanners();
-            List<Map<String, String>> heroSlides = new ArrayList<>();
-            
-            if (banners != null && !banners.isEmpty()) {
-                for (CarBannerEntity banner : banners) {
-                    Map<String, String> slide = new HashMap<>();
-                    slide.put("image", banner.getImageUrl());
-                    slide.put("title", "精選二手車");
-                    slide.put("subtitle", "品質保證，價格實惠");
-                    slide.put("link", banner.getIsLink() ? banner.getLinkUrl() : "#");
-                    slide.put("isLink", banner.getIsLink().toString());
-                    heroSlides.add(slide);
-                }
-            } else {
-                // 如果没有banner数据，使用默认数据
-                Map<String, String> slide1 = new HashMap<>();
-                slide1.put("image", "/img/swipper/slide1.jpg");
-                slide1.put("title", "精選二手車");
-                slide1.put("subtitle", "品質保證，價格實惠");
-                slide1.put("link", "/cars");
-                slide1.put("isLink", "true");
-                heroSlides.add(slide1);
-                
-                Map<String, String> slide2 = new HashMap<>();
-                slide2.put("image", "/img/swipper/slide2.jpg");
-                slide2.put("title", "專業檢測");
-                slide2.put("subtitle", "每輛車都經過嚴格檢測");
-                slide2.put("link", "/inspection");
-                slide2.put("isLink", "true");
-                heroSlides.add(slide2);
-            }
-            
-            model.addAttribute("heroSlides", heroSlides);
+//            // 获取banner数据
+//            List<CarBannerEntity> banners = carBannerService.getHomeBanners();
+//            List<Map<String, String>> heroSlides = new ArrayList<>();
+//            
+//            if (banners != null && !banners.isEmpty()) {
+//                for (CarBannerEntity banner : banners) {
+//                    Map<String, String> slide = new HashMap<>();
+//                    slide.put("image", banner.getImageUrl());
+//                    slide.put("title", "精選二手車");
+//                    slide.put("subtitle", "品質保證，價格實惠");
+//                    slide.put("link", banner.getIsLink() ? banner.getLinkUrl() : "#");
+//                    slide.put("isLink", banner.getIsLink().toString());
+//                    heroSlides.add(slide);
+//                }
+//            } else {
+//                // 如果没有banner数据，使用默认数据
+//                Map<String, String> slide1 = new HashMap<>();
+//                slide1.put("image", "/img/swipper/slide1.jpg");
+//                slide1.put("title", "精選二手車");
+//                slide1.put("subtitle", "品質保證，價格實惠");
+//                slide1.put("link", "/cars");
+//                slide1.put("isLink", "true");
+//                heroSlides.add(slide1);
+//                
+//                Map<String, String> slide2 = new HashMap<>();
+//                slide2.put("image", "/img/swipper/slide2.jpg");
+//                slide2.put("title", "專業檢測");
+//                slide2.put("subtitle", "每輛車都經過嚴格檢測");
+//                slide2.put("link", "/inspection");
+//                slide2.put("isLink", "true");
+//                heroSlides.add(slide2);
+//            }
+//            
+//            model.addAttribute("heroSlides", heroSlides);
             
             // 设置精选好车数据
             List<Map<String, String>> cars = new ArrayList<>();
@@ -169,10 +184,6 @@ public class CarViewController {
             
             model.addAttribute("dealers", dealers);
             
-            // 获取广告数据
-            List<CarAdvertisementEntity> advertisements = carAdvertisementService.getHomeAdvertisements();
-            model.addAttribute("advertisements", advertisements);
-            
             // 获取当前请求的完整URL
             String requestUrl = req.getRequestURL().toString();
             model.addAttribute("url", requestUrl);
@@ -197,79 +208,6 @@ public class CarViewController {
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
             
-            // 获取搜索参数
-            String brand = req.getParameter("brand");
-            String carModel = req.getParameter("model");
-            String year = req.getParameter("year");
-            String priceMin = req.getParameter("priceMin");
-            String priceMax = req.getParameter("priceMax");
-            String fuelType = req.getParameter("fuelType");
-            String transmission = req.getParameter("transmission");
-            String mileage = req.getParameter("mileage");
-            String bodyType = req.getParameter("bodyType");
-            String page = req.getParameter("page");
-            
-            int currentPage = page != null ? Integer.parseInt(page) : 1;
-            int pageSize = 24;
-            
-            // 设置搜索条件
-            model.addAttribute("brand", brand);
-            model.addAttribute("model", carModel);
-            model.addAttribute("year", year);
-            model.addAttribute("priceMin", priceMin);
-            model.addAttribute("priceMax", priceMax);
-            model.addAttribute("fuelType", fuelType);
-            model.addAttribute("transmission", transmission);
-            model.addAttribute("mileage", mileage);
-            model.addAttribute("bodyType", bodyType);
-            model.addAttribute("currentPage", currentPage);
-            
-            // 生成车辆数据（模拟数据）
-            List<Map<String, Object>> cars = new ArrayList<>();
-            String[] brands = {"Toyota", "Honda", "Nissan", "BMW", "Audi", "Mercedes", "Lexus", "Mazda"};
-            String[] models = {"Camry", "Civic", "Altima", "3 Series", "A4", "C-Class", "ES", "3"};
-            String[] fuelTypes = {"Gasoline", "Diesel", "Electric", "Hybrid"};
-            String[] transmissions = {"Automatic", "Manual", "CVT"};
-            String[] bodyTypes = {"Sedan", "SUV", "Hatchback", "Coupe"};
-            
-            for (int i = 1; i <= 48; i++) {
-                Map<String, Object> car = new HashMap<>();
-                int brandIndex = (i - 1) % brands.length;
-                int modelIndex = (i - 1) % models.length;
-                
-                car.put("id", i);
-                car.put("brand", brands[brandIndex]);
-                car.put("model", models[modelIndex]);
-                car.put("year", 2018 + (i % 7));
-                car.put("price", 15000 + (i * 1000));
-                car.put("mileage", 10000 + (i * 5000));
-                car.put("fuelType", fuelTypes[i % fuelTypes.length]);
-                car.put("transmission", transmissions[i % transmissions.length]);
-                car.put("bodyType", bodyTypes[i % bodyTypes.length]);
-                car.put("image", "/img/car/car6.jpg");
-                car.put("title", brands[brandIndex] + " " + models[modelIndex] + " " + (2018 + (i % 7)));
-                
-                cars.add(car);
-            }
-            
-            // 分页处理
-            int totalCars = cars.size();
-            int totalPages = (int) Math.ceil((double) totalCars / pageSize);
-            int startIndex = (currentPage - 1) * pageSize;
-            int endIndex = Math.min(startIndex + pageSize, totalCars);
-            
-            List<Map<String, Object>> currentPageCars = cars.subList(startIndex, endIndex);
-            
-            model.addAttribute("cars", currentPageCars);
-            model.addAttribute("totalPages", totalPages);
-            model.addAttribute("totalCars", totalCars);
-            
-            // 设置品牌和型号选项
-            model.addAttribute("brands", brands);
-            model.addAttribute("fuelTypes", fuelTypes);
-            model.addAttribute("transmissions", transmissions);
-            model.addAttribute("bodyTypes", bodyTypes);
-            
             model.addAttribute("title", "我要買車 - 二手車銷售平台");
             model.addAttribute("description", "瀏覽精選二手車，找到您的理想座駕");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
@@ -291,49 +229,7 @@ public class CarViewController {
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
             
-            // 生成商城商品数据（模拟数据）
-            List<Map<String, Object>> products = new ArrayList<>();
-            String[] productNames = {
-                "汽車座套", "車載充電器", "行車記錄儀", "汽車香水", "方向盤套", 
-                "汽車腳墊", "車載冰箱", "汽車音響", "導航儀", "汽車貼膜",
-                "輪胎", "機油", "煞車片", "雨刷器", "電瓶", "火花塞"
-            };
-            
-//            String[] productImages = {
-//                "/img/car/car4.jpg", "/img/car/car5.jpg", "/img/car/car6.jpg", "/img/car/car7.jpg", "/img/car/car8.jpg", "/img/car/car9.jpg",
-//                "/img/car/car10.jpg", "/img/car/car11.jpg", "/img/car/car12.jpg", "/img/car/car13.jpg", "/img/car/car14.jpg", "/img/car/car15.jpg",
-//                "/img/car/car16.jpg", "/img/car/car4.jpg", "/img/car/car5.jpg", "/img/car/car6.jpg"
-//            };
-            String[] productImages = {
-            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
-            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
-            		"/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg","/img/car/car6.jpg",
-            		"/img/car/car6.jpg"
-            };
-            
-            int[] prices = {
-                299, 89, 599, 129, 159, 399, 899, 1299, 799, 599, 899, 299, 199, 89, 599, 89
-            };
-            
-            // 商品分类
-            String[] categories = {
-                "exterior", "electrical", "electrical", "exterior", "exterior", 
-                "exterior", "electrical", "electrical", "electrical", "exterior",
-                "brake", "engine", "brake", "exterior", "electrical", "engine"
-            };
-            
-            for (int i = 0; i < productNames.length; i++) {
-                Map<String, Object> product = new HashMap<>();
-                product.put("id", "product_" + (i + 1));
-                product.put("name", productNames[i]);
-                product.put("price", prices[i]);
-                product.put("image", productImages[i]);
-                product.put("category", categories[i]);
-                product.put("description", "高品質汽車配件，提升您的駛駛體驗");
-                products.add(product);
-            }
-            
-            model.addAttribute("products", products);
+            // 设置页面基本信息
             model.addAttribute("title", "商城 - 汽車配件專營店");
             model.addAttribute("description", "專業汽車配件商城，提供優質汽車用品");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
@@ -413,63 +309,18 @@ public class CarViewController {
     /**
      * 跳转到汽车详情页面
      */
-    @GetMapping("/{uid}")
-    public String carDetail(Model model, @PathVariable("uid") String uid, HttpServletRequest req) {
-        // 排除静态资源路径
-        if (uid.contains(".") || uid.startsWith("ad-") || uid.startsWith("img/") || uid.startsWith("css/") || uid.startsWith("js/")) {
-            return "redirect:/";
-        }
+     @GetMapping("/detail/{saleId}")
+    public String carDetail(Model model, @PathVariable("saleId") Long saleId, HttpServletRequest req) {
         try {
-            // 检查用户登录状态
-            Object user = req.getSession().getAttribute("user");
-            model.addAttribute("user", user);
-        	model.addAttribute("image", "");
-        	model.addAttribute("imagesJson", JSONUtil.toJsonPrettyStr(new ArrayList<>()));
-        	model.addAttribute("videosJson", JSONUtil.toJsonPrettyStr(new ArrayList<>()));
-
-			Future<Boolean> videoF = ThreadUtil.execAsync(() -> {
-				List<String> videos = carService.getVideoByUid(uid);
-				model.addAttribute("videosJson", JSONUtil.toJsonPrettyStr(videos));
-
-				return true;
-			});
-
-//            获取图片
-			List<String> images = carService.getImagesByUid(uid);
-			if(CollUtil.isNotEmpty(images)) {
-				model.addAttribute("image", images.get(0));
-			}else {
-				model.addAttribute("image", "");
-			}
-
-			model.addAttribute("imagesJson", JSONUtil.toJsonPrettyStr(images));
-        		
-
-
-        	
             // 获取车辆基本信息
-            CarBaseInfoDto carInfo = carService.getBaseInfoByUidId(uid);
+            CarBaseInfoDto carInfo = carService.getBaseInfoBySaleId(saleId);
             model.addAttribute("carInfo", carInfo);
             model.addAttribute("carInfoJson", JSONUtil.toJsonPrettyStr(carInfo));
             
-            model.addAttribute("carId", uid);
+            model.addAttribute("saleId", saleId);
             
-            model.addAttribute("content", "/car/detail-static.ftl");
+            model.addAttribute("content", "/car/detail.ftl");
             
-//            设置描述
-            model.addAttribute("title", CollUtil.join(CollUtil.newArrayList(carInfo.getBrand(), carInfo.getCustomModel(), carInfo.getManufactureYear()), " "));
-            model.addAttribute("description", carInfo.getSaleTitle());
-            
-            // 设置网站图标
-            model.addAttribute("favicon", webUrl + "/favicon.ico");
-            
-            videoF.get(5, TimeUnit.SECONDS);
-            // 获取当前请求的完整URL
-            String requestUrl = req.getRequestURL().toString();
-            
-            model.addAttribute("url", requestUrl);
-            
-            model.addAttribute("loading", false);
         } catch (Exception e) {
             model.addAttribute("loading", false);
             model.addAttribute("error", "獲取數據失敗：" + e.getMessage());
@@ -518,22 +369,42 @@ public class CarViewController {
     }
     
     /**
-     * 获取banner数据的API接口
+     * 跳转到购物车页面
      */
-    @GetMapping("/api/banners")
-    @ResponseBody
-    public List<CarBannerEntity> getBanners() {
-        return carBannerService.getHomeBanners();
+    @ApiOperation(value = "购物车页面", notes = "显示用户购物车内容")
+    @GetMapping("/cart")
+    public String cartPage(Model model, HttpServletRequest req) {
+        try {
+            // 检查用户登录状态
+            Object user = req.getSession().getAttribute("user");
+            model.addAttribute("user", user);
+            
+            // 设置页面标题和描述
+            model.addAttribute("title", "購物車 - 二手車銷售平台");
+            model.addAttribute("description", "查看和管理您的購物車商品");
+            
+            // 设置网站图标
+            model.addAttribute("favicon", webUrl + "/favicon.ico");
+            
+            // 设置购物车页面内容
+            model.addAttribute("content", "/cart/index.ftl");
+            
+            // 获取当前请求的完整URL
+            String requestUrl = req.getRequestURL().toString();
+            model.addAttribute("url", requestUrl);
+            
+            // 添加一些必要的属性，避免模板中的变量未定义错误
+            model.addAttribute("id", ""); // 添加空的id属性
+            model.addAttribute("image", "/img/swipper/slide1.jpg"); // 添加默认图片
+            
+        } catch (Exception e) {
+            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
+            model.addAttribute("content", "/error/index.ftl");
+        }
+        
+        return "/layout/main";
     }
     
-    /**
-     * 获取广告数据的API接口
-     */
-    @GetMapping("/api/advertisements")
-    @ResponseBody
-    public List<CarAdvertisementEntity> getAdvertisements() {
-        return carAdvertisementService.getHomeAdvertisements();
-    }
     
     /**
      * 显示广告内容页面
@@ -554,4 +425,150 @@ public class CarViewController {
         }
         return "/ad-content";
     }
+    
+    /**
+	 * 显示支付页面（GET请求，用于直接访问）
+	 */
+	@GetMapping("/payment/index")
+	public String showPaymentPageGet(@RequestParam(required = false) String itemName,
+			@RequestParam(required = false) Integer amount, @RequestParam(required = false) String description,
+			@RequestParam(required = false) String cartData, Model model, HttpSession session) {
+
+		// 检查用户登录状态
+		UserInfo userInfo = getSessionUser();
+		if (userInfo == null) {
+			log.warn("未登录用户尝试访问支付页面");
+			return "redirect:/login?returnUrl=/payment/index";
+		}
+
+		// 设置页面数据
+		model.addAttribute("itemName", itemName != null ? itemName : "汽车商品");
+		model.addAttribute("amount", amount != null ? amount : 0);
+		model.addAttribute("description", description != null ? description : "");
+		model.addAttribute("cartData", cartData);
+		model.addAttribute("userInfo", userInfo);
+		model.addAttribute("isDevOrTest", isDevOrTestEnvironment());
+		
+		// 设置模板内容
+		model.addAttribute("content", "/payment/index.ftl");
+
+		log.info("用户通过GET请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}", userInfo.getId(), itemName, amount);
+
+		return "/layout/main";
+	}
+
+	/**
+	 * 处理支付页面请求（POST请求，用于购物车结算）
+	 */
+	@PostMapping("/payment/index")
+	public String showPaymentPagePost(@Valid PaymentRequestForm paymentRequest,
+			BindingResult bindingResult, Model model, HttpSession session) {
+
+		// 检查用户登录状态
+		UserInfo userInfo = getSessionUser();
+		if (userInfo == null) {
+			log.warn("未登录用户尝试访问支付页面");
+			return "redirect:/login?returnUrl=/payment/index";
+		}
+
+		// 参数验证
+		if (bindingResult.hasErrors()) {
+			log.warn("支付请求参数验证失败: {}", bindingResult.getAllErrors());
+			// 重定向到购物车页面，显示错误信息
+			return "redirect:/cart?error=支付参数错误";
+		}
+
+		// 获取当前环境配置
+		String activeProfile = System.getProperty("spring.profiles.active");
+		if (activeProfile == null) {
+			activeProfile = "dev"; // 默认使用dev环境
+		}
+
+		// 如果是dev或test环境，金额固定为1元
+		Integer finalAmount = paymentRequest.getAmount();
+		if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
+			finalAmount = 1;
+			log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", paymentRequest.getAmount());
+		}
+
+		// 设置页面数据
+		model.addAttribute("itemName", paymentRequest.getItemName());
+		model.addAttribute("amount", finalAmount);
+		model.addAttribute("description", paymentRequest.getDescription());
+		model.addAttribute("cartData", paymentRequest.getCartData());
+		model.addAttribute("userInfo", userInfo);
+		model.addAttribute("isDevOrTest", "dev".equals(activeProfile) || "test".equals(activeProfile));
+		
+		// 设置模板内容
+		model.addAttribute("content", "/payment/index.ftl");
+
+		log.info("用户通过POST请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}, 环境: {}", userInfo.getId(), paymentRequest.getItemName(),
+				finalAmount, activeProfile);
+
+		return "/layout/main";
+	}
+	
+	/**
+     * 显示支付结果页面
+     */
+    @GetMapping("/result")
+    public String showPaymentResult(@RequestParam(required = false) String merchantTradeNo,
+                                   Model model,
+                                   HttpSession session) {
+        
+        // 检查用户登录状态
+        UserInfo userInfo = getSessionUser();
+        if (userInfo == null) {
+            log.warn("未登录用户尝试访问支付结果页面");
+            return "redirect:/login?returnUrl=/payment/result";
+        }
+        
+        try {
+            if (merchantTradeNo != null && !merchantTradeNo.trim().isEmpty()) {
+                // 查询支付订单状态
+            	R<CarPaymentOrderEntity> result = ecPayService.queryPaymentStatus(merchantTradeNo);
+                
+                if (result.isSuccess() && result.getData() != null) {
+                    CarPaymentOrderEntity paymentOrder = result.getData();
+                    
+                    // 检查订单所属用户
+                    if (!paymentOrder.getUserId().equals(userInfo.getId())) {
+                        log.warn("用户尝试查看不属于自己的支付订单，用户ID: {}, 订单用户ID: {}", 
+                                userInfo.getId(), paymentOrder.getUserId());
+                        return "redirect:/payment/result";
+                    }
+                    
+                    model.addAttribute("paymentOrder", paymentOrder);
+                    model.addAttribute("paymentStatus", paymentOrder.getPaymentStatus());
+                    
+                    log.info("显示支付结果页面，商户订单号: {}, 支付状态: {}", 
+                            merchantTradeNo, paymentOrder.getPaymentStatus());
+                } else {
+                    log.warn("未找到支付订单，商户订单号: {}", merchantTradeNo);
+                    model.addAttribute("paymentStatus", -1); // 未知状态
+                }
+            } else {
+                // 没有订单号，显示默认状态
+                model.addAttribute("paymentStatus", -1);
+            }
+            
+        } catch (Exception e) {
+            log.error("查询支付订单状态异常", e);
+            model.addAttribute("paymentStatus", -1);
+        }
+        
+        model.addAttribute("userInfo", userInfo);
+        return "payment/result";
+    }
+
+	/**
+	 * 检查是否为开发或测试环境
+	 */
+	private boolean isDevOrTestEnvironment() {
+		String activeProfile = System.getProperty("spring.profiles.active");
+		if (activeProfile == null) {
+			activeProfile = "dev"; // 默认使用dev环境
+		}
+		return "dev".equals(activeProfile) || "test".equals(activeProfile);
+	}
 } 

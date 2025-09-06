@@ -25,17 +25,27 @@ spring:
     restart:
       enabled: false
   datasource:
+    # 基本连接池配置
     initialSize: 5
-    minIdle: 10
+    minIdle: 5
     maxActive: 20
     maxWait: 60000
+    
+    # 连接检测配置
     timeBetweenEvictionRunsMillis: 60000
     minEvictableIdleTimeMillis: 300000
     maxEvictableIdleTimeMillis: 900000
-    validationQuery: SELECT 1 FROM DUAL
+    
+    # 连接验证配置
+    validationQuery: SELECT 1
     testWhileIdle: true
-    testOnBorrow: false
+    testOnBorrow: true
     testOnReturn: false
+    
+    # 连接超时配置
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000;druid.stat.logSlowSql=true;druid.connectionTimeout=30000;druid.validationQueryTimeout=10000
+    
+    # 连接池监控
     webStatFilter:
       enabled: true
     statViewServlet:
@@ -65,18 +75,18 @@ spring:
     expose-session-attributes: false
     request-context-attribute: request
     expose-spring-macro-helpers: true
-  # redis:
-  #   host: localhost
-  #   port: 6379
-  #   database: 0
-  #   password: null
-  #   timeout: 10s
-  #   lettuce:
-  #     pool:
-  #       min-idle: 0
-  #       max-idle: 8
-  #       max-active: 8
-  #       max-wait: -1ms
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    timeout: 10s
+    # 简化连接池配置，避免复杂的pool配置
+    # lettuce:
+    #   pool:
+    #     min-idle: 0
+    #     max-idle: 8
+    #     max-active: 8
+    #     max-wait: -1ms
 mybatis:
   typeAliasesPackage: cc.carce.sale.entity
   mapperLocations: classpath*:mapper/**/*Mapper.xml

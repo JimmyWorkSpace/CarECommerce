@@ -93,20 +93,25 @@
         
         /* 已登錄狀態樣式 */
         .user-status {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: transparent;
             color: white !important;
-            border-radius: 20px;
-            padding: 8px 16px !important;
+            border-radius: 25px;
+            padding: 10px 20px !important;
             font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            font-size: 0.95rem;
             transition: all 0.3s ease;
+            border: none;
         }
         
         .user-status:hover {
-            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+            background: rgba(255, 255, 255, 0.1);
+            color: #f8f9fa !important;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+        
+        .user-status i {
+            margin-right: 8px;
+            font-size: 1.1rem;
         }
         
         /* 登錄按鈕樣式 */
@@ -159,6 +164,24 @@
             object-fit: contain;
         }
         
+        /* 導航欄字體樣式 */
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #f8f9fa !important;
+            transform: translateY(-1px);
+        }
+        
+        .navbar-nav .nav-item.active .nav-link {
+            color: #f8f9fa !important;
+            font-weight: 700;
+        }
+        
         /* 響應式設計 */
         @media (max-width: 768px) {
             .navbar-brand-img {
@@ -184,8 +207,12 @@
             
             .user-status,
             .login-btn {
-                padding: 6px 12px !important;
-                font-size: 0.8rem;
+                padding: 8px 16px !important;
+                font-size: 0.85rem;
+            }
+            
+            .user-status i {
+                font-size: 1rem;
             }
         }
         </style>
@@ -197,6 +224,8 @@
     <script src="/js/axios.min.js"></script>
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
+    <!-- Common JavaScript -->
+    <script src="/js/common.js"></script>
     <!-- Bootstrap JS -->
     <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- Custom CSS -->
@@ -252,6 +281,10 @@
                                     ${user.name!'已登錄'}
                                 </a>
                                 <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/my-order/index">
+                                        <i class="bi bi-list-ul me-2"></i>我的訂單
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/logout">
                                         <i class="bi bi-box-arrow-right me-2"></i>退出登錄
                                     </a></li>
@@ -293,50 +326,165 @@
 
         
         <script>
+            // 通用未登录处理函数
+            window.handleUnauthorized = function(response) {
+                if (response && response.data && response.data.message) {
+                    const message = response.data.message;
+                    if (message.includes('未登录') || message.includes('用户未登录')) {
+                        console.log('检测到未登录状态，跳转到登录页面');
+                        // 保存当前页面URL，登录后可以跳转回来
+                        const currentUrl = window.location.pathname + window.location.search;
+                        localStorage.setItem('redirectAfterLogin', currentUrl);
+                        // 跳转到登录页面
+                        window.location.href = '/login';
+                        return true; // 表示已处理未登录状态
+                    }
+                }
+                return false; // 表示不是未登录状态
+            };
+            
+            // 通用API错误处理函数
+            window.handleApiError = function(error, defaultMessage = '请求失败') {
+                if (error.response) {
+                    const response = error.response;
+                    // 检查是否是未登录错误
+                    if (window.handleUnauthorized(response)) {
+                        return; // 已处理未登录状态，直接返回
+                    }
+                    
+                    // 处理其他HTTP错误
+                    if (response.status === 401) {
+                        console.log('401未授权，跳转到登录页面');
+                        window.handleUnauthorized(response);
+                        return;
+                    }
+                    
+                    if (response.status === 403) {
+                        console.log('403禁止访问');
+                        return '权限不足，无法访问此资源';
+                    }
+                    
+                    if (response.status === 404) {
+                        console.log('404资源不存在');
+                        return '请求的资源不存在';
+                    }
+                    
+                    if (response.status >= 500) {
+                        console.log('服务器错误');
+                        return '服务器内部错误，请稍后重试';
+                    }
+                    
+                    // 返回服务器返回的错误信息
+                    if (response.data && response.data.message) {
+                        return response.data.message;
+                    }
+                }
+                
+                // 网络错误或其他错误
+                if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
+                    return '网络连接失败，请检查网络设置';
+                }
+                
+                return defaultMessage;
+            };
+            
             // 購物車功能
             let cart = JSON.parse(localStorage.getItem('cart') || '[]');
             
-            function updateCartCount() {
-                const count = cart.reduce((total, item) => total + item.quantity, 0);
-                const cartCountElement = document.getElementById('cartCount');
-                if (cartCountElement) {
-                    cartCountElement.textContent = count;
-                }
-            }
-            
-            function addToCart(product) {
-                const existingItem = cart.find(item => item.id === product.id);
-                if (existingItem) {
-                    existingItem.quantity += 1;
-                } else {
-                    cart.push({
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        image: product.image,
-                        quantity: 1
-                    });
-                }
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCartCount();
-                showToast('商品已添加到購物車');
-            }
-            
-            function showToast(message) {
-                // 創建toast提示
-                const toast = document.createElement('div');
-                toast.className = 'toast-notification';
-                toast.textContent = message;
-                document.body.appendChild(toast);
+            // 全局購物車狀態管理
+            window.cartManager = {
+                // 更新購物車數量顯示
+                updateCartCount: function() {
+                    const count = cart.reduce((total, item) => total + (item.quantity || 0), 0);
+                    const cartCountElement = document.getElementById('cartCount');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = count;
+                    }
+                },
                 
-                setTimeout(() => {
-                    toast.remove();
-                }, 2000);
-            }
+                // 從服務器同步購物車數據
+                syncCartFromServer: async function() {
+                    // 防止重复调用
+                    if (this.isSyncing) {
+                        console.log('正在同步中，跳过重复调用');
+                        return;
+                    }
+                    
+                    try {
+                        this.isSyncing = true;
+                        console.log('开始同步购物车数据...');
+                        
+                        const response = await fetch('/api/shopping-cart/list');
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.data) {
+                                // 轉換服務器數據格式為本地格式
+                                cart = data.data.map(item => ({
+                                    id: item.id,
+                                    name: item.productName,
+                                    price: item.productPrice,
+                                    image: item.productImage,
+                                    quantity: item.productAmount
+                                }));
+                                localStorage.setItem('cart', JSON.stringify(cart));
+                                this.updateCartCount();
+                                console.log('购物车数据同步成功，商品数量:', cart.length);
+                            }
+                        }
+                    } catch (error) {
+                        console.log('同步購物車數據失敗:', error);
+                    } finally {
+                        this.isSyncing = false;
+                    }
+                },
+                
+                // 添加商品到購物車
+                addToCart: function(product) {
+                    const existingItem = cart.find(item => item.id === product.id);
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1
+                        });
+                    }
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    this.updateCartCount();
+                    this.showToast('商品已添加到購物車');
+                },
+                
+                // 顯示Toast提示
+                showToast: function(message) {
+                    const toast = document.createElement('div');
+                    toast.className = 'toast-notification';
+                    toast.textContent = message;
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 2000);
+                },
+                
+                // 刷新購物車數量
+                refreshCartCount: function() {
+                    // 避免重复调用，只在需要时同步
+                    if (!this.isSyncing) {
+                        this.syncCartFromServer();
+                    }
+                }
+            };
             
             // 頁面加載完成後的初始化
             document.addEventListener('DOMContentLoaded', function() {
-                updateCartCount();
+                // 初始化購物車數量
+                window.cartManager.updateCartCount();
+                
+                // 從服務器同步購物車數據
+                window.cartManager.syncCartFromServer();
                 
                 // 購物車按鈕點擊事件
                 const cartFloatBtn = document.getElementById('cartFloatBtn');
@@ -345,7 +493,21 @@
                         window.location.href = '/cart';
                     });
                 }
+                
+                // 監聽購物車數據變化事件
+                window.addEventListener('cartUpdated', function() {
+                    window.cartManager.refreshCartCount();
+                });
             });
+            
+            // 暴露給全局使用
+            window.updateCartCount = function() {
+                window.cartManager.updateCartCount();
+            };
+            
+            window.refreshCartCount = function() {
+                window.cartManager.refreshCartCount();
+            };
         </script>
         
 

@@ -14,6 +14,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import tk.mybatis.spring.annotation.MapperScan;
+import com.alibaba.druid.pool.DruidDataSource;
 
 @Configuration
 @MapperScan(basePackages = "cc.carce.sale.mapper.manager", sqlSessionTemplateRef = "managerSqlSessionTemplate")
@@ -22,7 +23,9 @@ public class RyDataSourceConfig {
 	@Bean(name = "managerDataSource")
 	@ConfigurationProperties(prefix = "spring.datasource.manager")
 	public DataSource managerDataSource() {
-		return DataSourceBuilder.create().build();
+		return DataSourceBuilder.create()
+			.type(DruidDataSource.class)
+			.build();
 	}
 
 	@Bean(name = "managerSqlSessionFactory")

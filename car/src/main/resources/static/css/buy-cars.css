@@ -5,6 +5,42 @@
     min-height: 100vh;
 }
 
+/* 加载状态样式 */
+.loading-container {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.loading-container .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 20px;
+}
+
+/* 无数据状态样式 */
+.no-data-container {
+    text-align: center;
+    padding: 80px 20px;
+    color: #666;
+}
+
+.no-data-icon {
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.no-data-container h3 {
+    color: #999;
+    margin-bottom: 10px;
+}
+
+.no-data-container p {
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
 /* 搜索头部 */
 .search-header {
     background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
@@ -206,21 +242,25 @@
 /* 车辆卡片 */
 .car-card {
     background: white;
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
-    border: 1px solid #eee;
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    cursor: pointer;
 }
 
 .car-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
 .car-image-container {
     position: relative;
-    height: 200px;
+    height: 220px;
     overflow: hidden;
 }
 
@@ -232,79 +272,105 @@
 }
 
 .car-card:hover .car-image {
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 
 .car-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(90, 207, 201, 0.9);
+    top: 12px;
+    right: 12px;
+    background: rgba(90, 207, 201, 0.95);
     color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
     font-weight: 600;
+    backdrop-filter: blur(10px);
 }
 
 .car-info {
-    padding: 20px;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.car-price-section {
+	text-align: left;
+    margin-bottom: 6px;
+    padding: 10px 20px 0 20px;
+}
+
+.price-amount {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #5ACFC9;
+    line-height: 1.2;
 }
 
 .car-title {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #333;
     margin-bottom: 12px;
     line-height: 1.3;
+    flex-shrink: 0;
+    padding: 0 20px;
+	text-align: left;
 }
 
-.car-details {
+.car-specs {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    flex: 1;
+    border-radius: 0;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 12px 8px;
+    transition: all 0.3s ease;
+    border-right: 1px solid #e9ecef;
+}
+
+.spec-item:last-child {
+    border-right: none;
+}
+
+.spec-item:hover {
+    background: #f0f8f8;
+}
+
+.spec-content {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 15px;
-}
-
-.car-details span {
-    font-size: 0.85rem;
-    color: #666;
-    display: flex;
     align-items: center;
-    gap: 5px;
-}
-
-.car-details i {
-    color: #5ACFC9;
-    font-size: 0.9rem;
-}
-
-.car-price {
-    margin-bottom: 15px;
-}
-
-.price-amount {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #5ACFC9;
-}
-
-.car-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.car-actions .btn {
+    gap: 2px;
+    text-align: center;
     flex: 1;
-    padding: 8px 12px;
-    font-size: 0.85rem;
 }
 
-.car-actions .btn-outline-secondary {
-    flex: 0 0 auto;
-    width: 40px;
-    padding: 8px;
+.spec-label {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 500;
+    line-height: 1.2;
 }
+
+.spec-value {
+    font-size: 0.85rem;
+    color: #333;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
 
 /* 分页 */
 .pagination-container {
@@ -354,15 +420,36 @@
     }
     
     .car-info {
-        padding: 15px;
+        padding: 0;
     }
     
     .car-title {
         font-size: 1rem;
+        padding: 0 15px;
     }
     
     .price-amount {
         font-size: 1.2rem;
+    }
+    
+    .car-price-section {
+        padding: 8px 15px 0 15px;
+    }
+    
+    .car-specs {
+        gap: 0;
+    }
+    
+    .spec-item {
+        padding: 10px 6px;
+    }
+    
+    .spec-label {
+        font-size: 0.7rem;
+    }
+    
+    .spec-value {
+        font-size: 0.75rem;
     }
 }
 
@@ -382,5 +469,39 @@
     
     .search-btn {
         border-radius: 0 0 10px 10px;
+    }
+    
+    .car-specs {
+        flex-direction: column;
+        gap: 0;
+        background: transparent;
+    }
+    
+    .spec-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        text-align: center;
+        border-right: none;
+        border-bottom: 1px solid #e9ecef;
+        background: #f8f9fa;
+    }
+    
+    .spec-item:last-child {
+        border-bottom: none;
+    }
+    
+    .spec-content {
+        align-items: center;
+        text-align: center;
+    }
+    
+    .spec-label {
+        font-size: 0.7rem;
+    }
+    
+    .spec-value {
+        font-size: 0.75rem;
     }
 } 

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.carce.sale.mapper.manager.CarOrderDetailMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="cc.carce.sale.entity.CarOrderDetailEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="orderId" property="orderId" jdbcType="BIGINT"/>
+        <result column="delFlag" property="delFlag" jdbcType="BOOLEAN"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="showOrder" property="showOrder" jdbcType="INTEGER"/>
+        <result column="productId" property="productId" jdbcType="BIGINT"/>
+        <result column="productName" property="productName" jdbcType="VARCHAR"/>
+        <result column="productAmount" property="productAmount" jdbcType="INTEGER"/>
+        <result column="productPrice" property="productPrice" jdbcType="INTEGER"/>
+        <result column="totalPrice" property="totalPrice" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 基础列名 -->
+    <sql id="Base_Column_List">
+        id, orderId, delFlag, createTime, showOrder, productId, productName, 
+        productAmount, productPrice, totalPrice
+    </sql>
+
+    <!-- 插入订单详情 -->
+    <insert id="insert" parameterType="cc.carce.sale.entity.CarOrderDetailEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO car_order_detail (
+            orderId, delFlag, createTime, showOrder, productId, productName,
+            productAmount, productPrice, totalPrice
+        ) VALUES (
+            #{orderId}, #{delFlag}, #{createTime}, #{showOrder}, #{productId}, #{productName},
+            #{productAmount}, #{productPrice}, #{totalPrice}
+        )
+    </insert>
+
+    <!-- 根据ID查询订单详情 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_detail
+        WHERE id = #{id} AND delFlag = 0
+    </select>
+
+    <!-- 根据订单ID查询订单详情列表 -->
+    <select id="selectByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_detail
+        WHERE orderId = #{orderId} AND delFlag = 0
+        ORDER BY showOrder ASC, createTime ASC
+    </select>
+
+    <!-- 根据产品ID查询订单详情列表 -->
+    <select id="selectByProductId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_detail
+        WHERE productId = #{productId} AND delFlag = 0
+        ORDER BY createTime DESC
+    </select>
+
+    <!-- 根据订单ID和产品ID查询订单详情 -->
+    <select id="selectByOrderIdAndProductId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_order_detail
+        WHERE orderId = #{orderId} AND productId = #{productId} AND delFlag = 0
+    </select>
+
+    <!-- 更新订单详情 -->
+    <update id="updateById" parameterType="cc.carce.sale.entity.CarOrderDetailEntity">
+        UPDATE car_order_detail
+        <set>
+            <if test="orderId != null">orderId = #{orderId},</if>
+            <if test="delFlag != null">delFlag = #{delFlag},</if>
+            <if test="showOrder != null">showOrder = #{showOrder},</if>
+            <if test="productId != null">productId = #{productId},</if>
+            <if test="productName != null">productName = #{productName},</if>
+            <if test="productAmount != null">productAmount = #{productAmount},</if>
+            <if test="productPrice != null">productPrice = #{productPrice},</if>
+            <if test="totalPrice != null">totalPrice = #{totalPrice},</if>
+        </set>
+        WHERE id = #{id} AND delFlag = 0
+    </update>
+
+    <!-- 更新产品数量 -->
+    <update id="updateProductAmount">
+        UPDATE car_order_detail
+        SET productAmount = #{productAmount},
+            totalPrice = productPrice * #{productAmount}
+        WHERE id = #{id} AND delFlag = 0
+    </update>
+
+    <!-- 更新产品价格 -->
+    <update id="updateProductPrice">
+        UPDATE car_order_detail
+        SET productPrice = #{productPrice},
+            totalPrice = #{productPrice} * productAmount
+        WHERE id = #{id} AND delFlag = 0
+    </update>
+
+    <!-- 删除订单详情（逻辑删除） -->
+    <update id="deleteById" parameterType="java.lang.Long">
+        UPDATE car_order_detail
+        SET delFlag = 1
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据订单ID删除所有订单详情（逻辑删除） -->
+    <update id="deleteByOrderId" parameterType="java.lang.Long">
+        UPDATE car_order_detail
+        SET delFlag = 1
+        WHERE orderId = #{orderId}
+    </update>
+
+    <!-- 统计订单详情数量 -->
+    <select id="countByOrderId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM car_order_detail
+        WHERE orderId = #{orderId} AND delFlag = 0
+    </select>
+
+    <!-- 统计产品在订单中的总数量 -->
+    <select id="sumProductAmountByProductId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COALESCE(SUM(productAmount), 0)
+        FROM car_order_detail
+        WHERE productId = #{productId} AND delFlag = 0
+    </select>
+
+</mapper>
