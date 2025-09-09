@@ -227,39 +227,109 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h5 class="card-title mb-0">
-                                        <i class="bi bi-person me-2"></i>收件人信息
+                                        <i class="bi bi-truck me-2"></i>配送方式
                                     </h5>
                                 </div>
                                 <div class="card-body">
-                                    <form @submit.prevent="submitPayment">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="receiverName" class="form-label">收件人姓名 <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="receiverName" 
-                                                       placeholder="请输入收件人姓名" 
-                                                       v-model="formData.receiverName" required>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="receiverMobile" class="form-label">收件人手机号 <span class="text-danger">*</span></label>
-                                                <input type="tel" class="form-control" id="receiverMobile" 
-                                                       placeholder="请输入收件人手机号" 
-                                                       v-model="formData.receiverMobile" required>
-                                            </div>
+                                    <!-- Tab导航 -->
+                                    <ul class="nav nav-tabs mb-4" id="deliveryTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="home-delivery-tab" data-bs-toggle="tab" 
+                                                    data-bs-target="#home-delivery" type="button" role="tab" 
+                                                    aria-controls="home-delivery" aria-selected="true"
+                                                    @click="switchDeliveryType(1)">
+                                                <i class="bi bi-house me-2"></i>宅配到府
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="store-pickup-tab" data-bs-toggle="tab" 
+                                                    data-bs-target="#store-pickup" type="button" role="tab" 
+                                                    aria-controls="store-pickup" aria-selected="false"
+                                                    @click="switchDeliveryType(2)">
+                                                <i class="bi bi-shop me-2"></i>超商取货
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    
+                                    <!-- Tab内容 -->
+                                    <div class="tab-content" id="deliveryTabContent">
+                                        <!-- 宅配到府 -->
+                                        <div class="tab-pane fade show active" id="home-delivery" role="tabpanel" 
+                                             aria-labelledby="home-delivery-tab">
+                                            <form @submit.prevent="submitPayment">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="receiverName" class="form-label">收件人姓名 <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" id="receiverName" 
+                                                               placeholder="请输入收件人姓名" 
+                                                               v-model="formData.receiverName" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="receiverMobile" class="form-label">收件人手机号 <span class="text-danger">*</span></label>
+                                                        <input type="tel" class="form-control" id="receiverMobile" 
+                                                               placeholder="请输入收件人手机号" 
+                                                               v-model="formData.receiverMobile" required>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="receiverAddress" class="form-label">收件人地址 <span class="text-danger">*</span></label>
+                                                    <textarea class="form-control" id="receiverAddress" 
+                                                              rows="3" placeholder="请输入详细的收件人地址" 
+                                                              v-model="formData.receiverAddress" required></textarea>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="description" class="form-label">订单描述</label>
+                                                    <textarea class="form-control" id="description" 
+                                                              rows="2" placeholder="请输入订单描述（可选）"
+                                                              v-model="formData.description"></textarea>
+                                                </div>
+                                            </form>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="receiverAddress" class="form-label">收件人地址 <span class="text-danger">*</span></label>
-                                            <textarea class="form-control" id="receiverAddress" 
-                                                      rows="3" placeholder="请输入详细的收件人地址" 
-                                                      v-model="formData.receiverAddress" required></textarea>
+                                        
+                                        <!-- 超商取货 -->
+                                        <div class="tab-pane fade" id="store-pickup" role="tabpanel" 
+                                             aria-labelledby="store-pickup-tab">
+                                            <form @submit.prevent="submitPayment">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="pickupName" class="form-label">取货人姓名 <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" id="pickupName" 
+                                                               placeholder="请输入取货人姓名" 
+                                                               v-model="formData.receiverName" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="pickupMobile" class="form-label">取货人手机号 <span class="text-danger">*</span></label>
+                                                        <input type="tel" class="form-control" id="pickupMobile" 
+                                                               placeholder="请输入取货人手机号" 
+                                                               v-model="formData.receiverMobile" required>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="storeSelect" class="form-label">选择取货门店 <span class="text-danger">*</span></label>
+                                                    <select class="form-control" id="storeSelect" v-model="formData.selectedStore" required>
+                                                        <option value="">请选择取货门店</option>
+                                                        <option v-for="store in storeList" :key="store.storeId" :value="store">
+                                                            {{ store.storeName }} - {{ store.storeAddress }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="description" class="form-label">订单描述</label>
+                                                    <textarea class="form-control" id="description" 
+                                                              rows="2" placeholder="请输入订单描述（可选）"
+                                                              v-model="formData.description"></textarea>
+                                                </div>
+                                                
+                                                <!-- 门店信息显示 -->
+                                                <div v-if="formData.selectedStore" class="alert alert-info">
+                                                    <h6><i class="bi bi-info-circle me-2"></i>门店信息</h6>
+                                                    <p class="mb-1"><strong>门店名称：</strong>{{ formData.selectedStore.storeName }}</p>
+                                                    <p class="mb-1"><strong>门店地址：</strong>{{ formData.selectedStore.storeAddress }}</p>
+                                                    <p class="mb-0"><strong>联系电话：</strong>{{ formData.selectedStore.storeTelephone }}</p>
+                                                </div>
+                                            </form>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="description" class="form-label">订单描述</label>
-                                            <textarea class="form-control" id="description" 
-                                                      rows="2" placeholder="请输入订单描述（可选）"
-                                                      v-model="formData.description"></textarea>
-                    </div>
-                    
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -292,9 +362,21 @@
                                             <span class="info-value" v-text="formData.receiverMobile || '-'"></span>
                     </div>
                                         <div class="info-row">
+                                            <span class="info-label">配送方式：</span>
+                                            <span class="info-value" v-text="formData.orderType === 1 ? '宅配到府' : '超商取货'"></span>
+                                        </div>
+                                        <div class="info-row" v-if="formData.orderType === 1">
                                             <span class="info-label">收货地址：</span>
                                             <span class="info-value" v-text="formData.receiverAddress || '-'"></span>
-                    </div>
+                                        </div>
+                                        <div class="info-row" v-if="formData.orderType === 2 && formData.selectedStore">
+                                            <span class="info-label">取货门店：</span>
+                                            <span class="info-value" v-text="formData.selectedStore.storeName"></span>
+                                        </div>
+                                        <div class="info-row" v-if="formData.orderType === 2 && formData.selectedStore">
+                                            <span class="info-label">门店地址：</span>
+                                            <span class="info-value" v-text="formData.selectedStore.storeAddress"></span>
+                                        </div>
                     </div>
                     
                     <!-- 购物车商品列表 -->
@@ -361,9 +443,12 @@
                     description: '${description!''}',
                     receiverName: '',
                     receiverMobile: '',
-                    receiverAddress: ''
+                    receiverAddress: '',
+                    orderType: 1, // 1: 宅配到府, 2: 超商取货
+                    selectedStore: null
                 },
                 cartItems: [],
+                storeList: [], // 超商门店列表
                 isLoading: false,
                 errorMessage: '',
                 successMessage: '',
@@ -373,6 +458,7 @@
                 console.log('Vue实例已挂载');
                 this.initCartItems();
                 this.loadPaymentConfig();
+                this.loadStoreList();
             },
             methods: {
                 // 加载支付配置
@@ -417,15 +503,32 @@
                     this.clearMessages();
                     
                     // 创建支付订单
-                    axios.post('/api/payment/create', {
+                    const paymentData = {
                         amount: this.formData.amount,
                         itemName: this.formData.itemName,
                         description: this.formData.description || '购买商品：' + this.formData.itemName,
                         receiverName: this.formData.receiverName,
                         receiverMobile: this.formData.receiverMobile,
-                        receiverAddress: this.formData.receiverAddress,
+                        orderType: this.formData.orderType,
                         cartData: this.cartItems
-                    })
+                    };
+                    
+                    // 根据配送方式添加相应字段
+                    if (this.formData.orderType === 1) {
+                        // 宅配到府
+                        paymentData.receiverAddress = this.formData.receiverAddress;
+                    } else {
+                        // 超商取货
+                        if (this.formData.selectedStore) {
+                            paymentData.cvsStoreID = this.formData.selectedStore.storeId;
+                            paymentData.cvsStoreName = this.formData.selectedStore.storeName;
+                            paymentData.cvsAddress = this.formData.selectedStore.storeAddress;
+                            paymentData.cvsTelephone = this.formData.selectedStore.storeTelephone;
+                            paymentData.cvsOutSide = this.formData.selectedStore.outSide || 0;
+                        }
+                    }
+                    
+                    axios.post('/api/payment/create', paymentData)
                     .then(response => {
                         if (response.data.code === 1) {
                             // 支付订单创建成功，跳转到绿界支付页面
@@ -465,9 +568,19 @@
                         return false;
                     }
                     
-                    if (!this.formData.receiverAddress || this.formData.receiverAddress.trim() === '') {
-                        this.showError('收件人地址不能為空');
-                        return false;
+                    // 根据配送方式验证相应字段
+                    if (this.formData.orderType === 1) {
+                        // 宅配到府，验证地址
+                        if (!this.formData.receiverAddress || this.formData.receiverAddress.trim() === '') {
+                            this.showError('收件人地址不能為空');
+                            return false;
+                        }
+                    } else {
+                        // 超商取货，验证门店选择
+                        if (!this.formData.selectedStore) {
+                            this.showError('请选择取货门店');
+                            return false;
+                        }
                     }
                     
                     return true;
@@ -513,6 +626,37 @@
                 clearMessages() {
                     this.errorMessage = '';
                     this.successMessage = '';
+                },
+                
+                // 切换配送方式
+                switchDeliveryType(orderType) {
+                    this.formData.orderType = orderType;
+                    // 清空相关字段
+                    if (orderType === 1) {
+                        // 宅配到府，清空门店选择
+                        this.formData.selectedStore = null;
+                    } else {
+                        // 超商取货，清空地址
+                        this.formData.receiverAddress = '';
+                    }
+                },
+                
+                // 加载超商门店列表
+                loadStoreList() {
+                    axios.get('/api/logistics/stores')
+                        .then(response => {
+                            if (response.data.code === 1) {
+                                this.storeList = response.data.data || [];
+                                console.log('门店列表加载成功:', this.storeList);
+                            } else {
+                                console.error('获取门店列表失败:', response.data.msg);
+                                this.showError('获取门店列表失败');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('获取门店列表异常:', error);
+                            this.showError('获取门店列表异常');
+                        });
                 }
             }
         });

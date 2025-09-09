@@ -36,6 +36,12 @@ public class CarPaymentOrderEntity {
     private Long userId;
     
     /**
+     * 关联订单ID
+     */
+    @Column(name = "order_id", columnDefinition = "BIGINT(20) COMMENT '关联订单ID'")
+    private Long orderId;
+    
+    /**
      * 订单金额
      */
     @Column(name = "total_amount", nullable = false, columnDefinition = "INT(11) COMMENT '订单金额'")
@@ -88,6 +94,12 @@ public class CarPaymentOrderEntity {
      */
     @Column(name = "error_message", columnDefinition = "TEXT COMMENT '错误信息'")
     private String errorMessage;
+    
+    /**
+     * 支付消息
+     */
+    @Column(name = "payment_message", columnDefinition = "VARCHAR(500) COMMENT '支付消息'")
+    private String paymentMessage;
     
     /**
      * 创建时间

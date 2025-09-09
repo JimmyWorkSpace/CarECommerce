@@ -52,6 +52,7 @@ public class CarOrderInfoService {
             orderInfo.setCreateTime(new Date());
             orderInfo.setShowOrder(0);
             orderInfo.setOrderStatus(CarOrderInfoEntity.OrderStatus.UNPAID.getCode());
+            orderInfo.setOrderType(1); // 默认宅配到府
             orderInfo.setReceiverName(receiverName);
             orderInfo.setReceiverMobile(receiverMobile);
             orderInfo.setReceiverAddress(receiverAddress);
@@ -75,6 +76,26 @@ public class CarOrderInfoService {
         } catch (Exception e) {
             log.error("创建订单失败，用户ID：{}", userId, e);
             throw new RuntimeException("创建订单失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 更新订单信息
+     */
+    @Transactional
+    public boolean updateOrder(CarOrderInfoEntity orderInfo) {
+        try {
+            int result = carOrderInfoMapper.updateByPrimaryKeySelective(orderInfo);
+            if (result > 0) {
+                log.info("更新订单信息成功，订单ID：{}", orderInfo.getId());
+                return true;
+            } else {
+                log.error("更新订单信息失败，订单ID：{}", orderInfo.getId());
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("更新订单信息异常，订单ID：{}", orderInfo.getId(), e);
+            throw new RuntimeException("更新订单信息失败：" + e.getMessage());
         }
     }
 

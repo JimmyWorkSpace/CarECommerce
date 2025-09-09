@@ -426,7 +426,7 @@
                 // 取消订单
                 cancelOrder(orderId) {
                     if (confirm('确定要取消这个订单吗？取消后商品将放回购物车。')) {
-                        axios.post('/my-order/cancel', { orderId: orderId })
+                        axios.post('/my-order/cancel/' + orderId)
                             .then(response => {
                                 if (response.data.code === 1) {
                                     this.showSuccess(response.data.msg || '订单取消成功');

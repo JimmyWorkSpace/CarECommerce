@@ -2,11 +2,13 @@ package cc.carce.sale.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -363,6 +365,23 @@ public class ECPayService {
                 return R.fail("創建訂單失敗", null);
             }
             
+            // 设置订单类型和超商信息
+            if (form.getOrderType() != null) {
+                orderInfo.setOrderType(form.getOrderType());
+            }
+            
+            // 如果是超商取货，设置超商信息
+            if (form.getOrderType() != null && form.getOrderType() == 2) {
+                orderInfo.setCvsStoreID(form.getCvsStoreID());
+                orderInfo.setCvsStoreName(form.getCvsStoreName());
+                orderInfo.setCvsAddress(form.getCvsAddress());
+                orderInfo.setCvsTelephone(form.getCvsTelephone());
+                orderInfo.setCvsOutSide(form.getCvsOutSide());
+            }
+            
+            // 更新订单信息到数据库
+            carOrderInfoService.updateOrder(orderInfo);
+            
             // 删除购物车中已下单的商品
             if (form.getCartData() != null && !form.getCartData().isEmpty()) {
                 for (CartItem cartItem : form.getCartData()) {
@@ -410,6 +429,143 @@ public class ECPayService {
         } catch (Exception e) {
             log.error("创建支付订单异常", e);
             return R.fail("創建支付訂單異常: " + e.getMessage(), null);
+        }
+    }
+    
+    /**
+     * 验证付款结果通知的检查码
+     * 
+     * @param request HTTP请求对象
+     * @return 验证是否通过
+     */
+    public boolean verifyPaymentResult(HttpServletRequest request) {
+        try {
+            // 获取检查码
+            String checkMacValue = request.getParameter("CheckMacValue");
+            if (checkMacValue == null || checkMacValue.trim().isEmpty()) {
+                log.error("付款结果通知缺少检查码");
+                return false;
+            }
+            
+            // 构建验证参数
+            Map<String, String> params = new HashMap<>();
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            
+            for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+                String key = entry.getKey();
+                String[] values = entry.getValue();
+                if (values != null && values.length > 0 && !"CheckMacValue".equals(key)) {
+                    params.put(key, values[0]);
+                }
+            }
+            
+            // 使用ECPayUtils验证检查码
+            String calculatedCheckMac = ecPayUtils.generateSignature(params);
+            
+            boolean isValid = checkMacValue.equals(calculatedCheckMac);
+            if (!isValid) {
+                log.error("付款结果通知检查码验证失败 - 接收到的: {}, 计算出的: {}", checkMacValue, calculatedCheckMac);
+            } else {
+                log.info("付款结果通知检查码验证成功");
+            }
+            
+            return isValid;
+            
+        } catch (Exception e) {
+            log.error("验证付款结果通知检查码时发生异常", e);
+            return false;
+        }
+    }
+    
+    /**
+     * 处理付款结果通知
+     * 
+     * @param merchantId 特店编号
+     * @param merchantTradeNo 特店交易编号
+     * @param rtnCode 交易状态
+     * @param rtnMsg 交易消息
+     * @param tradeNo 绿界交易编号
+     * @param tradeAmt 交易金额
+     * @param paymentDate 付款时间
+     * @param paymentType 付款方式
+     * @param checkMacValue 检查码
+     * @return 处理是否成功
+     */
+    @Transactional
+    public boolean processPaymentResult(String merchantId, String merchantTradeNo, String rtnCode, 
+                                      String rtnMsg, String tradeNo, String tradeAmt, 
+                                      String paymentDate, String paymentType, String checkMacValue) {
+        try {
+            log.info("开始处理付款结果 - 特店交易编号: {}, 交易状态: {}", merchantTradeNo, rtnCode);
+            
+            // 查找支付订单
+            CarPaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
+            if (paymentOrder == null) {
+                log.error("未找到对应的支付订单 - 特店交易编号: {}", merchantTradeNo);
+                return false;
+            }
+            
+            // 检查订单状态，避免重复处理
+            if (paymentOrder.getPaymentStatus() != null && paymentOrder.getPaymentStatus() == 1) {
+                log.warn("订单已处理过付款结果 - 特店交易编号: {}", merchantTradeNo);
+                return true;
+            }
+            
+            // 根据交易状态更新订单
+            if ("1".equals(rtnCode)) {
+                // 付款成功
+                paymentOrder.setPaymentStatus(1); // 1表示已支付
+                paymentOrder.setPaymentTime(new Date());
+                paymentOrder.setEcpayTradeNo(tradeNo);
+                paymentOrder.setPaymentType(paymentType);
+                paymentOrder.setPaymentMessage(rtnMsg);
+                
+                // 更新支付订单
+                paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
+                
+                // 更新关联的订单状态
+                if (paymentOrder.getOrderId() != null) {
+                    CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderById(paymentOrder.getOrderId());
+                    if (orderInfo != null) {
+                        carOrderInfoService.updateOrderStatus(orderInfo.getId(), 2); // 2表示已支付
+                        
+                        log.info("订单状态已更新为已支付 - 订单ID: {}, 特店交易编号: {}", 
+                                orderInfo.getId(), merchantTradeNo);
+                    }
+                }
+                
+                log.info("付款成功处理完成 - 特店交易编号: {}, 绿界交易编号: {}, 交易金额: {}", 
+                        merchantTradeNo, tradeNo, tradeAmt);
+                
+            } else {
+                // 付款失败
+                paymentOrder.setPaymentStatus(2); // 2表示支付失败
+                paymentOrder.setPaymentMessage(rtnMsg);
+                paymentOrder.setEcpayTradeNo(tradeNo);
+                
+                // 更新支付订单
+                paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
+                
+                // 更新关联的订单状态
+                if (paymentOrder.getOrderId() != null) {
+                    CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderById(paymentOrder.getOrderId());
+                    if (orderInfo != null) {
+                        carOrderInfoService.updateOrderStatus(orderInfo.getId(), 4); // 4表示支付失败
+                        
+                        log.info("订单状态已更新为支付失败 - 订单ID: {}, 特店交易编号: {}", 
+                                orderInfo.getId(), merchantTradeNo);
+                    }
+                }
+                
+                log.warn("付款失败处理完成 - 特店交易编号: {}, 交易状态: {}, 失败原因: {}", 
+                        merchantTradeNo, rtnCode, rtnMsg);
+            }
+            
+            return true;
+            
+        } catch (Exception e) {
+            log.error("处理付款结果时发生异常 - 特店交易编号: {}", merchantTradeNo, e);
+            return false;
         }
     }
 }
