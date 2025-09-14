@@ -1,12 +1,12 @@
-<link href="/css/appointment.css" rel="stylesheet">
+<link href="/css/my-pages.css" rel="stylesheet">
 
-<div class="appointment-page" id="appointmentApp">
-    <div class="page-header">
-        <h2 class="page-title">
-            <i class="bi bi-calendar-check me-2"></i>我的預約
-        </h2>
-        <p class="page-subtitle">查看和管理您的車輛預約記錄</p>
-    </div>
+<div class="my-page" id="appointmentApp">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="page-title text-center">
+                    <i class="bi bi-calendar-check me-3"></i>我的預約
+                </h2>
 
     <!-- 加载状态 -->
     <div <#noparse>v-if="loading"</#noparse> class="loading-container">
@@ -16,86 +16,70 @@
         <p class="mt-3 text-muted">正在加載預約數據...</p>
     </div>
 
-    <!-- 无数据状态 -->
-    <div <#noparse>v-else-if="appointments.length === 0"</#noparse> class="no-data-container">
-        <div class="no-data-icon">
-            <i class="bi bi-calendar-x"></i>
-        </div>
-        <h3>暫無預約記錄</h3>
-        <p>您還沒有預約過任何車輛，快去挑選心儀的車輛吧！</p>
-        <a href="/buy-cars" class="btn btn-primary">
-            <i class="bi bi-search me-2"></i>去買車
-        </a>
-    </div>
-
-    <!-- 预约列表 -->
-    <div <#noparse>v-else</#noparse> class="appointments-container">
-        <div class="appointment-card" <#noparse>v-for="appointment in appointments" :key="appointment.id"</#noparse>>
-            <div class="appointment-header">
-                <div class="appointment-info">
-                    <h5 class="appointment-title"><#noparse>{{ appointment.carTitle }}</#noparse></h5>
-                    <div class="appointment-meta">
-                        <span class="appointment-date">
-                            <i class="bi bi-calendar me-1"></i>
-                            <#noparse>{{ formatDate(appointment.appointmentTime) }}</#noparse>
-                        </span>
-                        <span class="appointment-phone">
-                            <i class="bi bi-telephone me-1"></i>
-                            <#noparse>{{ appointment.appointmentPhone }}</#noparse>
-                        </span>
-                    </div>
+                <!-- 无数据状态 -->
+                <div <#noparse>v-else-if="appointments.length === 0"</#noparse> class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <h4>暫無預約記錄</h4>
+                    <p>您還沒有預約過任何車輛，快去挑選心儀的車輛吧！</p>
+                    <a href="/buy-cars" class="btn btn-primary">
+                        <i class="bi bi-search me-2"></i>去買車
+                    </a>
                 </div>
-                <div class="appointment-status">
-                    <span class="status-badge" <#noparse>:class="getStatusClass(appointment.appointmentStatus)"</#noparse>>
-                        <#noparse>{{ appointment.appointmentStatusDesc }}</#noparse>
-                    </span>
-                </div>
-            </div>
 
-            <div class="appointment-body">
-                <div class="car-info">
-                    <div class="car-image">
-                        <img <#noparse>:src="appointment.carCoverImage || '/img/car/car6.jpg'" 
-                             :alt="appointment.carTitle" 
-                             @error="handleImageError"</#noparse>>
-                    </div>
-                    <div class="car-details">
-                        <div class="car-specs">
-                            <span class="car-brand"><#noparse>{{ appointment.carBrand }}</#noparse></span>
-                            <span class="car-model"><#noparse>{{ appointment.carModel }}</#noparse></span>
+                <!-- 预约列表 -->
+                <div <#noparse>v-else</#noparse>>
+                    <div class="card item-card" <#noparse>v-for="appointment in appointments" :key="appointment.id"</#noparse>>
+
+                        <div class="card-body">
+                            <!-- 车辆信息行 -->
+                            <div class="car-info-row mb-3">
+                                <div class="car-image">
+                                    <img <#noparse>:src="appointment.carCoverImage || '/img/car/car6.jpg'" 
+                                         :alt="appointment.carTitle" 
+                                         @error="handleImageError"</#noparse>>
+                                </div>
+                                <div class="car-details">
+                                    <div class="car-title">
+                                        <#noparse>{{ appointment.carTitle }}</#noparse>
+                                    </div>
+                                    <div class="car-specs">
+                                        <span class="car-brand"><#noparse>{{ appointment.carBrand }}</#noparse></span>
+                                        <span class="car-model"><#noparse>{{ appointment.carModel }}</#noparse></span>
+                                    </div>
+                                    <div class="car-price">
+                                        $<#noparse>{{ formatPrice(appointment.carPrice) }}</#noparse>
+                                    </div>
+                                </div>
+                                <div class="status-actions-section">
+                                    <div class="status-badge" <#noparse>:class="getStatusClass(appointment.appointmentStatus)"</#noparse>>
+                                        <#noparse>{{ appointment.appointmentStatusDesc }}</#noparse>
+                                    </div>
+                                    <div class="appointment-actions" <#noparse>v-if="appointment.appointmentStatus === 1"</#noparse>>
+                                        <button class="btn btn-outline-danger btn-sm" <#noparse>@click="cancelAppointment(appointment.id)"</#noparse>>
+                                            <i class="bi bi-x-circle me-1"></i>取消預約
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="item-info">
+                                <div class="info-row">
+                                    <span class="info-label">預約時間：</span>
+                                    <span class="info-value"><#noparse>{{ formatDate(appointment.appointmentTime) }}</#noparse></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">聯繫電話：</span>
+                                    <span class="info-value"><#noparse>{{ appointment.appointmentPhone }}</#noparse></span>
+                                </div>
+                            </div>
+
+
+                            <div class="item-note" <#noparse>v-if="appointment.appointmentNote"</#noparse>>
+                                <strong>備註：</strong><#noparse>{{ appointment.appointmentNote }}</#noparse>
+                            </div>
                         </div>
-                        <div class="car-price">
-                            $<#noparse>{{ formatPrice(appointment.carPrice) }}</#noparse>
-                        </div>
+
                     </div>
-                </div>
-
-                <div class="appointment-actions" <#noparse>v-if="appointment.appointmentStatus === 1"</#noparse>>
-                    <button class="btn btn-outline-primary btn-sm" <#noparse>@click="confirmViewing(appointment.id)"</#noparse>>
-                        <i class="bi bi-check-circle me-1"></i>確認看車
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm" <#noparse>@click="cancelAppointment(appointment.id)"</#noparse>>
-                        <i class="bi bi-x-circle me-1"></i>取消預約
-                    </button>
-                </div>
-
-                <div class="appointment-note" <#noparse>v-if="appointment.appointmentNote"</#noparse>>
-                    <strong>備註：</strong><#noparse>{{ appointment.appointmentNote }}</#noparse>
-                </div>
-            </div>
-
-            <div class="appointment-footer">
-                <div class="appointment-time">
-                    <small class="text-muted">
-                        <i class="bi bi-clock me-1"></i>
-                        預約時間：<#noparse>{{ formatDateTime(appointment.appointmentTime) }}</#noparse>
-                    </small>
-                </div>
-                <div class="appointment-created">
-                    <small class="text-muted">
-                        <i class="bi bi-calendar-plus me-1"></i>
-                        創建時間：<#noparse>{{ formatDateTime(appointment.createTime) }}</#noparse>
-                    </small>
                 </div>
             </div>
         </div>
@@ -143,28 +127,6 @@ new Vue({
             }
         },
 
-        async confirmViewing(appointmentId) {
-            if (!confirm('確認您已經看過這輛車了嗎？')) {
-                return;
-            }
-
-            try {
-                <#noparse>const response = await axios.post(`/appointment/api/confirm/${appointmentId}`);</#noparse>
-                
-                if (response.data.success) {
-                    alert('確認成功！');
-                    this.loadAppointments(); // 重新加载列表
-                } else {
-                    alert('確認失败：' + response.data.message);
-                }
-            } catch (error) {
-                console.error('確認看車失败:', error);
-                const errorMessage = window.handleApiError ? 
-                    window.handleApiError(error, '確認看車失败') : 
-                    '確認看車失败，请稍后重试';
-                alert(errorMessage);
-            }
-        },
 
         async cancelAppointment(appointmentId) {
             if (!confirm('確定要取消這個預約嗎？')) {

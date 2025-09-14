@@ -32,12 +32,16 @@ import cc.carce.sale.dto.CarEquipmentDto;
 import cc.carce.sale.dto.CarGuaranteeDto;
 import cc.carce.sale.dto.CarReportDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
+import cc.carce.sale.entity.CarRichContentEntity;
+import cc.carce.sale.entity.CarQuestionAnswerEntity;
 import cc.carce.sale.form.PaymentRequestForm;
 import cc.carce.sale.form.CarReportForm;
 import cc.carce.sale.entity.CarAdvertisementEntity;
 import cc.carce.sale.service.CarBannerService;
 import cc.carce.sale.service.CarDealerService;
 import cc.carce.sale.service.CarReportService;
+import cc.carce.sale.service.CarRichContentService;
+import cc.carce.sale.service.CarQuestionAnswerService;
 import cc.carce.sale.service.CarSalesService;
 import cc.carce.sale.service.CarService;
 import cc.carce.sale.service.ECPayService;
@@ -71,6 +75,12 @@ public class CarViewController extends BaseController {
 	
 	@Resource
 	private CarReportService carReportService;
+	
+	@Resource
+	private CarRichContentService carRichContentService;
+	
+	@Resource
+	private CarQuestionAnswerService carQuestionAnswerService;
 	
 	@Resource
 	private CarBannerService carBannerService;
@@ -247,8 +257,12 @@ public class CarViewController extends BaseController {
     public String aboutPage(Model model, HttpServletRequest req) {
         try {
             // 检查用户登录状态
-            Object user = req.getSession().getAttribute("user");
-            model.addAttribute("user", user);
+            
+            // 从数据库获取关于页面的富文本内容
+            CarRichContentEntity aboutContent = carRichContentService.getFirstAboutContent();
+            if (aboutContent != null && aboutContent.getContent() != null) {
+                model.addAttribute("htmlContent", aboutContent.getContent());
+            }
             
             model.addAttribute("title", "關於我們 - 二手車銷售平台");
             model.addAttribute("description", "了解我們的服務理念和團隊");
@@ -719,5 +733,36 @@ public class CarViewController extends BaseController {
 			log.error("撤銷檢舉失敗", e);
 			return R.failMsg("系統錯誤，請稍後再試");
 		}
+	}
+
+	/**
+	 * 頻道頁面
+	 */
+	@GetMapping("/channel")
+	public String channel(Model model) {
+		try {
+			// 从数据库获取所有频道内容
+			List<CarRichContentEntity> channelContentList = carRichContentService.getChannelContent();
+			model.addAttribute("channelContentList", channelContentList);
+			
+			// 获取每个频道的问答数据
+			Map<String, List<CarQuestionAnswerEntity>> channelQAMap = new HashMap<>();
+			if (channelContentList != null) {
+				for (CarRichContentEntity channel : channelContentList) {
+					List<CarQuestionAnswerEntity> qaList = carQuestionAnswerService.getQuestionAnswersByChannelIdOrderByShowOrder(channel.getId());
+					if (qaList != null && !qaList.isEmpty()) {
+						channelQAMap.put(channel.getId().toString(), qaList);
+					}
+				}
+			}
+			model.addAttribute("channelQAMap", channelQAMap);
+			
+			model.addAttribute("title", "頻道");
+			model.addAttribute("content", "/channel/index.ftl");
+		} catch (Exception e) {
+			log.error("获取频道页面失败", e);
+			model.addAttribute("error", "获取数据失败");
+		}
+		return "layout/main";
 	}
 } 

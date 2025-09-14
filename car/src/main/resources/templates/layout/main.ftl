@@ -266,6 +266,9 @@
                             <a class="nav-link" href="/mall">商城</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="/channel">頻道</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="/about">關於</a>
                         </li>
                         <#if user?? && user?has_content>
