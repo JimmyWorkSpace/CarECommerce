@@ -5,7 +5,6 @@
                 <h2 class="cart-title">
                     <i class="bi bi-cart3 me-3"></i>
                     購物車
-                    <button class="btn btn-sm btn-outline-info ms-3" @click="testAPI">测试API</button>
                 </h2>
                 
                 <!-- 加载状态 -->
@@ -59,17 +58,17 @@
                                 </div>
                             </div>
                             <div class="col-md-2">
-                                <img :src="item.productImage" :alt="item.productName" class="cart-item-image">
+                                <img :src="getProductImage(item)" :alt="item.productName" class="cart-item-image">
                             </div>
                             <div class="col-md-3">
                                 <h5 class="cart-item-name">{{ item.productName }}</h5>
                                 <p class="cart-item-details">
-                                    <span class="badge bg-secondary me-2">{{ item.brandName }} {{ item.modelName }}</span>
-                                    <span class="badge bg-info me-2">{{ item.manufactureYear }}年</span>
-                                    <span class="badge bg-warning me-2">{{ item.color }}</span>
-                                    <span class="badge bg-success me-2">{{ item.mileage }}km</span>
+                                    <span class="badge bg-secondary me-2">{{ item.brand }} {{ item.model }}</span>
+                                    <span class="badge bg-info me-2">{{ item.tag }}</span>
+                                    <span class="badge bg-warning me-2">{{ item.source }}</span>
+                                    <span class="badge bg-success me-2">市价: ¥{{ formatPrice(item.marketPrice) }}</span>
                                 </p>
-                                <p class="cart-item-price">¥{{ formatPrice(item.productPrice) }}</p>
+                                <p class="cart-item-price">售价: ¥{{ formatPrice(item.productPrice) }}</p>
                             </div>
                             <div class="col-md-3">
                                 <div class="quantity-controls">
@@ -670,29 +669,6 @@ new Vue({
             });
         },
         
-        // 测试API调用
-        async testAPI() {
-            console.log('开始测试API...');
-            try {
-                // 测试购物车列表API
-                const listResponse = await axios.get('/api/shopping-cart/list');
-                console.log('购物车列表API响应:', listResponse.data);
-                
-                // 如果有商品，测试更新数量API
-                if (listResponse.data.success && listResponse.data.data && listResponse.data.data.length > 0) {
-                    const firstItem = listResponse.data.data[0];
-                    console.log('测试商品:', firstItem);
-                    
-                    const updateResponse = await axios.put('/api/shopping-cart/update/' + firstItem.id, {
-                        quantity: firstItem.productAmount + 1
-                    });
-                    console.log('更新数量API响应:', updateResponse.data);
-                }
-            } catch (error) {
-                console.error('API测试失败:', error);
-                console.error('错误详情:', error.response?.data || error.message);
-            }
-        },
         
         // 跳转到登录页面
         redirectToLogin() {
@@ -709,6 +685,12 @@ new Vue({
             if (window.cartManager && window.cartManager.updateCartCount) {
                 window.cartManager.updateCartCount();
             }
+        },
+        
+        // 获取商品图片
+        getProductImage(item) {
+            // 直接使用DTO中的商品图片路径
+            return item.productImage || '/img/product/default_90x90.jpg';
         }
     }
 });

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.CarShoppingCartDto;
 import cc.carce.sale.entity.CarShoppingCartEntity;
 import cc.carce.sale.service.CarShoppingCartService;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/shopping-cart")
 @Slf4j
-public class CarShoppingCartController {
+public class CarShoppingCartController extends BaseController{
 
 	@Resource
 	private CarShoppingCartService carShoppingCartService;
@@ -39,10 +40,9 @@ public class CarShoppingCartController {
 		
 		try {
 			// 从session获取用户ID
-			HttpSession session = request.getSession();
-			Object user = session.getAttribute("user");
+			UserInfo sessionUser = getSessionUser();
 			
-			if (user == null) {
+			if (sessionUser == null) {
 				result.put("success", false);
 				result.put("message", "用户未登录");
 				return result;
@@ -50,7 +50,7 @@ public class CarShoppingCartController {
 			
 			// 这里需要根据实际的用户对象结构获取用户ID
 			// 假设用户对象有getId()方法
-			Long userId = getUserIdFromUser(user);
+			Long userId = sessionUser.getId();
 			if (userId == null) {
 				result.put("success", false);
 				result.put("message", "无法获取用户ID");

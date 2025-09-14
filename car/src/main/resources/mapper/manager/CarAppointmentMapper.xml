@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.carce.sale.mapper.manager.CarAppointmentMapper">
+    
+    <!-- 根据用户ID查询预约列表 -->
+    <select id="selectAppointmentsByUserId" resultType="cc.carce.sale.dto.CarAppointmentDto">
+        SELECT 
+            ca.id,
+            ca.carSaleId,
+            ca.userId,
+            ca.appointmentName,
+            ca.appointmentPhone,
+            ca.appointmentTime,
+            ca.appointmentNote,
+            ca.appointmentStatus,
+            CASE ca.appointmentStatus
+                WHEN 1 THEN '已预约'
+                WHEN 2 THEN '已看车'
+                WHEN 3 THEN '已取消'
+                ELSE '未知状态'
+            END as appointmentStatusDesc,
+            ca.createTime,
+            ca.updateTime
+        FROM car_appointment ca
+        WHERE ca.userId = #{userId}
+        AND ca.delFlag = 0
+        ORDER BY ca.createTime DESC
+    </select>
+    
+    <!-- 根据ID查询预约详情 -->
+    <select id="selectAppointmentById" resultType="cc.carce.sale.dto.CarAppointmentDto">
+        SELECT 
+            ca.id,
+            ca.carSaleId,
+            ca.userId,
+            ca.appointmentName,
+            ca.appointmentPhone,
+            ca.appointmentTime,
+            ca.appointmentNote,
+            ca.appointmentStatus,
+            CASE ca.appointmentStatus
+                WHEN 1 THEN '已预约'
+                WHEN 2 THEN '已看车'
+                WHEN 3 THEN '已取消'
+                ELSE '未知状态'
+            END as appointmentStatusDesc,
+            ca.createTime,
+            ca.updateTime
+        FROM car_appointment ca
+        WHERE ca.id = #{id}
+        AND ca.delFlag = 0
+    </select>
+    
+    <!-- 更新预约状态 -->
+    <update id="updateAppointmentStatus">
+        UPDATE car_appointment 
+        SET appointmentStatus = #{status},
+            updateTime = NOW()
+        WHERE id = #{id}
+        AND delFlag = 0
+    </update>
+    
+</mapper>

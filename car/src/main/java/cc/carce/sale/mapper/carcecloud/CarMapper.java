@@ -26,4 +26,13 @@ public interface CarMapper extends Mapper<CarEntity> {
 	
 	// 车辆列表查询
 	List<CarListDto> selectCarListWithCover(CarSalesSearchForm form);
+	
+	// 查询变速系统选项
+	List<String> selectDistinctTransmissions();
+	
+	// 查询驱动方式选项
+	List<String> selectDistinctDrivetrains();
+	
+	// 查询燃料系统选项
+	List<String> selectDistinctFuelSystems();
 }

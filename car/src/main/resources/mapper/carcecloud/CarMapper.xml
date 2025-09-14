@@ -148,8 +148,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN car_sale_photos csp ON csp.car_sales_id = cs.id AND csp.is_cover = 1
         WHERE
         cs.is_visible = 1
-        <if test="brand != null and brand != ''">
-            AND cb.brand = #{brand}
+        AND cs.status = '上架'
+        <if test="brand != null and brand.size() > 0">
+            AND cb.brand IN
+            <foreach collection="brand" item="brandName" open="(" separator="," close=")">
+                #{brandName}
+            </foreach>
         </if>
         <if test="model != null and model != ''">
             AND (cm.model = #{model} OR c.custom_model = #{model})
@@ -163,14 +167,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="priceMax != null">
             AND cs.sale_price &lt;= #{priceMax}
         </if>
-        <if test="fuelType != null and fuelType != ''">
-            AND c.fuel_system = #{fuelType}
+        <if test="transmission != null and transmission.size() > 0">
+            AND c.transmission IN
+            <foreach collection="transmission" item="trans" open="(" separator="," close=")">
+                #{trans}
+            </foreach>
         </if>
-        <if test="transmission != null and transmission != ''">
-            AND c.transmission = #{transmission}
+        <if test="drivetrain != null and drivetrain.size() > 0">
+            AND c.drivetrain IN
+            <foreach collection="drivetrain" item="drive" open="(" separator="," close=")">
+                #{drive}
+            </foreach>
         </if>
-        <if test="mileage != null">
-            AND cs.mileage &lt;= #{mileage}
+        <if test="fuelSystem != null and fuelSystem.size() > 0">
+            AND c.fuel_system IN
+            <foreach collection="fuelSystem" item="fuel" open="(" separator="," close=")">
+                #{fuel}
+            </foreach>
         </if>
         <if test="keyword != null and keyword != ''">
             AND (cs.sale_title LIKE CONCAT('%', #{keyword}, '%') 
@@ -194,4 +207,41 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </otherwise>
         </choose>
     </select>
+    
+    <!-- 查询变速系统选项 -->
+    <select id="selectDistinctTransmissions" resultType="java.lang.String">
+        SELECT DISTINCT c.transmission 
+        FROM cars c
+        INNER JOIN car_sales cs ON c.id = cs.car_id
+        WHERE cs.is_visible = 1 
+        AND cs.status = '上架'
+        AND c.transmission IS NOT NULL 
+        AND c.transmission != ''
+        ORDER BY c.transmission ASC
+    </select>
+    
+    <!-- 查询驱动方式选项 -->
+    <select id="selectDistinctDrivetrains" resultType="java.lang.String">
+        SELECT DISTINCT c.drivetrain 
+        FROM cars c
+        INNER JOIN car_sales cs ON c.id = cs.car_id
+        WHERE cs.is_visible = 1 
+        AND cs.status = '上架'
+        AND c.drivetrain IS NOT NULL 
+        AND c.drivetrain != ''
+        ORDER BY c.drivetrain ASC
+    </select>
+    
+    <!-- 查询燃料系统选项 -->
+    <select id="selectDistinctFuelSystems" resultType="java.lang.String">
+        SELECT DISTINCT c.fuel_system 
+        FROM cars c
+        INNER JOIN car_sales cs ON c.id = cs.car_id
+        WHERE cs.is_visible = 1 
+        AND cs.status = '上架'
+        AND c.fuel_system IS NOT NULL 
+        AND c.fuel_system != ''
+        ORDER BY c.fuel_system ASC
+    </select>
+    
 </mapper>

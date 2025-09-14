@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.carce.sale.mapper.carcecloud.CarBrandMapper">
+    
+    <!-- 查询品牌在售数量统计 -->
+    <select id="selectBrandSaleCount" resultType="cc.carce.sale.dto.CarBrandSaleCountDto">
+        SELECT 
+            cb.brand, 
+            cb.id, 
+            COUNT(*) as saleCount 
+        FROM car_brand cb
+        INNER JOIN cars c ON cb.id = c.id_brand
+        INNER JOIN car_sales cs ON c.id = cs.car_id
+        WHERE cs.is_visible = 1
+        AND cs.status = '上架'
+        GROUP BY cb.brand, cb.id
+        ORDER BY saleCount DESC
+    </select>
+    
+</mapper>

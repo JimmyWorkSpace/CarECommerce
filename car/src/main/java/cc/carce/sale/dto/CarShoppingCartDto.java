@@ -1,12 +1,11 @@
 package cc.carce.sale.dto;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.Data;
 
 /**
- * 购物车DTO，包含车辆详细信息
+ * 购物车DTO，包含商品详细信息
  */
 @Data
 public class CarShoppingCartDto {
@@ -22,7 +21,7 @@ public class CarShoppingCartDto {
     private Long userId;
     
     /**
-     * 产品ID（车辆ID）
+     * 产品ID（商品ID）
      */
     private Long productId;
     
@@ -42,59 +41,44 @@ public class CarShoppingCartDto {
     private String productName;
     
     /**
-     * 车辆图片URL
+     * 商品图片URL
      */
     private String productImage;
     
     /**
-     * 车牌号
+     * 商品来源
      */
-    private String licensePlate;
+    private String source;
     
     /**
-     * 品牌名称
+     * 商品别名
      */
-    private String brandName;
+    private String alias;
     
     /**
-     * 型号名称
+     * 商品型号
      */
-    private String modelName;
+    private String model;
     
     /**
-     * 出厂年份
+     * 商品市价
      */
-    private Integer manufactureYear;
+    private Long marketPrice;
     
     /**
-     * 车色
+     * 商品品牌
      */
-    private String color;
+    private String brand;
     
     /**
-     * 里程数
+     * 商品类别标签
      */
-    private Integer mileage;
-    
-    /**
-     * 变速系统
-     */
-    private String transmission;
-    
-    /**
-     * 燃料系统
-     */
-    private String fuelSystem;
+    private String tag;
     
     /**
      * 创建时间
      */
     private Date createTime;
-    
-    /**
-     * 小计金额
-     */
-    private Integer subtotal;
     
     /**
      * 计算小计金额

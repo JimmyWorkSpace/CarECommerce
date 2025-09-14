@@ -1,7 +1,5 @@
 package cc.carce.sale.service;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -67,7 +65,9 @@ public class CarSalesService {
 
 	public CarSalesEntity getByUid(String uid) {
 		Example example = new Example(CarSalesEntity.class);
-		example.createCriteria().andEqualTo("uid", uid);
+		example.createCriteria()
+			.andEqualTo("uid", uid)
+			.andEqualTo("status", "上架");
 		return carSalesMapper.selectOneByExample(example);
 	}
 
@@ -79,7 +79,9 @@ public class CarSalesService {
 
 	public PageInfo<CarSalesEntity> getRecommendCarsSalesByPage(CarSalesSearchForm form) {
 		Example example = new Example(CarSalesEntity.class);
-		example.createCriteria().andGreaterThan("recommendedValue", 0L);
+		example.createCriteria()
+			.andGreaterThan("recommendedValue", 0L)
+			.andEqualTo("status", "上架");
 		example.orderBy("recommendedValue").desc();
 		PageInfo<CarSalesEntity> pi = PageHelper
 				.startPage(form.getPageNum(), form.getPageSize())

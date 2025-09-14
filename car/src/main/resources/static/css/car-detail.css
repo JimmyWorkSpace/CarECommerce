@@ -285,15 +285,38 @@
 .car-detail .action-buttons {
   margin-top: 20px;
   display: flex;
-  gap: 15px;
+  width: 100%;
+  gap: 0;
 }
 .car-detail .action-buttons .btn {
-  border-radius: 4px;
-  flex: 1;
+  border-radius: 10px;
   color: white;
-  font-size: 1.1rem;
-  padding: 0.75rem;
-  height: 50px;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  height: auto;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+}
+.car-detail .action-buttons .btn-report {
+  background-color: #6f42c1;
+}
+.car-detail .action-buttons .btn-report:hover {
+  background-color: #5a32a3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
+}
+.car-detail .action-buttons .btn-appointment {
+  background-color: #5ACFC9;
+}
+.car-detail .action-buttons .btn-appointment:hover {
+  background-color: #4AB8B2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
 }
 .car-detail .action-buttons .btn-primary {
   background-color: #CD001D;
@@ -306,10 +329,12 @@
 @media (max-width: 768px) {
   .car-detail .action-buttons {
     flex-direction: column;
-    gap: 0;
+    gap: 12px;
   }
   .car-detail .action-buttons .btn {
-    margin-bottom: 10px;
+    margin-bottom: 0;
+    width: 100%;
+    font-size: 1rem;
   }
 }
 .car-detail .tags {
@@ -356,6 +381,21 @@
     text-align: center;
   }
 }
+
+/* Tab样式 */
+.car-detail .tab-content {
+  background-color: #fff;
+  border-radius: 0 0 8px 8px;
+}
+
+.car-detail .tab-pane {
+  display: none;
+}
+
+.car-detail .tab-pane.active {
+  display: block;
+}
+
 .car-detail .equipment-header {
   font-weight: bold;
   font-size: 1.2em;
@@ -455,4 +495,120 @@
 }
 .car-detail .cursor-pointer:hover {
   opacity: 0.9;
+}
+
+/* 新的轮播图样式 */
+.car-detail .swiper-wrapper-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.car-detail .swiper-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.car-detail .swiper-wrapper {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.car-detail .swiper-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  display: none;
+}
+
+.car-detail .swiper-slide.active {
+  display: block;
+}
+
+.car-detail .swiper-slide .image-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 66.67%; /* 3:2 宽高比 (2/3 * 100%) */
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+.car-detail .swiper-slide img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* 轮播图导航按钮 */
+.car-detail .swiper-button-prev,
+.car-detail .swiper-button-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  z-index: 10;
+  transition: background 0.3s ease;
+}
+
+.car-detail .swiper-button-prev:hover,
+.car-detail .swiper-button-next:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.car-detail .swiper-button-prev {
+  left: 10px;
+}
+
+.car-detail .swiper-button-next {
+  right: 10px;
+}
+
+.car-detail .swiper-button-prev::before {
+  content: '‹';
+}
+
+.car-detail .swiper-button-next::before {
+  content: '›';
+}
+
+/* 轮播图指示器 */
+.car-detail .swiper-pagination {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.car-detail .swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.car-detail .swiper-pagination-bullet.active {
+  background: #FA9F42;
+}
+
+.car-detail .swiper-pagination-bullet:hover {
+  background: rgba(255, 255, 255, 0.8);
 }

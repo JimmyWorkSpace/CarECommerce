@@ -162,6 +162,41 @@
     font-weight: bold;
 }
 
+/* 品牌数量显示 */
+.brand-count {
+    color: #999;
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+/* 品牌展开/收起按钮 */
+.brand-toggle {
+    text-align: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.brand-toggle .btn-link {
+    color: #5ACFC9;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border: none;
+    background: none;
+    transition: color 0.3s ease;
+}
+
+.brand-toggle .btn-link:hover {
+    color: #4AB8B2;
+    text-decoration: none;
+}
+
+.brand-toggle .btn-link i {
+    margin-left: 5px;
+    font-size: 0.8rem;
+}
+
 /* 价格范围 */
 .price-range {
     display: flex;
