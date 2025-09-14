@@ -96,4 +96,10 @@ springfox:
     swagger-ui:
       enabled: true
     enabled: true
+	
+sms:
+  url: https://smsapi.mitake.com.tw/api/mtk/SmSend
+  account: Dweizhe
+  password: carce12345
+
 
