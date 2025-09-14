@@ -107,9 +107,9 @@ public class MyOrderController extends BaseController {
     /**
      * 取消订单
      */
-    @PostMapping("/cancel")
+    @PostMapping("/cancel/{orderId}")
     @ResponseBody
-    public R<String> cancelOrder(@RequestParam Long orderId) {
+    public R<String> cancelOrder(@PathVariable("orderId") Long orderId) {
         try {
             // 检查用户登录状态
             if (!isLogin()) {

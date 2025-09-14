@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.carce.sale.mapper.manager.CarReportMapper">
+
+    <!-- 插入檢舉記錄 -->
+    <insert id="insert" parameterType="cc.carce.sale.entity.CarReportEntity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO car_reports (
+            sale_id, reporter_id, reason, description, anonymous, 
+            status, process_note, processor_id, processed_at, 
+            created_at, updated_at
+        ) VALUES (
+            #{saleId}, #{reporterId}, #{reason}, #{description}, #{anonymous},
+            #{status}, #{processNote}, #{processorId}, #{processedAt},
+            #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <!-- 根據ID查詢檢舉記錄 -->
+    <select id="selectById" resultType="cc.carce.sale.entity.CarReportEntity">
+        SELECT * FROM car_reports WHERE id = #{id}
+    </select>
+
+    <!-- 更新檢舉記錄 -->
+    <update id="updateById" parameterType="cc.carce.sale.entity.CarReportEntity">
+        UPDATE car_reports SET
+            sale_id = #{saleId},
+            reporter_id = #{reporterId},
+            reason = #{reason},
+            description = #{description},
+            anonymous = #{anonymous},
+            status = #{status},
+            process_note = #{processNote},
+            processor_id = #{processorId},
+            processed_at = #{processedAt},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根據檢舉人ID查詢檢舉列表 -->
+    <select id="selectReportsByReporterId" resultType="cc.carce.sale.dto.CarReportDto">
+        SELECT 
+            cr.id,
+            cr.sale_id as saleId,
+            cr.reporter_id as reporterId,
+            CASE 
+                WHEN cr.anonymous = 1 THEN '匿名用戶'
+                ELSE u.nickName
+            END as reporterName,
+            cr.reason,
+            CASE cr.reason
+                WHEN 'price_mismatch' THEN '價格與現場不符'
+                WHEN 'false_info' THEN '資料虛假'
+                WHEN 'fraud_suspicion' THEN '詐騙嫌疑'
+                WHEN 'other' THEN '其它'
+                ELSE cr.reason
+            END as reasonDisplayName,
+            cr.description,
+            cr.anonymous,
+            cr.status,
+            CASE cr.status
+                WHEN 'submitted' THEN '已提交'
+                WHEN 'processing' THEN '處理中'
+                WHEN 'processed' THEN '已處理'
+                WHEN 'rejected' THEN '已駁回'
+                WHEN 'cancelled' THEN '已撤銷'
+                ELSE cr.status
+            END as statusDisplayName,
+            cr.process_note as processNote,
+            cr.processor_id as processorId,
+            p.nickName as processorName,
+            cr.processed_at as processedAt,
+            cr.created_at as createdAt,
+            cr.updated_at as updatedAt
+        FROM car_reports cr
+        LEFT JOIN car_user u ON cr.reporter_id = u.id
+        LEFT JOIN car_user p ON cr.processor_id = p.id
+        WHERE cr.reporter_id = #{reporterId}
+        ORDER BY cr.created_at DESC
+    </select>
+
+    <!-- 根據ID查詢檢舉詳情 -->
+    <select id="selectReportById" resultType="cc.carce.sale.dto.CarReportDto">
+        SELECT 
+            cr.id,
+            cr.sale_id as saleId,
+            cr.reporter_id as reporterId,
+            CASE 
+                WHEN cr.anonymous = 1 THEN '匿名用戶'
+                ELSE u.nickName
+            END as reporterName,
+            cr.reason,
+            CASE cr.reason
+                WHEN 'price_mismatch' THEN '價格與現場不符'
+                WHEN 'false_info' THEN '資料虛假'
+                WHEN 'fraud_suspicion' THEN '詐騙嫌疑'
+                WHEN 'other' THEN '其它'
+                ELSE cr.reason
+            END as reasonDisplayName,
+            cr.description,
+            cr.anonymous,
+            cr.status,
+            CASE cr.status
+                WHEN 'submitted' THEN '已提交'
+                WHEN 'processing' THEN '處理中'
+                WHEN 'processed' THEN '已處理'
+                WHEN 'rejected' THEN '已駁回'
+                WHEN 'cancelled' THEN '已撤銷'
+                ELSE cr.status
+            END as statusDisplayName,
+            cr.process_note as processNote,
+            cr.processor_id as processorId,
+            p.nickName as processorName,
+            cr.processed_at as processedAt,
+            cr.created_at as createdAt,
+            cr.updated_at as updatedAt
+        FROM car_reports cr
+        LEFT JOIN car_user u ON cr.reporter_id = u.id
+        LEFT JOIN car_user p ON cr.processor_id = p.id
+        WHERE cr.id = #{id}
+    </select>
+
+</mapper>

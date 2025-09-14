@@ -48,6 +48,13 @@ spring:
       test-on-return: false
       # 连接超时配置
 #      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000;druid.stat.logSlowSql=true;druid.connectionTimeout=30000;druid.validationQueryTimeout=10000
+  freemarker:
+   cache: false
+   settings:
+     template_update_delay: 0
+  devtools:
+    restart:
+      exclude: static/**,public/**,resources/**,META-INF/**,templates/**
 
 # 绿界支付配置
 ecpay:

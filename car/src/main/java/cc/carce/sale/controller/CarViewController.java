@@ -1,13 +1,9 @@
 package cc.carce.sale.controller;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -15,9 +11,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +19,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,22 +27,28 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.CarBaseInfoDto;
-import cc.carce.sale.entity.CarBannerEntity;
+import cc.carce.sale.dto.CarDealerInfoDto;
+import cc.carce.sale.dto.CarEquipmentDto;
+import cc.carce.sale.dto.CarGuaranteeDto;
+import cc.carce.sale.dto.CarReportDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
+import cc.carce.sale.entity.CarRichContentEntity;
+import cc.carce.sale.entity.CarQuestionAnswerEntity;
 import cc.carce.sale.form.PaymentRequestForm;
+import cc.carce.sale.form.CarReportForm;
 import cc.carce.sale.entity.CarAdvertisementEntity;
 import cc.carce.sale.service.CarBannerService;
 import cc.carce.sale.service.CarDealerService;
+import cc.carce.sale.service.CarReportService;
+import cc.carce.sale.service.CarRichContentService;
+import cc.carce.sale.service.CarQuestionAnswerService;
 import cc.carce.sale.service.CarSalesService;
 import cc.carce.sale.service.CarService;
 import cc.carce.sale.service.ECPayService;
 import cc.carce.sale.service.CarAdvertisementService;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -72,6 +72,15 @@ public class CarViewController extends BaseController {
 
 	@Resource
 	private CarDealerService carDealerService;
+	
+	@Resource
+	private CarReportService carReportService;
+	
+	@Resource
+	private CarRichContentService carRichContentService;
+	
+	@Resource
+	private CarQuestionAnswerService carQuestionAnswerService;
 	
 	@Resource
 	private CarBannerService carBannerService;
@@ -248,8 +257,12 @@ public class CarViewController extends BaseController {
     public String aboutPage(Model model, HttpServletRequest req) {
         try {
             // 检查用户登录状态
-            Object user = req.getSession().getAttribute("user");
-            model.addAttribute("user", user);
+            
+            // 从数据库获取关于页面的富文本内容
+            CarRichContentEntity aboutContent = carRichContentService.getFirstAboutContent();
+            if (aboutContent != null && aboutContent.getContent() != null) {
+                model.addAttribute("htmlContent", aboutContent.getContent());
+            }
             
             model.addAttribute("title", "關於我們 - 二手車銷售平台");
             model.addAttribute("description", "了解我們的服務理念和團隊");
@@ -312,12 +325,53 @@ public class CarViewController extends BaseController {
      @GetMapping("/detail/{saleId}")
     public String carDetail(Model model, @PathVariable("saleId") Long saleId, HttpServletRequest req) {
         try {
+            // 检查用户登录状态
+            Object user = req.getSession().getAttribute("user");
+            model.addAttribute("user", user);
+            
             // 获取车辆基本信息
             CarBaseInfoDto carInfo = carService.getBaseInfoBySaleId(saleId);
             model.addAttribute("carInfo", carInfo);
             model.addAttribute("carInfoJson", JSONUtil.toJsonPrettyStr(carInfo));
             
+            // 获取车辆图片
+            List<String> images = carService.getImagesBySaleId(saleId);
+            model.addAttribute("images", images);
+            model.addAttribute("imagesJson", JSONUtil.toJsonPrettyStr(images));
+            
+            // 获取车辆配置信息
+            List<CarEquipmentDto> equipments = carService.getEquipmentBySaleId(saleId);
+            model.addAttribute("equipments", equipments);
+            model.addAttribute("equipmentsJson", JSONUtil.toJsonPrettyStr(equipments));
+            
+            // 获取车辆保证信息
+            List<CarGuaranteeDto> guarantees = carService.getGuaranteeBySaleId(saleId);
+            model.addAttribute("guarantees", guarantees);
+            model.addAttribute("guaranteesJson", JSONUtil.toJsonPrettyStr(guarantees));
+            
+            // 获取店家信息
+            CarDealerInfoDto dealerInfo = new CarDealerInfoDto();
+            if (carInfo.getGarageId() != null && !carInfo.getGarageId().isEmpty()) {
+                try {
+                    Long garageId = Long.parseLong(carInfo.getGarageId());
+                    dealerInfo = carDealerService.getInfoById(garageId);
+                } catch (NumberFormatException e) {
+                    log.warn("GarageId格式错误: {}", carInfo.getGarageId());
+                }
+            }
+            model.addAttribute("dealerInfo", dealerInfo);
+            model.addAttribute("dealerInfoJson", JSONUtil.toJsonPrettyStr(dealerInfo));
+            
             model.addAttribute("saleId", saleId);
+            
+            // 设置页面标题和描述
+            String title = carInfo.getSaleTitle() != null ? carInfo.getSaleTitle() : "車輛詳情";
+            model.addAttribute("title", title + " - 二手車銷售平台");
+            model.addAttribute("description", carInfo.getSaleDescription() != null ? 
+                carInfo.getSaleDescription().replaceAll("<[^>]*>", "").substring(0, Math.min(150, carInfo.getSaleDescription().length())) : 
+                "專業的二手車銷售平台，提供優質二手車資訊");
+            model.addAttribute("image", images != null && !images.isEmpty() ? images.get(0) : "/img/car/car4.jpg");
+            model.addAttribute("url", req.getRequestURL().toString());
             
             model.addAttribute("content", "/car/detail.ftl");
             
@@ -570,5 +624,145 @@ public class CarViewController extends BaseController {
 			activeProfile = "dev"; // 默认使用dev环境
 		}
 		return "dev".equals(activeProfile) || "test".equals(activeProfile);
+	}
+	
+	/**
+	 * 我的檢舉列表頁面
+	 */
+	@GetMapping("/my-reports")
+	public String myReports(Model model) {
+		UserInfo sessionUser = getSessionUser();
+		if (sessionUser == null) {
+			return "redirect:/login";
+		}
+		
+		// 獲取用戶的檢舉列表
+		List<CarReportDto> reports = carReportService.getReportsByReporterId(sessionUser.getId());
+		model.addAttribute("reports", reports);
+		model.addAttribute("content", "/report/my-reports.ftl");
+		model.addAttribute("title", "我的檢舉");
+		
+		return "layout/main";
+	}
+	
+	/**
+	 * 創建檢舉API
+	 */
+	@PostMapping("/api/report/create")
+	@ResponseBody
+	public R<String> createReport(@RequestBody CarReportForm form) {
+		try {
+			UserInfo sessionUser = getSessionUser();
+			if (sessionUser == null) {
+				return R.failMsg("請先登入");
+			}
+			
+			form.setReporterId(sessionUser.getId());
+			
+			boolean success = carReportService.createReport(form);
+			if (success) {
+				return R.okMsg("檢舉提交成功");
+			} else {
+				return R.failMsg("檢舉提交失敗");
+			}
+		} catch (Exception e) {
+			log.error("創建檢舉失敗", e);
+			return R.failMsg("系統錯誤，請稍後再試");
+		}
+	}
+	
+	/**
+	 * 檢舉詳情API
+	 */
+	@GetMapping("/api/report/detail/{id}")
+	@ResponseBody
+	public R<CarReportDto> getReportDetail(@PathVariable Long id) {
+		try {
+			UserInfo sessionUser = getSessionUser();
+			if (sessionUser == null) {
+				return R.failMsg("請先登入");
+			}
+			
+			CarReportDto report = carReportService.getReportById(id);
+			if (report == null) {
+				return R.failMsg("檢舉不存在");
+			}
+			
+			return R.ok(report);
+		} catch (Exception e) {
+			log.error("查詢檢舉詳情失敗", e);
+			return R.failMsg("系統錯誤，請稍後再試");
+		}
+	}
+	
+	/**
+	 * 撤銷檢舉API
+	 */
+	@PostMapping("/api/report/cancel/{id}")
+	@ResponseBody
+	public R<String> cancelReport(@PathVariable Long id) {
+		try {
+			UserInfo sessionUser = getSessionUser();
+			if (sessionUser == null) {
+				return R.failMsg("請先登入");
+			}
+			
+			// 检查檢舉是否存在且属于当前用户
+			CarReportDto report = carReportService.getReportById(id);
+			if (report == null) {
+				return R.failMsg("檢舉不存在");
+			}
+			
+			if (!sessionUser.getId().equals(report.getReporterId())) {
+				return R.failMsg("無權限撤銷此檢舉");
+			}
+			
+			// 只有已提交状态的檢舉才能撤銷
+			if (!"submitted".equals(report.getStatus())) {
+				return R.failMsg("只有已提交的檢舉才能撤銷");
+			}
+			
+			// 执行撤銷操作
+			boolean success = carReportService.cancelReport(id);
+			if (success) {
+				return R.okMsg("檢舉已成功撤銷");
+			} else {
+				return R.failMsg("撤銷失敗");
+			}
+		} catch (Exception e) {
+			log.error("撤銷檢舉失敗", e);
+			return R.failMsg("系統錯誤，請稍後再試");
+		}
+	}
+
+	/**
+	 * 頻道頁面
+	 */
+	@GetMapping("/channel")
+	public String channel(Model model) {
+		try {
+			// 从数据库获取所有频道内容
+			List<CarRichContentEntity> channelContentList = carRichContentService.getChannelContent();
+			model.addAttribute("channelContentList", channelContentList);
+			
+			// 获取每个频道的问答数据
+			Map<String, List<CarQuestionAnswerEntity>> channelQAMap = new HashMap<>();
+			if (channelContentList != null) {
+				for (CarRichContentEntity channel : channelContentList) {
+					List<CarQuestionAnswerEntity> qaList = carQuestionAnswerService.getQuestionAnswersByChannelIdOrderByShowOrder(channel.getId());
+					if (qaList != null && !qaList.isEmpty()) {
+						channelQAMap.put(channel.getId().toString(), qaList);
+					}
+				}
+			}
+			model.addAttribute("channelQAMap", channelQAMap);
+			
+			model.addAttribute("title", "頻道");
+			model.addAttribute("content", "/channel/index.ftl");
+		} catch (Exception e) {
+			log.error("获取频道页面失败", e);
+			model.addAttribute("error", "获取数据失败");
+		}
+		return "layout/main";
 	}
 } 

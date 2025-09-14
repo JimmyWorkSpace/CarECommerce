@@ -1,0 +1,291 @@
+/* 预约页面样式 */
+.appointment-page {
+    padding: 20px 0;
+    min-height: 60vh;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 0;
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+    color: white;
+    border-radius: 15px;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* 加载状态样式 */
+.loading-container {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.loading-container .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 20px;
+}
+
+/* 无数据状态样式 */
+.no-data-container {
+    text-align: center;
+    padding: 80px 20px;
+    color: #666;
+}
+
+.no-data-icon {
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.no-data-container h3 {
+    color: #999;
+    margin-bottom: 10px;
+}
+
+.no-data-container p {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+/* 预约卡片样式 */
+.appointments-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.appointment-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+}
+
+.appointment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.appointment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.appointment-title {
+    color: #333;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+}
+
+.appointment-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.appointment-date,
+.appointment-phone {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.appointment-status {
+    flex-shrink: 0;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-appointed {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-viewed {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-cancelled {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.status-unknown {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.appointment-body {
+    padding: 20px;
+}
+
+.appointment-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.car-info {
+    display: flex;
+    gap: 15px;
+    flex: 1;
+}
+
+.car-image {
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.car-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.car-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.car-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.car-brand {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+}
+
+.car-model {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.car-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #5ACFC9;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.appointment-actions .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.appointment-actions .btn:hover {
+    transform: translateY(-1px);
+}
+
+.appointment-note {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.appointment-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.appointment-time,
+.appointment-created {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .appointment-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .appointment-meta {
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .appointment-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .car-info {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .car-image {
+        width: 100%;
+        height: 120px;
+    }
+    
+    .appointment-actions {
+        align-self: flex-end;
+    }
+    
+    .appointment-footer {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}

@@ -1,9 +1,8 @@
 <link href="/css/car-detail.css" rel="stylesheet">
-
 <div class="car-detail" id="app">
     <div class="main-title-container">
         <div class="first-title">
-            優質二手車商 /
+            {{ dealerInfo.dealerName || '優質二手車商' }} /
         </div>
         <div class="second-title">
             {{ carInfo.saleTitle || (carInfo.manufactureYear + '年 ' + carInfo.brand + ' ' + carInfo.customModel) || '車輛詳情' }}
@@ -14,16 +13,51 @@
     <div class="row mb-4">
         <!-- 左侧图片轮播 -->
         <div class="col-md-6">
-            <div class="swiper-wrapper-container">
+            <div class="swiper-wrapper-container" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
                 <div class="swiper-container">
-                    <img style="width:100%;aspect-ratio: 3/2;" class="swiper_image" :src="carInfo.coverImage || '/img/car/car4.jpg'" :alt="carInfo.saleTitle || '汽车图片'">
+                    <div class="swiper-wrapper">
+                        <div v-for="(image, index) in images" 
+                             :key="index"
+                             class="swiper-slide"
+                             :class="{ active: currentImageIndex === index }">
+                            <div class="image-container">
+                                <img class="swiper_image" 
+                                     :src="image" 
+                                     :alt="carInfo.saleTitle || '汽车图片'"
+                                     @click="openLightbox(index)"
+                                     @error="handleImageError">
+                            </div>
+                        </div>
+                        <!-- 如果没有图片，显示默认图片 -->
+                        <div v-if="!images || images.length === 0" class="swiper-slide active">
+                            <div class="image-container">
+                                <img class="swiper_image" 
+                                     src="/img/car/car4.jpg" 
+                                     alt="汽车图片"
+                                     @error="handleImageError">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 轮播图导航按钮 -->
+                    <div class="swiper-button-prev" v-if="images && images.length > 1" @click="prevImage"></div>
+                    <div class="swiper-button-next" v-if="images && images.length > 1" @click="nextImage"></div>
+                    <!-- 轮播图指示器 -->
+                    <div class="swiper-pagination" v-if="images && images.length > 1">
+                        <span v-for="(image, index) in images" 
+                              :key="index"
+                              class="swiper-pagination-bullet"
+                              :class="{ active: currentImageIndex === index }"
+                              @click="changeImage(index)"></span>
+                    </div>
                 </div>
-                <div class="thumbnail-container">
-                    <img :src="carInfo.coverImage || '/img/car/car4.jpg'" class="thumbnail active" alt="缩略图">
-                    <img :src="carInfo.coverImage || '/img/car/car4.jpg'" class="thumbnail" alt="缩略图">
-                    <img src="/img/car/car6.jpg" class="thumbnail" alt="缩略图">
-                    <img src="/img/car/car6.jpg" class="thumbnail" alt="缩略图">
-                    <img src="/img/car/car8.jpg" class="thumbnail" alt="缩略图">
+                <div class="thumbnail-container" v-if="images && images.length > 1">
+                    <img v-for="(image, index) in images" 
+                         :key="index"
+                         :src="image" 
+                         class="thumbnail" 
+                         :class="{ active: currentImageIndex === index }"
+                         @click="changeImage(index)"
+                         alt="缩略图">
                 </div>
             </div>
             <!-- Line分享按钮 -->
@@ -82,19 +116,24 @@
                     </div>
                 </div>
             </div>
-            <div class="action-buttons">
-                <button class="btn btn-report" @click="openReportModal">
+            <div class="action-buttons d-flex w-100 mb-3">
+                <a href="/检车报告.pdf" target="_blank" class="btn btn-report flex-fill me-2">
                     <i class="bi bi-file-earmark-text"></i> 檢車報告
-                </button>
-                <button class="btn btn-appointment" @click="openAppointmentModal">
+                </a>
+                <button class="btn btn-appointment flex-fill ms-2" @click="openAppointmentModal">
                     <i class="bi bi-calendar-check"></i> 預約看車
                 </button>
             </div>
             <div class="dealer-info mt-3 text-left">
-                <div class="dealer-contact">聯絡人： 張經理</div>
+                <div class="dealer-contact">聯絡人： {{ dealerInfo.contactPerson || '張經理' }}</div>
                 <div class="dealer-address">
-                    賞車地址： 台北市信義區信義路五段7號
-                    📍<a href="https://www.google.com/maps/search/?api=1&query=台北市信義區信義路五段7號" target="_blank">查看地圖</a>
+                    賞車地址： {{ dealerInfo.publicAddress || '台北市信義區信義路五段7號' }}
+                    📍<a :href="'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(dealerInfo.publicAddress || '台北市信義區信義路五段7號')" target="_blank">查看地圖</a>
+                </div>
+                <div class="report-section mt-2">
+                    <button class="btn btn-outline-danger btn-sm" @click="openReportModal">
+                        <i class="bi bi-flag"></i> 檢舉
+                    </button>
                 </div>
             </div>
         </div>
@@ -102,337 +141,240 @@
     
     <!-- 第三行：Tab页 -->
     <div class="tabs">
-        <ul class="nav nav-tabs car-detail-tabs">
-            <li class="nav-item">
-                <a class="nav-link" :class="{ active: activeTab === 'equipment' }" @click="setActiveTab('equipment')">車輛配備</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" :class="{ active: activeTab === 'dealer' }" @click="setActiveTab('dealer')">店家介紹</a>
+        <ul class="nav nav-tabs">
+            <li class="nav-item" v-for="(tab, index) in tabs" :key="index">
+                <a class="nav-link" :class="{ active: activeTab.code === tab.code }" @click="activeTab = tab">
+                    {{ tab.title }}
+                </a>
             </li>
         </ul>
         <div class="tab-content p-3 border border-top-0 rounded-bottom">
-            <div v-show="activeTab === 'equipment'" class="tab-pane">
+            <div v-show="activeTab.code === 'car_equipments'">
                 <div class="equipment-header">
                     車輛配備
                 </div>
-                <div class="equipment-section">
+                <div class="equipment-section" v-for="(equipment, index) in carEquipments" :key="index">
                     <div class="equipment-row d-flex flex-column flex-md-row">
-                        <div class="equipment-name">安全配備</div>
+                        <div class="equipment-name">{{ equipment.name }}</div>
                         <div class="equipment-tags">
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 安全氣囊
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> ABS防鎖死煞車
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 電子穩定控制
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 倒車影像
+                            <span class="equipment-tag" v-for="(tag, tagIndex) in equipment.tags" :key="tagIndex">
+                                <i class="iconfont">&#xe632;</i> {{ tag }}
                             </span>
                         </div>
                     </div>
                 </div>
-                <div class="equipment-section">
-                    <div class="equipment-row d-flex flex-column flex-md-row">
-                        <div class="equipment-name">舒適配備</div>
-                        <div class="equipment-tags">
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 電動座椅
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 雙區恆溫空調
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 全景天窗
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 真皮座椅
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="equipment-section">
-                    <div class="equipment-row d-flex flex-column flex-md-row">
-                        <div class="equipment-name">科技配備</div>
-                        <div class="equipment-tags">
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 導航系統
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 藍牙連接
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 無線充電
-                            </span>
-                            <span class="equipment-tag">
-                                <i class="iconfont">&#xe632;</i> 智能鑰匙
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="equipment-header">
                     賣家保證
                 </div>
                 <div class="guarantee-tags">
-                    <div class="guarantee-section">
-                        <div class="guarantee-name">
-                            <i class="iconfont">&#xe632;</i>無重大事故
-                        </div>
+                    <div class="guarantee-section" v-for="(gur, index) in carGuarantees" :key="index">
+                        <div class="guarantee-name"><i class="iconfont">&#xe632;</i>{{ gur.itemName }}</div>
                         <div class="guarantee-desc">
-                            本車無重大事故記錄，車身結構完整，安全性能良好。
-                        </div>
-                    </div>
-                    <div class="guarantee-section">
-                        <div class="guarantee-name">
-                            <i class="iconfont">&#xe632;</i>里程真實
-                        </div>
-                        <div class="guarantee-desc">
-                            里程數真實可靠，無調表記錄，可提供完整保養記錄。
-                        </div>
-                    </div>
-                    <div class="guarantee-section">
-                        <div class="guarantee-name">
-                            <i class="iconfont">&#xe632;</i>品質保證
-                        </div>
-                        <div class="guarantee-desc">
-                            提供3個月品質保證，如有問題可免費維修或更換。
+                            {{ gur.description }}
                         </div>
                     </div>
                 </div>
-                
                 <div class="equipment-header">
                     車輛描述
                 </div>
-                <div class="content-frame">
-                    <div v-if="carInfo.saleDescription" v-html="carInfo.saleDescription"></div>
-                    <div v-else>
-                        <p>這是一輛{{ carInfo.manufactureYear || '' }}年 {{ carInfo.brand || '' }} {{ carInfo.customModel || '' }}，車況極佳{{ carInfo.mileage ? '，里程僅' + formatMileage(carInfo.mileage) + '公里' : '' }}。</p>
-                        <p><strong>車況特點：</strong></p>
-                        <ul>
-                            <li>原廠保養，定期維護</li>
-                            <li>無重大事故，車身完整</li>
-                            <li>內裝乾淨，座椅無磨損</li>
-                            <li>引擎運轉順暢，變速箱正常</li>
-                            <li>空調系統良好，音響系統完整</li>
-                        </ul>
-                        <p><strong>配備特色：</strong></p>
-                        <ul>
-                            <li v-if="carInfo.displacement">{{ carInfo.displacement }}引擎，動力充沛</li>
-                            <li v-if="carInfo.transmission">{{ carInfo.transmission }}變速箱，換檔順暢</li>
-                            <li>雙區恆溫空調系統</li>
-                            <li>全景天窗，採光良好</li>
-                            <li>真皮座椅，舒適度佳</li>
-                            <li>倒車影像系統，安全便利</li>
-                            <li>藍牙音響系統，娛樂功能完整</li>
-                        </ul>
-                        <p><strong>適合對象：</strong></p>
-                        <p>適合家庭使用，商務代步，長途旅行等各種用途。車況良好，值得信賴。</p>
-                    </div>
-                </div>
+                <iframe ref="contentFrame" class="content-frame" :srcdoc="getHtmlContent(carInfo.saleDescription)"
+                    frameborder="0" width="100%"></iframe>
+                <div style="height: 1em;"></div>
             </div>
             
-            <div v-show="activeTab === 'dealer'" class="tab-pane">
+            <div v-show="activeTab.code === 'dealer_intro'">
                 <div class="dealer-container">
                     <div class="dealer-intro">
                         <div class="dealer-intro-row">
                             <div class="dealer-title">店家名稱</div>
-                            <div class="dealer-content">優質二手車商</div>
+                            <div class="dealer-content">{{ dealerInfo.dealerName || '--' }}</div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">店家地址</div>
-                            <div class="dealer-content">台北市信義區信義路五段7號</div>
+                            <div class="dealer-content">{{ dealerInfo.publicAddress || '--' }}</div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">聯絡人</div>
-                            <div class="dealer-content">張經理</div>
+                            <div class="dealer-content">{{ dealerInfo.contactPerson || '--' }}</div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">店家電話</div>
-                            <div class="dealer-content">02-2345-6789</div>
+                            <div class="dealer-content">{{ dealerInfo.companyPhone || '--' }}</div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">手機</div>
-                            <div class="dealer-content">0912-345-678</div>
+                            <div class="dealer-content">{{ dealerInfo.companyMobile || '--' }}</div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">LINE</div>
                             <div class="dealer-content">
-                                <button class="btn-line-id">
-                                    <i class="bi bi-chat-dots"></i> LINE聯絡我
+                                <button class="btn-line-id" @click="contactLine" @mouseenter="lineIdHover = true"
+                                    @mouseleave="lineIdHover = false" v-if="dealerInfo.lineId">
+                                    <i class="bi bi-chat-dots"></i> {{ lineIdHover ? dealerInfo.lineId : 'LINE聯絡我' }}
                                 </button>
+                                <span v-else>--</span>
                             </div>
                         </div>
                         <div class="dealer-intro-row">
                             <div class="dealer-title">網址</div>
-                            <div class="dealer-content">www.qualitycars.com.tw</div>
+                            <div class="dealer-content">{{ dealerInfo.website || '--' }}</div>
                         </div>
                     </div>
                     <div class="dealer-cover">
-                        <img src="/img/car/car9.jpg" alt="店家封面">
+                        <img :src="dealerInfo.coverImage" alt="店家封面">
                     </div>
                 </div>
-                <div class="content-frame">
-                    <p><strong>關於我們</strong></p>
-                    <p>優質二手車商成立於2010年，專注於中高級二手車的買賣業務。我們擁有專業的車輛檢測團隊，確保每輛車都經過嚴格的安全檢查。</p>
-                    <p><strong>服務特色</strong></p>
-                    <ul>
-                        <li>專業車輛檢測，確保車況</li>
-                        <li>提供完整保養記錄</li>
-                        <li>3個月品質保證</li>
-                        <li>免費試駕服務</li>
-                        <li>靈活的分期付款方案</li>
-                        <li>完善的售後服務</li>
-                    </ul>
-                    <p><strong>營業時間</strong></p>
-                    <p>週一至週五：09:00-18:00<br>
-                    週六：09:00-17:00<br>
-                    週日：10:00-16:00</p>
-                    <p><strong>交通資訊</strong></p>
-                    <p>捷運信義安和站步行5分鐘即可到達，附近設有停車場，方便客戶前來賞車。</p>
-                </div>
+                <iframe ref="dealerContentFrame" class="content-frame"
+                    :srcdoc="getHtmlContent(dealerInfo.description)" frameborder="0" width="100%"></iframe>
             </div>
         </div>
     </div>
-</div>
-
-<!-- 预约看车弹窗 -->
-<div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="appointmentModalLabel">
-                    <i class="bi bi-calendar-check me-2"></i>預約看車
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="appointmentForm">
-                    <div class="mb-3">
-                        <label for="appointmentDate" class="form-label">
-                            <i class="bi bi-calendar me-2"></i>預約日期
-                        </label>
-                        <input type="date" class="form-control" id="appointmentDate" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="appointmentTime" class="form-label">
-                            <i class="bi bi-clock me-2"></i>預約時間
-                        </label>
-                        <select class="form-control" id="appointmentTime" required>
-                            <option value="">請選擇時間</option>
-                            <option value="09:00">09:00</option>
-                            <option value="10:00">10:00</option>
-                            <option value="11:00">11:00</option>
-                            <option value="14:00">14:00</option>
-                            <option value="15:00">15:00</option>
-                            <option value="16:00">16:00</option>
-                            <option value="17:00">17:00</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="appointmentPhone" class="form-label">
-                            <i class="bi bi-telephone me-2"></i>聯絡電話
-                        </label>
-                        <input type="tel" class="form-control" id="appointmentPhone" 
-                               placeholder="請輸入您的手機號碼" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <i class="bi bi-person me-2"></i>聯絡人
-                        </label>
-                        <div class="form-control-plaintext" id="appointmentNameDisplay">
-                            <#if user?? && user?has_content>
-                                ${user.name!'未设置姓名'}
-                            <#else>
-                                <span class="text-danger">请先登录</span>
-                            </#if>
+    
+    <!-- 预约看车弹窗 -->
+    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-start" id="appointmentModalLabel">
+                        <i class="bi bi-calendar-check me-2"></i>預約看車
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="appointmentForm">
+                        <div class="mb-3">
+                            <label for="appointmentDate" class="form-label">
+                                <i class="bi bi-calendar me-2"></i>預約日期
+                            </label>
+                            <input type="date" class="form-control" id="appointmentDate" required>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="appointmentNote" class="form-label">
-                            <i class="bi bi-chat-text me-2"></i>備註
-                        </label>
-                        <textarea class="form-control" id="appointmentNote" rows="3" 
-                                  placeholder="如有特殊需求請在此說明"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" @click="submitAppointment">
-                    <i class="bi bi-check-circle me-2"></i>提交預約
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 检车报告弹窗 -->
-<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reportModalLabel">
-                    <i class="bi bi-file-earmark-text me-2"></i>檢車報告
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="pdf-info-container">
-                    <div class="text-center p-4">
-                        <i class="bi bi-file-earmark-pdf text-primary" style="font-size: 4rem;"></i>
-                        <h4 class="mt-3 mb-3">檢車報告</h4>
-                        <p class="text-muted mb-4">這份檢車報告包含了車輛的詳細檢測信息，包括發動機、變速箱、底盤等各個系統的檢測結果。</p>
-                        
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <a href="/api/pdf/inspection-report" target="_blank" class="btn btn-primary btn-lg w-100">
-                                    <i class="bi bi-eye me-2"></i>在線查看
-                                </a>
-                            </div>
-                            <div class="col-md-6">
-                                <a href="/api/pdf/inspection-report" download="检车报告.pdf" class="btn btn-outline-primary btn-lg w-100">
-                                    <i class="bi bi-download me-2"></i>下載報告
-                                </a>
+                        <div class="mb-3">
+                            <label for="appointmentTime" class="form-label">
+                                <i class="bi bi-clock me-2"></i>預約時間
+                            </label>
+                            <select class="form-control" id="appointmentTime" required>
+                                <option value="">請選擇時間</option>
+                                <option value="09:00">09:00</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="appointmentPhone" class="form-label">
+                                <i class="bi bi-telephone me-2"></i>聯絡電話
+                            </label>
+                            <input type="tel" class="form-control" id="appointmentPhone" 
+                                   placeholder="請輸入您的手機號碼" 
+                                   value="<#if user?? && user?has_content>${user.phone!''}</#if>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-person me-2"></i>聯絡人
+                            </label>
+                            <div class="form-control-plaintext" id="appointmentNameDisplay">
+                                <#if user?? && user?has_content>
+                                    ${user.name!'未设置姓名'}
+                                <#else>
+                                    <span class="text-danger">请先登录</span>
+                                </#if>
                             </div>
                         </div>
-                        
-                        <div class="mt-4">
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle me-1"></i>
-                                報告包含：發動機檢測、變速箱檢測、底盤檢測、電器系統檢測、外觀檢測等
-                            </small>
+                        <div class="mb-3">
+                            <label for="appointmentNote" class="form-label">
+                                <i class="bi bi-chat-text me-2"></i>備註
+                            </label>
+                            <textarea class="form-control" id="appointmentNote" rows="3" 
+                                      placeholder="如有特殊需求請在此說明"></textarea>
                         </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-success" @click="submitAppointment">
+                        <i class="bi bi-check-circle me-2"></i>提交預約
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 成功提示弹窗 -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="success-icon mb-3">
+                        <i class="bi bi-check-circle-fill"></i>
                     </div>
+                    <h5 class="modal-title">預約成功！</h5>
+                    <p class="text-muted">我們會盡快與您聯繫確認預約詳情。</p>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">確定</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
             </div>
         </div>
     </div>
-</div>
 
-<!-- 成功提示弹窗 -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="success-icon mb-3">
-                    <i class="bi bi-check-circle-fill"></i>
+    <!-- 檢舉弹窗 -->
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-start" id="reportModalLabel">
+                        <i class="bi bi-flag me-2"></i>檢舉車輛
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <h5 class="modal-title">預約成功！</h5>
-                <p class="text-muted">我們會盡快與您聯繫確認預約詳情。</p>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">確定</button>
+                <div class="modal-body">
+                    <form id="reportForm">
+                        <div class="mb-3">
+                            <label for="reportReason" class="form-label">
+                                <i class="bi bi-exclamation-triangle me-2"></i>檢舉原因
+                            </label>
+                            <select class="form-control" id="reportReason" required>
+                                <option value="">請選擇檢舉原因</option>
+                                <option value="price_mismatch">價格與現場不符</option>
+                                <option value="false_info">資料虛假</option>
+                                <option value="fraud_suspicion">詐騙嫌疑</option>
+                                <option value="other">其它</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reportDescription" class="form-label">
+                                <i class="bi bi-chat-text me-2"></i>詳細說明
+                            </label>
+                            <textarea class="form-control" id="reportDescription" rows="4" 
+                                      placeholder="請詳細描述檢舉原因，提供更多資訊有助於我們處理您的檢舉" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="reportAnonymous">
+                                <label class="form-check-label" for="reportAnonymous">
+                                    匿名檢舉
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" @click="submitReport">
+                        <i class="bi bi-flag me-2"></i>提交檢舉
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
+ 
 <script>
-new Vue({
+console.log('Vue版本:', Vue.version);
+console.log('开始初始化Vue实例...');
+
+try {
+    new Vue({
     el: '#app',
     data: {
         carInfo: <#if carInfoJson??>${carInfoJson}<#else>{
@@ -451,13 +393,41 @@ new Vue({
             saleDescription: '',
             coverImage: ''
         }</#if>,
+        images: <#if imagesJson??>${imagesJson}<#else>[]</#if>,
+        equipments: <#if equipmentsJson??>${equipmentsJson}<#else>[]</#if>,
+        guarantees: <#if guaranteesJson??>${guaranteesJson}<#else>[]</#if>,
+        dealerInfo: <#if dealerInfoJson??>${dealerInfoJson}<#else>{}</#if>,
         saleId: <#if saleId??>${saleId}<#else>null</#if>,
-        activeTab: 'equipment',
-        loading: false
+        activeTab: { code: 'car_equipments', title: '車輛配備' },
+        loading: false,
+        currentImageIndex: 0,
+        tabs: [
+            { code: 'car_equipments', title: '車輛配備' },
+            { code: 'dealer_intro', title: '店家介紹' }
+        ],
+        carEquipments: <#if equipmentsJson??>${equipmentsJson}<#else>[]</#if>,
+        carGuarantees: <#if guaranteesJson??>${guaranteesJson}<#else>[]</#if>,
+        lineIdHover: false,
+        autoPlayTimer: null,
+        autoPlayInterval: 5000
     },
     mounted() {
         console.log('车辆详情页Vue实例已挂载');
+        console.log('Vue实例数据:', this.$data);
+        console.log('Vue实例方法:', Object.keys(this.$options.methods));
+        
+        
         this.initializePage();
+        this.startAutoPlay();
+        
+        // 测试Vue实例是否正常工作
+        setTimeout(() => {
+            console.log('Vue实例测试 - 3秒后执行');
+            const testButton = document.querySelector('[data-test="vue-test"]');
+            if (testButton) {
+                console.log('找到测试按钮');
+            }
+        }, 3000);
     },
     methods: {
         // 初始化页面
@@ -476,26 +446,150 @@ new Vue({
         
         // 初始化缩略图
         initializeThumbnails() {
-            const thumbnails = document.querySelectorAll('.thumbnail');
-            const mainImage = document.querySelector('.swiper_image');
-            
-            if (thumbnails.length > 0 && mainImage) {
-                thumbnails.forEach(thumb => {
-                    thumb.addEventListener('click', function() {
-                        // 移除所有active类
-                        thumbnails.forEach(t => t.classList.remove('active'));
-                        // 添加active类到当前缩略图
-                        this.classList.add('active');
-                        // 更新主图片
-                        mainImage.src = this.src;
-                    });
-                });
+            // 这个方法现在由Vue的@click事件处理，不再需要手动绑定事件
+        },
+        
+        // 切换图片
+        changeImage(index) {
+            this.currentImageIndex = index;
+        },
+        
+        // 上一张图片
+        prevImage() {
+            if (this.images && this.images.length > 0) {
+                this.currentImageIndex = this.currentImageIndex > 0 ? this.currentImageIndex - 1 : this.images.length - 1;
+            }
+        },
+        
+        // 下一张图片
+        nextImage() {
+            if (this.images && this.images.length > 0) {
+                this.currentImageIndex = this.currentImageIndex < this.images.length - 1 ? this.currentImageIndex + 1 : 0;
+            }
+        },
+        
+        // 开始自动轮播
+        startAutoPlay() {
+            if (this.images && this.images.length > 1) {
+                this.autoPlayTimer = setInterval(() => {
+                    this.nextImage();
+                }, this.autoPlayInterval);
+            }
+        },
+        
+        // 停止自动轮播
+        stopAutoPlay() {
+            if (this.autoPlayTimer) {
+                clearInterval(this.autoPlayTimer);
+                this.autoPlayTimer = null;
+            }
+        },
+        
+        // 打开灯箱
+        openLightbox(index) {
+            // 简单的图片查看功能，可以后续扩展为更复杂的灯箱组件
+            if (this.images && this.images.length > 0) {
+                window.open(this.images[index], '_blank');
             }
         },
         
         // 设置活动标签页
         setActiveTab(tab) {
             this.activeTab = tab;
+        },
+        
+        // 获取HTML内容
+        getHtmlContent(htmlContent) {
+            if (!htmlContent) return '';
+            return htmlContent;
+        },
+        
+        // 联系Line
+        contactLine() {
+            if (this.dealerInfo.lineId) {
+                window.open('https://line.me/ti/p/' + this.dealerInfo.lineId, '_blank');
+            }
+        },
+        
+        // 处理图片加载失败
+        handleImageError(event) {
+            console.log('图片加载失败，使用默认图片');
+            event.target.src = '/img/car/car4.jpg';
+        },
+        
+        // 打开檢舉弹窗
+        openReportModal() {
+            // 检查用户是否已登录
+            <#if user??>
+                // 已登录，打开檢舉弹窗
+                const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+                modal.show();
+            <#else>
+                // 未登录，提示用户先登录
+                alert('請先登入後再進行檢舉');
+                return;
+            </#if>
+        },
+        
+        // 提交檢舉
+        async submitReport() {
+            const reason = document.getElementById('reportReason').value;
+            const description = document.getElementById('reportDescription').value;
+            const anonymous = document.getElementById('reportAnonymous').checked;
+            
+            if (!reason) {
+                alert('請選擇檢舉原因');
+                return;
+            }
+            
+            if (!description.trim()) {
+                alert('請填寫詳細說明');
+                return;
+            }
+            
+            const reportData = {
+                saleId: this.saleId,
+                reason: reason,
+                description: description.trim(),
+                anonymous: anonymous,
+                reporterId: <#if user??>${user.id}<#else>null</#if>
+            };
+            
+            try {
+                console.log('提交檢舉數據:', reportData);
+                const response = await axios.post('/api/report/create', reportData);
+                console.log('檢舉提交響應:', response.data);
+                
+                if (response.data.success) {
+                    // 关闭檢舉弹窗
+                    const reportModalElement = document.getElementById('reportModal');
+                    if (reportModalElement) {
+                        const reportModal = bootstrap.Modal.getInstance(reportModalElement);
+                        if (reportModal) {
+                            reportModal.hide();
+                        } else {
+                            // 备用方案：直接隐藏弹窗
+                            reportModalElement.style.display = 'none';
+                            document.body.classList.remove('modal-open');
+                            const backdrop = document.querySelector('.modal-backdrop');
+                            if (backdrop) {
+                                backdrop.remove();
+                            }
+                        }
+                    }
+                    
+                    // 清空表单
+                    document.getElementById('reportForm').reset();
+                    
+                    // 显示成功提示
+                    alert('檢舉已提交，我們會盡快處理您的檢舉');
+                } else {
+                    alert('檢舉提交失敗：' + (response.data.message || '未知錯誤'));
+                }
+            } catch (error) {
+                console.error('檢舉提交錯誤:', error);
+                alert('檢舉提交失敗，請稍後再試');
+            }
         },
         
         // 格式化价格
@@ -510,11 +604,6 @@ new Vue({
             return mileage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         },
         
-        // 打开检车报告弹窗
-        openReportModal() {
-            const modal = new bootstrap.Modal(document.getElementById('reportModal'));
-            modal.show();
-        },
         
         // 打开预约弹窗
         openAppointmentModal() {
@@ -542,8 +631,18 @@ new Vue({
             modal.show();
         },
         
+        // 测试方法
+        testMethod() {
+            console.log('测试方法被调用');
+            console.log('当前Vue实例:', this);
+            console.log('saleId:', this.saleId);
+            alert('Vue实例正常工作！saleId: ' + this.saleId);
+        },
+        
         // 提交预约
-        submitAppointment() {
+        async submitAppointment() {
+            console.log('submitAppointment 方法被调用');
+            
             const form = document.getElementById('appointmentForm');
             if (!form) {
                 console.error('找不到预约表单');
@@ -557,83 +656,135 @@ new Vue({
             }
             
             // 获取表单数据
+            const appointmentDate = document.getElementById('appointmentDate')?.value || '';
+            const appointmentTime = document.getElementById('appointmentTime')?.value || '';
+            const appointmentPhone = document.getElementById('appointmentPhone')?.value || '';
+            const appointmentName = document.getElementById('appointmentNameDisplay')?.textContent?.trim() || '';
+            const appointmentNote = document.getElementById('appointmentNote')?.value || '';
+            
+            console.log('表单数据:', {
+                appointmentDate,
+                appointmentTime,
+                appointmentPhone,
+                appointmentName,
+                appointmentNote,
+                saleId: this.saleId
+            });
+            
+            // 组合日期和时间
+            const appointmentDateTime = new Date(appointmentDate + 'T' + appointmentTime);
+            
             const appointmentData = {
-                date: document.getElementById('appointmentDate')?.value || '',
-                time: document.getElementById('appointmentTime')?.value || '',
-                phone: document.getElementById('appointmentPhone')?.value || '',
-                name: document.getElementById('appointmentNameDisplay')?.textContent?.trim() || '',
-                note: document.getElementById('appointmentNote')?.value || '',
-                carTitle: this.carInfo.saleTitle || (this.carInfo.manufactureYear + '年 ' + this.carInfo.brand + ' ' + this.carInfo.customModel) || '車輛詳情'
+                carSaleId: this.saleId,
+                appointmentName: appointmentName,
+                appointmentPhone: appointmentPhone,
+                appointmentTime: appointmentDateTime.toISOString(),
+                appointmentNote: appointmentNote
             };
             
-            // 模拟提交预约
-            console.log('预约数据:', appointmentData);
+            console.log('准备提交的预约数据:', appointmentData);
             
-            // 关闭预约弹窗
-            const appointmentModalElement = document.getElementById('appointmentModal');
-            if (appointmentModalElement) {
-                const appointmentModal = bootstrap.Modal.getInstance(appointmentModalElement);
-                if (appointmentModal) {
-                    appointmentModal.hide();
+            try {
+                // 提交预约到后端
+                const response = await axios.post('/appointment/api/create', appointmentData);
+                console.log('预约提交响应:', response.data);
+                
+                if (response.data.success) {
+                    // 关闭预约弹窗
+                    const appointmentModalElement = document.getElementById('appointmentModal');
+                    if (appointmentModalElement) {
+                        const appointmentModal = bootstrap.Modal.getInstance(appointmentModalElement);
+                        if (appointmentModal) {
+                            appointmentModal.hide();
+                        } else {
+                            // 备用方案：直接隐藏弹窗
+                            appointmentModalElement.style.display = 'none';
+                            document.body.classList.remove('modal-open');
+                            const backdrop = document.querySelector('.modal-backdrop');
+                            if (backdrop) {
+                                backdrop.remove();
+                            }
+                        }
+                    }
+                    
+                    // 显示成功提示
+                    alert('預約成功！我們會盡快與您聯繫確認預約詳情。');
+                    
+                    // 重置表单
+                    form.reset();
+                    
+                    // 设置默认日期为明天
+                    const appointmentDateInput = document.getElementById('appointmentDate');
+                    if (appointmentDateInput) {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        appointmentDateInput.value = tomorrow.toISOString().split('T')[0];
+                    }
+                } else {
+                    alert('预约失败：' + response.data.message);
                 }
-            }
-            
-            // 显示成功提示
-            const successModalElement = document.getElementById('successModal');
-            if (successModalElement) {
-                const successModal = new bootstrap.Modal(successModalElement);
-                successModal.show();
-            }
-            
-            // 重置表单
-            form.reset();
-            
-            // 设置默认日期为明天
-            const appointmentDateInput = document.getElementById('appointmentDate');
-            if (appointmentDateInput) {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                appointmentDateInput.value = tomorrow.toISOString().split('T')[0];
+            } catch (error) {
+                console.error('提交预约失败:', error);
+                alert('预约失败，请稍后重试');
             }
         }
     }
 });
+} catch (error) {
+    console.error('Vue实例初始化失败:', error);
+    alert('页面初始化失败，请刷新页面重试');
+}
 </script>
 
 <style>
+/* 动作按钮容器样式 */
+.action-buttons {
+    display: flex;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
 /* 检车报告按钮样式 */
 .btn-report {
-    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    background-color: #6f42c1;
     border: none;
     color: white;
     border-radius: 10px;
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1rem;
     font-weight: 600;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .btn-report:hover {
-    background: linear-gradient(135deg, #5a32a3 0%, #4a2d8a 100%);
+    background-color: #5a32a3;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
     color: white;
 }
 
-/* 预约按钮样式 */
+/* 预约按钮样式 - 使用网站主色调 */
 .btn-appointment {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background-color: #5ACFC9;
     border: none;
     color: white;
     border-radius: 10px;
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1rem;
     font-weight: 600;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .btn-appointment:hover {
-    background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+    background-color: #4AB8B2;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
     color: white;
 }
 
@@ -683,6 +834,9 @@ new Vue({
 .form-label {
     font-weight: 600;
     color: #333;
+    text-align: left !important;
+    width: 100% !important;
+    display: block !important;
 }
 
 /* 联系人显示样式 */
@@ -695,56 +849,66 @@ new Vue({
     font-weight: 500;
 }
 
-.form-control-plaintext .text-danger {
-    font-weight: 600;
-}
-
-/* PDF信息容器样式 */
-.pdf-info-container {
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.pdf-info-container .text-center {
-    max-width: 500px;
-}
-
-.pdf-info-container i {
-    color: #5ACFC9;
-}
-
-.pdf-info-container h4 {
-    color: #495057;
-    font-weight: 600;
-}
-
-.pdf-info-container .btn {
-    border-radius: 10px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.pdf-info-container .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* 响应式设计 */
+ .form-control-plaintext .text-danger {
+     font-weight: 600;
+ }
+ 
+ /* 响应式设计 */
 @media (max-width: 768px) {
     .modal-dialog {
         margin: 1rem;
     }
     
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .action-buttons .flex-fill {
+        width: 100%;
+    }
+    
+    .action-buttons .me-2,
+    .action-buttons .ms-2 {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
     .btn-appointment,
     .btn-report {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        width: 100%;
+        margin-bottom: 0;
     }
     
     .modal-xl {
         max-width: 95%;
     }
+    
+    .specs .row {
+        margin: 0;
+    }
+    
+    .specs .row > div {
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-appointment,
+    .btn-report {
+        font-size: 0.9rem;
+        padding: 0.65rem 1rem;
+    }
+    
+    .car-title {
+        font-size: 1.5rem;
+    }
+    
+    .price .h4 {
+        font-size: 1.5rem;
+    }
 }
 </style>
+

@@ -1,13 +1,14 @@
 package cc.carce.sale.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cc.carce.sale.dto.CarShoppingCartDto;
+import cc.carce.sale.entity.CarProductsEntity;
 import cc.carce.sale.entity.CarShoppingCartEntity;
 import cc.carce.sale.mapper.manager.CarShoppingCartMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,12 @@ public class CarShoppingCartService {
 
 	@Resource
 	private CarShoppingCartMapper carShoppingCartMapper;
+	
+	@Resource
+	private CarProductsService carProductsService;
+	
+	@Value("${carce.prefix}")
+	private String imagePrefix;
 	
 	/**
 	 * 获取用户的购物车列表
@@ -173,18 +180,27 @@ public class CarShoppingCartService {
 		dto.setProductName(entity.getProductName());
 		dto.setCreateTime(entity.getCreateTime());
 		
-		// 这里可以添加从其他表获取车辆详细信息的逻辑
-		// 例如：从CarEntity、CarSalesEntity等表获取品牌、型号、图片等信息
-		// 暂时使用默认值
-		dto.setProductImage("/img/car/car" + (entity.getProductId() % 16 + 1) + ".jpg");
-		dto.setLicensePlate("车牌号");
-		dto.setBrandName("品牌");
-		dto.setModelName("型号");
-		dto.setManufactureYear(2020);
-		dto.setColor("白色");
-		dto.setMileage(50000);
-		dto.setTransmission("自动");
-		dto.setFuelSystem("汽油");
+		// 查询商品详细信息
+		CarProductsEntity product = carProductsService.getProductById(entity.getProductId());
+		if (product != null) {
+			dto.setSource(product.getSource());
+			dto.setAlias(product.getAlias());
+			dto.setModel(product.getModel());
+			dto.setMarketPrice(product.getMarketPrice());
+			dto.setBrand(product.getBrand());
+			dto.setTag(product.getTag());
+			// 设置商品图片路径
+			dto.setProductImage(imagePrefix + "/img/product/" + product.getId() + "_90x90.jpg");
+		} else {
+			// 如果商品不存在，设置默认值
+			dto.setSource("未知");
+			dto.setAlias("未知");
+			dto.setModel("未知");
+			dto.setMarketPrice(0L);
+			dto.setBrand("未知");
+			dto.setTag("未知");
+			dto.setProductImage(imagePrefix + "/img/product/default_90x90.jpg");
+		}
 		
 		return dto;
 	}

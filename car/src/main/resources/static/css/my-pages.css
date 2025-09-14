@@ -1,0 +1,441 @@
+/* 统一我的页面样式 - 基于我的订单页面设计 */
+
+/* 页面基础样式 */
+.my-page {
+    padding: 20px 0;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.page-title {
+    color: #333;
+    margin-bottom: 30px;
+    font-weight: 600;
+    font-size: 1.8rem;
+}
+
+/* 卡片样式 */
+.item-card {
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.item-card .card-header {
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+    color: white;
+    border-radius: 10px 10px 0 0 !important;
+    border: none;
+    padding: 15px 20px;
+}
+
+.item-card .card-title {
+    color: white;
+    font-weight: 600;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* 信息区域样式 */
+.item-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.info-value {
+    color: #333;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.info-value.amount {
+    color: #e74c3c;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.info-value.highlight {
+    color: #5ACFC9;
+    font-weight: 600;
+}
+
+/* 状态标签样式 */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* 预约状态 */
+.status-appointed {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.status-viewed {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* 检举状态 */
+.status-submitted {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-processing {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b3d7ff;
+}
+
+.status-processed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-cancelled-report {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* 订单状态 */
+.status-unpaid {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-paid {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-shipped {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b3d7ff;
+}
+
+.status-completed {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* 操作按钮区域 */
+.item-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn-outline-primary {
+    border-color: #5ACFC9;
+    color: #5ACFC9;
+}
+
+.btn-outline-primary:hover {
+    background-color: #5ACFC9;
+    border-color: #5ACFC9;
+    color: white;
+}
+
+.btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #5ACFC9;
+    border-color: #5ACFC9;
+}
+
+.btn-primary:hover {
+    background-color: #4AB8B2;
+    border-color: #4AB8B2;
+}
+
+/* 车辆信息样式 */
+.car-info {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex: 1;
+}
+
+.car-info-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.car-image {
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.car-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.car-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.car-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+    margin-bottom: 1px;
+}
+
+.car-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-bottom: 2px;
+}
+
+.car-brand {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.car-model {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.car-price {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #5ACFC9;
+}
+
+.status-actions-section {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: 120px;
+}
+
+/* 空状态样式 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #dee2e6;
+}
+
+.empty-state h4 {
+    color: #999;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+/* 加载状态样式 */
+.loading-container {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.loading-container .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 20px;
+}
+
+/* 备注信息样式 */
+.item-note {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-top: 15px;
+}
+
+.item-note strong {
+    color: #333;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .my-page {
+        padding: 10px 0;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .item-card .card-body {
+        padding: 15px;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .item-actions {
+        flex-direction: column;
+    }
+    
+    .car-info {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .car-info-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .car-image {
+        width: 100%;
+        height: 120px;
+    }
+    
+    .status-actions-section {
+        align-self: stretch;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        min-width: auto;
+    }
+}
+
+/* 链接样式 */
+.car-link {
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.car-link:hover {
+    color: #5ACFC9;
+    text-decoration: none;
+}
+
+/* 特殊布局 */
+.appointment-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* 状态和操作按钮的顶部布局 */
+.status-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+    .appointment-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .appointment-actions {
+        align-self: flex-end;
+    }
+    
+    .status-actions-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

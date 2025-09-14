@@ -266,6 +266,9 @@
                             <a class="nav-link" href="/mall">商城</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="/channel">頻道</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="/about">關於</a>
                         </li>
                         <#if user?? && user?has_content>
@@ -283,6 +286,12 @@
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="/my-order/index">
                                         <i class="bi bi-list-ul me-2"></i>我的訂單
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="/appointment/my-appointments">
+                                        <i class="bi bi-calendar-check me-2"></i>我的預約
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="/my-reports">
+                                        <i class="bi bi-flag me-2"></i>我的檢舉
                                     </a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/logout">

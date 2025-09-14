@@ -31,4 +31,12 @@ public class BaseController {
 		}
 		return null;
 	}
+
+	protected Long getCurrentUserId(){
+		UserInfo sessionUser = getSessionUser();
+		if(sessionUser != null) {
+			return sessionUser.getId();
+		}
+		return null;
+	}
 }

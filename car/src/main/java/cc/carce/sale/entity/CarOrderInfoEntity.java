@@ -85,6 +85,75 @@ public class CarOrderInfoEntity {
     private String logicNumber;
 
     /**
+     * 订单类型 1 宅配到府 2 超商取货
+     */
+    @Column(name = "orderType", columnDefinition = "INT(11) DEFAULT 1 COMMENT '订单类型 1 宅配到府 2 超商取货'")
+    private Integer orderType = 1;
+
+    /**
+     * 超商店舖編號
+     */
+    @Column(name = "CVSStoreID", columnDefinition = "VARCHAR(50) COMMENT '超商店舖編號'")
+    private String cvsStoreID;
+
+    /**
+     * 超商店舖名稱
+     */
+    @Column(name = "CVSStoreName", columnDefinition = "VARCHAR(100) COMMENT '超商店舖名稱'")
+    private String cvsStoreName;
+
+    /**
+     * 超商店舖地址
+     */
+    @Column(name = "CVSAddress", columnDefinition = "VARCHAR(255) COMMENT '超商店舖地址'")
+    private String cvsAddress;
+
+    /**
+     * 超商店舖電話
+     */
+    @Column(name = "CVSTelephone", columnDefinition = "VARCHAR(50) COMMENT '超商店舖電話'")
+    private String cvsTelephone;
+
+    /**
+     * 使用者選擇的超商店舖是否為離島店鋪.0：本島,1：離島
+     */
+    @Column(name = "CVSOutSide", columnDefinition = "INT(11) COMMENT '使用者選擇的超商店舖是否為離島店鋪.0：本島,1：離島'")
+    private Integer cvsOutSide;
+
+    /**
+     * 订单类型枚举
+     */
+    public enum OrderType {
+        HOME_DELIVERY(1, "宅配到府"),
+        CONVENIENCE_STORE(2, "超商取货");
+
+        private final Integer code;
+        private final String description;
+
+        OrderType(Integer code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public static OrderType fromCode(Integer code) {
+            for (OrderType type : values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("未知的订单类型码: " + code);
+        }
+    }
+
+    /**
      * 订单状态枚举
      */
     public enum OrderStatus {

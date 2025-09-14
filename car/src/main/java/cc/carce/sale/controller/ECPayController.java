@@ -61,8 +61,21 @@ public class ECPayController extends BaseController{
                 return R.fail("收件人手機號不能為空", null);
             }
             
-            if (form.getReceiverAddress() == null || form.getReceiverAddress().trim().isEmpty()) {
-                return R.fail("收件人地址不能為空", null);
+            // 根据订单类型验证相应字段
+            if (form.getOrderType() == null) {
+                form.setOrderType(1); // 默认宅配到府
+            }
+            
+            if (form.getOrderType() == 1) {
+                // 宅配到府，验证地址
+                if (form.getReceiverAddress() == null || form.getReceiverAddress().trim().isEmpty()) {
+                    return R.fail("收件人地址不能為空", null);
+                }
+            } else if (form.getOrderType() == 2) {
+                // 超商取货，验证门店信息
+                if (form.getCvsStoreID() == null || form.getCvsStoreID().trim().isEmpty()) {
+                    return R.fail("請選擇取貨門店", null);
+                }
             }
             
             if (form.getDescription() == null || form.getDescription().trim().isEmpty()) {
@@ -182,32 +195,76 @@ public class ECPayController extends BaseController{
     }
     
     /**
-     * 绿界支付同步返回接口
+     * 绿界付款结果通知接口
+     * 接收绿界POST过来的付款结果通知
+     * 
+     * @param request HTTP请求对象，包含绿界返回的所有参数
+     * @return 返回"1|OK"表示接收成功
      */
-    @GetMapping("/return")
-    public String handlePaymentReturn(HttpServletRequest request) {
+    @PostMapping("/return")
+    public String paymentReturn(HttpServletRequest request) {
         try {
-            // 获取所有返回参数
-            Map<String, String[]> parameterMap = request.getParameterMap();
-            Map<String, String> returnParams = new java.util.HashMap<>();
+            log.info("收到绿界付款结果通知");
             
+            // 获取所有请求参数
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            
+            // 记录接收到的参数（用于调试）
+            StringBuilder paramsLog = new StringBuilder("付款结果通知参数: ");
             for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
                 String key = entry.getKey();
                 String[] values = entry.getValue();
                 if (values != null && values.length > 0) {
-                    returnParams.put(key, values[0]);
+                    paramsLog.append(key).append("=").append(values[0]).append(", ");
                 }
             }
+            log.info(paramsLog.toString());
             
-            log.info("收到绿界支付同步返回，参数数量: {}", returnParams.size());
+            // 提取关键参数
+            String merchantId = request.getParameter("MerchantID");
+            String merchantTradeNo = request.getParameter("MerchantTradeNo");
+            String rtnCode = request.getParameter("RtnCode");
+            String rtnMsg = request.getParameter("RtnMsg");
+            String tradeNo = request.getParameter("TradeNo");
+            String tradeAmt = request.getParameter("TradeAmt");
+            String paymentDate = request.getParameter("PaymentDate");
+            String paymentType = request.getParameter("PaymentType");
+            String checkMacValue = request.getParameter("CheckMacValue");
             
-            // 这里可以重定向到前端页面，显示支付结果
-            // 或者返回支付结果页面
-            return "支付處理完成，請查看訂單狀態";
+            log.info("付款结果通知 - 特店编号: {}, 特店交易编号: {}, 交易状态: {}, 交易消息: {}, 绿界交易编号: {}, 交易金额: {}, 付款时间: {}, 付款方式: {}", 
+                    merchantId, merchantTradeNo, rtnCode, rtnMsg, tradeNo, tradeAmt, paymentDate, paymentType);
+            
+            // 验证必要参数
+            if (merchantId == null || merchantTradeNo == null || rtnCode == null) {
+                log.error("付款结果通知缺少必要参数");
+                return "0|ERROR";
+            }
+            
+            // 验证检查码（这里可以调用ECPayService的验证方法）
+            boolean isValid = ecPayService.verifyPaymentResult(request);
+            if (!isValid) {
+                log.error("付款结果通知检查码验证失败");
+                return "0|ERROR";
+            }
+            
+            // 处理付款结果
+            boolean processResult = ecPayService.processPaymentResult(
+                merchantId, merchantTradeNo, rtnCode, rtnMsg, tradeNo, 
+                tradeAmt, paymentDate, paymentType, checkMacValue
+            );
+            
+            if (processResult) {
+                log.info("付款结果处理成功 - 特店交易编号: {}", merchantTradeNo);
+                return "1|OK";
+            } else {
+                log.error("付款结果处理失败 - 特店交易编号: {}", merchantTradeNo);
+                return "0|ERROR";
+            }
             
         } catch (Exception e) {
-            log.error("处理绿界支付同步返回异常", e);
-            return "支付處理異常";
+            log.error("处理付款结果通知时发生异常", e);
+            return "0|ERROR";
         }
     }
+    
 }

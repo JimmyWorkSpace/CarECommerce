@@ -26,11 +26,18 @@
                     <div class="filter-section">
                         <h5 class="filter-section-title">品牌</h5>
                         <div class="filter-options">
-                            <label class="filter-option" v-for="brandItem in filterOptions.brands" :key="brandItem">
-                                <input type="checkbox" name="brand" :value="brandItem" v-model="searchForm.brand">
+                            <label class="filter-option" v-for="brandItem in visibleBrands" :key="brandItem.brand">
+                                <input type="checkbox" :value="brandItem.brand" v-model="searchForm.brand">
                                 <span class="checkmark"></span>
-                                <span v-text="brandItem"></span>
+                                <span v-text="brandItem.brand"></span>
+                                <span class="brand-count">({{ brandItem.saleCount }})</span>
                             </label>
+                        </div>
+                        <div class="brand-toggle" v-if="brandSaleCountList.length > 8">
+                            <button type="button" class="btn btn-link btn-sm" @click="toggleBrandExpanded">
+                                {{ brandExpanded ? '收起' : '展开全部' }}
+                                <i :class="brandExpanded ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -53,52 +60,41 @@
                         </select>
                     </div>
 
-                    <!-- 燃料类型 -->
+
+                    <!-- 变速系统 -->
                     <div class="filter-section">
-                        <h5 class="filter-section-title">燃料類型</h5>
+                        <h5 class="filter-section-title">變速系統</h5>
                         <div class="filter-options">
-                            <label class="filter-option" v-for="fuelTypeItem in filterOptions.fuelTypes" :key="fuelTypeItem">
-                                <input type="checkbox" name="fuelType" :value="fuelTypeItem" v-model="searchForm.fuelType">
+                            <label class="filter-option" v-for="transmission in filterOptions.transmissions" :key="transmission">
+                                <input type="checkbox" :value="transmission" v-model="searchForm.transmission">
                                 <span class="checkmark"></span>
-                                <span v-text="fuelTypeItem"></span>
+                                <span v-text="transmission"></span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- 变速箱 -->
+                    <!-- 驱动方式 -->
                     <div class="filter-section">
-                        <h5 class="filter-section-title">變速箱</h5>
+                        <h5 class="filter-section-title">驅動方式</h5>
                         <div class="filter-options">
-                            <label class="filter-option" v-for="transmissionItem in filterOptions.transmissions" :key="transmissionItem">
-                                <input type="checkbox" name="transmission" :value="transmissionItem" v-model="searchForm.transmission">
+                            <label class="filter-option" v-for="drivetrain in filterOptions.drivetrains" :key="drivetrain">
+                                <input type="checkbox" :value="drivetrain" v-model="searchForm.drivetrain">
                                 <span class="checkmark"></span>
-                                <span v-text="transmissionItem"></span>
+                                <span v-text="drivetrain"></span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- 车身类型 -->
+                    <!-- 燃料系统 -->
                     <div class="filter-section">
-                        <h5 class="filter-section-title">車身類型</h5>
+                        <h5 class="filter-section-title">燃料系統</h5>
                         <div class="filter-options">
-                            <label class="filter-option" v-for="bodyTypeItem in filterOptions.bodyTypes" :key="bodyTypeItem">
-                                <input type="checkbox" name="bodyType" :value="bodyTypeItem" v-model="searchForm.bodyType">
+                            <label class="filter-option" v-for="fuelSystem in filterOptions.fuelSystems" :key="fuelSystem">
+                                <input type="checkbox" :value="fuelSystem" v-model="searchForm.fuelSystem">
                                 <span class="checkmark"></span>
-                                <span v-text="bodyTypeItem"></span>
+                                <span v-text="fuelSystem"></span>
                             </label>
                         </div>
-                    </div>
-
-                    <!-- 里程数 -->
-                    <div class="filter-section">
-                        <h5 class="filter-section-title">里程數</h5>
-                        <select class="form-control" v-model="searchForm.mileage">
-                            <option value="">所有里程</option>
-                            <option value="10000">10,000 km以下</option>
-                            <option value="30000">30,000 km以下</option>
-                            <option value="50000">50,000 km以下</option>
-                            <option value="100000">100,000 km以下</option>
-                        </select>
                     </div>
 
                     <!-- 应用筛选按钮 -->
@@ -215,26 +211,27 @@ new Vue({
         pageSize: 24,
         searchForm: {
             keyword: '',
-            brand: '',
+            brand: [],
             model: '',
             year: '',
             priceMin: '',
             priceMax: '',
-            fuelType: '',
-            transmission: '',
-            mileage: '',
-            bodyType: '',
             sortBy: 'newest',
             pageNum: 1,
-            pageSize: 24
+            pageSize: 24,
+            // 新增筛选字段
+            transmission: [],
+            drivetrain: [],
+            fuelSystem: []
         },
         filterOptions: {
-            brands: ['Toyota', 'Honda', 'Nissan', 'BMW', 'Audi', 'Mercedes', 'Lexus', 'Mazda'],
             years: [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016],
-            fuelTypes: ['Gasoline', 'Diesel', 'Electric', 'Hybrid'],
-            transmissions: ['Automatic', 'Manual', 'CVT'],
-            bodyTypes: ['Sedan', 'SUV', 'Hatchback', 'Coupe']
-        }
+            transmissions: [],
+            drivetrains: [],
+            fuelSystems: []
+        },
+        brandSaleCountList: [],
+        brandExpanded: false
     },
     computed: {
         visiblePages() {
@@ -246,10 +243,19 @@ new Vue({
                 pages.push(i);
             }
             return pages;
+        },
+        visibleBrands() {
+            if (this.brandExpanded) {
+                return this.brandSaleCountList;
+            } else {
+                return this.brandSaleCountList.slice(0, 8);
+            }
         }
     },
     mounted() {
         this.loadCars();
+        this.loadBrandSaleCount();
+        this.loadCarFilterOptions();
     },
     methods: {
         async loadCars() {
@@ -308,6 +314,39 @@ new Vue({
         
         goToCarDetail(saleId) {
             window.location.href = '/detail/' + saleId;
+        },
+        
+        async loadBrandSaleCount() {
+            try {
+                const response = await axios.get('/api/car-filter/brand-sale-count');
+                if (response.data.success) {
+                    this.brandSaleCountList = response.data.data || [];
+                } else {
+                    console.error('加载品牌数据失败:', response.data.message);
+                }
+            } catch (error) {
+                console.error('加载品牌数据失败:', error);
+            }
+        },
+        
+        async loadCarFilterOptions() {
+            try {
+                const response = await axios.get('/api/car-filter/options');
+                if (response.data.success) {
+                    const options = response.data.data || {};
+                    this.filterOptions.transmissions = options.transmissions || [];
+                    this.filterOptions.drivetrains = options.drivetrains || [];
+                    this.filterOptions.fuelSystems = options.fuelSystems || [];
+                } else {
+                    console.error('加载筛选选项失败:', response.data.message);
+                }
+            } catch (error) {
+                console.error('加载筛选选项失败:', error);
+            }
+        },
+        
+        toggleBrandExpanded() {
+            this.brandExpanded = !this.brandExpanded;
         }
     }
 });
