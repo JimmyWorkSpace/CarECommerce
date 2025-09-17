@@ -29,14 +29,6 @@ public interface CarAppointmentMapper extends Mapper<CarAppointmentEntity> {
     CarAppointmentDto selectAppointmentById(@Param("id") Long id);
 
     /**
-     * 更新预约状态
-     * @param id 预约ID
-     * @param status 新状态
-     * @return 影响行数
-     */
-    int updateAppointmentStatus(@Param("id") Long id, @Param("status") Integer status);
-
-    /**
      * 查询预约看车列表（带车辆销售标题）
      * @param carAppointment 预约看车查询条件
      * @return 预约看车列表

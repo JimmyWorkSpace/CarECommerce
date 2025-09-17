@@ -54,8 +54,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         order by a.createTime desc
     </select>
 
-    <update id="updateAppointmentStatus">
-        update car_appointment set appointmentStatus = #{status}, updateTime = now() where id = #{id}
-    </update>
 
 </mapper>
