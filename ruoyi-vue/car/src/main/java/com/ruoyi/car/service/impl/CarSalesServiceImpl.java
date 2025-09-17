@@ -1,9 +1,8 @@
 package com.ruoyi.car.service.impl;
 
-import java.util.UUID;
+import java.util.List;
 
 import javax.annotation.Resource;
-import javax.persistence.Table;
 
 import org.springframework.stereotype.Service;
 
@@ -13,9 +12,7 @@ import com.ruoyi.car.service.CarSalesService;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.EntityTable;
 import tk.mybatis.mapper.entity.Example;
-import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
 @Service
 @Slf4j
@@ -74,5 +71,33 @@ public class CarSalesServiceImpl implements CarSalesService {
 		Example example = new Example(CarSalesEntity.class);
 		example.createCriteria().andEqualTo("id", carSaleId);
 		return carSalesMapper.selectOneByExample(example);
+	}
+	
+	/**
+	 * 查询车辆销售列表
+	 * 
+	 * @param carSales 车辆销售信息
+	 * @return 车辆销售集合
+	 */
+	@Override
+	public List<CarSalesEntity> selectCarSalesList(CarSalesEntity carSales) {
+		Example example = new Example(CarSalesEntity.class);
+		Example.Criteria criteria = example.createCriteria();
+		
+		if (carSales.getSaleTitle() != null && !carSales.getSaleTitle().trim().isEmpty()) {
+			criteria.andLike("saleTitle", "%" + carSales.getSaleTitle() + "%");
+		}
+		if (carSales.getSalesperson() != null && !carSales.getSalesperson().trim().isEmpty()) {
+			criteria.andLike("salesperson", "%" + carSales.getSalesperson() + "%");
+		}
+		if (carSales.getStatus() != null && !carSales.getStatus().trim().isEmpty()) {
+			criteria.andEqualTo("status", carSales.getStatus());
+		}
+		if (carSales.getPublisher() != null && !carSales.getPublisher().trim().isEmpty()) {
+			criteria.andLike("publisher", "%" + carSales.getPublisher() + "%");
+		}
+		
+		example.orderBy("createDate").desc();
+		return carSalesMapper.selectByExample(example);
 	}
 }

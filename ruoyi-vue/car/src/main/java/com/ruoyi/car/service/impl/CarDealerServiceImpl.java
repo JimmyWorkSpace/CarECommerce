@@ -99,4 +99,29 @@ public class CarDealerServiceImpl implements CarDealerService {
 		}
 		return result;
 	}
+	
+	/**
+	 * 查询经销商列表
+	 * 
+	 * @param carDealer 经销商信息
+	 * @return 经销商集合
+	 */
+	@Override
+	public List<CarDealerEntity> selectCarDealerList(CarDealerEntity carDealer) {
+		Example example = new Example(CarDealerEntity.class);
+		Example.Criteria criteria = example.createCriteria();
+		
+		if (carDealer.getDealerName() != null && !carDealer.getDealerName().trim().isEmpty()) {
+			criteria.andLike("dealerName", "%" + carDealer.getDealerName() + "%");
+		}
+		if (carDealer.getContactPerson() != null && !carDealer.getContactPerson().trim().isEmpty()) {
+			criteria.andLike("contactPerson", "%" + carDealer.getContactPerson() + "%");
+		}
+		if (carDealer.getCompanyPhone() != null && !carDealer.getCompanyPhone().trim().isEmpty()) {
+			criteria.andLike("companyPhone", "%" + carDealer.getCompanyPhone() + "%");
+		}
+		
+		example.orderBy("cDt").desc();
+		return carDealerMapper.selectByExample(example);
+	}
 }
