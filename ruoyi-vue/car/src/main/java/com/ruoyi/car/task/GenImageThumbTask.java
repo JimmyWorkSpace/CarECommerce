@@ -45,7 +45,7 @@ public class GenImageThumbTask {
 	
 	private ExecutorService es = ThreadUtil.newExecutor(3);
 	
-	@PostConstruct
+//	@PostConstruct
 	public void execute() {
 //		获取要生成缩略图的图片信息
 		List<CarSalePhotoEntity> list = carSalePhotoMapper.getNotThumbedImage();
