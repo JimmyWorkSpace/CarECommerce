@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.car.mapper.master.CarAppointmentMapper">
+    
+    <resultMap type="com.ruoyi.car.dto.CarAppointmentDto" id="CarAppointmentDtoResult">
+        <result property="id"    column="id"    />
+        <result property="carSaleId"    column="carSaleId"    />
+        <result property="userId"    column="userId"    />
+        <result property="appointmentName"    column="appointmentName"    />
+        <result property="appointmentPhone"    column="appointmentPhone"    />
+        <result property="appointmentTime"    column="appointmentTime"    />
+        <result property="appointmentNote"    column="appointmentNote"    />
+        <result property="appointmentStatus"    column="appointmentStatus"    />
+        <result property="appointmentStatusDesc"    column="appointmentStatusDesc"    />
+        <result property="createTime"    column="createTime"    />
+        <result property="updateTime"    column="updateTime"    />
+        <result property="saleTitle"    column="saleTitle"    />
+    </resultMap>
+
+    <sql id="selectCarAppointmentDtoVo">
+        select a.id, a.carSaleId, a.userId, a.appointmentName, a.appointmentPhone, 
+               a.appointmentTime, a.appointmentNote, a.appointmentStatus, 
+               a.createTime, a.updateTime,
+               case a.appointmentStatus 
+                   when 1 then '已预约'
+                   when 2 then '已看车' 
+                   when 3 then '已取消'
+                   else '未知'
+               end as appointmentStatusDesc
+        from car_appointment a
+    </sql>
+
+    <select id="selectCarAppointmentListWithSaleTitle" parameterType="com.ruoyi.car.domain.CarAppointmentEntity" resultMap="CarAppointmentDtoResult">
+        <include refid="selectCarAppointmentDtoVo"/>
+        <where>  
+            <if test="appointmentName != null  and appointmentName != ''"> and a.appointmentName like concat('%', #{appointmentName}, '%')</if>
+            <if test="appointmentPhone != null  and appointmentPhone != ''"> and a.appointmentPhone like concat('%', #{appointmentPhone}, '%')</if>
+            <if test="appointmentStatus != null "> and a.appointmentStatus = #{appointmentStatus}</if>
+            and a.delFlag = 0
+        </where>
+        order by a.createTime desc
+    </select>
+
+    <select id="selectAppointmentById" parameterType="Long" resultMap="CarAppointmentDtoResult">
+        <include refid="selectCarAppointmentDtoVo"/>
+        where a.id = #{id}
+    </select>
+
+    <select id="selectAppointmentsByUserId" parameterType="Long" resultMap="CarAppointmentDtoResult">
+        <include refid="selectCarAppointmentDtoVo"/>
+        where a.userId = #{userId} and a.delFlag = 0
+        order by a.createTime desc
+    </select>
+
+    <update id="updateAppointmentStatus">
+        update car_appointment set appointmentStatus = #{status}, updateTime = now() where id = #{id}
+    </update>
+
+</mapper>

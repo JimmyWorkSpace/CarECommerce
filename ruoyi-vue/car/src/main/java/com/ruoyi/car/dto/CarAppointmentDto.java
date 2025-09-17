@@ -66,6 +66,11 @@ public class CarAppointmentDto {
 
     // 车辆相关信息
     /**
+     * 车辆销售标题
+     */
+    private String saleTitle;
+
+    /**
      * 车辆标题
      */
     private String carTitle;
