@@ -50,6 +50,38 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
+          type="info"
+          plain
+          icon="el-icon-arrow-up"
+          size="mini"
+          :disabled="single"
+          @click="handleMoveUp"
+          v-hasPermi="['car:richContent:edit']"
+        >上移</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="info"
+          plain
+          icon="el-icon-arrow-down"
+          size="mini"
+          :disabled="single"
+          @click="handleMoveDown"
+          v-hasPermi="['car:richContent:edit']"
+        >下移</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="info"
+          plain
+          icon="el-icon-sort"
+          size="mini"
+          @click="handleSaveOrder"
+          v-hasPermi="['car:richContent:edit']"
+        >保存排序</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
           type="danger"
           plain
           icon="el-icon-delete"
@@ -59,20 +91,15 @@
           v-hasPermi="['car:richContent:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['car:richContent:export']"
-        >导出</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="richContentList" @selection-change="handleSelectionChange">
+    <el-table 
+      v-loading="loading" 
+      :data="richContentList" 
+      @selection-change="handleSelectionChange"
+      row-key="id"
+      :row-class-name="tableRowClassName">
       <el-table-column type="selection" width="55" align="center" />
       <!-- <el-table-column label="主键ID" align="center" prop="id" /> -->
       <el-table-column label="标题" align="center" prop="title" />
@@ -81,7 +108,6 @@
           <dict-tag :options="contentTypeOptions" :value="scope.row.contentType"/>
         </template>
       </el-table-column> -->
-      <el-table-column label="排序" align="center" prop="showOrder" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -124,11 +150,6 @@
               <el-input v-model="form.title" placeholder="请输入标题" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="排序" prop="showOrder">
-              <el-input-number v-model="form.showOrder" :min="0" placeholder="请输入排序" />
-            </el-form-item>
-          </el-col>
         </el-row>
         <el-form-item label="内容" prop="content">
           <editor v-model="form.content" :min-height="500"/>
@@ -143,7 +164,7 @@
 </template>
 
 <script>
-import { listRichContent, getRichContent, delRichContent, addRichContent, updateRichContent } from "@/api/car/richContent";
+import { listRichContent, getRichContent, delRichContent, addRichContent, updateRichContent, updateRichContentOrder } from "@/api/car/richContent";
 
 export default {
   name: "RichContent",
@@ -186,7 +207,10 @@ export default {
         title: [
           { required: true, message: "标题不能为空", trigger: "blur" }
         ]
-      }
+      },
+      // 排序相关
+      orderChanged: false,
+      originalOrder: []
     };
   },
   created() {
@@ -200,6 +224,8 @@ export default {
         this.richContentList = response.rows;
         this.total = response.total;
         this.loading = false;
+        // 保存原始排序
+        this.originalOrder = this.richContentList.map(item => ({ id: item.id, showOrder: item.showOrder }));
       });
     },
     /** 搜索按钮操作 */
@@ -244,12 +270,6 @@ export default {
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      this.download('car/richContent/export', {
-        ...this.queryParams
-      }, `richContent_${new Date().getTime()}.xlsx`)
-    },
     // 取消按钮
     cancel() {
       this.open = false;
@@ -285,7 +305,89 @@ export default {
           }
         }
       });
+    },
+    /** 上移操作 */
+    handleMoveUp() {
+      if (this.ids.length !== 1) {
+        this.$modal.msgWarning("请选择一条记录进行上移操作");
+        return;
+      }
+      
+      const selectedId = this.ids[0];
+      const currentIndex = this.richContentList.findIndex(item => item.id === selectedId);
+      
+      if (currentIndex <= 0) {
+        this.$modal.msgWarning("已经是第一条记录，无法上移");
+        return;
+      }
+      
+      // 交换当前记录与上一条记录的排序
+      const currentItem = this.richContentList[currentIndex];
+      const prevItem = this.richContentList[currentIndex - 1];
+      
+      const tempOrder = currentItem.showOrder;
+      currentItem.showOrder = prevItem.showOrder;
+      prevItem.showOrder = tempOrder;
+      
+      // 重新排序数组
+      this.richContentList.sort((a, b) => a.showOrder - b.showOrder);
+      
+      this.orderChanged = true;
+    },
+    /** 下移操作 */
+    handleMoveDown() {
+      if (this.ids.length !== 1) {
+        this.$modal.msgWarning("请选择一条记录进行下移操作");
+        return;
+      }
+      
+      const selectedId = this.ids[0];
+      const currentIndex = this.richContentList.findIndex(item => item.id === selectedId);
+      
+      if (currentIndex >= this.richContentList.length - 1) {
+        this.$modal.msgWarning("已经是最后一条记录，无法下移");
+        return;
+      }
+      
+      // 交换当前记录与下一条记录的排序
+      const currentItem = this.richContentList[currentIndex];
+      const nextItem = this.richContentList[currentIndex + 1];
+      
+      const tempOrder = currentItem.showOrder;
+      currentItem.showOrder = nextItem.showOrder;
+      nextItem.showOrder = tempOrder;
+      
+      // 重新排序数组
+      this.richContentList.sort((a, b) => a.showOrder - b.showOrder);
+      
+      this.orderChanged = true;
+    },
+    /** 保存排序 */
+    handleSaveOrder() {
+      // 批量更新排序
+      updateRichContentOrder(this.richContentList).then(response => {
+        this.$modal.msgSuccess("排序保存成功");
+        this.orderChanged = false;
+        this.getList();
+      });
+    },
+    /** 表格行样式 */
+    tableRowClassName({row, rowIndex}) {
+      // 如果排序发生变化，给行添加高亮样式
+      if (this.orderChanged) {
+        const original = this.originalOrder.find(o => o.id === row.id);
+        if (original && original.showOrder !== row.showOrder) {
+          return 'order-changed-row';
+        }
+      }
+      return '';
     }
   }
 };
 </script>
+
+<style scoped>
+.order-changed-row {
+  background-color: #f0f9ff !important;
+}
+</style>

@@ -58,4 +58,12 @@ public interface ICarRichContentService
      * @return 结果
      */
     public int deleteCarRichContentById(Long id);
+
+    /**
+     * 批量更新富文本内容排序
+     * 
+     * @param carRichContentList 富文本内容列表
+     * @return 结果
+     */
+    public int updateCarRichContentOrder(List<CarRichContentEntity> carRichContentList);
 }

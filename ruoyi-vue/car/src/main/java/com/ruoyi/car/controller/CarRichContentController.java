@@ -101,4 +101,15 @@ public class CarRichContentController extends BaseController
     {
         return toAjax(carRichContentService.deleteCarRichContentByIds(ids));
     }
+
+    /**
+     * 更新富文本内容排序
+     */
+    @PreAuthorize("@ss.hasPermi('car:richContent:edit')")
+    @Log(title = "富文本内容排序", businessType = BusinessType.UPDATE)
+    @PutMapping("/order")
+    public AjaxResult updateOrder(@RequestBody List<CarRichContentEntity> carRichContentList)
+    {
+        return toAjax(carRichContentService.updateCarRichContentOrder(carRichContentList));
+    }
 }

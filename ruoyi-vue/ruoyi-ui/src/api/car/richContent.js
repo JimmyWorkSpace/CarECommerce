@@ -42,3 +42,12 @@ export function delRichContent(id) {
     method: 'delete'
   })
 }
+
+// 批量更新富文本内容排序
+export function updateRichContentOrder(data) {
+  return request({
+    url: '/car/richContent/order',
+    method: 'put',
+    data: data
+  })
+}

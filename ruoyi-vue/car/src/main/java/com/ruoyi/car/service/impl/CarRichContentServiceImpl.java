@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.car.mapper.master.CarRichContentMapper;
 import com.ruoyi.car.domain.CarRichContentEntity;
 import com.ruoyi.car.service.ICarRichContentService;
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * 富文本内容Service业务层处理
@@ -29,7 +30,11 @@ public class CarRichContentServiceImpl implements ICarRichContentService
     @Override
     public CarRichContentEntity selectCarRichContentById(Long id)
     {
-        return carRichContentMapper.selectById(id);
+        Example example = new Example(CarRichContentEntity.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("id", id);
+        criteria.andCondition("(delFlag = 0 or delFlag is null)");
+        return carRichContentMapper.selectOneByExample(example);
     }
 
     /**
@@ -41,7 +46,26 @@ public class CarRichContentServiceImpl implements ICarRichContentService
     @Override
     public List<CarRichContentEntity> selectCarRichContentList(CarRichContentEntity carRichContent)
     {
-        return carRichContentMapper.selectCarRichContentList(carRichContent);
+        Example example = new Example(CarRichContentEntity.class);
+        Example.Criteria criteria = example.createCriteria();
+        
+        // 未删除条件
+        criteria.andCondition("(delFlag = 0 or delFlag is null)");
+        
+        // 标题模糊查询
+        if (carRichContent.getTitle() != null && !carRichContent.getTitle().trim().isEmpty()) {
+            criteria.andLike("title", "%" + carRichContent.getTitle() + "%");
+        }
+        
+        // 内容类型查询
+        if (carRichContent.getContentType() != null) {
+            criteria.andEqualTo("contentType", carRichContent.getContentType());
+        }
+        
+        // 排序
+        example.orderBy("showOrder").asc().orderBy("createTime").desc();
+        
+        return carRichContentMapper.selectByExample(example);
     }
 
     /**
@@ -55,7 +79,7 @@ public class CarRichContentServiceImpl implements ICarRichContentService
     {
         carRichContent.setCreateTime(LocalDateTime.now());
         carRichContent.setDelFlag(false);
-        return carRichContentMapper.insert(carRichContent);
+        return carRichContentMapper.insertSelective(carRichContent);
     }
 
     /**
@@ -67,7 +91,7 @@ public class CarRichContentServiceImpl implements ICarRichContentService
     @Override
     public int updateCarRichContent(CarRichContentEntity carRichContent)
     {
-        return carRichContentMapper.updateById(carRichContent);
+        return carRichContentMapper.updateByPrimaryKeySelective(carRichContent);
     }
 
     /**
@@ -81,7 +105,10 @@ public class CarRichContentServiceImpl implements ICarRichContentService
     {
         int result = 0;
         for (Long id : ids) {
-            result += carRichContentMapper.deleteById(id);
+            CarRichContentEntity entity = new CarRichContentEntity();
+            entity.setId(id);
+            entity.setDelFlag(true);
+            result += carRichContentMapper.updateByPrimaryKeySelective(entity);
         }
         return result;
     }
@@ -95,6 +122,28 @@ public class CarRichContentServiceImpl implements ICarRichContentService
     @Override
     public int deleteCarRichContentById(Long id)
     {
-        return carRichContentMapper.deleteById(id);
+        CarRichContentEntity entity = new CarRichContentEntity();
+        entity.setId(id);
+        entity.setDelFlag(true);
+        return carRichContentMapper.updateByPrimaryKeySelective(entity);
+    }
+
+    /**
+     * 批量更新富文本内容排序
+     * 
+     * @param carRichContentList 富文本内容列表
+     * @return 结果
+     */
+    @Override
+    public int updateCarRichContentOrder(List<CarRichContentEntity> carRichContentList)
+    {
+        int result = 0;
+        for (CarRichContentEntity entity : carRichContentList) {
+            CarRichContentEntity updateEntity = new CarRichContentEntity();
+            updateEntity.setId(entity.getId());
+            updateEntity.setShowOrder(entity.getShowOrder());
+            result += carRichContentMapper.updateByPrimaryKeySelective(updateEntity);
+        }
+        return result;
     }
 }
