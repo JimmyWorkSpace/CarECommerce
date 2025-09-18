@@ -15,23 +15,9 @@ import tk.mybatis.mapper.common.Mapper;
 public interface CarAppointmentMapper extends Mapper<CarAppointmentEntity> {
 
     /**
-     * 根据用户ID查询预约列表
-     * @param userId 用户ID
-     * @return 预约列表
-     */
-    List<CarAppointmentDto> selectAppointmentsByUserId(@Param("userId") Long userId);
-
-    /**
-     * 根据ID查询预约详情
-     * @param id 预约ID
-     * @return 预约详情
-     */
-    CarAppointmentDto selectAppointmentById(@Param("id") Long id);
-
-    /**
      * 查询预约看车列表（带车辆销售标题）
      * @param carAppointment 预约看车查询条件
      * @return 预约看车列表
      */
-    List<CarAppointmentDto> selectCarAppointmentListWithSaleTitle(CarAppointmentEntity carAppointment);
+    List<CarAppointmentDto> selectCarAppointmentListWithSaleTitle(@Param("entity") CarAppointmentEntity carAppointment, @Param("carDbName") String carDbName);
 }

@@ -32,27 +32,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from car_appointment a
     </sql>
 
-    <select id="selectCarAppointmentListWithSaleTitle" parameterType="com.ruoyi.car.domain.CarAppointmentEntity" resultMap="CarAppointmentDtoResult">
-        <include refid="selectCarAppointmentDtoVo"/>
+    <select id="selectCarAppointmentListWithSaleTitle" resultType="com.ruoyi.car.dto.CarAppointmentDto">
+        select t.*, concat(c.manufacture_year, ' ', cb.brand, ' ', case c.id_model when 0 then c.custom_model else cm.model end) as saleTitle
+		from car_appointment t 
+		left join carce_cloud.car_sales cs on t.carSaleId = cs.id
+		left JOIN carce_cloud.cars c on cs.car_id = c.id
+		left join carce_cloud.car_brand cb on c.id_brand = cb.id
+		left join carce_cloud.car_model cm on c.id_model = cm.id
         <where>  
-            <if test="appointmentName != null  and appointmentName != ''"> and a.appointmentName like concat('%', #{appointmentName}, '%')</if>
-            <if test="appointmentPhone != null  and appointmentPhone != ''"> and a.appointmentPhone like concat('%', #{appointmentPhone}, '%')</if>
-            <if test="appointmentStatus != null "> and a.appointmentStatus = #{appointmentStatus}</if>
-            and a.delFlag = 0
+            <if test="entity.appointmentName != null  and entity.appointmentName != ''"> and t.appointmentName like concat('%', #{entity.appointmentName}, '%')</if>
+            <if test="entity.appointmentPhone != null  and entity.appointmentPhone != ''"> and t.appointmentPhone like concat('%', #{entity.appointmentPhone}, '%')</if>
+            <if test="entity.appointmentStatus != null "> and t.appointmentStatus = #{entity.appointmentStatus}</if>
+            and t.delFlag = 0
         </where>
-        order by a.createTime desc
+        order by t.createTime desc
     </select>
 
-    <select id="selectAppointmentById" parameterType="Long" resultMap="CarAppointmentDtoResult">
-        <include refid="selectCarAppointmentDtoVo"/>
-        where a.id = #{id}
-    </select>
-
-    <select id="selectAppointmentsByUserId" parameterType="Long" resultMap="CarAppointmentDtoResult">
-        <include refid="selectCarAppointmentDtoVo"/>
-        where a.userId = #{userId} and a.delFlag = 0
-        order by a.createTime desc
-    </select>
 
 
 </mapper>

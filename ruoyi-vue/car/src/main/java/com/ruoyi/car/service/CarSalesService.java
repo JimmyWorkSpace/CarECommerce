@@ -18,4 +18,12 @@ public interface CarSalesService {
    * @return 车辆销售集合
    */
   List<CarSalesEntity> selectCarSalesList(CarSalesEntity carSales);
+  
+  /**
+   * 根据ID列表批量查询车辆销售信息
+   * 
+   * @param ids 车辆销售ID列表
+   * @return 车辆销售集合
+   */
+  List<CarSalesEntity> selectCarSalesByIds(List<Long> ids);
 }

@@ -1,5 +1,6 @@
 package com.ruoyi.car.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -98,6 +99,23 @@ public class CarSalesServiceImpl implements CarSalesService {
 		}
 		
 		example.orderBy("createDate").desc();
+		return carSalesMapper.selectByExample(example);
+	}
+	
+	/**
+	 * 根据ID列表批量查询车辆销售信息
+	 * 
+	 * @param ids 车辆销售ID列表
+	 * @return 车辆销售集合
+	 */
+	@Override
+	public List<CarSalesEntity> selectCarSalesByIds(List<Long> ids) {
+		if (ids == null || ids.isEmpty()) {
+			return new ArrayList<>();
+		}
+		
+		Example example = new Example(CarSalesEntity.class);
+		example.createCriteria().andIn("id", ids);
 		return carSalesMapper.selectByExample(example);
 	}
 }

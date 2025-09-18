@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="90px">
       <el-form-item label="预约人姓名" prop="appointmentName">
         <el-input
           v-model="queryParams.appointmentName"
@@ -36,7 +36,7 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="primary"
           plain
@@ -45,7 +45,7 @@
           @click="handleAdd"
           v-hasPermi="['car:appointment:add']"
         >新增</el-button>
-      </el-col>
+      </el-col> -->
       <el-col :span="1.5">
         <el-button
           type="success"
@@ -68,7 +68,7 @@
           v-hasPermi="['car:appointment:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="warning"
           plain
@@ -77,7 +77,7 @@
           @click="handleExport"
           v-hasPermi="['car:appointment:export']"
         >导出</el-button>
-      </el-col>
+      </el-col> -->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -88,7 +88,7 @@
       <el-table-column label="预约人电话" align="center" prop="appointmentPhone" />
       <el-table-column label="预约时间" align="center" prop="appointmentTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.appointmentTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+          <span>{{ parseTime(scope.row.appointmentTime, '{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="预约状态" align="center" prop="appointmentStatus">
@@ -96,7 +96,7 @@
           <dict-tag :options="dict.type.car_appointment_status" :value="scope.row.appointmentStatus"/>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="提交时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -132,12 +132,7 @@
     <!-- 添加或修改预约看车对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="车辆销售ID" prop="carSaleId" v-if="form.id">
-          <el-input v-model="form.carSaleId" placeholder="车辆销售ID" disabled />
-        </el-form-item>
-        <el-form-item label="用户ID" prop="userId" v-if="form.id">
-          <el-input v-model="form.userId" placeholder="用户ID" disabled />
-        </el-form-item>
+        
         <el-form-item label="预约人姓名" prop="appointmentName">
           <el-input v-model="form.appointmentName" placeholder="请输入预约人姓名" />
         </el-form-item>
@@ -148,7 +143,7 @@
           <el-date-picker clearable size="small"
             v-model="form.appointmentTime"
             type="datetime"
-            value-format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm"
             placeholder="请选择预约时间">
           </el-date-picker>
         </el-form-item>
@@ -282,7 +277,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加预约看车";
+      this.title = "添加预约";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -291,7 +286,7 @@ export default {
       getAppointment(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改预约看车";
+        this.title = "修改预约";
       });
     },
     /** 提交按钮 */

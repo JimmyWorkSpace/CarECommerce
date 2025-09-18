@@ -37,6 +37,14 @@ public interface CarAppointmentService
     public List<CarAppointmentDto> selectCarAppointmentListWithSaleTitle(CarAppointmentEntity carAppointment);
 
     /**
+     * 根据用户ID查询预约列表
+     * 
+     * @param userId 用户ID
+     * @return 预约列表
+     */
+    public List<CarAppointmentEntity> selectAppointmentsByUserId(Long userId);
+
+    /**
      * 新增预约看车
      * 
      * @param carAppointment 预约看车
