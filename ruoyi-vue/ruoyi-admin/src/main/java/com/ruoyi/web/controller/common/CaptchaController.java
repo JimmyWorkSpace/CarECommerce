@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.code.kaptcha.Producer;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.cache.MemoryCache;
+import com.ruoyi.common.core.cache.RedisCache;
 import com.ruoyi.common.utils.sign.Base64;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.system.service.ISysConfigService;
@@ -35,7 +35,7 @@ public class CaptchaController extends BaseController
     private Producer captchaProducerMath;
 
     @Autowired
-    private MemoryCache memoryCache;
+    private RedisCache redisCache;
     
     @Autowired
     private ISysConfigService configService;
@@ -75,7 +75,7 @@ public class CaptchaController extends BaseController
             image = captchaProducer.createImage(capStr);
         }
 
-        memoryCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
+        redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
         // 转换流信息写出
         FastByteArrayOutputStream os = new FastByteArrayOutputStream();
         try

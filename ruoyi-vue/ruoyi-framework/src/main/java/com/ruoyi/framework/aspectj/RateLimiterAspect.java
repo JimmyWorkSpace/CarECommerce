@@ -12,11 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.annotation.RateLimiter;
-import com.ruoyi.common.core.cache.MemoryCache;
+import com.ruoyi.common.core.cache.RedisCache;
 import com.ruoyi.common.enums.LimitType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
 
 /**
@@ -31,7 +30,7 @@ public class RateLimiterAspect
     private static final Logger log = LoggerFactory.getLogger(RateLimiterAspect.class);
 
     @Autowired
-    private MemoryCache memoryCache;
+    private RedisCache redisCache;
 
     @Before("@annotation(rateLimiter)")
     public void doBefore(JoinPoint point, RateLimiter rateLimiter) throws Throwable
@@ -45,10 +44,10 @@ public class RateLimiterAspect
         try
         {
             // 獲取或建立計數器
-            AtomicInteger counter = memoryCache.getCacheObject(combineKey);
+            AtomicInteger counter = redisCache.getCacheObject(combineKey);
             if (counter == null) {
                 counter = new AtomicInteger(0);
-                memoryCache.setCacheObject(combineKey, counter, time, TimeUnit.SECONDS);
+                redisCache.setCacheObject(combineKey, counter, time, TimeUnit.SECONDS);
             }
             
             int currentCount = counter.incrementAndGet();

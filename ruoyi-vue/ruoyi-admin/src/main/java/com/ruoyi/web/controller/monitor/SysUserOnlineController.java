@@ -17,7 +17,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.core.cache.MemoryCache;
+import com.ruoyi.common.core.cache.RedisCache;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.service.TokenService;
@@ -37,7 +37,7 @@ public class SysUserOnlineController extends BaseController
     private ISysUserOnlineService userOnlineService;
 
     @Autowired
-    private MemoryCache memoryCache;
+    private RedisCache redisCache;
 
     @Autowired
     private TokenService tokenService;
@@ -46,11 +46,11 @@ public class SysUserOnlineController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(String ipaddr, String userName)
     {
-        Collection<String> keys = memoryCache.keys(Constants.LOGIN_TOKEN_KEY + "*");
+        Collection<String> keys = redisCache.keys(Constants.LOGIN_TOKEN_KEY + "*");
         List<SysUserOnline> userOnlineList = new ArrayList<SysUserOnline>();
         for (String key : keys)
         {
-            LoginUser user = memoryCache.getCacheObject(key);
+            LoginUser user = redisCache.getCacheObject(key);
             if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName))
             {
                 if (StringUtils.equals(ipaddr, user.getIpaddr()) && StringUtils.equals(userName, user.getUsername()))
@@ -90,7 +90,7 @@ public class SysUserOnlineController extends BaseController
     @DeleteMapping("/{tokenId}")
     public AjaxResult forceLogout(@PathVariable String tokenId)
     {
-        memoryCache.deleteObject(Constants.LOGIN_TOKEN_KEY + tokenId);
+        redisCache.deleteObject(Constants.LOGIN_TOKEN_KEY + tokenId);
         return success();
     }
 }
