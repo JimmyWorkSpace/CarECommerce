@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="88px">
       <el-form-item label="经销商名称" prop="dealerName">
         <el-input
           v-model="queryParams.dealerName"
@@ -19,22 +19,14 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="公司电话" prop="companyPhone">
-        <el-input
-          v-model="queryParams.companyPhone"
-          placeholder="请输入公司电话"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+      
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="mb8" v-show="false">
       <el-col :span="1.5">
         <el-button
           type="warning"
@@ -50,12 +42,12 @@
 
     <el-table v-loading="loading" :data="dealerList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" width="80" />
+      <!-- <el-table-column label="ID" align="center" prop="id" width="80" /> -->
       <el-table-column label="经销商名称" align="center" prop="dealerName" :show-overflow-tooltip="true" />
       <el-table-column label="注册名称" align="center" prop="registeredName" :show-overflow-tooltip="true" />
       <el-table-column label="联系人" align="center" prop="contactPerson" />
-      <el-table-column label="公司电话" align="center" prop="companyPhone" />
-      <el-table-column label="公司手机" align="center" prop="companyMobile" />
+      <!-- <el-table-column label="公司电话" align="center" prop="companyPhone" />
+      <el-table-column label="公司手机" align="center" prop="companyMobile" /> -->
       <el-table-column label="推荐状态" align="center" width="120">
         <template slot-scope="scope">
           <el-switch
@@ -67,11 +59,11 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="cDt" width="180">
+      <!-- <el-table-column label="创建时间" align="center" prop="cDt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.cDt, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="120">
         <template slot-scope="scope">
           <el-button

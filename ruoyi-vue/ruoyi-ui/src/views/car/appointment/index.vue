@@ -25,7 +25,7 @@
             v-for="dict in dict.type.car_appointment_status"
             :key="dict.value"
             :label="dict.label"
-            :value="dict.value"
+            :value="parseInt(dict.value)"
           />
         </el-select>
       </el-form-item>

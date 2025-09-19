@@ -33,7 +33,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="selectCarAppointmentListWithSaleTitle" resultType="com.ruoyi.car.dto.CarAppointmentDto">
-        select t.*, concat(c.manufacture_year, ' ', cb.brand, ' ', case c.id_model when 0 then c.custom_model else cm.model end) as saleTitle
+        select t.*, 
+               concat(c.manufacture_year, ' ', cb.brand, ' ', case c.id_model when 0 then c.custom_model else cm.model end) as saleTitle,
+               case t.appointmentStatus 
+                   when 1 then '已预约'
+                   when 2 then '已看车' 
+                   when 3 then '已取消'
+                   else '未知'
+               end as appointmentStatusDesc
 		from car_appointment t 
 		left join carce_cloud.car_sales cs on t.carSaleId = cs.id
 		left JOIN carce_cloud.cars c on cs.car_id = c.id

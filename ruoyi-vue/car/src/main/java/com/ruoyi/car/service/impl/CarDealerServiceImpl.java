@@ -17,6 +17,7 @@ import com.ruoyi.car.mapper.carcecloud.CarSalesMapper;
 import com.ruoyi.car.service.CarDealerService;
 import com.ruoyi.car.service.CarSalesService;
 import com.ruoyi.car.service.ImageService;
+import com.ruoyi.framework.service.BaseServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -26,7 +27,7 @@ import tk.mybatis.mapper.entity.Example;
 @Service
 @Slf4j
 //@DataSource(DataSourceType.SLAVE)
-public class CarDealerServiceImpl implements CarDealerService {
+public class CarDealerServiceImpl extends BaseServiceImpl implements CarDealerService {
 
 	@Resource
 	private CarDealerMapper carDealerMapper;

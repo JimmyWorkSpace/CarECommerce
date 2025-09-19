@@ -21,12 +21,12 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="是否匿名" prop="anonymous">
+      <!-- <el-form-item label="是否匿名" prop="anonymous">
         <el-select v-model="queryParams.anonymous" placeholder="请选择是否匿名" clearable size="small">
           <el-option label="是" :value="true" />
           <el-option label="否" :value="false" />
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="檢舉人" prop="reporterName">
         <el-input
           v-model="queryParams.reporterName"
@@ -77,7 +77,7 @@
           v-hasPermi="['car:report:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="warning"
           plain
@@ -86,13 +86,13 @@
           @click="handleExport"
           v-hasPermi="['car:report:export']"
         >导出</el-button>
-      </el-col>
+      </el-col> -->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="reportList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="車輛標題" align="center" prop="saleTitle" width="200" show-overflow-tooltip />
+      <el-table-column label="車輛" align="center" prop="saleTitle" width="200" show-overflow-tooltip />
       <el-table-column label="檢舉人" align="center" prop="reporterName" width="120" />
       <el-table-column label="檢舉人電話" align="center" prop="reporterPhone" width="120" />
       <el-table-column label="檢舉原因" align="center" prop="reason" width="120">
@@ -107,7 +107,7 @@
         </template>
       </el-table-column>
       <el-table-column label="處理備註" align="center" prop="processNote" width="150" show-overflow-tooltip />
-      <el-table-column label="創建時間" align="center" prop="createdAt" width="180">
+      <el-table-column label="提交時間" align="center" prop="createdAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createdAt, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -143,7 +143,7 @@
     <!-- 添加或修改車輛檢舉对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row>
+        <!-- <el-row>
           <el-col :span="12">
             <el-form-item label="車輛銷售ID" prop="saleId">
               <el-input v-model="form.saleId" placeholder="请输入車輛銷售ID" :disabled="form.id != null" />
@@ -154,7 +154,7 @@
               <el-input v-model="form.reporterId" placeholder="请输入檢舉人ID" :disabled="form.id != null" />
             </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
         <el-row>
           <el-col :span="12">
             <el-form-item label="檢舉原因" prop="reason">
