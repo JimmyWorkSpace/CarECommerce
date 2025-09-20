@@ -1,17 +1,21 @@
 package com.ruoyi.car.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.car.mapper.master.CarReportMapper;
+
 import com.ruoyi.car.domain.CarReportEntity;
 import com.ruoyi.car.domain.CarSalesEntity;
 import com.ruoyi.car.dto.CarReportDto;
+import com.ruoyi.car.mapper.master.CarReportMapper;
 import com.ruoyi.car.service.CarReportService;
 import com.ruoyi.car.service.CarSalesService;
+import com.ruoyi.framework.service.BaseServiceImpl;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-public class CarReportServiceImpl implements CarReportService 
+public class CarReportServiceImpl extends BaseServiceImpl implements CarReportService 
 {
     @Autowired
     private CarReportMapper carReportMapper;
@@ -52,33 +56,7 @@ public class CarReportServiceImpl implements CarReportService
     public List<CarReportDto> selectCarReportList(CarReportEntity carReport)
     {
         // 先查询检举列表
-        List<CarReportDto> reportList = carReportMapper.selectCarReportList(carReport);
-        
-        // 获取所有车辆销售ID
-        List<Long> saleIds = reportList.stream()
-                .map(CarReportDto::getSaleId)
-                .distinct()
-                .collect(Collectors.toList());
-        
-        // 批量查询车辆销售信息
-        Map<Long, String> saleTitleMap = saleIds.stream()
-                .collect(Collectors.toMap(
-                    id -> id,
-                    id -> {
-                        try {
-                            CarSalesEntity carSales = carSalesService.getById(id);
-                            return carSales != null ? carSales.getSaleTitle() : "未知车辆";
-                        } catch (Exception e) {
-                            log.warn("查询车辆销售信息失败，ID: {}", id, e);
-                            return "查询失败";
-                        }
-                    }
-                ));
-        
-        // 设置车辆销售标题
-        reportList.forEach(report -> {
-            report.setSaleTitle(saleTitleMap.get(report.getSaleId()));
-        });
+        List<CarReportDto> reportList = carReportMapper.selectCarReportList(carReport, carDbName);
         
         return reportList;
     }

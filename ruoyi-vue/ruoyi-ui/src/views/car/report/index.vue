@@ -168,14 +168,14 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <!-- <el-col :span="12">
             <el-form-item label="是否匿名" prop="anonymous">
               <el-radio-group v-model="form.anonymous" :disabled="form.id != null">
                 <el-radio :label="true">是</el-radio>
                 <el-radio :label="false">否</el-radio>
               </el-radio-group>
             </el-form-item>
-          </el-col>
+          </el-col> -->
         </el-row>
         <el-form-item label="詳細說明" prop="description">
           <el-input v-model="form.description" type="textarea" placeholder="请输入詳細說明" :disabled="form.id != null" />

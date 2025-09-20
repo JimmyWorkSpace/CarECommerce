@@ -47,16 +47,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join car_user u on r.reporter_id = u.id
     </sql>
 
-    <select id="selectCarReportList" parameterType="com.ruoyi.car.domain.CarReportEntity" resultMap="CarReportDtoResult">
-        <include refid="selectCarReportDtoVo"/>
+    <select id="selectCarReportList" parameterType="com.ruoyi.car.domain.CarReportEntity" resultType="com.ruoyi.car.dto.CarReportDto">
+        select r.*, cu.nickName as reporterName, cu.phoneNumber as reporterPhone,
+               concat(c.manufacture_year, ' ', cb.brand, ' ', case c.id_model when 0 then c.custom_model else cm.model end) as saleTitle
+		from car_reports r 
+		left join car_user cu on r.reporter_id = cu.id
+		left join ${carDbName}.car_sales cs on r.sale_id = cs.id
+		left JOIN ${carDbName}.cars c on cs.car_id = c.id
+		left join ${carDbName}.car_brand cb on c.id_brand = cb.id
+		left join ${carDbName}.car_model cm on c.id_model = cm.id
         <where>  
-            <if test="saleId != null "> and r.sale_id = #{saleId}</if>
-            <if test="reporterId != null "> and r.reporter_id = #{reporterId}</if>
-            <if test="reason != null  and reason != ''"> and r.reason = #{reason}</if>
-            <if test="description != null  and description != ''"> and r.description like concat('%', #{description}, '%')</if>
-            <if test="anonymous != null "> and r.anonymous = #{anonymous}</if>
-            <if test="status != null  and status != ''"> and r.status = #{status}</if>
-            <if test="processorId != null "> and r.processor_id = #{processorId}</if>
+            <if test="entity.saleId != null "> and r.sale_id = #{entity.saleId}</if>
+            <if test="entity.reporterId != null "> and r.reporter_id = #{entity.reporterId}</if>
+            <if test="entity.reason != null  and reason != ''"> and r.reason = #{entity.reason}</if>
+            <if test="entity.description != null  and description != ''"> and r.description like concat('%', #{entity.description}, '%')</if>
+            <if test="entity.anonymous != null "> and r.anonymous = #{entity.anonymous}</if>
+            <if test="entity.status != null  and status != ''"> and r.status = #{entity.status}</if>
+            <if test="entity.processorId != null "> and r.processor_id = #{entity.processorId}</if>
         </where>
         order by r.created_at desc
     </select>

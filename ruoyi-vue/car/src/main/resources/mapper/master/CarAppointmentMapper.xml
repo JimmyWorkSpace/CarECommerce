@@ -42,10 +42,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                    else '未知'
                end as appointmentStatusDesc
 		from car_appointment t 
-		left join carce_cloud.car_sales cs on t.carSaleId = cs.id
-		left JOIN carce_cloud.cars c on cs.car_id = c.id
-		left join carce_cloud.car_brand cb on c.id_brand = cb.id
-		left join carce_cloud.car_model cm on c.id_model = cm.id
+		left join ${carDbName}.car_sales cs on t.carSaleId = cs.id
+		left JOIN ${carDbName}.cars c on cs.car_id = c.id
+		left join ${carDbName}.car_brand cb on c.id_brand = cb.id
+		left join ${carDbName}.car_model cm on c.id_model = cm.id
         <where>  
             <if test="entity.appointmentName != null  and entity.appointmentName != ''"> and t.appointmentName like concat('%', #{entity.appointmentName}, '%')</if>
             <if test="entity.appointmentPhone != null  and entity.appointmentPhone != ''"> and t.appointmentPhone like concat('%', #{entity.appointmentPhone}, '%')</if>

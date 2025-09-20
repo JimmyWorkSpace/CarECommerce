@@ -27,5 +27,5 @@ public interface CarReportMapper extends Mapper<CarReportEntity> {
     /**
      * 查詢檢舉列表（分頁）
      */
-    List<CarReportDto> selectCarReportList(CarReportEntity carReport);
+    List<CarReportDto> selectCarReportList(@Param("entity") CarReportEntity carReport, @Param("carDbName") String carDbName);
 }

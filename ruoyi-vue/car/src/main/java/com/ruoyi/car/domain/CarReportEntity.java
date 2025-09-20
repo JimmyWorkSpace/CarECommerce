@@ -63,9 +63,9 @@ public class CarReportEntity {
      * submitted: 已提交
      * processing: 處理中
      * processed: 已處理
-     * rejected: 已駁回
+     * cancelled: 已取消
      */
-    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'submitted' COMMENT '處理狀態：submitted(已提交), processing(處理中), processed(已處理), rejected(已駁回)'")
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'submitted' COMMENT '處理狀態：submitted(已提交), processing(處理中), processed(已處理), cancelled(已取消)'")
     private String status;
     
     /**
