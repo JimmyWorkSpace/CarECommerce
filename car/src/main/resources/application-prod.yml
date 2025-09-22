@@ -18,6 +18,8 @@ ecpay:
   notify-url: "https://sale.carce.cc/api/payment/callback"
   client-back-url: "https://sale.carce.cc/payment/result"
   result-url: "https://sale.carce.cc/payment/result"
+  # 查询API地址配置
+  query-server-url: "https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5"
 
 spring:
   datasource:

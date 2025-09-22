@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 
 import cc.carce.sale.common.ECPayUtils;
 import cc.carce.sale.common.R;
@@ -115,9 +117,7 @@ public class ECPayService {
         try {
             String merchantTradeNo = callbackParams.get("MerchantTradeNo");
             String ecpayTradeNo = callbackParams.get("TradeNo");
-            String paymentDate = callbackParams.get("PaymentDate");
             String paymentType = callbackParams.get("PaymentType");
-            String paymentTypeChargeFee = callbackParams.get("PaymentTypeChargeFee");
             String simulatePaid = callbackParams.get("SimulatePaid");
             String checkMacValue = callbackParams.get("CheckMacValue");
             
@@ -566,6 +566,242 @@ public class ECPayService {
         } catch (Exception e) {
             log.error("处理付款结果时发生异常 - 特店交易编号: {}", merchantTradeNo, e);
             return false;
+        }
+    }
+    
+    /**
+     * 查询绿界订单状态
+     * 根据绿界支付官方文档：https://developers.ecpay.com.tw/?p=2890
+     * 
+     * @param merchantTradeNo 特店交易编号
+     * @return 查询结果
+     */
+    public Map<String, String> queryOrderStatusFromECPay(String merchantTradeNo) {
+        try {
+            log.info("开始查询绿界订单状态，商户订单号: {}", merchantTradeNo);
+            
+            // 构建查询参数
+            Map<String, String> params = new HashMap<>();
+            params.put("MerchantID", ecPayConfig.getMerchantId());
+            params.put("MerchantTradeNo", merchantTradeNo);
+            params.put("TimeStamp", String.valueOf(System.currentTimeMillis() / 1000));
+            
+            // 生成检查码
+            String checkMacValue = ecPayUtils.generateSignature(params);
+            params.put("CheckMacValue", checkMacValue);
+            
+            // 从配置文件获取查询API地址
+            String queryUrl = ecPayConfig.getQueryServerUrl();
+            
+            log.info("查询绿界订单状态，请求URL: {}, 参数: {}", queryUrl, params);
+            
+            // 使用Hutool的HttpUtil发送POST请求
+            Map<String, Object> formParams = new HashMap<>();
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                formParams.put(entry.getKey(), entry.getValue());
+            }
+            
+            HttpResponse response = HttpRequest.post(queryUrl)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .form(formParams)
+                .timeout(30000) // 30秒超时
+                .execute();
+            
+            if (response.isOk()) {
+                String responseBody = response.body();
+                log.info("绿界订单状态查询成功，响应: {}", responseBody);
+                
+                // 解析响应结果
+                return parseQueryResponse(responseBody);
+            } else {
+                log.error("绿界订单状态查询失败，状态码: {}, 响应: {}", 
+                         response.getStatus(), response.body());
+                return null;
+            }
+            
+        } catch (Exception e) {
+            log.error("查询绿界订单状态异常，商户订单号: {}", merchantTradeNo, e);
+            return null;
+        }
+    }
+    
+    /**
+     * 解析查询响应结果
+     * 
+     * @param responseBody 响应体
+     * @return 解析后的参数Map
+     */
+    private Map<String, String> parseQueryResponse(String responseBody) {
+        Map<String, String> result = new HashMap<>();
+        
+        try {
+            if (responseBody != null && !responseBody.trim().isEmpty()) {
+                // 绿界返回的是HTML格式，需要解析其中的参数
+                // 这里简化处理，实际应该解析HTML中的表单参数
+                String[] lines = responseBody.split("\n");
+                for (String line : lines) {
+                    if (line.contains("name=") && line.contains("value=")) {
+                        // 简单的HTML解析，提取name和value
+                        String name = extractValue(line, "name=\"", "\"");
+                        String value = extractValue(line, "value=\"", "\"");
+                        if (name != null && value != null) {
+                            result.put(name, value);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("解析查询响应结果异常", e);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * 从字符串中提取指定标记之间的值
+     */
+    private String extractValue(String text, String startTag, String endTag) {
+        try {
+            int startIndex = text.indexOf(startTag);
+            if (startIndex != -1) {
+                startIndex += startTag.length();
+                int endIndex = text.indexOf(endTag, startIndex);
+                if (endIndex != -1) {
+                    return text.substring(startIndex, endIndex);
+                }
+            }
+        } catch (Exception e) {
+            log.error("提取值异常", e);
+        }
+        return null;
+    }
+    
+    /**
+     * 根据查询结果更新支付订单状态
+     * 
+     * @param merchantTradeNo 商户订单号
+     * @param queryResult 查询结果
+     * @return 是否更新成功
+     */
+    @Transactional
+    public boolean updateOrderStatusFromQuery(String merchantTradeNo, Map<String, String> queryResult) {
+        try {
+            if (queryResult == null || queryResult.isEmpty()) {
+                log.warn("查询结果为空，商户订单号: {}", merchantTradeNo);
+                return false;
+            }
+            
+            // 验证返回的检查码
+            String receivedCheckMac = queryResult.get("CheckMacValue");
+            if (receivedCheckMac == null) {
+                log.error("查询结果中缺少检查码，商户订单号: {}", merchantTradeNo);
+                return false;
+            }
+            
+            // 验证检查码
+            Map<String, String> verifyParams = new HashMap<>(queryResult);
+            verifyParams.remove("CheckMacValue");
+            String calculatedCheckMac = ecPayUtils.generateSignature(verifyParams);
+            
+            if (!receivedCheckMac.equalsIgnoreCase(calculatedCheckMac)) {
+                log.error("查询结果检查码验证失败，商户订单号: {}", merchantTradeNo);
+                return false;
+            }
+            
+            // 获取交易状态
+            String tradeStatus = queryResult.get("TradeStatus");
+            if (tradeStatus == null) {
+                log.error("查询结果中缺少交易状态，商户订单号: {}", merchantTradeNo);
+                return false;
+            }
+            
+            // 查找支付订单
+            CarPaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
+            if (paymentOrder == null) {
+                log.error("未找到对应的支付订单，商户订单号: {}", merchantTradeNo);
+                return false;
+            }
+            
+            // 检查是否已经处理过
+            if (CarPaymentOrderEntity.PaymentStatus.SUCCESS.getCode().equals(paymentOrder.getPaymentStatus()) ||
+                CarPaymentOrderEntity.PaymentStatus.CANCELLED.getCode().equals(paymentOrder.getPaymentStatus())) {
+                log.info("订单状态已确定，无需更新，商户订单号: {}, 当前状态: {}", 
+                        merchantTradeNo, paymentOrder.getPaymentStatus());
+                return true;
+            }
+            
+            // 根据交易状态更新订单
+            boolean updated = false;
+            if ("1".equals(tradeStatus)) {
+                // 交易成功
+                paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.SUCCESS.getCode());
+                paymentOrder.setEcpayTradeNo(queryResult.get("TradeNo"));
+                paymentOrder.setPaymentType(queryResult.get("PaymentType"));
+                paymentOrder.setPaymentTime(parsePaymentDate(queryResult.get("PaymentDate")));
+                paymentOrder.setEcpayStatus("SUCCESS");
+                paymentOrder.setEcpayStatusDesc("支付成功");
+                updated = true;
+                
+                log.info("订单状态更新为支付成功，商户订单号: {}", merchantTradeNo);
+                
+            } else if ("10200095".equals(tradeStatus)) {
+                // 交易失败
+                paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.FAILED.getCode());
+                paymentOrder.setEcpayStatus("FAILED");
+                paymentOrder.setEcpayStatusDesc("交易失败");
+                updated = true;
+                
+                log.info("订单状态更新为支付失败，商户订单号: {}", merchantTradeNo);
+                
+            } else if ("0".equals(tradeStatus)) {
+                // 未付款，保持待支付状态
+                log.info("订单仍为未付款状态，商户订单号: {}", merchantTradeNo);
+                return true;
+            }
+            
+            if (updated) {
+                // 更新支付订单
+                paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
+                
+                // 更新关联的业务订单状态
+                if (paymentOrder.getEcpayTradeNo() != null) {
+                    CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(paymentOrder.getEcpayTradeNo());
+                    if (orderInfo != null) {
+                        if ("1".equals(tradeStatus)) {
+                            carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAID.getCode());
+                        } else if ("10200095".equals(tradeStatus)) {
+                            carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAYMENT_FAILED.getCode());
+                        }
+                        
+                        log.info("业务订单状态已同步更新，订单号: {}", orderInfo.getOrderNo());
+                    }
+                }
+            }
+            
+            return true;
+            
+        } catch (Exception e) {
+            log.error("根据查询结果更新订单状态异常，商户订单号: {}", merchantTradeNo, e);
+            return false;
+        }
+    }
+    
+    /**
+     * 解析支付时间
+     * 格式：yyyy/MM/dd HH:mm:ss
+     */
+    private Date parsePaymentDate(String paymentDateStr) {
+        try {
+            if (paymentDateStr == null || paymentDateStr.trim().isEmpty()) {
+                return null;
+            }
+            
+            // 简单的时间解析，实际项目中建议使用更robust的日期解析
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            return sdf.parse(paymentDateStr);
+        } catch (Exception e) {
+            log.error("解析支付时间异常: {}", paymentDateStr, e);
+            return null;
         }
     }
 }

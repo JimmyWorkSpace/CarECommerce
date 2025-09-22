@@ -67,3 +67,5 @@ ecpay:
   notify-url: "http://localhost:8080/api/payment/callback"
   client-back-url: "http://localhost:8080/payment/result"
   result-url: "http://localhost:8080/payment/result"
+  # 查询API地址配置
+  query-production-url: "https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5"
