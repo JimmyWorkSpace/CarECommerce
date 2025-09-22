@@ -1,5 +1,8 @@
 package cc.carce.sale.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -9,9 +12,13 @@ import com.github.pagehelper.PageInfo;
 
 import cc.carce.sale.dto.CarListDto;
 import cc.carce.sale.entity.CarSalesEntity;
+import cc.carce.sale.entity.CarRecommandEntity;
+import cc.carce.sale.entity.CarDealerEntity;
 import cc.carce.sale.form.CarSalesSearchForm;
 import cc.carce.sale.mapper.carcecloud.CarMapper;
 import cc.carce.sale.mapper.carcecloud.CarSalesMapper;
+import cc.carce.sale.mapper.carcecloud.CarDealerMapper;
+import cc.carce.sale.mapper.manager.CarRecommandMapper;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Example;
@@ -26,6 +33,12 @@ public class CarSalesService {
 	
 	@Resource
 	private CarMapper carMapper;
+	
+	@Resource
+	private CarRecommandMapper carRecommandMapper;
+	
+	@Resource
+	private CarDealerMapper carDealerMapper;
 
 	/**
 	 * 根据id获取uid,  如果uid为空则生成一个
@@ -101,5 +114,109 @@ public class CarSalesService {
 		.doSelectPageInfo(() -> {
 			carMapper.selectCarListWithCover(form);
 		});
+	}
+	
+	/**
+	 * 获取推荐车辆列表（用于首页精选好车）
+	 * @param limit 限制数量
+	 * @return 推荐车辆列表
+	 */
+	public List<CarSalesEntity> getRecommendedCars(int limit) {
+		// 查询推荐类型为1的推荐记录
+		Example recommandExample = new Example(CarRecommandEntity.class);
+		recommandExample.createCriteria()
+			.andEqualTo("recommandType", 1)
+			.andEqualTo("delFlag", 0);
+		recommandExample.orderBy("showOrder").asc();
+		
+		List<CarRecommandEntity> recommandList = carRecommandMapper.selectByExample(recommandExample);
+		
+		if (recommandList == null || recommandList.isEmpty()) {
+			return new ArrayList<>();
+		}
+		
+		// 提取推荐ID列表
+		List<Long> recommandIds = new ArrayList<>();
+		for (CarRecommandEntity recommand : recommandList) {
+			recommandIds.add(recommand.getRecommandId());
+		}
+		
+		// 查询对应的车辆销售信息
+		Example salesExample = new Example(CarSalesEntity.class);
+		salesExample.createCriteria()
+			.andIn("id", recommandIds);
+//			.andEqualTo("status", "上架")
+//			.andEqualTo("isVisible", 1);
+		
+		List<CarSalesEntity> salesList = carSalesMapper.selectByExample(salesExample);
+		
+		// 按照推荐顺序排序
+		List<CarSalesEntity> orderedSalesList = new ArrayList<>();
+		for (CarRecommandEntity recommand : recommandList) {
+			for (CarSalesEntity sales : salesList) {
+				if (sales.getId().equals(recommand.getRecommandId())) {
+					orderedSalesList.add(sales);
+					break;
+				}
+			}
+		}
+		
+		// 限制返回数量
+		if (orderedSalesList.size() > limit) {
+			return orderedSalesList.subList(0, limit);
+		}
+		
+		return orderedSalesList;
+	}
+	
+	/**
+	 * 获取推荐店家列表（用于首页精选店家）
+	 * @param limit 限制数量
+	 * @return 推荐店家列表
+	 */
+	public List<CarDealerEntity> getRecommendedDealers(int limit) {
+		// 查询推荐类型为0的推荐记录（店家推荐）
+		Example recommandExample = new Example(CarRecommandEntity.class);
+		recommandExample.createCriteria()
+			.andEqualTo("recommandType", 0)
+			.andEqualTo("delFlag", 0);
+		recommandExample.orderBy("showOrder").asc();
+		
+		List<CarRecommandEntity> recommandList = carRecommandMapper.selectByExample(recommandExample);
+		
+		if (recommandList == null || recommandList.isEmpty()) {
+			return new ArrayList<>();
+		}
+		
+		// 提取推荐ID列表
+		List<Long> recommandIds = new ArrayList<>();
+		for (CarRecommandEntity recommand : recommandList) {
+			recommandIds.add(recommand.getRecommandId());
+		}
+		
+		// 查询对应的店家信息
+		Example dealerExample = new Example(CarDealerEntity.class);
+		dealerExample.createCriteria()
+			.andIn("id", recommandIds);
+		
+		List<CarDealerEntity> dealerList = carDealerMapper.selectByExample(dealerExample);
+		
+		// 按照推荐顺序排序
+		List<CarDealerEntity> orderedDealerList = new ArrayList<>();
+		for (CarRecommandEntity recommand : recommandList) {
+			for (CarDealerEntity dealer : dealerList) {
+				if (dealer.getId().equals(recommand.getRecommandId())) {
+					orderedDealerList.add(dealer);
+					break;
+				}
+			}
+		}
+		
+		// 限制返回数量
+		if (orderedDealerList.size() > limit) {
+			return orderedDealerList.subList(0, limit);
+		}
+		
+		return orderedDealerList;
 	}
 }

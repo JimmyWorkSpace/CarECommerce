@@ -30,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     select * from (
         SELECT cs.* ,
         concat(c.manufacture_year, ' ', cb.brand, ' ', case c.id_model when 0 then c.custom_model else cm.model end) as saleTitleShow,
-        case cr.id when null then 0 else 1 end as recommendedValue
+        case when cr.id is null then 0 else 1 end as recommendedValue
         FROM car_sales cs
         left JOIN cars c on cs.car_id = c.id
 		left join car_brand cb on c.id_brand = cb.id

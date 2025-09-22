@@ -121,7 +121,6 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">精選店家</h2>
-                <a href="/dealers" class="view-more-link">查看更多 <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="dealers-container">
                 <#list dealers as dealer>
@@ -139,7 +138,6 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">精選好車</h2>
-                <a href="/buy-cars" class="view-more-link">查看更多 <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="cars-container">
                 <#list cars as car>
