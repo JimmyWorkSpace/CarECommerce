@@ -106,6 +106,17 @@
         ORDER BY create_time DESC
     </select>
 
+    <!-- 查询待支付的订单（用于定时任务查询状态） -->
+    <select id="selectPendingOrdersForQuery" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM car_payment_order
+        WHERE payment_status = 0 
+          AND del_flag = 0
+          AND create_time &gt;= #{startTime}
+          AND create_time &lt;= #{endTime}
+        ORDER BY create_time ASC
+    </select>
+
     <!-- 删除支付订单（逻辑删除） -->
     <update id="deleteById" parameterType="java.lang.Long">
         UPDATE car_payment_order

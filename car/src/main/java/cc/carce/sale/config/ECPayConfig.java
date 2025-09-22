@@ -23,6 +23,12 @@ public class ECPayConfig {
     private String productionUrl = "https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5";
     
     /**
+     * 绿界查询订单状态API地址（测试环境）
+     */
+    private String queryServerUrl = "https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5";
+    
+    
+    /**
      * 商户编号
      */
     private String merchantId;
@@ -63,4 +69,5 @@ public class ECPayConfig {
     public String getCurrentServerUrl() {
         return production ? productionUrl : serverUrl;
     }
+    
 }
