@@ -266,7 +266,7 @@
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="receiverMobile" class="form-label">收件人手機號 <span class="text-danger">*</span></label>
-                                                        <input type="tel" class="form-control" id="receiverMobile" 
+                                                        <input type="text" class="form-control" id="receiverMobile" 
                                                                placeholder="请输入收件人手機號" 
                                                                v-model="formData.receiverMobile" required>
                                                     </div>
@@ -299,7 +299,7 @@
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="pickupMobile" class="form-label">取貨人手機號 <span class="text-danger">*</span></label>
-                                                        <input type="tel" class="form-control" id="pickupMobile" 
+                                                        <input type="text" class="form-control" id="pickupMobile" 
                                                                placeholder="请输入取貨人手機號" 
                                                                v-model="formData.receiverMobile" required>
                                                     </div>
