@@ -245,7 +245,7 @@
     </script>
 </head>
 <body>
-        <!-- 头部导航 -->
+        <!-- 頭部導航 -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
                 <a class="navbar-brand" href="/">
@@ -256,21 +256,13 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/">首頁</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/buy-cars">買車</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/mall">商城</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/channel">頻道</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/about">關於</a>
-                        </li>
+                        <#if menus?? && menus?has_content>
+                            <#list menus as menu>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="${menu.linkUrl!''}">${menu.title!''}</a>
+                                </li>
+                            </#list>
+                        </#if>
                         <#if user?? && user?has_content>
                             <li class="nav-item">
                                 <a class="nav-link" href="/cart">

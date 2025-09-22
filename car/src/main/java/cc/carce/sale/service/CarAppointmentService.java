@@ -7,10 +7,12 @@ import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.form.CarAppointmentForm;
 import cc.carce.sale.mapper.manager.CarAppointmentMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +31,11 @@ public class CarAppointmentService {
     
     @Resource
     private CarSalesService carSalesService;
+    
+    @Resource
+    private SmsService smsService;
+    
+    private String dealerMobile = "0975760203";
 
     /**
      * 创建预约
@@ -55,6 +62,15 @@ public class CarAppointmentService {
         int result = carAppointmentMapper.insert(appointment);
         if (result > 0) {
             log.info("预约创建成功，预约ID: {}", appointment.getId());
+            
+            // 发送短信通知
+            try {
+                sendAppointmentNotifications(appointment, form);
+            } catch (Exception e) {
+                log.error("发送预约通知短信失败，预约ID: {}, 错误: {}", appointment.getId(), e.getMessage(), e);
+                // 短信发送失败不影响预约创建成功
+            }
+            
             return appointment.getId();
         } else {
             log.error("预约创建失败");
@@ -195,5 +211,49 @@ public class CarAppointmentService {
     public boolean confirmViewing(Long id) {
         log.info("确认看车，预约ID: {}", id);
         return updateAppointmentStatus(id, CarAppointmentEntity.AppointmentStatus.VIEWED.getCode());
+    }
+    
+    /**
+     * 发送预约通知短信
+     * @param appointment 预约实体
+     * @param form 预约表单
+     */
+    private void sendAppointmentNotifications(CarAppointmentEntity appointment, CarAppointmentForm form) {
+        try {
+            // 格式化预约时间
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            String formattedTime = dateFormat.format(appointment.getAppointmentTime());
+            
+            // 获取车辆信息用于短信内容
+            String carTitle = "车辆";
+            try {
+                CarSalesEntity carSales = carSalesService.getById(appointment.getCarSaleId());
+                if (carSales != null) {
+                    carTitle = carSales.getSaleTitle();
+                }
+            } catch (Exception e) {
+                log.warn("获取车辆信息失败，使用默认标题，carSaleId: {}", appointment.getCarSaleId());
+            }
+            
+            // 1. 发送短信给客户
+            String customerMsg = String.format(
+                    "親愛的 %s 您好，預約已完成！車輛: %s, 時間: %s, 如有疑問請聯繫客服。",
+                    appointment.getAppointmentName(), carTitle, formattedTime
+            );
+            smsService.sendSms(appointment.getAppointmentPhone(), customerMsg);
+            log.info("客户预约确认短信发送成功，手机号: {}", appointment.getAppointmentPhone());
+            
+            // 2. 发送短信给后台管理员
+            String dealerMsg = String.format(
+                    "有新的預約: 姓名: %s, 電話: %s, 車輛: %s, 時間: %s",
+                    appointment.getAppointmentName(), appointment.getAppointmentPhone(), carTitle, formattedTime
+            );
+            smsService.sendSms(dealerMobile, dealerMsg);
+            log.info("管理员预约通知短信发送成功，手机号: {}", dealerMobile);
+            
+        } catch (Exception e) {
+            log.error("发送预约通知短信异常: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 }

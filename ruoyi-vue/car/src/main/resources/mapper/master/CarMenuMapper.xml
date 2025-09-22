@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.car.mapper.master.CarMenuMapper">
+    
+    <resultMap type="com.ruoyi.car.domain.CarMenuEntity" id="CarMenuResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="showOrder"    column="showOrder"    />
+        <result property="delFlag"    column="delFlag"    />
+        <result property="createTime"    column="createTime"    />
+        <result property="isShow"    column="isShow"    />
+        <result property="canDel"    column="canDel"    />
+        <result property="linkUrl"    column="linkUrl"    />
+    </resultMap>
+
+    <sql id="selectCarMenuVo">
+        select id, title, showOrder, delFlag, createTime, isShow, canDel, linkUrl from car_menu
+    </sql>
+
+    <select id="selectCarMenuList" parameterType="com.ruoyi.car.domain.CarMenuEntity" resultMap="CarMenuResult">
+        <include refid="selectCarMenuVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')</if>
+            <if test="showOrder != null "> and showOrder = #{showOrder}</if>
+            <if test="delFlag != null "> and delFlag = #{delFlag}</if>
+            <if test="createTime != null "> and createTime = #{createTime}</if>
+            <if test="isShow != null "> and isShow = #{isShow}</if>
+            <if test="canDel != null "> and canDel = #{canDel}</if>
+            <if test="linkUrl != null  and linkUrl != ''"> and linkUrl = #{linkUrl}</if>
+        </where>
+        order by showOrder asc, createTime desc
+    </select>
+    
+    <select id="selectCarMenuById" parameterType="Long" resultMap="CarMenuResult">
+        <include refid="selectCarMenuVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCarMenu" parameterType="com.ruoyi.car.domain.CarMenuEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into car_menu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="showOrder != null">showOrder,</if>
+            <if test="delFlag != null">delFlag,</if>
+            <if test="createTime != null">createTime,</if>
+            <if test="isShow != null">isShow,</if>
+            <if test="canDel != null">canDel,</if>
+            <if test="linkUrl != null">linkUrl,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="showOrder != null">#{showOrder},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="isShow != null">#{isShow},</if>
+            <if test="canDel != null">#{canDel},</if>
+            <if test="linkUrl != null">#{linkUrl},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCarMenu" parameterType="com.ruoyi.car.domain.CarMenuEntity">
+        update car_menu
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="showOrder != null">showOrder = #{showOrder},</if>
+            <if test="delFlag != null">delFlag = #{delFlag},</if>
+            <if test="createTime != null">createTime = #{createTime},</if>
+            <if test="isShow != null">isShow = #{isShow},</if>
+            <if test="canDel != null">canDel = #{canDel},</if>
+            <if test="linkUrl != null">linkUrl = #{linkUrl},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateCarMenuShowStatus">
+        update car_menu set isShow = #{isShow} where id = #{id}
+    </update>
+
+    <update id="updateCarMenuOrder">
+        update car_menu set showOrder = #{showOrder} where id = #{id}
+    </update>
+
+    <delete id="deleteCarMenuById" parameterType="Long">
+        delete from car_menu where id = #{id}
+    </delete>
+
+    <delete id="deleteCarMenuByIds" parameterType="String">
+        delete from car_menu where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

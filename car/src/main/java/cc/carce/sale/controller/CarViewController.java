@@ -34,6 +34,8 @@ import cc.carce.sale.dto.CarReportDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarRichContentEntity;
 import cc.carce.sale.entity.CarQuestionAnswerEntity;
+import cc.carce.sale.entity.CarSalesEntity;
+import cc.carce.sale.entity.CarDealerEntity;
 import cc.carce.sale.form.PaymentRequestForm;
 import cc.carce.sale.form.CarReportForm;
 import cc.carce.sale.entity.CarAdvertisementEntity;
@@ -46,6 +48,7 @@ import cc.carce.sale.service.CarSalesService;
 import cc.carce.sale.service.CarService;
 import cc.carce.sale.service.ECPayService;
 import cc.carce.sale.service.CarAdvertisementService;
+import cc.carce.sale.service.CarMenuService;
 import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -91,6 +94,9 @@ public class CarViewController extends BaseController {
 	@Resource
     private ECPayService ecPayService;
     
+    @Resource
+    private CarMenuService carMenuService;
+    
     /**
      * 首页
      */
@@ -112,83 +118,77 @@ public class CarViewController extends BaseController {
             // 设置首页主图
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             
-//            // 获取banner数据
-//            List<CarBannerEntity> banners = carBannerService.getHomeBanners();
-//            List<Map<String, String>> heroSlides = new ArrayList<>();
-//            
-//            if (banners != null && !banners.isEmpty()) {
-//                for (CarBannerEntity banner : banners) {
-//                    Map<String, String> slide = new HashMap<>();
-//                    slide.put("image", banner.getImageUrl());
-//                    slide.put("title", "精選二手車");
-//                    slide.put("subtitle", "品質保證，價格實惠");
-//                    slide.put("link", banner.getIsLink() ? banner.getLinkUrl() : "#");
-//                    slide.put("isLink", banner.getIsLink().toString());
-//                    heroSlides.add(slide);
-//                }
-//            } else {
-//                // 如果没有banner数据，使用默认数据
-//                Map<String, String> slide1 = new HashMap<>();
-//                slide1.put("image", "/img/swipper/slide1.jpg");
-//                slide1.put("title", "精選二手車");
-//                slide1.put("subtitle", "品質保證，價格實惠");
-//                slide1.put("link", "/cars");
-//                slide1.put("isLink", "true");
-//                heroSlides.add(slide1);
-//                
-//                Map<String, String> slide2 = new HashMap<>();
-//                slide2.put("image", "/img/swipper/slide2.jpg");
-//                slide2.put("title", "專業檢測");
-//                slide2.put("subtitle", "每輛車都經過嚴格檢測");
-//                slide2.put("link", "/inspection");
-//                slide2.put("isLink", "true");
-//                heroSlides.add(slide2);
-//            }
-//            
-//            model.addAttribute("heroSlides", heroSlides);
             
-            // 设置精选好车数据
+            // 设置精选好车数据 - 从数据库查询推荐车辆
             List<Map<String, String>> cars = new ArrayList<>();
-            
-            String[] carModels = {
-                "Toyota Camry 2020", "Honda Civic 2021", "Nissan Altima 2019", 
-                "Mazda 3 2020", "Subaru Impreza 2021", "Mitsubishi Lancer 2019",
-                "Toyota Corolla 2020", "Honda Accord 2021", "Nissan Sentra 2019"
-            };
-            
-            String[] carPrices = {
-                "850,000", "780,000", "720,000", "680,000", "750,000", "650,000",
-                "820,000", "890,000", "700,000"
-            };
-            
-            for (int i = 8; i <= 16; i++) {
-                Map<String, String> car = new HashMap<>();
-                car.put("model", carModels[i - 8]);
-                car.put("price", carPrices[i - 8]);
-                car.put("image", "/img/car/car" + i + ".jpg");
-                cars.add(car);
+            try {
+                List<CarSalesEntity> recommendedCars = carSalesService.getRecommendedCars(9);
+                for (CarSalesEntity carSales : recommendedCars) {
+                    Map<String, String> car = new HashMap<>();
+                    // 构建车型信息
+                    String carModel = carSales.getSaleTitle() != null ? carSales.getSaleTitle() : "精選車輛";
+                    car.put("model", carModel);
+                    
+                    // 格式化价格
+                    String price = "面議";
+                    if (carSales.getSalePrice() != null && carSales.getSalePrice() > 0) {
+                        price = String.format("%,d", carSales.getSalePrice());
+                    }
+                    car.put("price", price);
+                    
+                    // 设置图片 - 使用默认图片或根据ID生成
+                    String image = "/img/car/car" + (8 + cars.size() + 1) + ".jpg";
+                    car.put("image", image);
+                    
+                    // 添加车辆ID用于链接
+                    car.put("id", carSales.getId().toString());
+                    car.put("uid", carSales.getUid() != null ? carSales.getUid() : "");
+                    
+                    cars.add(car);
+                }
+            } catch (Exception e) {
+                log.error("获取推荐车辆失败，使用默认数据", e);
             }
             
             model.addAttribute("cars", cars);
             
-            // 设置精选店家数据
+            // 设置精选店家数据 - 从数据库查询推荐店家
             List<Map<String, String>> dealers = new ArrayList<>();
-            
-            String[] dealerNames = {
-                "台北汽車", "新北車行", "桃園汽車", "台中車行", "台南汽車", "高雄車行"
-            };
-            
-            // 随机挑选的汽车图片
-            String[] carImages = {
-                "/img/car/car4.jpg", "/img/car/car6.jpg", "/img/car/car8.jpg", 
-                "/img/car/car9.jpg", "/img/car/car10.jpg", "/img/car/car11.jpg"
-            };
-            
-            for (int i = 0; i < dealerNames.length; i++) {
-                Map<String, String> dealer = new HashMap<>();
-                dealer.put("name", dealerNames[i]);
-                dealer.put("image", carImages[i]);
-                dealers.add(dealer);
+            try {
+                List<CarDealerEntity> recommendedDealers = carSalesService.getRecommendedDealers(6);
+                String[] carImages = {
+                    "/img/car/car4.jpg", "/img/car/car6.jpg", "/img/car/car8.jpg", 
+                    "/img/car/car9.jpg", "/img/car/car10.jpg", "/img/car/car11.jpg"
+                };
+                
+                for (int i = 0; i < recommendedDealers.size(); i++) {
+                    CarDealerEntity dealerEntity = recommendedDealers.get(i);
+                    Map<String, String> dealer = new HashMap<>();
+                    
+                    // 设置店家名称
+                    String dealerName = dealerEntity.getDealerName() != null ? 
+                        dealerEntity.getDealerName() : "精選店家";
+                    dealer.put("name", dealerName);
+                    
+                    // 设置图片 - 使用默认图片或根据索引生成
+                    String image = carImages[i % carImages.length];
+                    dealer.put("image", image);
+                    
+                    // 添加店家ID用于链接
+                    dealer.put("id", dealerEntity.getId().toString());
+                    
+                    // 添加其他有用信息
+                    if (dealerEntity.getPublicAddress() != null) {
+                        dealer.put("address", dealerEntity.getPublicAddress());
+                    }
+                    if (dealerEntity.getCompanyPhone() != null) {
+                        dealer.put("phone", dealerEntity.getCompanyPhone());
+                    }
+                    
+                    dealers.add(dealer);
+                }
+            } catch (Exception e) {
+                log.error("获取推荐店家失败，使用默认数据", e);
             }
             
             model.addAttribute("dealers", dealers);
@@ -203,6 +203,9 @@ public class CarViewController extends BaseController {
         } catch (Exception e) {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
         
         return "/layout/main";
     }
@@ -225,6 +228,10 @@ public class CarViewController extends BaseController {
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -247,6 +254,10 @@ public class CarViewController extends BaseController {
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -272,6 +283,10 @@ public class CarViewController extends BaseController {
         } catch (Exception e) {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -294,6 +309,10 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -316,6 +335,10 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -380,6 +403,9 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "獲取數據失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
         
         return "/layout/main";
     }
@@ -456,6 +482,9 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -508,6 +537,9 @@ public class CarViewController extends BaseController {
 
 		log.info("用户通过GET请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}", userInfo.getId(), itemName, amount);
 
+		// 添加菜单数据
+		addMenuData(model);
+
 		return "/layout/main";
 	}
 
@@ -558,6 +590,9 @@ public class CarViewController extends BaseController {
 
 		log.info("用户通过POST请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}, 环境: {}", userInfo.getId(), paymentRequest.getItemName(),
 				finalAmount, activeProfile);
+
+		// 添加菜单数据
+		addMenuData(model);
 
 		return "/layout/main";
 	}
@@ -641,6 +676,9 @@ public class CarViewController extends BaseController {
 		model.addAttribute("reports", reports);
 		model.addAttribute("content", "/report/my-reports.ftl");
 		model.addAttribute("title", "我的檢舉");
+		
+		// 添加菜单数据
+		addMenuData(model);
 		
 		return "layout/main";
 	}
@@ -763,6 +801,24 @@ public class CarViewController extends BaseController {
 			log.error("获取频道页面失败", e);
 			model.addAttribute("error", "获取数据失败");
 		}
+		
+		// 添加菜单数据
+		addMenuData(model);
+		
 		return "layout/main";
+	}
+	
+	/**
+	 * 添加菜单数据到Model
+	 * @param model Model对象
+	 */
+	private void addMenuData(Model model) {
+		try {
+			model.addAttribute("menus", carMenuService.getVisibleMenus());
+		} catch (Exception e) {
+			log.error("获取菜单数据失败", e);
+			// 如果获取菜单失败，设置空列表避免模板报错
+			model.addAttribute("menus", new ArrayList<>());
+		}
 	}
 } 

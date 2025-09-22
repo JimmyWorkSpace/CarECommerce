@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.car.mapper.master.CarRecommandMapper">
+    
+    <resultMap type="com.ruoyi.car.domain.CarRecommandEntity" id="CarRecommandResult">
+        <id     property="id"           column="id"           />
+        <result property="recommandType" column="recommandType" />
+        <result property="recommandId"   column="recommandId"   />
+        <result property="showOrder"     column="showOrder"     />
+        <result property="delFlag"       column="delFlag"       />
+        <result property="createTime"    column="createTime"    />
+    </resultMap>
+    
+    <sql id="selectCarRecommandVo">
+        select id, recommandType, recommandId, showOrder, delFlag, createTime 
+        from car_recommand
+    </sql>
+    
+    <select id="selectByRecommandTypeAndId" resultMap="CarRecommandResult">
+        <include refid="selectCarRecommandVo"/>
+        where recommandType = #{recommandType} and recommandId = #{recommandId} and (delFlag = 0 or delFlag is null)
+    </select>
+    
+    <select id="selectByRecommandType" resultMap="CarRecommandResult">
+        <include refid="selectCarRecommandVo"/>
+        where recommandType = #{recommandType} and (delFlag = 0 or delFlag is null)
+        order by showOrder asc, createTime desc
+    </select>
+    
+    <delete id="deleteByRecommandTypeAndId">
+        delete from car_recommand 
+        where recommandType = #{recommandType} and recommandId = #{recommandId}
+    </delete>
+    
+</mapper>

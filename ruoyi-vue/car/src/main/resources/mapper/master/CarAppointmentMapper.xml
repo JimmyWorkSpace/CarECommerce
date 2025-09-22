@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.car.mapper.master.CarAppointmentMapper">
+    
+    <resultMap type="com.ruoyi.car.dto.CarAppointmentDto" id="CarAppointmentDtoResult">
+        <result property="id"    column="id"    />
+        <result property="carSaleId"    column="carSaleId"    />
+        <result property="userId"    column="userId"    />
+        <result property="appointmentName"    column="appointmentName"    />
+        <result property="appointmentPhone"    column="appointmentPhone"    />
+        <result property="appointmentTime"    column="appointmentTime"    />
+        <result property="appointmentNote"    column="appointmentNote"    />
+        <result property="appointmentStatus"    column="appointmentStatus"    />
+        <result property="appointmentStatusDesc"    column="appointmentStatusDesc"    />
+        <result property="createTime"    column="createTime"    />
+        <result property="updateTime"    column="updateTime"    />
+        <result property="saleTitle"    column="saleTitle"    />
+    </resultMap>
+
+    <sql id="selectCarAppointmentDtoVo">
+        select a.id, a.carSaleId, a.userId, a.appointmentName, a.appointmentPhone, 
+               a.appointmentTime, a.appointmentNote, a.appointmentStatus, 
+               a.createTime, a.updateTime,
+               case a.appointmentStatus 
+                   when 1 then '已预约'
+                   when 2 then '已看车' 
+                   when 3 then '已取消'
+                   else '未知'
+               end as appointmentStatusDesc
+        from car_appointment a
+    </sql>
+
+    <select id="selectCarAppointmentListWithSaleTitle" resultType="com.ruoyi.car.dto.CarAppointmentDto">
+        select t.*, 
+               concat(c.manufacture_year, ' ', cb.brand, ' ', case c.id_model when 0 then c.custom_model else cm.model end) as saleTitle,
+               case t.appointmentStatus 
+                   when 1 then '已预约'
+                   when 2 then '已看车' 
+                   when 3 then '已取消'
+                   else '未知'
+               end as appointmentStatusDesc
+		from car_appointment t 
+		left join ${carDbName}.car_sales cs on t.carSaleId = cs.id
+		left JOIN ${carDbName}.cars c on cs.car_id = c.id
+		left join ${carDbName}.car_brand cb on c.id_brand = cb.id
+		left join ${carDbName}.car_model cm on c.id_model = cm.id
+        <where>  
+            <if test="entity.appointmentName != null  and entity.appointmentName != ''"> and t.appointmentName like concat('%', #{entity.appointmentName}, '%')</if>
+            <if test="entity.appointmentPhone != null  and entity.appointmentPhone != ''"> and t.appointmentPhone like concat('%', #{entity.appointmentPhone}, '%')</if>
+            <if test="entity.appointmentStatus != null "> and t.appointmentStatus = #{entity.appointmentStatus}</if>
+            and t.delFlag = 0
+        </where>
+        order by t.createTime desc
+    </select>
+
+
+
+</mapper>

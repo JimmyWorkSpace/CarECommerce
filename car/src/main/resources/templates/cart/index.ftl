@@ -7,7 +7,7 @@
                     購物車
                 </h2>
                 
-                <!-- 加载状态 -->
+                <!-- 加載狀態 -->
                 <div v-if="loading" class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">載入中...</span>
@@ -15,7 +15,7 @@
                     <p class="mt-3 text-muted">正在載入購物車...</p>
                 </div>
                 
-                <!-- 错误提示 -->
+                <!-- 錯誤提示 -->
                 <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
                     {{ error }}
@@ -380,39 +380,39 @@ new Vue({
         }
     },
     mounted() {
-        console.log('购物车页面Vue实例已挂载');
+        console.log('購物車页面Vue实例已挂载');
         // 延迟加载，避免与主布局的初始化冲突
         setTimeout(() => {
             this.loadCart();
         }, 100);
     },
     methods: {
-        // 加载购物车数据
+        // 加载購物車数据
         async loadCart() {
             // 防止重复调用
             if (this.loading) {
-                console.log('购物车正在加载中，跳过重复调用');
+                console.log('購物車正在加载中，跳过重复调用');
                 return;
             }
             
             try {
-                console.log('开始加载购物车数据...');
+                console.log('开始加载購物車数据...');
                 this.loading = true;
                 this.error = '';
                 
                 const response = await axios.get('/api/shopping-cart/list');
-                console.log('购物车API响应:', response);
+                console.log('購物車API响应:', response);
                 const data = response.data;
-                console.log('购物车数据:', data);
+                console.log('購物車数据:', data);
                 
                 if (data.success) {
                     this.cartItems = (data.data || []).map(item => ({
                         ...item,
                         selected: true // 默认选中所有商品
                     }));
-                    console.log('购物车数据加载成功，商品数量:', this.cartItems.length);
-                    console.log('购物车商品详情:', this.cartItems);
-                    // 更新全局购物车数量
+                    console.log('購物車数据加载成功，商品数量:', this.cartItems.length);
+                    console.log('購物車商品详情:', this.cartItems);
+                    // 更新全局購物車数量
                     this.updateGlobalCartCount();
                 } else {
                     // 检查是否是未登录错误
@@ -425,20 +425,20 @@ new Vue({
                         window.location.href = '/login';
                         return; // 已处理未登录状态，不显示错误信息
                     }
-                    this.error = data.message || '获取购物车失败';
-                    console.error('购物车数据加载失败:', data.message);
+                    this.error = data.message || '获取購物車失败';
+                    console.error('購物車数据加载失败:', data.message);
                 }
             } catch (error) {
-                console.error('加载购物车失败:', error);
+                console.error('加载購物車失败:', error);
                 console.error('错误详情:', error.response?.data || error.message);
                 console.error('错误状态码:', error.response?.status);
                 // 使用通用错误处理函数
                 const errorMessage = window.handleApiError ? window.handleApiError(error, '网络错误，请稍后重试') : '网络错误，请稍后重试';
                 this.error = errorMessage;
             } finally {
-                console.log('购物车加载完成，loading状态设置为false');
+                console.log('購物車加载完成，loading状态设置为false');
                 this.loading = false;
-                console.log('当前购物车状态 - loading:', this.loading, 'cartItems数量:', this.cartItems.length, 'error:', this.error);
+                console.log('当前購物車状态 - loading:', this.loading, 'cartItems数量:', this.cartItems.length, 'error:', this.error);
             }
         },
         
@@ -492,7 +492,7 @@ new Vue({
                         item.productAmount = newQuantity;
                         console.log('商品 ' + id + ' 数量已更新为: ' + newQuantity);
                     }
-                    // 更新全局购物车数量
+                    // 更新全局購物車数量
                     this.updateGlobalCartCount();
                 } else {
                     // 使用通用错误消息显示函数
@@ -525,7 +525,7 @@ new Vue({
                 if (data.success) {
                     // 从本地数组中移除
                     this.cartItems = this.cartItems.filter(item => item.id !== id);
-                    // 更新全局购物车数量
+                    // 更新全局購物車数量
                     this.updateGlobalCartCount();
                     // 显示成功消息
                     if (window.showSuccessMessage) {
@@ -548,7 +548,7 @@ new Vue({
             }
         },
         
-        // 清空购物车
+        // 清空購物車
         async clearCart() {
             if (!confirm('確定要清空整個購物車嗎？')) {
                 return;
@@ -560,7 +560,7 @@ new Vue({
                 const data = response.data;
                 if (data.success) {
                     this.cartItems = [];
-                    // 更新全局购物车数量
+                    // 更新全局購物車数量
                     this.updateGlobalCartCount();
                     // 显示成功消息
                     if (window.showSuccessMessage) {
@@ -680,7 +680,7 @@ new Vue({
             window.location.href = '/login';
         },
         
-        // 更新全局购物车数量
+        // 更新全局購物車数量
         updateGlobalCartCount() {
             if (window.cartManager && window.cartManager.updateCartCount) {
                 window.cartManager.updateCartCount();

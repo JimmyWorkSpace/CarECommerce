@@ -10,8 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.core.cache.MemoryCache;
-import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.cache.RedisCache;
 import com.ruoyi.common.filter.RepeatedlyRequestWrapper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.http.HttpHelper;
@@ -36,7 +35,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
     private String header;
 
     @Autowired
-    private MemoryCache memoryCache;
+    private RedisCache redisCache;
 
     @Autowired
     private TokenService tokenService;
@@ -70,7 +69,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         // 唯一标识（指定key + url + 消息头）
         String cacheRepeatKey = Constants.REPEAT_SUBMIT_KEY + submitKey + nowParams;
 
-        Object sessionObj = memoryCache.getCacheObject(cacheRepeatKey);
+        Object sessionObj = redisCache.getCacheObject(cacheRepeatKey);
         if (sessionObj != null)
         {
             Map<String, Object> sessionMap = (Map<String, Object>) sessionObj;
@@ -86,7 +85,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         Map<String, Object> cacheMap = new HashMap<String, Object>();
         cacheMap.put(REPEAT_PARAMS, nowParams);
         cacheMap.put(REPEAT_TIME, System.currentTimeMillis());
-        memoryCache.setCacheObject(cacheRepeatKey, cacheMap, annotation.interval(), TimeUnit.MILLISECONDS);
+        redisCache.setCacheObject(cacheRepeatKey, cacheMap, annotation.interval(), TimeUnit.MILLISECONDS);
         return false;
     }
 

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
-import com.ruoyi.common.core.cache.MemoryCache;
+import com.ruoyi.common.core.cache.RedisCache;
 import com.ruoyi.common.utils.spring.SpringUtils;
 
 /**
@@ -27,7 +27,7 @@ public class DictUtils
      */
     public static void setDictCache(String key, List<SysDictData> dictDatas)
     {
-        SpringUtils.getBean(MemoryCache.class).setCacheObject(getCacheKey(key), dictDatas);
+        SpringUtils.getBean(RedisCache.class).setCacheObject(getCacheKey(key), dictDatas);
     }
 
     /**
@@ -38,7 +38,7 @@ public class DictUtils
      */
     public static List<SysDictData> getDictCache(String key)
     {
-        Object cacheObj = SpringUtils.getBean(MemoryCache.class).getCacheObject(getCacheKey(key));
+        Object cacheObj = SpringUtils.getBean(RedisCache.class).getCacheObject(getCacheKey(key));
         if (StringUtils.isNotNull(cacheObj))
         {
             return StringUtils.cast(cacheObj);
@@ -157,7 +157,7 @@ public class DictUtils
      */
     public static void removeDictCache(String key)
     {
-        SpringUtils.getBean(MemoryCache.class).deleteObject(getCacheKey(key));
+        SpringUtils.getBean(RedisCache.class).deleteObject(getCacheKey(key));
     }
 
     /**
@@ -165,8 +165,8 @@ public class DictUtils
      */
     public static void clearDictCache()
     {
-        Collection<String> keys = SpringUtils.getBean(MemoryCache.class).keys(Constants.SYS_DICT_KEY + "*");
-        SpringUtils.getBean(MemoryCache.class).deleteObject(keys);
+        Collection<String> keys = SpringUtils.getBean(RedisCache.class).keys(Constants.SYS_DICT_KEY + "*");
+        SpringUtils.getBean(RedisCache.class).deleteObject(keys);
     }
 
     /**

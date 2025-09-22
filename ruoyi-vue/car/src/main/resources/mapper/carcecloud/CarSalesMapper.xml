@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.car.mapper.carcecloud.CarSalesMapper">
+
+    <!-- 根据uid查询车辆销售信息 -->
+    <select id="getByUid" parameterType="string" resultType="com.ruoyi.car.domain.CarSalesEntity">
+        SELECT * FROM car_sales cs 
+        WHERE cs.uid = #{uid} 
+        LIMIT 1
+    </select>
+
+    <!-- 根据id查询车辆销售信息 -->
+    <select id="getById" parameterType="long" resultType="com.ruoyi.car.domain.CarSalesEntity">
+        SELECT * FROM car_sales cs 
+        WHERE cs.id = #{id} 
+        LIMIT 1
+    </select>
+
+    <!-- 根据id更新uid -->
+    <update id="updateUidById">
+        UPDATE car_sales 
+        SET uid = #{uid} 
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据条件查询车辆销售列表 -->
+    <select id="selectCarSalesList" parameterType="com.ruoyi.car.domain.CarSalesEntity" resultType="com.ruoyi.car.dto.CarSalesDto">
+    select * from (
+        SELECT cs.* ,
+        concat(c.manufacture_year, ' ', cb.brand, ' ', case c.id_model when 0 then c.custom_model else cm.model end) as saleTitleShow,
+        case when cr.id is null then 0 else 1 end as recommendedValue
+        FROM car_sales cs
+        left JOIN cars c on cs.car_id = c.id
+		left join car_brand cb on c.id_brand = cb.id
+		left join car_model cm on c.id_model = cm.id
+		left join ${mgrDbName}.car_recommand cr on recommandType = 1 and cr.recommandId = cs.id
+        <where>
+<!--             <if test="saleTitle != null and saleTitle != ''"> -->
+<!--                 AND cs.sale_title LIKE CONCAT('%', #{saleTitle}, '%') -->
+<!--             </if> -->
+            <if test="entity.salesperson != null and entity.salesperson != ''">
+                AND cs.salesperson LIKE CONCAT('%', #{entity.salesperson}, '%')
+            </if>
+            <if test="entity.status != null and entity.status != ''">
+                AND cs.status = #{entity.status}
+            </if>
+            <if test="entity.publisher != null and entity.publisher != ''">
+                AND cs.publisher LIKE CONCAT('%', #{entity.publisher}, '%')
+            </if>
+            <if test="entity.isVisible != null">
+                AND cs.is_visible = #{entity.isVisible}
+            </if>
+        </where>
+        ) t
+        ORDER BY t.recommendedValue desc, t.c_dt DESC
+    </select>
+
+    <!-- 根据ID列表批量查询车辆销售信息 -->
+    <select id="selectCarSalesByIds" resultType="com.ruoyi.car.domain.CarSalesEntity">
+        SELECT * FROM car_sales
+        WHERE id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- 根据车辆销售ID查询车辆基本信息 -->
+    <select id="selectCarBaseInfoBySaleId" parameterType="long" resultType="com.ruoyi.car.dto.CarBaseInfoDto">
+        SELECT
+            cb.brand,                    -- 品牌
+            c.manufacture_year,          -- 出厂年
+            c.displacement,              -- 排气量
+            c.fuel_system,               -- 燃料系统
+            c.transmission,              -- 变速系统
+            c.color,                     -- 颜色
+            c.door_count,                -- 车门数
+            c.passenger_count,           -- 乘坐人数
+            cs.sale_price,               -- 售价
+            cs.sale_title,               -- 标题
+            cs.sale_description,         -- 详情
+            cs.mileage,                  -- 公里数
+            cl.name AS location_name,    -- 地点
+            cs.id_garage as garage_id,   -- 车库ID
+            cm.model as custom_model     -- 自定义型号
+        FROM cars c
+        LEFT JOIN car_brand cb ON cb.id = c.id_brand
+        LEFT JOIN car_sales cs ON c.id = cs.car_id
+        LEFT JOIN car_location cl ON cs.car_location_id = cl.id
+        LEFT JOIN car_model cm ON c.id_model = cm.id
+        WHERE cs.id = #{saleId}
+        LIMIT 1
+    </select>
+
+    <!-- 根据uid查询车辆基本信息 -->
+    <select id="selectCarBaseInfoByUid" parameterType="string" resultType="com.ruoyi.car.dto.CarBaseInfoDto">
+        SELECT
+            cb.brand,                    -- 品牌
+            c.manufacture_year,          -- 出厂年
+            c.displacement,              -- 排气量
+            c.fuel_system,               -- 燃料系统
+            c.transmission,              -- 变速系统
+            c.color,                     -- 颜色
+            c.door_count,                -- 车门数
+            c.passenger_count,           -- 乘坐人数
+            cs.sale_price,               -- 售价
+            cs.sale_title,               -- 标题
+            cs.sale_description,         -- 详情
+            cs.mileage,                  -- 公里数
+            cl.name AS location_name,    -- 地点
+            cs.id_garage as garage_id,   -- 车库ID
+            cm.model as custom_model     -- 自定义型号
+        FROM cars c
+        LEFT JOIN car_brand cb ON cb.id = c.id_brand
+        LEFT JOIN car_sales cs ON c.id = cs.car_id
+        LEFT JOIN car_location cl ON cs.car_location_id = cl.id
+        LEFT JOIN car_model cm ON c.id_model = cm.id
+        WHERE cs.uid = #{uid}
+        LIMIT 1
+    </select>
+
+</mapper>

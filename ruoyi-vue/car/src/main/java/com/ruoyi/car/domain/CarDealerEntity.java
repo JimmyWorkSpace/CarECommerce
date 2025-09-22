@@ -3,6 +3,7 @@ package com.ruoyi.car.domain;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.ruoyi.car.DataSourceConstants;
@@ -13,6 +14,7 @@ import lombok.Data;
 @Entity
 @Table(name = "car_dealers")
 public class CarDealerEntity {
+  @Id
   @Column(name = "id")
   private Long id;
 

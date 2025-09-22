@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.car.mapper.master.CarReportMapper">
+    
+    <resultMap type="com.ruoyi.car.domain.CarReportEntity" id="CarReportResult">
+        <result property="id"    column="id"    />
+        <result property="saleId"    column="sale_id"    />
+        <result property="reporterId"    column="reporter_id"    />
+        <result property="reason"    column="reason"    />
+        <result property="description"    column="description"    />
+        <result property="anonymous"    column="anonymous"    />
+        <result property="status"    column="status"    />
+        <result property="processNote"    column="process_note"    />
+        <result property="processorId"    column="processor_id"    />
+        <result property="processedAt"    column="processed_at"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="updatedAt"    column="updated_at"    />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.car.dto.CarReportDto" id="CarReportDtoResult">
+        <result property="id"    column="id"    />
+        <result property="saleId"    column="sale_id"    />
+        <result property="reporterId"    column="reporter_id"    />
+        <result property="reason"    column="reason"    />
+        <result property="description"    column="description"    />
+        <result property="anonymous"    column="anonymous"    />
+        <result property="status"    column="status"    />
+        <result property="processNote"    column="process_note"    />
+        <result property="processorId"    column="processor_id"    />
+        <result property="processedAt"    column="processed_at"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="updatedAt"    column="updated_at"    />
+        <result property="reporterName"    column="reporter_name"    />
+        <result property="reporterPhone"    column="reporter_phone"    />
+    </resultMap>
+
+    <sql id="selectCarReportVo">
+        select id, sale_id, reporter_id, reason, description, anonymous, status, process_note, processor_id, processed_at, created_at, updated_at from car_reports
+    </sql>
+
+    <sql id="selectCarReportDtoVo">
+        select r.id, r.sale_id, r.reporter_id, r.reason, r.description, r.anonymous, r.status, r.process_note, r.processor_id, r.processed_at, r.created_at, r.updated_at,
+               u.nickName as reporter_name, u.phoneNumber as reporter_phone
+        from car_reports r
+        left join car_user u on r.reporter_id = u.id
+    </sql>
+
+    <select id="selectCarReportList" parameterType="com.ruoyi.car.domain.CarReportEntity" resultType="com.ruoyi.car.dto.CarReportDto">
+        select r.*, cu.nickName as reporterName, cu.phoneNumber as reporterPhone,
+               concat(c.manufacture_year, ' ', cb.brand, ' ', case c.id_model when 0 then c.custom_model else cm.model end) as saleTitle
+		from car_reports r 
+		left join car_user cu on r.reporter_id = cu.id
+		left join ${carDbName}.car_sales cs on r.sale_id = cs.id
+		left JOIN ${carDbName}.cars c on cs.car_id = c.id
+		left join ${carDbName}.car_brand cb on c.id_brand = cb.id
+		left join ${carDbName}.car_model cm on c.id_model = cm.id
+        <where>  
+            <if test="entity.saleId != null "> and r.sale_id = #{entity.saleId}</if>
+            <if test="entity.reporterId != null "> and r.reporter_id = #{entity.reporterId}</if>
+            <if test="entity.reason != null  and reason != ''"> and r.reason = #{entity.reason}</if>
+            <if test="entity.description != null  and description != ''"> and r.description like concat('%', #{entity.description}, '%')</if>
+            <if test="entity.anonymous != null "> and r.anonymous = #{entity.anonymous}</if>
+            <if test="entity.status != null  and status != ''"> and r.status = #{entity.status}</if>
+            <if test="entity.processorId != null "> and r.processor_id = #{entity.processorId}</if>
+        </where>
+        order by r.created_at desc
+    </select>
+    
+    <select id="selectReportById" parameterType="Long" resultMap="CarReportDtoResult">
+        <include refid="selectCarReportDtoVo"/>
+        where r.id = #{id}
+    </select>
+    
+    <select id="selectReportsByReporterId" parameterType="Long" resultMap="CarReportDtoResult">
+        <include refid="selectCarReportDtoVo"/>
+        where r.reporter_id = #{reporterId}
+        order by r.created_at desc
+    </select>
+</mapper>

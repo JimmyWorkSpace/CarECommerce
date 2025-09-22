@@ -1,26 +1,25 @@
 package com.ruoyi.car.service.impl;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
-import javax.persistence.Table;
 
 import org.springframework.stereotype.Service;
 
 import com.ruoyi.car.domain.CarSalesEntity;
+import com.ruoyi.car.dto.CarSalesDto;
 import com.ruoyi.car.mapper.carcecloud.CarSalesMapper;
 import com.ruoyi.car.service.CarSalesService;
+import com.ruoyi.framework.service.BaseServiceImpl;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.EntityTable;
-import tk.mybatis.mapper.entity.Example;
-import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
 @Service
 @Slf4j
 //@DataSource(DataSourceType.SLAVE)
-public class CarSalesServiceImpl implements CarSalesService {
+public class CarSalesServiceImpl extends BaseServiceImpl implements CarSalesService {
 
 	@Resource
 	private CarSalesMapper carSalesMapper;
@@ -64,15 +63,37 @@ public class CarSalesServiceImpl implements CarSalesService {
 
 	@Override
 	public CarSalesEntity getByUid(String uid) {
-		Example example = new Example(CarSalesEntity.class);
-		example.createCriteria().andEqualTo("uid", uid);
-		return carSalesMapper.selectOneByExample(example);
+		return carSalesMapper.getByUid(uid);
 	}
 
 	@Override
 	public CarSalesEntity getById(Long carSaleId) {
-		Example example = new Example(CarSalesEntity.class);
-		example.createCriteria().andEqualTo("id", carSaleId);
-		return carSalesMapper.selectOneByExample(example);
+		return carSalesMapper.getById(carSaleId);
+	}
+	
+	/**
+	 * 查询车辆销售列表
+	 * 
+	 * @param carSales 车辆销售信息
+	 * @return 车辆销售集合
+	 */
+	@Override
+	public List<CarSalesDto> selectCarSalesList(CarSalesEntity carSales) {
+		return carSalesMapper.selectCarSalesList(carSales, mgrDbName);
+	}
+	
+	/**
+	 * 根据ID列表批量查询车辆销售信息
+	 * 
+	 * @param ids 车辆销售ID列表
+	 * @return 车辆销售集合
+	 */
+	@Override
+	public List<CarSalesEntity> selectCarSalesByIds(List<Long> ids) {
+		if (ids == null || ids.isEmpty()) {
+			return new ArrayList<>();
+		}
+		
+		return carSalesMapper.selectCarSalesByIds(ids);
 	}
 }
