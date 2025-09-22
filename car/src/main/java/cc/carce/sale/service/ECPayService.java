@@ -1,5 +1,6 @@
 package cc.carce.sale.service;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -636,44 +637,41 @@ public class ECPayService {
         
         try {
             if (responseBody != null && !responseBody.trim().isEmpty()) {
-                // 绿界返回的是HTML格式，需要解析其中的参数
-                // 这里简化处理，实际应该解析HTML中的表单参数
-                String[] lines = responseBody.split("\n");
-                for (String line : lines) {
-                    if (line.contains("name=") && line.contains("value=")) {
-                        // 简单的HTML解析，提取name和value
-                        String name = extractValue(line, "name=\"", "\"");
-                        String value = extractValue(line, "value=\"", "\"");
-                        if (name != null && value != null) {
-                            result.put(name, value);
+                log.info("开始解析绿界查询响应: {}", responseBody);
+                
+                // 绿界返回的是URL编码的查询字符串格式，如：
+                // CustomField1=&CustomField2=&CustomField3=&CustomField4=&HandlingCharge=0&ItemName=...
+                
+                // 按&分割参数
+                String[] params = responseBody.split("&");
+                for (String param : params) {
+                    if (param.contains("=")) {
+                        String[] keyValue = param.split("=", 2);
+                        if (keyValue.length == 2) {
+                            String key = keyValue[0];
+                            String value = keyValue[1];
+                            
+                            // URL解码
+                            try {
+                                key = URLDecoder.decode(key, "UTF-8");
+                                value = URLDecoder.decode(value, "UTF-8");
+                            } catch (Exception e) {
+                                log.warn("URL解码失败，参数: {}={}", key, value, e);
+                            }
+                            
+                            result.put(key, value);
+                            log.debug("解析参数: {}={}", key, value);
                         }
                     }
                 }
+                
+                log.info("解析完成，共解析到 {} 个参数", result.size());
             }
         } catch (Exception e) {
             log.error("解析查询响应结果异常", e);
         }
         
         return result;
-    }
-    
-    /**
-     * 从字符串中提取指定标记之间的值
-     */
-    private String extractValue(String text, String startTag, String endTag) {
-        try {
-            int startIndex = text.indexOf(startTag);
-            if (startIndex != -1) {
-                startIndex += startTag.length();
-                int endIndex = text.indexOf(endTag, startIndex);
-                if (endIndex != -1) {
-                    return text.substring(startIndex, endIndex);
-                }
-            }
-        } catch (Exception e) {
-            log.error("提取值异常", e);
-        }
-        return null;
     }
     
     /**
