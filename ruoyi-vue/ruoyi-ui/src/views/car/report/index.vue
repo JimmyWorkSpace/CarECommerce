@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="檢舉原因" prop="reason">
-        <el-select v-model="queryParams.reason" placeholder="请选择檢舉原因" clearable size="small">
+        <el-select v-model="queryParams.reason" placeholder="請選擇檢舉原因" clearable size="small">
           <el-option
             v-for="dict in dict.type.car_report_reason"
             :key="dict.value"
@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="處理狀態" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择處理狀態" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="請選擇處理狀態" clearable size="small">
           <el-option
             v-for="dict in dict.type.car_report_status"
             :key="dict.value"
@@ -30,7 +30,7 @@
       <el-form-item label="檢舉人" prop="reporterName">
         <el-input
           v-model="queryParams.reporterName"
-          placeholder="请输入檢舉人姓名"
+          placeholder="請輸入檢舉人姓名"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -44,8 +44,8 @@
           value-format="yyyy-MM-dd"
           type="daterange"
           range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          start-placeholder="開始日期"
+          end-placeholder="結束日期"
         ></el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -75,7 +75,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['car:report:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <!-- <el-col :span="1.5">
         <el-button
@@ -127,7 +127,7 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['car:report:remove']"
-          >删除</el-button>
+          >刪除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -140,7 +140,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改車輛檢舉对话框 -->
+    <!-- 添加或修改車輛檢舉對話框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <!-- <el-row>
@@ -158,7 +158,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="檢舉原因" prop="reason">
-              <el-select v-model="form.reason" placeholder="请选择檢舉原因" :disabled="form.id != null">
+              <el-select v-model="form.reason" placeholder="請選擇檢舉原因" :disabled="form.id != null">
                 <el-option
                   v-for="dict in dict.type.car_report_reason"
                   :key="dict.value"
@@ -178,12 +178,12 @@
           </el-col> -->
         </el-row>
         <el-form-item label="詳細說明" prop="description">
-          <el-input v-model="form.description" type="textarea" placeholder="请输入詳細說明" :disabled="form.id != null" />
+          <el-input v-model="form.description" type="textarea" placeholder="請輸入詳細說明" :disabled="form.id != null" />
         </el-form-item>
         <el-row>
           <el-col :span="12">
             <el-form-item label="處理狀態" prop="status">
-              <el-select v-model="form.status" placeholder="请选择處理狀態">
+              <el-select v-model="form.status" placeholder="請選擇處理狀態">
                 <el-option
                   v-for="dict in dict.type.car_report_status"
                   :key="dict.value"
@@ -195,25 +195,25 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="處理人ID" prop="processorId">
-              <el-input v-model="form.processorId" placeholder="请输入處理人ID" :disabled="true" />
+              <el-input v-model="form.processorId" placeholder="請輸入處理人ID" :disabled="true" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-form-item label="處理備註" prop="processNote">
-          <el-input v-model="form.processNote" type="textarea" placeholder="请输入處理備註" />
+          <el-input v-model="form.processNote" type="textarea" placeholder="請輸入處理備註" />
         </el-form-item>
         <el-form-item label="處理時間" prop="processedAt">
           <el-date-picker clearable size="small"
             v-model="form.processedAt"
             type="datetime"
             value-format="yyyy-MM-dd HH:mm:ss"
-            placeholder="请选择處理時間"
+            placeholder="請選擇處理時間"
             :disabled="true">
           </el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm">確 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -228,27 +228,27 @@ export default {
   dicts: ['car_report_reason', 'car_report_status'],
   data() {
     return {
-      // 遮罩层
+      // 遮罩層
       loading: true,
-      // 选中数组
+      // 選中數組
       ids: [],
-      // 非单个禁用
+      // 非單個禁用
       single: true,
-      // 非多个禁用
+      // 非多個禁用
       multiple: true,
-      // 显示搜索条件
+      // 顯示搜索條件
       showSearch: true,
-      // 总条数
+      // 總條數
       total: 0,
-      // 車輛檢舉表格数据
+      // 車輛檢舉表格數據
       reportList: [],
-      // 弹出层标题
+      // 彈出層標題
       title: "",
-      // 是否显示弹出层
+      // 是否顯示彈出層
       open: false,
-      // 创建时间时间范围
+      // 創建時間時間範圍
       daterangeCreatedAt: [],
-      // 查询参数
+      // 查詢參數
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -257,27 +257,27 @@ export default {
         anonymous: null,
         reporterName: null
       },
-      // 表单参数
+      // 表單參數
       form: {},
-      // 表单校验
+      // 表單校驗
       rules: {
         saleId: [
-          { required: true, message: "車輛銷售ID不能为空", trigger: "blur" }
+          { required: true, message: "車輛銷售ID不能為空", trigger: "blur" }
         ],
         reporterId: [
-          { required: true, message: "檢舉人ID不能为空", trigger: "blur" }
+          { required: true, message: "檢舉人ID不能為空", trigger: "blur" }
         ],
         reason: [
-          { required: true, message: "檢舉原因不能为空", trigger: "change" }
+          { required: true, message: "檢舉原因不能為空", trigger: "change" }
         ],
         description: [
-          { required: true, message: "詳細說明不能为空", trigger: "blur" }
+          { required: true, message: "詳細說明不能為空", trigger: "blur" }
         ],
         anonymous: [
-          { required: true, message: "是否匿名不能为空", trigger: "change" }
+          { required: true, message: "是否匿名不能為空", trigger: "change" }
         ],
         status: [
-          { required: true, message: "處理狀態不能为空", trigger: "change" }
+          { required: true, message: "處理狀態不能為空", trigger: "change" }
         ]
       }
     };
@@ -286,7 +286,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询車輛檢舉列表 */
+    /** 查詢車輛檢舉列表 */
     getList() {
       this.loading = true;
       this.queryParams.params = {};
@@ -300,12 +300,12 @@ export default {
         this.loading = false;
       });
     },
-    // 取消按钮
+    // 取消按鈕
     cancel() {
       this.open = false;
       this.reset();
     },
-    // 表单重置
+    // 表單重置
     reset() {
       this.form = {
         id: null,
@@ -321,18 +321,18 @@ export default {
       };
       this.resetForm("form");
     },
-    /** 搜索按钮操作 */
+    /** 搜索按鈕操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置按钮操作 */
+    /** 重置按鈕操作 */
     resetQuery() {
       this.daterangeCreatedAt = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
+    // 多選框選中數據
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
       this.single = selection.length!==1
@@ -344,14 +344,14 @@ export default {
       const id = row.id || this.ids
       getReport(id).then(response => {
         this.form = response.data;
-        // 设置默认值
+        // 設置默認值
         this.form.processorId = this.$store.state.user.id;
         this.form.processedAt = new Date();
         this.open = true;
         this.title = "修改車輛檢舉";
       });
     },
-    /** 提交按钮 */
+    /** 提交按鈕 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -371,17 +371,17 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按鈕操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除車輛檢舉编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否確認刪除車輛檢舉編號為"' + ids + '"的數據項？').then(function() {
         return delReport(ids);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("删除成功");
+        this.$modal.msgSuccess("刪除成功");
       }).catch(() => {});
     },
-    /** 导出按钮操作 */
+    /** 導出按鈕操作 */
     handleExport() {
       this.download('car/report/export', {
         ...this.queryParams

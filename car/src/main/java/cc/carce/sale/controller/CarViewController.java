@@ -46,6 +46,7 @@ import cc.carce.sale.service.CarSalesService;
 import cc.carce.sale.service.CarService;
 import cc.carce.sale.service.ECPayService;
 import cc.carce.sale.service.CarAdvertisementService;
+import cc.carce.sale.service.CarMenuService;
 import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -90,6 +91,9 @@ public class CarViewController extends BaseController {
 	
 	@Resource
     private ECPayService ecPayService;
+    
+    @Resource
+    private CarMenuService carMenuService;
     
     /**
      * 首页
@@ -204,6 +208,9 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
         
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -225,6 +232,10 @@ public class CarViewController extends BaseController {
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -247,6 +258,10 @@ public class CarViewController extends BaseController {
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -272,6 +287,10 @@ public class CarViewController extends BaseController {
         } catch (Exception e) {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -294,6 +313,10 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -316,6 +339,10 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -380,6 +407,9 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "獲取數據失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
+        
+        // 添加菜单数据
+        addMenuData(model);
         
         return "/layout/main";
     }
@@ -456,6 +486,9 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
     
@@ -508,6 +541,9 @@ public class CarViewController extends BaseController {
 
 		log.info("用户通过GET请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}", userInfo.getId(), itemName, amount);
 
+		// 添加菜单数据
+		addMenuData(model);
+
 		return "/layout/main";
 	}
 
@@ -558,6 +594,9 @@ public class CarViewController extends BaseController {
 
 		log.info("用户通过POST请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}, 环境: {}", userInfo.getId(), paymentRequest.getItemName(),
 				finalAmount, activeProfile);
+
+		// 添加菜单数据
+		addMenuData(model);
 
 		return "/layout/main";
 	}
@@ -641,6 +680,9 @@ public class CarViewController extends BaseController {
 		model.addAttribute("reports", reports);
 		model.addAttribute("content", "/report/my-reports.ftl");
 		model.addAttribute("title", "我的檢舉");
+		
+		// 添加菜单数据
+		addMenuData(model);
 		
 		return "layout/main";
 	}
@@ -763,6 +805,24 @@ public class CarViewController extends BaseController {
 			log.error("获取频道页面失败", e);
 			model.addAttribute("error", "获取数据失败");
 		}
+		
+		// 添加菜单数据
+		addMenuData(model);
+		
 		return "layout/main";
+	}
+	
+	/**
+	 * 添加菜单数据到Model
+	 * @param model Model对象
+	 */
+	private void addMenuData(Model model) {
+		try {
+			model.addAttribute("menus", carMenuService.getVisibleMenus());
+		} catch (Exception e) {
+			log.error("获取菜单数据失败", e);
+			// 如果获取菜单失败，设置空列表避免模板报错
+			model.addAttribute("menus", new ArrayList<>());
+		}
 	}
 } 

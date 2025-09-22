@@ -1,19 +1,19 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="88px">
-      <el-form-item label="经销商名称" prop="dealerName">
+      <el-form-item label="經銷商名稱" prop="dealerName">
         <el-input
           v-model="queryParams.dealerName"
-          placeholder="请输入经销商名称"
+          placeholder="請輸入經銷商名稱"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="联系人" prop="contactPerson">
+      <el-form-item label="聯繫人" prop="contactPerson">
         <el-input
           v-model="queryParams.contactPerson"
-          placeholder="请输入联系人"
+          placeholder="請輸入聯繫人"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -35,7 +35,7 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['car:dealerRecommend:export']"
-        >导出</el-button>
+        >導出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -43,12 +43,12 @@
     <el-table v-loading="loading" :data="dealerList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <!-- <el-table-column label="ID" align="center" prop="id" width="80" /> -->
-      <el-table-column label="经销商名称" align="center" prop="dealerName" :show-overflow-tooltip="true" />
-      <el-table-column label="注册名称" align="center" prop="registeredName" :show-overflow-tooltip="true" />
-      <el-table-column label="联系人" align="center" prop="contactPerson" />
+      <el-table-column label="經銷商名稱" align="center" prop="dealerName" :show-overflow-tooltip="true" />
+      <el-table-column label="註冊名稱" align="center" prop="registeredName" :show-overflow-tooltip="true" />
+      <el-table-column label="聯繫人" align="center" prop="contactPerson" />
       <!-- <el-table-column label="公司电话" align="center" prop="companyPhone" />
       <el-table-column label="公司手机" align="center" prop="companyMobile" /> -->
-      <el-table-column label="推荐状态" align="center" width="120">
+      <el-table-column label="推薦狀態" align="center" width="120">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.recommendedValue"

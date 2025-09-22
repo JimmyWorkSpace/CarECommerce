@@ -8,17 +8,18 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.ruoyi.car.domain.CarSalesEntity;
+import com.ruoyi.car.dto.CarSalesDto;
 import com.ruoyi.car.mapper.carcecloud.CarSalesMapper;
 import com.ruoyi.car.service.CarSalesService;
+import com.ruoyi.framework.service.BaseServiceImpl;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Example;
 
 @Service
 @Slf4j
 //@DataSource(DataSourceType.SLAVE)
-public class CarSalesServiceImpl implements CarSalesService {
+public class CarSalesServiceImpl extends BaseServiceImpl implements CarSalesService {
 
 	@Resource
 	private CarSalesMapper carSalesMapper;
@@ -62,16 +63,12 @@ public class CarSalesServiceImpl implements CarSalesService {
 
 	@Override
 	public CarSalesEntity getByUid(String uid) {
-		Example example = new Example(CarSalesEntity.class);
-		example.createCriteria().andEqualTo("uid", uid);
-		return carSalesMapper.selectOneByExample(example);
+		return carSalesMapper.getByUid(uid);
 	}
 
 	@Override
 	public CarSalesEntity getById(Long carSaleId) {
-		Example example = new Example(CarSalesEntity.class);
-		example.createCriteria().andEqualTo("id", carSaleId);
-		return carSalesMapper.selectOneByExample(example);
+		return carSalesMapper.getById(carSaleId);
 	}
 	
 	/**
@@ -81,25 +78,8 @@ public class CarSalesServiceImpl implements CarSalesService {
 	 * @return 车辆销售集合
 	 */
 	@Override
-	public List<CarSalesEntity> selectCarSalesList(CarSalesEntity carSales) {
-		Example example = new Example(CarSalesEntity.class);
-		Example.Criteria criteria = example.createCriteria();
-		
-		if (carSales.getSaleTitle() != null && !carSales.getSaleTitle().trim().isEmpty()) {
-			criteria.andLike("saleTitle", "%" + carSales.getSaleTitle() + "%");
-		}
-		if (carSales.getSalesperson() != null && !carSales.getSalesperson().trim().isEmpty()) {
-			criteria.andLike("salesperson", "%" + carSales.getSalesperson() + "%");
-		}
-		if (carSales.getStatus() != null && !carSales.getStatus().trim().isEmpty()) {
-			criteria.andEqualTo("status", carSales.getStatus());
-		}
-		if (carSales.getPublisher() != null && !carSales.getPublisher().trim().isEmpty()) {
-			criteria.andLike("publisher", "%" + carSales.getPublisher() + "%");
-		}
-		
-		example.orderBy("createDate").desc();
-		return carSalesMapper.selectByExample(example);
+	public List<CarSalesDto> selectCarSalesList(CarSalesEntity carSales) {
+		return carSalesMapper.selectCarSalesList(carSales, mgrDbName);
 	}
 	
 	/**
@@ -114,8 +94,6 @@ public class CarSalesServiceImpl implements CarSalesService {
 			return new ArrayList<>();
 		}
 		
-		Example example = new Example(CarSalesEntity.class);
-		example.createCriteria().andIn("id", ids);
-		return carSalesMapper.selectByExample(example);
+		return carSalesMapper.selectCarSalesByIds(ids);
 	}
 }

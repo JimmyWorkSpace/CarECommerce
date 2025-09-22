@@ -1,7 +1,9 @@
 package com.ruoyi.car.service;
 
 import java.util.List;
+
 import com.ruoyi.car.domain.CarSalesEntity;
+import com.ruoyi.car.dto.CarSalesDto;
 
 public interface CarSalesService {
 
@@ -17,7 +19,7 @@ public interface CarSalesService {
    * @param carSales 车辆销售信息
    * @return 车辆销售集合
    */
-  List<CarSalesEntity> selectCarSalesList(CarSalesEntity carSales);
+  List<CarSalesDto> selectCarSalesList(CarSalesEntity carSales);
   
   /**
    * 根据ID列表批量查询车辆销售信息

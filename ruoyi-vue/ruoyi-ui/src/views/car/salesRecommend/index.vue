@@ -1,29 +1,35 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="销售标题" prop="saleTitle">
+      <el-form-item label="銷售標題" prop="saleTitle">
         <el-input
           v-model="queryParams.saleTitle"
-          placeholder="请输入销售标题"
+          placeholder="請輸入銷售標題"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="销售员" prop="salesperson">
+      <el-form-item label="銷售員" prop="salesperson">
         <el-input
           v-model="queryParams.salesperson"
-          placeholder="请输入销售员"
+          placeholder="請輸入銷售員"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
+      <el-form-item label="狀態" prop="status">
+        <el-select v-model="queryParams.status" placeholder="請選擇狀態" clearable size="small">
           <el-option label="在售" value="在售" />
           <el-option label="已售" value="已售" />
           <el-option label="下架" value="下架" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="是否可見" prop="isVisible">
+        <el-select v-model="queryParams.isVisible" placeholder="請選擇是否可見" clearable size="small">
+          <el-option label="可見" :value="1" />
+          <el-option label="不可見" :value="0" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -41,33 +47,30 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['car:salesRecommend:export']"
-        >导出</el-button>
+        >導出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="salesList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" width="80" />
-      <el-table-column label="销售标题" align="center" prop="saleTitle" :show-overflow-tooltip="true" />
-      <el-table-column label="车辆ID" align="center" prop="carId" width="80" />
-      <el-table-column label="销售员" align="center" prop="salesperson" />
-      <el-table-column label="销售价格" align="center" prop="salePrice" width="100">
+      <el-table-column label="銷售標題" align="center" prop="saleTitleShow" :show-overflow-tooltip="true" />
+      <el-table-column label="銷售價格" align="center" prop="salePrice" width="120">
         <template slot-scope="scope">
           <span v-if="scope.row.salePrice">¥{{ scope.row.salePrice.toLocaleString() }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="里程数" align="center" prop="mileage" width="100">
+      <el-table-column label="里程數" align="center" prop="mileage" width="120">
         <template slot-scope="scope">
           <span v-if="scope.row.mileage">{{ scope.row.mileage.toLocaleString() }}km</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status" width="80">
+      <el-table-column label="狀態" align="center" prop="status" width="110">
         <template slot-scope="scope">
           <el-tag :type="getStatusType(scope.row.status)">{{ scope.row.status }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="推荐状态" align="center" width="120">
+      <el-table-column label="推薦狀態" align="center" width="120">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.recommendedValue"
@@ -76,11 +79,6 @@
             @change="handleRecommendChange(scope.row)"
             v-hasPermi="['car:salesRecommend:edit']"
           />
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createDate" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="120">
@@ -104,29 +102,29 @@
       @pagination="getList"
     />
 
-    <!-- 查看车辆详情对话框 -->
-    <el-dialog title="车辆详情" :visible.sync="viewOpen" width="800px" append-to-body>
+    <!-- 查看車輛詳情對話框 -->
+    <el-dialog title="車輛詳情" :visible.sync="viewOpen" width="800px" append-to-body>
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="销售ID">{{ viewData.id }}</el-descriptions-item>
-        <el-descriptions-item label="车辆ID">{{ viewData.carId }}</el-descriptions-item>
-        <el-descriptions-item label="销售标题">{{ viewData.saleTitle }}</el-descriptions-item>
-        <el-descriptions-item label="销售员">{{ viewData.salesperson }}</el-descriptions-item>
-        <el-descriptions-item label="销售价格">
+        <el-descriptions-item label="銷售ID">{{ viewData.id }}</el-descriptions-item>
+        <el-descriptions-item label="車輛ID">{{ viewData.carId }}</el-descriptions-item>
+        <el-descriptions-item label="銷售標題">{{ viewData.saleTitle }}</el-descriptions-item>
+        <el-descriptions-item label="銷售員">{{ viewData.salesperson }}</el-descriptions-item>
+        <el-descriptions-item label="銷售價格">
           <span v-if="viewData.salePrice">¥{{ viewData.salePrice.toLocaleString() }}</span>
         </el-descriptions-item>
-        <el-descriptions-item label="里程数">
+        <el-descriptions-item label="里程數">
           <span v-if="viewData.mileage">{{ viewData.mileage.toLocaleString() }}km</span>
         </el-descriptions-item>
-        <el-descriptions-item label="状态">
+        <el-descriptions-item label="狀態">
           <el-tag :type="getStatusType(viewData.status)">{{ viewData.status }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="推荐状态">
+        <el-descriptions-item label="推薦狀態">
           <el-tag :type="viewData.recommendedValue === 1 ? 'success' : 'info'">
-            {{ viewData.recommendedValue === 1 ? '已推荐' : '未推荐' }}
+            {{ viewData.recommendedValue === 1 ? '已推薦' : '未推薦' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="销售描述" :span="2">
-          {{ viewData.saleDescription || '暂无描述' }}
+        <el-descriptions-item label="銷售描述" :span="2">
+          {{ viewData.saleDescription || '暫無描述' }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -140,33 +138,34 @@ export default {
   name: "SalesRecommend",
   data() {
     return {
-      // 遮罩层
+      // 遮罩層
       loading: true,
-      // 选中数组
+      // 選中數組
       ids: [],
-      // 非单个禁用
+      // 非單個禁用
       single: true,
-      // 非多个禁用
+      // 非多個禁用
       multiple: true,
-      // 显示搜索条件
+      // 顯示搜索條件
       showSearch: true,
-      // 总条数
+      // 總條數
       total: 0,
-      // 车辆销售表格数据
+      // 車輛銷售表格數據
       salesList: [],
-      // 弹出层标题
+      // 彈出層標題
       title: "",
-      // 是否显示查看弹出层
+      // 是否顯示查看彈出層
       viewOpen: false,
-      // 查看数据
+      // 查看數據
       viewData: {},
-      // 查询参数
+      // 查詢參數
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         saleTitle: null,
         salesperson: null,
-        status: null
+        status: null,
+        isVisible: 1
       }
     };
   },
@@ -174,7 +173,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询车辆销售列表 */
+    /** 查詢車輛銷售列表 */
     getList() {
       this.loading = true;
       listSalesRecommend(this.queryParams).then(response => {
@@ -183,48 +182,48 @@ export default {
         this.loading = false;
       });
     },
-    /** 搜索按钮操作 */
+    /** 搜索按鈕操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置按钮操作 */
+    /** 重置按鈕操作 */
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
+    // 多選框選中數據
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
-    /** 推荐状态改变 */
+    /** 推薦狀態改變 */
     handleRecommendChange(row) {
       const data = {
         id: row.id,
         recommendedValue: row.recommendedValue
       };
       setSalesRecommended(data).then(response => {
-        this.$modal.msgSuccess(row.recommendedValue === 1 ? "设置推荐成功" : "取消推荐成功");
+        this.$modal.msgSuccess(row.recommendedValue === 1 ? "設置推薦成功" : "取消推薦成功");
         this.getList();
       }).catch(() => {
-        // 如果失败，恢复原状态
+        // 如果失敗，恢復原狀態
         row.recommendedValue = row.recommendedValue === 1 ? 0 : 1;
       });
     },
-    /** 查看按钮操作 */
+    /** 查看按鈕操作 */
     handleView(row) {
       this.viewData = row;
       this.viewOpen = true;
     },
-    /** 导出按钮操作 */
+    /** 導出按鈕操作 */
     handleExport() {
       this.download('car/salesRecommend/export', {
         ...this.queryParams
-      }, `精选好车_${new Date().getTime()}.xlsx`)
+      }, `精選好車_${new Date().getTime()}.xlsx`)
     },
-    /** 获取状态类型 */
+    /** 獲取狀態類型 */
     getStatusType(status) {
       const statusMap = {
         '在售': 'success',
