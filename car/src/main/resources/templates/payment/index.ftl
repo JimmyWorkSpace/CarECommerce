@@ -197,13 +197,13 @@
             <div class="col-12">
                 <h2 class="payment-title">
                     <i class="bi bi-credit-card me-3"></i>
-                    支付订单
+                    支付訂單
                 </h2>
                 
-                <!-- 环境提示 -->
+                <!-- 環境提示 -->
                 <div v-if="paymentConfig && !paymentConfig.isProduction" class="alert alert-warning alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>测试环境提示：</strong>当前为{{ paymentConfig.environment }}环境，支付金额固定为0.01元
+                    <strong>測試環境提示：</strong>當前為{{ paymentConfig.environment }}環境，支付金額固定為0.01元
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 
@@ -261,26 +261,26 @@
                                                     <div class="col-md-6 mb-3">
                                                         <label for="receiverName" class="form-label">收件人姓名 <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="receiverName" 
-                                                               placeholder="请输入收件人姓名" 
+                                                               placeholder="請輸入收件人姓名" 
                                                                v-model="formData.receiverName" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="receiverMobile" class="form-label">收件人手机号 <span class="text-danger">*</span></label>
+                                                        <label for="receiverMobile" class="form-label">收件人手機號 <span class="text-danger">*</span></label>
                                                         <input type="tel" class="form-control" id="receiverMobile" 
-                                                               placeholder="请输入收件人手机号" 
+                                                               placeholder="请输入收件人手機號" 
                                                                v-model="formData.receiverMobile" required>
                                                     </div>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="receiverAddress" class="form-label">收件人地址 <span class="text-danger">*</span></label>
                                                     <textarea class="form-control" id="receiverAddress" 
-                                                              rows="3" placeholder="请输入详细的收件人地址" 
+                                                              rows="3" placeholder="請輸入詳細的收件人地址" 
                                                               v-model="formData.receiverAddress" required></textarea>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label for="description" class="form-label">订单描述</label>
+                                                    <label for="description" class="form-label">訂單描述</label>
                                                     <textarea class="form-control" id="description" 
-                                                              rows="2" placeholder="请输入订单描述（可选）"
+                                                              rows="2" placeholder="请输入訂單描述（可选）"
                                                               v-model="formData.description"></textarea>
                                                 </div>
                                             </form>
@@ -292,31 +292,31 @@
                                             <form @submit.prevent="submitPayment">
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="pickupName" class="form-label">取货人姓名 <span class="text-danger">*</span></label>
+                                                        <label for="pickupName" class="form-label">取貨人姓名 <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="pickupName" 
-                                                               placeholder="请输入取货人姓名" 
+                                                               placeholder="请输入取貨人姓名" 
                                                                v-model="formData.receiverName" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="pickupMobile" class="form-label">取货人手机号 <span class="text-danger">*</span></label>
+                                                        <label for="pickupMobile" class="form-label">取貨人手機號 <span class="text-danger">*</span></label>
                                                         <input type="tel" class="form-control" id="pickupMobile" 
-                                                               placeholder="请输入取货人手机号" 
+                                                               placeholder="请输入取貨人手機號" 
                                                                v-model="formData.receiverMobile" required>
                                                     </div>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label for="storeSelect" class="form-label">选择取货门店 <span class="text-danger">*</span></label>
+                                                    <label for="storeSelect" class="form-label">選擇取貨門店 <span class="text-danger">*</span></label>
                                                     <select class="form-control" id="storeSelect" v-model="formData.selectedStore" required>
-                                                        <option value="">请选择取货门店</option>
+                                                        <option value="">请選擇取貨門店</option>
                                                         <option v-for="store in storeList" :key="store.storeId" :value="store">
                                                             {{ store.storeName }} - {{ store.storeAddress }}
                                                         </option>
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label for="description" class="form-label">订单描述</label>
+                                                    <label for="description" class="form-label">訂單描述</label>
                                                     <textarea class="form-control" id="description" 
-                                                              rows="2" placeholder="请输入订单描述（可选）"
+                                                              rows="2" placeholder="请输入訂單描述（可选）"
                                                               v-model="formData.description"></textarea>
                                                 </div>
                                                 
@@ -340,7 +340,7 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h5 class="card-title mb-0">
-                                        <i class="bi bi-receipt me-2"></i>订单摘要
+                                        <i class="bi bi-receipt me-2"></i>訂單摘要
                                     </h5>
                                 </div>
                                 <div class="card-body">
@@ -502,7 +502,7 @@
                     this.isLoading = true;
                     this.clearMessages();
                     
-                    // 创建支付订单
+                    // 创建支付訂單
                     const paymentData = {
                         amount: this.formData.amount,
                         itemName: this.formData.itemName,
@@ -531,14 +531,14 @@
                     axios.post('/api/payment/create', paymentData)
                     .then(response => {
                         if (response.data.code === 1) {
-                            // 支付订单创建成功，跳转到绿界支付页面
+                            // 支付訂單创建成功，跳转到绿界支付页面
                             this.submitToECPay(response.data.data);
                         } else {
                             this.showError(response.data.msg || '創建支付訂單失敗');
                         }
                     })
                     .catch(error => {
-                        console.error('创建支付订单失败:', error);
+                        console.error('创建支付訂單失败:', error);
                         this.showError('創建支付訂單失敗，請稍後重試');
                     })
                     .finally(() => {
@@ -578,7 +578,7 @@
                     } else {
                         // 超商取货，验证门店选择
                         if (!this.formData.selectedStore) {
-                            this.showError('请选择取货门店');
+                            this.showError('请選擇取貨門店');
                             return false;
                         }
                     }

@@ -23,7 +23,7 @@
                             <div class="image-container">
                                 <img class="swiper_image" 
                                      :src="image" 
-                                     :alt="carInfo.saleTitle || '汽车图片'"
+                                     :alt="carInfo.saleTitle || '汽車圖片'"
                                      @click="openLightbox(index)"
                                      @error="handleImageError">
                             </div>
@@ -33,15 +33,15 @@
                             <div class="image-container">
                                 <img class="swiper_image" 
                                      src="/img/car/car4.jpg" 
-                                     alt="汽车图片"
+                                     alt="汽車圖片"
                                      @error="handleImageError">
                             </div>
                         </div>
                     </div>
-                    <!-- 轮播图导航按钮 -->
+                    <!-- 輪播圖导航按钮 -->
                     <div class="swiper-button-prev" v-if="images && images.length > 1" @click="prevImage"></div>
                     <div class="swiper-button-next" v-if="images && images.length > 1" @click="nextImage"></div>
-                    <!-- 轮播图指示器 -->
+                    <!-- 輪播圖指示器 -->
                     <div class="swiper-pagination" v-if="images && images.length > 1">
                         <span v-for="(image, index) in images" 
                               :key="index"
@@ -57,7 +57,7 @@
                          class="thumbnail" 
                          :class="{ active: currentImageIndex === index }"
                          @click="changeImage(index)"
-                         alt="缩略图">
+                         alt="縮略圖">
                 </div>
             </div>
             <!-- Line分享按钮 -->
@@ -440,11 +440,11 @@ try {
                 appointmentDateInput.value = tomorrow.toISOString().split('T')[0];
             }
             
-            // 初始化缩略图点击事件
+            // 初始化縮略圖点击事件
             this.initializeThumbnails();
         },
         
-        // 初始化缩略图
+        // 初始化縮略圖
         initializeThumbnails() {
             // 这个方法现在由Vue的@click事件处理，不再需要手动绑定事件
         },

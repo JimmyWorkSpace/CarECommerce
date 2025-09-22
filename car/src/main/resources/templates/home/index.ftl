@@ -2,24 +2,24 @@
 <link href="/assets/swiper/css/swiper.min.css" rel="stylesheet">
 <script src="/assets/swiper/js/swiper.min.js"></script>
 <div class="home-page" id="app">
-    <!-- 第一行：轮播图 -->
+    <!-- 第一行：輪播圖 -->
     <div class="hero-section">
         <div class="swiper hero-swiper">
             <div class="swiper-wrapper">
-                <!-- 使用 Vue.js 动态展示轮播图数据 -->
+                <!-- 使用 Vue.js 動態展示輪播圖數據 -->
                 <div class="swiper-slide" v-for="(banner, index) in banners" :key="banner.id">
-                    <!-- 链接类型轮播图 -->
+                    <!-- 連結類型輪播圖 -->
                     <a v-if="banner.isLink && banner.linkUrl" :href="banner.linkUrl" class="hero-slide-link">
-                        <img :src="banner.imageUrl" :alt="banner.title || '轮播图' + (index + 1)" class="hero-image">
+                        <img :src="banner.imageUrl" :alt="banner.title || '輪播圖' + (index + 1)" class="hero-image">
                         <div class="hero-content" v-if="banner.title">
                             <h2 class="hero-title" v-text="banner.title"></h2>
                             <p class="hero-subtitle" v-if="banner.subtitle" v-text="banner.subtitle"></p>
                             <span class="hero-btn">了解更多</span>
                         </div>
                     </a>
-                    <!-- 非链接类型轮播图 -->
+                    <!-- 非連結類型輪播圖 -->
                     <template v-else>
-                        <img :src="banner.imageUrl" :alt="banner.title || '轮播图' + (index + 1)" class="hero-image">
+                        <img :src="banner.imageUrl" :alt="banner.title || '輪播圖' + (index + 1)" class="hero-image">
                         <div class="hero-content" v-if="banner.title">
                             <h2 class="hero-title" v-text="banner.title"></h2>
                             <p class="hero-subtitle" v-if="banner.subtitle" v-text="banner.subtitle"></p>
@@ -27,9 +27,9 @@
                     </template>
                 </div>
                 
-                <!-- 当没有轮播图数据时显示默认内容 -->
+                <!-- 當沒有輪播圖數據時顯示默認內容 -->
                 <div class="swiper-slide" v-if="!banners || banners.length === 0">
-                    <img src="/img/default-hero.jpg" alt="默认轮播图" class="hero-image">
+                    <img src="/img/default-hero.jpg" alt="默認輪播圖" class="hero-image">
                     <div class="hero-content">
                         <h2 class="hero-title">歡迎來到二手車銷售平台</h2>
                         <p class="hero-subtitle">尋找您的理想座駕</p>
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <!-- 第二行：功能区域 -->
+    <!-- 第二行：功能區域 -->
     <div class="features-section">
         <div class="container">
             <div class="row">
@@ -75,20 +75,20 @@
         </div>
     </div>
 
-    <!-- 第四行：广告位 -->
+    <!-- 第四行：廣告位 -->
     <div class="ad-section">
         <div class="container">
             <div class="row">
-                <!-- 使用 Vue.js 动态展示广告数据 -->
+                <!-- 使用 Vue.js 動態展示廣告數據 -->
                 <div class="col-12 col-md-6 mb-4" v-for="(ad, index) in advertisements" :key="ad.id">
                     <div class="ad-card" :data-ad-id="ad.id">
-                        <!-- 链接类型广告 -->
+                        <!-- 連結類型广告 -->
                         <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
                             <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
                                  @error="handleImageError($event, ad.title)">
                             <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
                         </a>
-                        <!-- 内容类型广告 -->
+                        <!-- 內容類型广告 -->
                         <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
                             <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
                                  @error="handleImageError($event, ad.title)">
@@ -97,7 +97,7 @@
                     </div>
                 </div>
                 
-                <!-- 当没有广告数据时显示默认内容 -->
+                <!-- 當沒有廣告數據时顯示默認内容 -->
                 <template v-if="!advertisements || advertisements.length === 0">
                     <div class="col-12 col-md-6 mb-4">
                         <div class="ad-card">
@@ -232,7 +232,7 @@ new Vue({
                 },
                 error: (error) => {
                     console.log(error);
-                    // 加载失败时也初始化 Swiper，显示默认内容
+                    // 加载失败时也初始化 Swiper，顯示默認内容
                     _this.$nextTick(() => {
                         _this.initHeroSlider();
                     });

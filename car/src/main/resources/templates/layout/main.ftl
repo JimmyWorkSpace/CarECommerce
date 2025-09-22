@@ -245,7 +245,7 @@
     </script>
 </head>
 <body>
-        <!-- 头部导航 -->
+        <!-- 頭部導航 -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
                 <a class="navbar-brand" href="/">
