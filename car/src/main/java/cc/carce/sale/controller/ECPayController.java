@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping({"/api/payment", "ecpay"})
 public class ECPayController extends BaseController{
     
     @Resource
