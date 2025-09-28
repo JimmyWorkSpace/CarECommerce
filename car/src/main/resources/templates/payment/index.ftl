@@ -1,5 +1,5 @@
     <style>
-    /* 支付页面样式 */
+    /* 支付頁面樣式 */
     .payment-page {
         padding: 20px 0;
         background-color: #f8f9fa;
@@ -168,7 +168,7 @@
         to { transform: rotate(360deg); }
     }
     
-    /* 响应式设计 */
+    /* 響應式設計 */
     @media (max-width: 768px) {
         .payment-page {
             padding: 10px 0;
@@ -207,7 +207,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 
-                <!-- 错误提示 -->
+                <!-- 錯誤提示 -->
                 <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
                     {{ errorMessage }}
@@ -231,7 +231,7 @@
                                     </h5>
                                 </div>
                                 <div class="card-body">
-                                    <!-- Tab导航 -->
+                                    <!-- Tab導航 -->
                                     <ul class="nav nav-tabs mb-4" id="deliveryTabs" role="tablist">
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link active" id="home-delivery-tab" data-bs-toggle="tab" 
@@ -246,12 +246,12 @@
                                                     data-bs-target="#store-pickup" type="button" role="tab" 
                                                     aria-controls="store-pickup" aria-selected="false"
                                                     @click="switchDeliveryType(2)">
-                                                <i class="bi bi-shop me-2"></i>超商取货
+                                                <i class="bi bi-shop me-2"></i>超商取貨
                                             </button>
                                         </li>
                                     </ul>
                                     
-                                    <!-- Tab内容 -->
+                                    <!-- Tab內容 -->
                                     <div class="tab-content" id="deliveryTabContent">
                                         <!-- 宅配到府 -->
                                         <div class="tab-pane fade show active" id="home-delivery" role="tabpanel" 
@@ -267,7 +267,7 @@
                                                     <div class="col-md-6 mb-3">
                                                         <label for="receiverMobile" class="form-label">收件人手機號 <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="receiverMobile" 
-                                                               placeholder="请输入收件人手機號" 
+                                                               placeholder="請輸入收件人手機號" 
                                                                v-model="formData.receiverMobile" required>
                                                     </div>
                                                 </div>
@@ -280,13 +280,13 @@
                                                 <div class="mb-3">
                                                     <label for="description" class="form-label">訂單描述</label>
                                                     <textarea class="form-control" id="description" 
-                                                              rows="2" placeholder="请输入訂單描述（可选）"
+                                                              rows="2" placeholder="請輸入訂單描述（可選）"
                                                               v-model="formData.description"></textarea>
                                                 </div>
                                             </form>
                                         </div>
                                         
-                                        <!-- 超商取货 -->
+                                        <!-- 超商取貨 -->
                                         <div class="tab-pane fade" id="store-pickup" role="tabpanel" 
                                              aria-labelledby="store-pickup-tab">
                                             <form @submit.prevent="submitPayment">
@@ -294,20 +294,20 @@
                                                     <div class="col-md-6 mb-3">
                                                         <label for="pickupName" class="form-label">取貨人姓名 <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="pickupName" 
-                                                               placeholder="请输入取貨人姓名" 
+                                                               placeholder="請輸入取貨人姓名" 
                                                                v-model="formData.receiverName" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="pickupMobile" class="form-label">取貨人手機號 <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="pickupMobile" 
-                                                               placeholder="请输入取貨人手機號" 
+                                                               placeholder="請輸入取貨人手機號" 
                                                                v-model="formData.receiverMobile" required>
                                                     </div>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="storeSelect" class="form-label">選擇取貨門店 <span class="text-danger">*</span></label>
                                                     <select class="form-control" id="storeSelect" v-model="formData.selectedStore" required>
-                                                        <option value="">请選擇取貨門店</option>
+                                                        <option value="">請選擇取貨門店</option>
                                                         <option v-for="store in storeList" :key="store.storeId" :value="store">
                                                             {{ store.storeName }} - {{ store.storeAddress }}
                                                         </option>
@@ -316,16 +316,16 @@
                                                 <div class="mb-3">
                                                     <label for="description" class="form-label">訂單描述</label>
                                                     <textarea class="form-control" id="description" 
-                                                              rows="2" placeholder="请输入訂單描述（可选）"
+                                                              rows="2" placeholder="請輸入訂單描述（可選）"
                                                               v-model="formData.description"></textarea>
                                                 </div>
                                                 
-                                                <!-- 门店信息显示 -->
+                                                <!-- 門店資訊顯示 -->
                                                 <div v-if="formData.selectedStore" class="alert alert-info">
-                                                    <h6><i class="bi bi-info-circle me-2"></i>门店信息</h6>
-                                                    <p class="mb-1"><strong>门店名称：</strong>{{ formData.selectedStore.storeName }}</p>
-                                                    <p class="mb-1"><strong>门店地址：</strong>{{ formData.selectedStore.storeAddress }}</p>
-                                                    <p class="mb-0"><strong>联系电话：</strong>{{ formData.selectedStore.storeTelephone }}</p>
+                                                    <h6><i class="bi bi-info-circle me-2"></i>門店資訊</h6>
+                                                    <p class="mb-1"><strong>門店名稱：</strong>{{ formData.selectedStore.storeName }}</p>
+                                                    <p class="mb-1"><strong>門店地址：</strong>{{ formData.selectedStore.storeAddress }}</p>
+                                                    <p class="mb-0"><strong>聯繫電話：</strong>{{ formData.selectedStore.storeTelephone }}</p>
                                                 </div>
                                             </form>
                                         </div>
@@ -346,67 +346,67 @@
                                 <div class="card-body">
                                     <div class="order-info">
                                         <div class="info-row">
-                                            <span class="info-label">商品名称：</span>
+                                            <span class="info-label">商品名稱：</span>
                                             <span class="info-value" v-text="formData.itemName"></span>
                                         </div>
                                         <div class="info-row">
-                                            <span class="info-label">支付金额：</span>
-                                            <span class="info-value amount">¥ {{ formData.amount }}</span>
+                                            <span class="info-label">支付金額：</span>
+                                            <span class="info-value amount">${CurrencyUnit} {{ formData.amount }}</span>
                                         </div>
                                         <div class="info-row">
                                             <span class="info-label">收件人：</span>
                                             <span class="info-value" v-text="formData.receiverName || '-'"></span>
                     </div>
                                         <div class="info-row">
-                                            <span class="info-label">联系电话：</span>
+                                            <span class="info-label">聯繫電話：</span>
                                             <span class="info-value" v-text="formData.receiverMobile || '-'"></span>
                     </div>
                                         <div class="info-row">
                                             <span class="info-label">配送方式：</span>
-                                            <span class="info-value" v-text="formData.orderType === 1 ? '宅配到府' : '超商取货'"></span>
+                                            <span class="info-value" v-text="formData.orderType === 1 ? '宅配到府' : '超商取貨'"></span>
                                         </div>
                                         <div class="info-row" v-if="formData.orderType === 1">
-                                            <span class="info-label">收货地址：</span>
+                                            <span class="info-label">收貨地址：</span>
                                             <span class="info-value" v-text="formData.receiverAddress || '-'"></span>
                                         </div>
                                         <div class="info-row" v-if="formData.orderType === 2 && formData.selectedStore">
-                                            <span class="info-label">取货门店：</span>
+                                            <span class="info-label">取貨門店：</span>
                                             <span class="info-value" v-text="formData.selectedStore.storeName"></span>
                                         </div>
                                         <div class="info-row" v-if="formData.orderType === 2 && formData.selectedStore">
-                                            <span class="info-label">门店地址：</span>
+                                            <span class="info-label">門店地址：</span>
                                             <span class="info-value" v-text="formData.selectedStore.storeAddress"></span>
                                         </div>
                     </div>
                     
-                    <!-- 购物车商品列表 -->
+                    <!-- 購物車商品列表 -->
                                     <div v-if="cartItems && cartItems.length > 0" class="mt-3">
                                         <h6 class="mb-3">
-                                            <i class="bi bi-cart3 me-2"></i>购物车商品
+                                            <i class="bi bi-cart3 me-2"></i>購物車商品
                                         </h6>
                                         <div class="cart-items-list">
                                             <div class="cart-item" v-for="item in cartItems" :key="item.id">
                                                 <div class="cart-item-info">
                                                     <div class="cart-item-name" v-text="item.productName"></div>
                                                     <div class="cart-item-details">
-                                                        数量: {{ item.productAmount }} × ¥{{ parseFloat(item.productPrice).toFixed(2) }}
+                                                        數量: {{ item.productAmount }} × ${CurrencyUnit} {{ parseFloat(item.productPrice).toFixed(2) }}
                                                     </div>
                                                 </div>
                                                 <div class="cart-item-price">
-                                                    ¥{{ parseFloat(item.subtotal).toFixed(2) }}
+                                                    ${CurrencyUnit} {{ parseFloat(item.subtotal).toFixed(2) }}
                                                 </div>
                                             </div>
                         </div>
                     </div>
                         
-                        <!-- 立即支付按钮 -->
+                        <!-- 立即支付按鈕 -->
                         <div class="d-grid gap-2 mt-4">
                             <button type="button" class="btn btn-primary btn-lg" @click="submitPayment" :disabled="isLoading">
                                 <span v-if="!isLoading">
                                     <i class="bi bi-credit-card me-2"></i>立即支付
                                 </span>
                                 <span v-else>
-                                    <i class="bi bi-arrow-clockwise spin me-2"></i>处理中...
+                                    <i class="bi bi-arrow-clockwise spin me-2"></i>處理中...
                                 </span>
                             </button>
                         </div>
@@ -420,10 +420,10 @@
                     <div class="col-12">
                         <div class="d-flex justify-content-center gap-3">
                             <a href="/cart" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-2"></i>返回购物车
+                                <i class="bi bi-arrow-left me-2"></i>返回購物車
                 </a>
                 <a href="/mall" class="btn btn-outline-primary">
-                                <i class="bi bi-shop me-2"></i>继续购物
+                                <i class="bi bi-shop me-2"></i>繼續購物
                 </a>
                         </div>
                     </div>
@@ -431,7 +431,7 @@
             </div>
         </div>
     </div>
-    
+</div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             new Vue({
@@ -444,39 +444,39 @@
                     receiverName: '',
                     receiverMobile: '',
                     receiverAddress: '',
-                    orderType: 1, // 1: 宅配到府, 2: 超商取货
+                    orderType: 1, // 1: 宅配到府, 2: 超商取貨
                     selectedStore: null
                 },
                 cartItems: [],
-                storeList: [], // 超商门店列表
+                storeList: [], // 超商門店列表
                 isLoading: false,
                 errorMessage: '',
                 successMessage: '',
                 paymentConfig: null
             },
             mounted() {
-                console.log('Vue实例已挂载');
+                console.log('Vue實例已掛載');
                 this.initCartItems();
                 this.loadPaymentConfig();
                 this.loadStoreList();
             },
             methods: {
-                // 加载支付配置
+                // 載入支付配置
                 loadPaymentConfig() {
                     axios.get('/api/payment/config')
                         .then(response => {
                             if (response.data.code === 1) {
                                 this.paymentConfig = response.data.data;
                             } else {
-                                console.error('获取支付配置失败:', response.data.msg);
+                                console.error('獲取支付配置失敗:', response.data.msg);
                             }
                         })
                         .catch(error => {
-                            console.error('获取支付配置异常:', error);
+                            console.error('獲取支付配置異常:', error);
                         });
                 },
                 
-                // 初始化购物车商品列表
+                // 初始化購物車商品列表
                 initCartItems() {
                     const cartDataStr = '${cartData!''}';
                     if (cartDataStr && cartDataStr.trim() !== '') {
@@ -484,41 +484,105 @@
                             const cartData = JSON.parse(cartDataStr);
                             this.cartItems = cartData.items || [];
                         } catch (error) {
-                            console.error('解析购物车数据失败:', error);
-                            console.error('购物车数据内容:', cartDataStr);
+                            console.error('解析購物車數據失敗:', error);
+                            console.error('購物車數據內容:', cartDataStr);
                         }
                     }
                 },
                 
                 // 提交支付
                 submitPayment() {
-                    console.log('submitPayment方法被调用');
-                    // 表单验证
+                    console.log('submitPayment方法被調用');
+                    // 表單驗證
                     if (!this.validateForm()) {
-                        console.log('表单验证失败');
+                        console.log('表單驗證失敗');
                     return;
                 }
                 
+                    // 顯示支付確認對話框
+                    this.showPaymentConfirmDialog();
+                },
+                
+                // 顯示支付確認對話框
+                showPaymentConfirmDialog() {
+                    // 創建模態框HTML
+                    const modalHtml = `
+                        <div class="modal fade" id="paymentConfirmModal" tabindex="-1" aria-labelledby="paymentConfirmModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="paymentConfirmModalLabel">
+                                            <i class="bi bi-question-circle me-2"></i>支付確認
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <div class="mb-4">
+                                            <i class="bi bi-credit-card" style="font-size: 3rem; color: #5ACFC9;"></i>
+                                        </div>
+                                        <h6 class="mb-3">是否已完成支付？</h6>
+                                        <p class="text-muted">請確認您是否已經完成支付操作</p>
+                                    </div>
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-outline-secondary me-3" data-bs-dismiss="modal">
+                                            <i class="bi bi-x-circle me-2"></i>未支付
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="confirmPaidBtn">
+                                            <i class="bi bi-check-circle me-2"></i>已支付
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 移除已存在的模態框
+                    const existingModal = document.getElementById('paymentConfirmModal');
+                    if (existingModal) {
+                        existingModal.remove();
+                    }
+                    
+                    // 添加模態框到頁面
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+                    
+                    // 顯示模態框
+                    const modal = new bootstrap.Modal(document.getElementById('paymentConfirmModal'));
+                    modal.show();
+                    
+                    // 綁定事件
+                    document.getElementById('confirmPaidBtn').addEventListener('click', () => {
+                        modal.hide();
+                        this.proceedToPayment();
+                    });
+                    
+                    // 模態框關閉時清理
+                    document.getElementById('paymentConfirmModal').addEventListener('hidden.bs.modal', () => {
+                        document.getElementById('paymentConfirmModal').remove();
+                    });
+                },
+                
+                // 繼續支付流程
+                proceedToPayment() {
                     this.isLoading = true;
                     this.clearMessages();
                     
-                    // 创建支付訂單
+                    // 創建支付訂單
                     const paymentData = {
                         amount: this.formData.amount,
                         itemName: this.formData.itemName,
-                        description: this.formData.description || '购买商品：' + this.formData.itemName,
+                        description: this.formData.description || '購買商品：' + this.formData.itemName,
                         receiverName: this.formData.receiverName,
                         receiverMobile: this.formData.receiverMobile,
                         orderType: this.formData.orderType,
                         cartData: this.cartItems
                     };
                     
-                    // 根据配送方式添加相应字段
+                    // 根據配送方式添加相應字段
                     if (this.formData.orderType === 1) {
                         // 宅配到府
                         paymentData.receiverAddress = this.formData.receiverAddress;
                     } else {
-                        // 超商取货
+                        // 超商取貨
                         if (this.formData.selectedStore) {
                             paymentData.cvsStoreID = this.formData.selectedStore.storeId;
                             paymentData.cvsStoreName = this.formData.selectedStore.storeName;
@@ -531,14 +595,14 @@
                     axios.post('/api/payment/create', paymentData)
                     .then(response => {
                         if (response.data.code === 1) {
-                            // 支付訂單创建成功，跳转到绿界支付页面
-                            this.submitToECPay(response.data.data);
+                            // 支付訂單創建成功，在新窗口打開綠界支付頁面
+                            this.openPaymentInNewWindow(response.data.data);
                         } else {
                             this.showError(response.data.msg || '創建支付訂單失敗');
                         }
                     })
                     .catch(error => {
-                        console.error('创建支付訂單失败:', error);
+                        console.error('創建支付訂單失敗:', error);
                         this.showError('創建支付訂單失敗，請稍後重試');
                     })
                     .finally(() => {
@@ -546,7 +610,7 @@
                     });
                 },
                 
-                // 表单验证
+                // 表單驗證
                 validateForm() {
                     if (!this.formData.amount || this.formData.amount <= 0) {
                         this.showError('支付金額必須大於0');
@@ -568,17 +632,17 @@
                         return false;
                     }
                     
-                    // 根据配送方式验证相应字段
+                    // 根據配送方式驗證相應字段
                     if (this.formData.orderType === 1) {
-                        // 宅配到府，验证地址
+                        // 宅配到府，驗證地址
                         if (!this.formData.receiverAddress || this.formData.receiverAddress.trim() === '') {
                             this.showError('收件人地址不能為空');
                             return false;
                         }
                     } else {
-                        // 超商取货，验证门店选择
+                        // 超商取貨，驗證門店選擇
                         if (!this.formData.selectedStore) {
-                            this.showError('请選擇取貨門店');
+                            this.showError('請選擇取貨門店');
                             return false;
                         }
                     }
@@ -586,76 +650,174 @@
                     return true;
                 },
             
-            // 提交到绿界支付
-                submitToECPay(paymentParams) {
-                    // 获取支付服务器地址
+                // 在新窗口打開支付頁面
+                openPaymentInNewWindow(paymentParams) {
+                    // 獲取支付服務器地址
                     const serverUrl = this.paymentConfig ? this.paymentConfig.serverUrl : 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
                     
-                // 创建表单并提交到绿界支付
-                const form = document.createElement('form');
-                form.method = 'POST';
+                    // 創建表單並提交到綠界支付
+                    const form = document.createElement('form');
+                    form.method = 'POST';
                     form.action = serverUrl;
+                    form.target = '_blank'; // 在新窗口打開
+                    
+                    // 添加所有支付參數
+                    for (const [key, value] of Object.entries(paymentParams)) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value;
+                        form.appendChild(input);
+                    }
+                    
+                    // 提交表單
+                    document.body.appendChild(form);
+                    form.submit();
+                    
+                    // 顯示支付完成確認對話框
+                    setTimeout(() => {
+                        this.showPaymentCompleteDialog(paymentParams.merchantTradeNo);
+                    }, 2000);
+                },
                 
-                // 添加所有支付参数
-                for (const [key, value] of Object.entries(paymentParams)) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = value;
-                    form.appendChild(input);
-                }
+                // 顯示支付完成確認對話框
+                showPaymentCompleteDialog(orderNo) {
+                    const modalHtml = `
+                        <div class="modal fade" id="paymentCompleteModal" tabindex="-1" aria-labelledby="paymentCompleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="paymentCompleteModalLabel">
+                                            <i class="bi bi-check-circle me-2"></i>支付完成確認
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <div class="mb-4">
+                                            <i class="bi bi-credit-card" style="font-size: 3rem; color: #28a745;"></i>
+                                        </div>
+                                        <h6 class="mb-3">支付是否已完成？</h6>
+                                        <p class="text-muted">請確認您是否已經完成支付操作</p>
+                                        <div class="alert alert-info">
+                                            <small>訂單號：` + orderNo + `</small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-outline-secondary me-3" data-bs-dismiss="modal">
+                                            <i class="bi bi-x-circle me-2"></i>未支付
+                                        </button>
+                                        <button type="button" class="btn btn-success" id="confirmPaymentCompleteBtn">
+                                            <i class="bi bi-check-circle me-2"></i>已支付
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 移除已存在的模態框
+                    const existingModal = document.getElementById('paymentCompleteModal');
+                    if (existingModal) {
+                        existingModal.remove();
+                    }
+                    
+                    // 添加模態框到頁面
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+                    
+                    // 顯示模態框
+                    const modal = new bootstrap.Modal(document.getElementById('paymentCompleteModal'));
+                    modal.show();
+                    
+                    // 綁定事件
+                    document.getElementById('confirmPaymentCompleteBtn').addEventListener('click', () => {
+                        modal.hide();
+                        this.checkOrderStatus(orderNo);
+                    });
+                    
+                    // 模態框關閉時清理
+                    document.getElementById('paymentCompleteModal').addEventListener('hidden.bs.modal', () => {
+                        document.getElementById('paymentCompleteModal').remove();
+                    });
+                },
                 
-                // 提交表单
-                document.body.appendChild(form);
-                form.submit();
+                // 檢查訂單狀態
+                checkOrderStatus(orderNo) {
+                    this.isLoading = true;
+                    this.clearMessages();
+                    
+                    axios.get('/api/payment/status/' + orderNo)
+                        .then(response => {
+                            if (response.data.code === 1) {
+                                const orderStatus = response.data.data;
+                                if (orderStatus.paymentStatus === 1) {
+                                    // 支付成功
+                                    this.showSuccess('支付成功！正在跳轉到訂單頁面...');
+                                    setTimeout(() => {
+                                        window.location.href = '/my-order';
+                                    }, 2000);
+                                } else {
+                                    // 支付未完成
+                                    this.showError('支付尚未完成，請完成支付後再次確認');
+                                }
+                            } else {
+                                this.showError(response.data.msg || '查詢訂單狀態失敗');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('查詢訂單狀態失敗:', error);
+                            this.showError('查詢訂單狀態失敗，請稍後重試');
+                        })
+                        .finally(() => {
+                            this.isLoading = false;
+                        });
                 },
             
-            // 显示错误信息
+            // 顯示錯誤資訊
                 showError(message) {
                     this.errorMessage = message;
                     this.successMessage = '';
                 },
             
-            // 显示成功信息
+            // 顯示成功資訊
                 showSuccess(message) {
                     this.successMessage = message;
                     this.errorMessage = '';
                 },
                 
-                // 清除所有消息
+                // 清除所有訊息
                 clearMessages() {
                     this.errorMessage = '';
                     this.successMessage = '';
                 },
                 
-                // 切换配送方式
+                // 切換配送方式
                 switchDeliveryType(orderType) {
                     this.formData.orderType = orderType;
-                    // 清空相关字段
+                    // 清空相關字段
                     if (orderType === 1) {
-                        // 宅配到府，清空门店选择
+                        // 宅配到府，清空門店選擇
                         this.formData.selectedStore = null;
                     } else {
-                        // 超商取货，清空地址
+                        // 超商取貨，清空地址
                         this.formData.receiverAddress = '';
                     }
                 },
                 
-                // 加载超商门店列表
+                // 載入超商門店列表
                 loadStoreList() {
                     axios.get('/api/logistics/stores')
                         .then(response => {
                             if (response.data.code === 1) {
                                 this.storeList = response.data.data || [];
-                                console.log('门店列表加载成功:', this.storeList);
+                                console.log('門店列表載入成功:', this.storeList);
                             } else {
-                                console.error('获取门店列表失败:', response.data.msg);
-                                this.showError('获取门店列表失败');
+                                console.error('獲取門店列表失敗:', response.data.msg);
+                                this.showError('獲取門店列表失敗');
                             }
                         })
                         .catch(error => {
-                            console.error('获取门店列表异常:', error);
-                            this.showError('获取门店列表异常');
+                            console.error('獲取門店列表異常:', error);
+                            this.showError('獲取門店列表異常');
                         });
                 }
             }

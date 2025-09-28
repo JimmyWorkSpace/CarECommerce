@@ -26,7 +26,7 @@
                             <div class="item-info">
                                 <div class="info-row">
                                     <span class="info-label">订单金额：</span>
-                                    <span class="info-value amount">¥{{ order.totalPrice }}</span>
+                                    <span class="info-value amount">${CurrencyUnit} {{ order.totalPrice }}</span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">下单时间：</span>
@@ -53,11 +53,11 @@
                                     <div class="detail-item-info">
                                         <div class="detail-item-name">{{ detail.productName }}</div>
                                         <div class="detail-item-details">
-                                            数量: {{ detail.productAmount }} × ¥{{ detail.productPrice }}
+                                            数量: {{ detail.productAmount }} × ${CurrencyUnit} {{ detail.productPrice }}
                                         </div>
                                     </div>
                                     <div class="detail-item-price">
-                                        ¥{{ detail.totalPrice }}
+                                                ${CurrencyUnit} {{ detail.totalPrice }}
                                     </div>
                                 </div>
                             </div>
@@ -104,10 +104,17 @@
                 orderDetails: {},
                 isLoading: false,
                 errorMessage: '',
-                successMessage: ''
+                successMessage: '',
+                statusCheckInterval: null,
+                originalOrderStatuses: {}
             },
             mounted() {
                 console.log('我的订单页面已加载');
+                this.initializeOrderStatusTracking();
+                this.startStatusCheck();
+            },
+            beforeDestroy() {
+                this.stopStatusCheck();
             },
             methods: {
                 // 获取订单状态文本
@@ -243,6 +250,84 @@
                     setTimeout(() => {
                         this.successMessage = '';
                     }, 5000);
+                },
+                
+                // 初始化订单状态跟踪
+                initializeOrderStatusTracking() {
+                    this.originalOrderStatuses = {};
+                    this.orders.forEach(order => {
+                        this.originalOrderStatuses[order.id] = order.orderStatus;
+                    });
+                },
+                
+                // 开始状态检查
+                startStatusCheck() {
+                    // 检查是否有未支付或待支付的订单
+                    const hasUnpaidOrders = this.orders.some(order => 
+                        order.orderStatus === 0 || order.orderStatus === 1
+                    );
+                    
+                    if (hasUnpaidOrders) {
+                        console.log('检测到未支付订单，开始定时检查状态');
+                        this.statusCheckInterval = setInterval(() => {
+                            this.checkOrderStatuses();
+                        }, 5000); // 每5秒检查一次
+                    }
+                },
+                
+                // 停止状态检查
+                stopStatusCheck() {
+                    if (this.statusCheckInterval) {
+                        clearInterval(this.statusCheckInterval);
+                        this.statusCheckInterval = null;
+                    }
+                },
+                
+                // 检查所有订单状态
+                checkOrderStatuses() {
+                    const unpaidOrderIds = this.orders
+                        .filter(order => order.orderStatus === 0 || order.orderStatus === 1)
+                        .map(order => order.id);
+                    
+                    if (unpaidOrderIds.length === 0) {
+                        // 没有未支付订单，停止检查
+                        this.stopStatusCheck();
+                        return;
+                    }
+                    
+                    // 批量查询订单状态
+                    axios.post('/api/order/batch-status', { orderIds: unpaidOrderIds })
+                        .then(response => {
+                            if (response.data.code === 1) {
+                                const statusUpdates = response.data.data;
+                                this.updateOrderStatuses(statusUpdates);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('批量查询订单状态失败:', error);
+                        });
+                },
+                
+                // 更新订单状态
+                updateOrderStatuses(statusUpdates) {
+                    let hasStatusChanged = false;
+                    
+                    statusUpdates.forEach(update => {
+                        const order = this.orders.find(o => o.id === update.orderId);
+                        if (order && order.orderStatus !== update.orderStatus) {
+                            order.orderStatus = update.orderStatus;
+                            hasStatusChanged = true;
+                        }
+                    });
+                    
+                    // 如果有状态变化，刷新页面
+                    if (hasStatusChanged) {
+                        console.log('检测到订单状态变化，准备刷新页面');
+                        this.showSuccess('订单状态已更新，页面即将刷新...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }
                 }
             }
         });

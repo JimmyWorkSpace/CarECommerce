@@ -4,6 +4,14 @@
   margin: 0 auto;
   overflow-x: hidden;
 }
+
+/* 确保页脚全宽显示 */
+.car-detail + .footer,
+.footer {
+  max-width: none !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
 @media (max-width: 768px) {
   .car-detail {
     padding: 0 10px;
@@ -102,9 +110,11 @@
 }
 .car-detail .content-frame {
   width: 100%;
-  min-height: 300px;
+  min-height: 200px;
   border: none;
   overflow: hidden;
+  display: block;
+  background: transparent;
 }
 .car-detail .thumbnail-container {
   display: flex;

@@ -138,10 +138,10 @@
                                 <div class="car-badge" v-text="car.manufactureYear"></div>
                             </div>
                             <div class="car-info">
+                                <h3 class="car-title" v-text="(car.brand || '') + ' ' + (car.model || '')"></h3>
                                 <div class="car-price-section">
                                     <span class="price-amount" v-text="'$' + formatPrice(car.salePrice)"></span>
                                 </div>
-                                <h3 class="car-title" v-text="car.saleTitle || (car.brand + ' ' + car.model)"></h3>
                                 <div class="car-specs">
                                     <div class="spec-item" v-if="car.fuelSystem">
                                         <div class="spec-content">

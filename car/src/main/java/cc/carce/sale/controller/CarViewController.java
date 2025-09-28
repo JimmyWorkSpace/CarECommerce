@@ -34,6 +34,7 @@ import cc.carce.sale.dto.CarReportDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarRichContentEntity;
 import cc.carce.sale.entity.CarQuestionAnswerEntity;
+import cc.carce.sale.entity.dto.CarConfigContent;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.entity.CarDealerEntity;
 import cc.carce.sale.form.PaymentRequestForm;
@@ -49,6 +50,7 @@ import cc.carce.sale.service.CarService;
 import cc.carce.sale.service.ECPayService;
 import cc.carce.sale.service.CarAdvertisementService;
 import cc.carce.sale.service.CarMenuService;
+import cc.carce.sale.service.CarConfigService;
 import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -64,6 +66,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/")
 public class CarViewController extends BaseController {
 	
+    private static final String CurrencyUnit = "$";
 	@Value("${carce.webUrl}")
 	private String webUrl;
 
@@ -96,6 +99,9 @@ public class CarViewController extends BaseController {
     
     @Resource
     private CarMenuService carMenuService;
+    
+    @Resource
+    private CarConfigService carConfigService;
     
     /**
      * 首页
@@ -197,6 +203,7 @@ public class CarViewController extends BaseController {
             String requestUrl = req.getRequestURL().toString();
             model.addAttribute("url", requestUrl);
             
+            
             // 设置模板内容
             model.addAttribute("content", "/home/index.ftl");
             
@@ -206,6 +213,9 @@ public class CarViewController extends BaseController {
         
         // 添加菜单数据
         addMenuData(model);
+        
+        // 添加配置内容
+        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -232,6 +242,9 @@ public class CarViewController extends BaseController {
         // 添加菜单数据
         addMenuData(model);
         
+        // 添加配置内容
+        addConfigContent(model);
+        
         return "/layout/main";
     }
     
@@ -250,6 +263,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("description", "專業汽車配件商城，提供優質汽車用品");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
             model.addAttribute("content", "/mall/index.ftl");
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
@@ -257,6 +271,9 @@ public class CarViewController extends BaseController {
         
         // 添加菜单数据
         addMenuData(model);
+        
+        // 添加配置内容
+        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -287,6 +304,9 @@ public class CarViewController extends BaseController {
         // 添加菜单数据
         addMenuData(model);
         
+        // 添加配置内容
+        addConfigContent(model);
+        
         return "/layout/main";
     }
     
@@ -313,6 +333,9 @@ public class CarViewController extends BaseController {
         // 添加菜单数据
         addMenuData(model);
         
+        // 添加配置内容
+        addConfigContent(model);
+        
         return "/layout/main";
     }
     
@@ -338,6 +361,9 @@ public class CarViewController extends BaseController {
         
         // 添加菜单数据
         addMenuData(model);
+        
+        // 添加配置内容
+        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -390,9 +416,9 @@ public class CarViewController extends BaseController {
             // 设置页面标题和描述
             String title = carInfo.getSaleTitle() != null ? carInfo.getSaleTitle() : "車輛詳情";
             model.addAttribute("title", title + " - 二手車銷售平台");
-            model.addAttribute("description", carInfo.getSaleDescription() != null ? 
-                carInfo.getSaleDescription().replaceAll("<[^>]*>", "").substring(0, Math.min(150, carInfo.getSaleDescription().length())) : 
-                "專業的二手車銷售平台，提供優質二手車資訊");
+            // model.addAttribute("description", carInfo.getSaleDescription() != null ? 
+            //     carInfo.getSaleDescription().replaceAll("<[^>]*>", "").substring(0, Math.min(150, carInfo.getSaleDescription().length())) : 
+            //     "專業的二手車銷售平台，提供優質二手車資訊");
             model.addAttribute("image", images != null && !images.isEmpty() ? images.get(0) : "/img/car/car4.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
             
@@ -406,6 +432,9 @@ public class CarViewController extends BaseController {
         
         // 添加菜单数据
         addMenuData(model);
+        
+        // 添加配置内容
+        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -472,7 +501,7 @@ public class CarViewController extends BaseController {
             // 获取当前请求的完整URL
             String requestUrl = req.getRequestURL().toString();
             model.addAttribute("url", requestUrl);
-            
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
             // 添加一些必要的属性，避免模板中的变量未定义错误
             model.addAttribute("id", ""); // 添加空的id属性
             model.addAttribute("image", "/img/swipper/slide1.jpg"); // 添加默认图片
@@ -484,6 +513,9 @@ public class CarViewController extends BaseController {
         
         // 添加菜单数据
         addMenuData(model);
+        
+        // 添加配置内容
+        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -531,7 +563,7 @@ public class CarViewController extends BaseController {
 		model.addAttribute("cartData", cartData);
 		model.addAttribute("userInfo", userInfo);
 		model.addAttribute("isDevOrTest", isDevOrTestEnvironment());
-		
+		model.addAttribute("CurrencyUnit", CurrencyUnit);
 		// 设置模板内容
 		model.addAttribute("content", "/payment/index.ftl");
 
@@ -584,7 +616,7 @@ public class CarViewController extends BaseController {
 		model.addAttribute("cartData", paymentRequest.getCartData());
 		model.addAttribute("userInfo", userInfo);
 		model.addAttribute("isDevOrTest", "dev".equals(activeProfile) || "test".equals(activeProfile));
-		
+		model.addAttribute("CurrencyUnit", CurrencyUnit);
 		// 设置模板内容
 		model.addAttribute("content", "/payment/index.ftl");
 
@@ -647,7 +679,13 @@ public class CarViewController extends BaseController {
         }
         
         model.addAttribute("userInfo", userInfo);
-        return "payment/result";
+        model.addAttribute("user", userInfo); // 添加user属性用于模板
+        model.addAttribute("content", "/payment/result.ftl");
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
+        return "/layout/main";
     }
 
 	/**
@@ -808,17 +846,26 @@ public class CarViewController extends BaseController {
 		return "layout/main";
 	}
 	
+	
 	/**
-	 * 添加菜单数据到Model
+	 * 添加配置内容到Model
 	 * @param model Model对象
 	 */
-	private void addMenuData(Model model) {
+	private void addConfigContent(Model model) {
 		try {
-			model.addAttribute("menus", carMenuService.getVisibleMenus());
+			CarConfigContent configContent = carConfigService.getConfigContent();
+			model.addAttribute("configContent", configContent);
 		} catch (Exception e) {
-			log.error("获取菜单数据失败", e);
-			// 如果获取菜单失败，设置空列表避免模板报错
-			model.addAttribute("menus", new ArrayList<>());
+			log.error("获取网站配置内容失败", e);
+			// 设置默认配置内容
+			CarConfigContent defaultConfig = new CarConfigContent();
+			defaultConfig.setKefu("400-123-4567");
+			defaultConfig.setYouxiang("service@carce.cc");
+			defaultConfig.setDizhi("台北市信義區信義路五段7號");
+			defaultConfig.setFwsj1("週一至週五：9:00-18:00");
+			defaultConfig.setFwsj2("週六至週日：10:00-17:00");
+			defaultConfig.setFwsj3("節假日：10:00-16:00");
+			model.addAttribute("configContent", defaultConfig);
 		}
 	}
 } 

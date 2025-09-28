@@ -53,7 +53,7 @@
                 <div class="thumbnail-container" v-if="images && images.length > 1">
                     <img v-for="(image, index) in images" 
                          :key="index"
-                         :src="image" 
+                         :src="getThumbnailUrl(image)" 
                          class="thumbnail" 
                          :class="{ active: currentImageIndex === index }"
                          @click="changeImage(index)"
@@ -368,7 +368,7 @@
             </div>
         </div>
     </div>
- 
+ </div>
 <script>
 console.log('Vue版本:', Vue.version);
 console.log('开始初始化Vue实例...');
@@ -515,6 +515,28 @@ try {
         handleImageError(event) {
             console.log('图片加载失败，使用默认图片');
             event.target.src = '/img/car/car4.jpg';
+        },
+        
+        // 获取缩略图URL
+        getThumbnailUrl(originalUrl) {
+            if (!originalUrl) return '';
+            
+            // 检查URL是否已经包含_90x90后缀
+            if (originalUrl.includes('_90x90.')) {
+                return originalUrl;
+            }
+            
+            // 获取文件扩展名
+            const lastDotIndex = originalUrl.lastIndexOf('.');
+            if (lastDotIndex === -1) {
+                return originalUrl;
+            }
+            
+            // 在扩展名前插入_90x90
+            const baseUrl = originalUrl.substring(0, lastDotIndex);
+            const extension = originalUrl.substring(lastDotIndex);
+            
+            return baseUrl + '_90x90' + extension;
         },
         
         // 打开檢舉弹窗

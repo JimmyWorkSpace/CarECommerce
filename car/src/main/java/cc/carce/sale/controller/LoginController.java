@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Controller
 @Slf4j
-public class LoginController {
+public class LoginController extends BaseController {
 
     @Resource
     private SmsService smsService;
@@ -58,6 +58,9 @@ public class LoginController {
         
         // 设置模板内容
         model.addAttribute("content", "/login/index.ftl");
+        
+        // 添加菜单数据
+        addMenuData(model);
         
         return "/layout/main";
     }
@@ -145,6 +148,10 @@ public class LoginController {
         model.addAttribute("title", "登入/註冊 - 二手車銷售平台");
         model.addAttribute("description", "用戶登入和註冊頁面");
         model.addAttribute("content", "/login/index.ftl");
+        
+        // 添加菜单数据
+        addMenuData(model);
+        
         return "/layout/main";
     }
 

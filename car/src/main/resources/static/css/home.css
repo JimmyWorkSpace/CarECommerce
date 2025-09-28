@@ -282,6 +282,27 @@
     opacity: 1;
 }
 
+.ad-title-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 20px 15px 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.ad-card:hover .ad-title-bottom {
+    transform: translateY(-5px);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+}
+
 .ad-iframe {
     width: 100%;
     height: 100%;
@@ -363,12 +384,48 @@
     transform: translateX(3px);
 }
 
-.dealers-container {
+/* 跑马灯容器样式 */
+.marquee-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.marquee-content {
     display: flex;
     gap: 20px;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding: 20px;
+    width: fit-content;
+}
+
+/* 跑马灯动画 - 只在有 marquee-active 类时生效 */
+.marquee-content.marquee-active {
+    animation: marquee 30s linear infinite;
+}
+
+/* 跑马灯动画 */
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* 店家跑马灯 */
+.dealers-marquee.marquee-active {
+    animation: marquee 40s linear infinite;
+}
+
+/* 车辆跑马灯 */
+.cars-marquee.marquee-active {
+    animation: marquee 35s linear infinite;
+}
+
+/* 悬停时暂停动画 - 只对有动画的元素生效 */
+.marquee-container:hover .marquee-content.marquee-active {
+    animation-play-state: paused;
 }
 
 .dealer-card {
@@ -406,24 +463,30 @@
     background-color: white;
 }
 
-.cars-container {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding: 20px;
+
+/* 车辆卡片链接样式 */
+.car-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    flex: 0 0 300px;
+}
+
+.car-card-link:hover {
+    text-decoration: none;
+    color: inherit;
 }
 
 .car-card {
-    flex: 0 0 300px;
     background: white;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
+    height: 100%;
 }
 
-.car-card:hover {
+.car-card-link:hover .car-card {
     transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0,0,0,0.2);
 }
@@ -452,62 +515,6 @@
 
 
 
-/* 第七行：页脚 */
-.footer {
-    background-color: #333;
-    color: white;
-    padding: 50px 0 20px;
-}
-
-.footer h4 {
-    color: #5ACFC9;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.footer p {
-    margin-bottom: 10px;
-    color: #ccc;
-}
-
-.footer i {
-    margin-right: 10px;
-    color: #5ACFC9;
-}
-
-.social-links {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.social-link {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    background-color: #5ACFC9;
-    color: white;
-    text-align: center;
-    line-height: 40px;
-    border-radius: 50%;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.social-link:hover {
-    background-color: #4AB8B2;
-    transform: translateY(-2px);
-    color: white;
-    text-decoration: none;
-}
-
-.footer-bottom {
-    text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #555;
-    color: #999;
-}
 
 /* 响应式设计 */
 @media (max-width: 768px) {
@@ -553,17 +560,25 @@
         font-size: 1rem;
     }
     
-    .dealers-container,
-    .cars-container {
-        padding: 15px;
+    .marquee-container {
+        padding: 15px 0;
     }
     
     .dealer-card {
         flex: 0 0 250px;
     }
     
-    .car-card {
+    .car-card-link {
         flex: 0 0 250px;
+    }
+    
+    /* 移动端跑马灯速度调整 */
+    .dealers-marquee.marquee-active {
+        animation: marquee 30s linear infinite;
+    }
+    
+    .cars-marquee.marquee-active {
+        animation: marquee 25s linear infinite;
     }
 }
 
@@ -610,28 +625,24 @@
         font-size: 0.9rem;
     }
     
-    .dealers-container,
-    .cars-container {
-        padding: 10px;
+    .marquee-container {
+        padding: 10px 0;
     }
     
     .dealer-card {
         flex: 0 0 220px;
     }
     
-    .car-card {
+    .car-card-link {
         flex: 0 0 220px;
     }
+    
+    /* 小屏幕跑马灯速度调整 */
+    .dealers-marquee.marquee-active {
+        animation: marquee 25s linear infinite;
+    }
+    
+    .cars-marquee.marquee-active {
+        animation: marquee 20s linear infinite;
+    }
 }
-
-/* 隐藏滚动条但保持功能 */
-.dealers-container::-webkit-scrollbar,
-.cars-container::-webkit-scrollbar {
-    display: none;
-}
-
-.dealers-container,
-.cars-container {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-} 

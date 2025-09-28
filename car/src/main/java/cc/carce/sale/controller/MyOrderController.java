@@ -33,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/my-order")
 public class MyOrderController extends BaseController {
 
+    private static final String CurrencyUnit = "$";
+
     @Resource
     private CarOrderInfoService carOrderInfoService;
     
@@ -60,9 +62,13 @@ public class MyOrderController extends BaseController {
             model.addAttribute("orders", orders);
             model.addAttribute("ordersJson", JSONUtil.toJsonPrettyStr(orders));
             model.addAttribute("userInfo", userInfo);
-
+            model.addAttribute("user", userInfo); // 添加user属性用于模板
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
             // 设置模板内容
             model.addAttribute("content", "/my-order/index.ftl");
+            
+            // 添加菜单数据
+            addMenuData(model);
 
             log.info("用户访问我的订单页面，用户ID: {}, 订单数量: {}", userInfo.getId(), orders.size());
 

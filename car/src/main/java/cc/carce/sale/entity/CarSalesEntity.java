@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.Data;
 import tk.mybatis.mapper.annotation.KeySql;
@@ -126,6 +127,7 @@ public class CarSalesEntity {
     @Column(name = "second_warning_issued_at")
     private Date secondWarningIssuedAt;
     
-    @Column(name = "recommended_value")
-    private Long recommendedValue;
+//    @Transient
+//    @Column(name = "recommended_value")
+//    private Long recommendedValue;
 }

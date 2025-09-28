@@ -97,10 +97,10 @@
                     <span v-if="product.source" class="badge bg-warning me-2">{{ product.source }}</span>
                 </div>
                 <div class="product-price">
-                    <span class="price-symbol">¥</span>
+                    <span class="price-symbol">${CurrencyUnit}</span>
                     <span class="price-amount">{{ formatPrice(product.price) }}</span>
                     <span v-if="product.marketPrice && product.marketPrice > product.price" 
-                          class="market-price">¥{{ formatPrice(product.marketPrice) }}</span>
+                          class="market-price">${CurrencyUnit} {{ formatPrice(product.marketPrice) }}</span>
                 </div>
             </div>
         </div>
