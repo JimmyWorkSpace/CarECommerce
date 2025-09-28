@@ -1,14 +1,12 @@
 package cc.carce.sale.controller;
 
 import cc.carce.sale.common.R;
-import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.CarAppointmentDto;
 import cc.carce.sale.form.CarAppointmentForm;
 import cc.carce.sale.service.CarAppointmentService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -28,67 +26,6 @@ public class CarAppointmentController extends BaseController {
     @Resource
     private CarAppointmentService carAppointmentService;
 
-    /**
-     * 预约看车页面
-     */
-    @GetMapping("/create/{carSaleId}")
-    public String createAppointmentPage(@PathVariable Long carSaleId, Model model) {
-        try {
-            // 检查用户登录状态
-            UserInfo userInfo = getSessionUser();
-            if (userInfo == null) {
-                log.warn("未登录用户尝试访问预约页面");
-                return "redirect:/login?returnUrl=/appointment/create/" + carSaleId;
-            }
-            
-            model.addAttribute("carSaleId", carSaleId);
-            model.addAttribute("userInfo", userInfo);
-            model.addAttribute("user", userInfo); // 添加user属性用于模板
-            model.addAttribute("content", "/appointment/create.ftl");
-            
-            // 添加菜单数据
-            addMenuData(model);
-            
-            return "/layout/main";
-        } catch (Exception e) {
-            log.error("显示预约页面异常", e);
-            model.addAttribute("error", "页面加载失败：" + e.getMessage());
-            return "/layout/main";
-        }
-    }
-
-    /**
-     * 我的预约列表页面
-     */
-    @GetMapping("/my-appointments")
-    public String myAppointmentsPage(Model model) {
-        try {
-            // 检查用户登录状态
-            UserInfo userInfo = getSessionUser();
-            if (userInfo == null) {
-                log.warn("未登录用户尝试访问我的预约页面");
-                return "redirect:/login?returnUrl=/appointment/my-appointments";
-            }
-            
-            // 设置用户信息
-            model.addAttribute("userInfo", userInfo);
-            model.addAttribute("user", userInfo); // 添加user属性用于模板
-            
-            // 设置模板内容
-            model.addAttribute("content", "/appointment/my-appointments.ftl");
-            
-            // 添加菜单数据
-            addMenuData(model);
-            
-            log.info("用户访问我的预约页面，用户ID: {}", userInfo.getId());
-            
-            return "/layout/main";
-        } catch (Exception e) {
-            log.error("显示我的预约页面异常", e);
-            model.addAttribute("error", "页面加载失败：" + e.getMessage());
-            return "/layout/main";
-        }
-    }
 
     /**
      * 创建预约API

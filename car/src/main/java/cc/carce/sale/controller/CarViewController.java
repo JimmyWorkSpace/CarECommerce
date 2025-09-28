@@ -34,6 +34,10 @@ import cc.carce.sale.dto.CarReportDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarRichContentEntity;
 import cc.carce.sale.entity.CarQuestionAnswerEntity;
+import cc.carce.sale.entity.CarOrderInfoEntity;
+import cc.carce.sale.entity.CarOrderDetailEntity;
+import cc.carce.sale.entity.CarShoppingCartEntity;
+import cc.carce.sale.entity.CarUserEntity;
 import cc.carce.sale.entity.dto.CarConfigContent;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.entity.CarDealerEntity;
@@ -51,10 +55,18 @@ import cc.carce.sale.service.ECPayService;
 import cc.carce.sale.service.CarAdvertisementService;
 import cc.carce.sale.service.CarMenuService;
 import cc.carce.sale.service.CarConfigService;
+import cc.carce.sale.service.CarAppointmentService;
+import cc.carce.sale.service.CarOrderInfoService;
+import cc.carce.sale.service.CarOrderDetailService;
+import cc.carce.sale.service.CarShoppingCartService;
+import cc.carce.sale.service.CarUserService;
+import cc.carce.sale.service.SmsService;
 import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import cc.carce.sale.common.JwtUtils;
 
 /**
  * 汽车详情页面控制器
@@ -100,8 +112,29 @@ public class CarViewController extends BaseController {
     @Resource
     private CarMenuService carMenuService;
     
-    @Resource
+	@Resource
     private CarConfigService carConfigService;
+    
+    @Resource
+    private CarAppointmentService carAppointmentService;
+    
+    @Resource
+    private CarOrderInfoService carOrderInfoService;
+    
+    @Resource
+    private CarOrderDetailService carOrderDetailService;
+    
+    @Resource
+    private CarShoppingCartService carShoppingCartService;
+    
+    @Resource
+    private CarUserService carUserService;
+    
+    @Resource
+    private SmsService smsService;
+    
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
     
     /**
      * 首页
@@ -211,11 +244,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
         
-        // 添加菜单数据
-        addMenuData(model);
         
-        // 添加配置内容
-        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -239,11 +268,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
         
-        // 添加菜单数据
-        addMenuData(model);
         
-        // 添加配置内容
-        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -269,11 +294,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
         
-        // 添加菜单数据
-        addMenuData(model);
         
-        // 添加配置内容
-        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -301,11 +322,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
         
-        // 添加菜单数据
-        addMenuData(model);
         
-        // 添加配置内容
-        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -330,11 +347,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
-        // 添加菜单数据
-        addMenuData(model);
         
-        // 添加配置内容
-        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -359,11 +372,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
-        // 添加菜单数据
-        addMenuData(model);
         
-        // 添加配置内容
-        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -430,11 +439,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
-        // 添加菜单数据
-        addMenuData(model);
         
-        // 添加配置内容
-        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -511,11 +516,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
-        // 添加菜单数据
-        addMenuData(model);
         
-        // 添加配置内容
-        addConfigContent(model);
         
         return "/layout/main";
     }
@@ -569,8 +570,6 @@ public class CarViewController extends BaseController {
 
 		log.info("用户通过GET请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}", userInfo.getId(), itemName, amount);
 
-		// 添加菜单数据
-		addMenuData(model);
 
 		return "/layout/main";
 	}
@@ -623,8 +622,6 @@ public class CarViewController extends BaseController {
 		log.info("用户通过POST请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}, 环境: {}", userInfo.getId(), paymentRequest.getItemName(),
 				finalAmount, activeProfile);
 
-		// 添加菜单数据
-		addMenuData(model);
 
 		return "/layout/main";
 	}
@@ -682,8 +679,6 @@ public class CarViewController extends BaseController {
         model.addAttribute("user", userInfo); // 添加user属性用于模板
         model.addAttribute("content", "/payment/result.ftl");
         
-        // 添加菜单数据
-        addMenuData(model);
         
         return "/layout/main";
     }
@@ -715,8 +710,6 @@ public class CarViewController extends BaseController {
 		model.addAttribute("content", "/report/my-reports.ftl");
 		model.addAttribute("title", "我的檢舉");
 		
-		// 添加菜单数据
-		addMenuData(model);
 		
 		return "layout/main";
 	}
@@ -840,32 +833,138 @@ public class CarViewController extends BaseController {
 			model.addAttribute("error", "获取数据失败");
 		}
 		
-		// 添加菜单数据
-		addMenuData(model);
 		
 		return "layout/main";
 	}
 	
 	
+	
+	
 	/**
-	 * 添加配置内容到Model
-	 * @param model Model对象
+	 * 预约看车页面
 	 */
-	private void addConfigContent(Model model) {
+	@GetMapping("/appointment/create/{carSaleId}")
+	public String createAppointmentPage(@PathVariable Long carSaleId, Model model) {
 		try {
-			CarConfigContent configContent = carConfigService.getConfigContent();
-			model.addAttribute("configContent", configContent);
+			// 检查用户登录状态
+			UserInfo userInfo = getSessionUser();
+			if (userInfo == null) {
+				log.warn("未登录用户尝试访问预约页面");
+				return "redirect:/login?returnUrl=/appointment/create/" + carSaleId;
+			}
+			
+			model.addAttribute("carSaleId", carSaleId);
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("user", userInfo); // 添加user属性用于模板
+			model.addAttribute("content", "/appointment/create.ftl");
+			
+			return "/layout/main";
 		} catch (Exception e) {
-			log.error("获取网站配置内容失败", e);
-			// 设置默认配置内容
-			CarConfigContent defaultConfig = new CarConfigContent();
-			defaultConfig.setKefu("400-123-4567");
-			defaultConfig.setYouxiang("service@carce.cc");
-			defaultConfig.setDizhi("台北市信義區信義路五段7號");
-			defaultConfig.setFwsj1("週一至週五：9:00-18:00");
-			defaultConfig.setFwsj2("週六至週日：10:00-17:00");
-			defaultConfig.setFwsj3("節假日：10:00-16:00");
-			model.addAttribute("configContent", defaultConfig);
+			log.error("显示预约页面异常", e);
+			model.addAttribute("error", "页面加载失败：" + e.getMessage());
+			return "/layout/main";
 		}
+	}
+
+	/**
+	 * 我的预约列表页面
+	 */
+	@GetMapping("/appointment/my-appointments")
+	public String myAppointmentsPage(Model model) {
+		try {
+			// 检查用户登录状态
+			UserInfo userInfo = getSessionUser();
+			if (userInfo == null) {
+				log.warn("未登录用户尝试访问我的预约页面");
+				return "redirect:/login?returnUrl=/appointment/my-appointments";
+			}
+			
+			// 设置用户信息
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("user", userInfo); // 添加user属性用于模板
+			
+			// 设置模板内容
+			model.addAttribute("content", "/appointment/my-appointments.ftl");
+			
+			log.info("用户访问我的预约页面，用户ID: {}", userInfo.getId());
+			
+			return "/layout/main";
+		} catch (Exception e) {
+			log.error("显示我的预约页面异常", e);
+			model.addAttribute("error", "页面加载失败：" + e.getMessage());
+			return "/layout/main";
+		}
+	}
+	
+	/**
+	 * 我的订单页面
+	 */
+	@GetMapping("/my-order/index")
+	public String showMyOrderPage(Model model, HttpServletRequest request) {
+		try {
+			// 检查用户登录状态
+			UserInfo userInfo = getSessionUser();
+			if (userInfo == null) {
+				log.warn("未登录用户尝试访问我的订单页面");
+				return "redirect:/login?returnUrl=/my-order/index";
+			}
+
+			// 获取用户的所有订单
+			List<CarOrderInfoEntity> orders = carOrderInfoService.getOrdersByUserId(userInfo.getId());
+			model.addAttribute("orders", orders);
+			model.addAttribute("ordersJson", JSONUtil.toJsonPrettyStr(orders));
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("user", userInfo); // 添加user属性用于模板
+			model.addAttribute("CurrencyUnit", CurrencyUnit);
+			// 设置模板内容
+			model.addAttribute("content", "/my-order/index.ftl");
+
+			log.info("用户访问我的订单页面，用户ID: {}, 订单数量: {}", userInfo.getId(), orders.size());
+
+			return "/layout/main";
+		} catch (Exception e) {
+			log.error("显示我的订单页面异常", e);
+			model.addAttribute("error", "页面加载失败：" + e.getMessage());
+			return "/layout/main";
+		}
+	}
+	
+	/**
+	 * 显示登录页面
+	 */
+	@GetMapping("/login")
+	public String loginPage(Model model, HttpServletRequest req) {
+		// 获取返回URL参数
+		String returnUrl = req.getParameter("returnUrl");
+		if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+			model.addAttribute("returnUrl", returnUrl);
+		}
+		
+		// 获取错误信息参数
+		String error = req.getParameter("error");
+		if (error != null && !error.trim().isEmpty()) {
+			model.addAttribute("error", error);
+		}
+		
+		// 设置页面标题和描述
+		model.addAttribute("title", "登入/註冊 - 二手車銷售平台");
+		model.addAttribute("description", "用戶登入和註冊頁面");
+		model.addAttribute("url", req.getRequestURL().toString());
+		model.addAttribute("image", "/img/swipper/slide1.jpg");
+		
+		// 设置模板内容
+		model.addAttribute("content", "/login/index.ftl");
+		
+		return "/layout/main";
+	}
+	
+	/**
+	 * 拦截器测试页面
+	 */
+	@GetMapping("/test-interceptor")
+	public String testInterceptorPage(Model model) {
+		model.addAttribute("title", "拦截器测试页面");
+		model.addAttribute("content", "/test-interceptor.ftl");
+		return "/layout/main";
 	}
 } 

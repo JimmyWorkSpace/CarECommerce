@@ -3,10 +3,8 @@ package cc.carce.sale.controller;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +19,6 @@ import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.service.CarOrderInfoService;
 import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarShoppingCartService;
-import cn.hutool.json.JSONUtil;
 import cc.carce.sale.entity.CarShoppingCartEntity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,41 +41,6 @@ public class MyOrderController extends BaseController {
     @Resource
     private CarShoppingCartService carShoppingCartService;
 
-    /**
-     * 显示我的订单页面
-     */
-    @GetMapping("/index")
-    public String showMyOrderPage(Model model, HttpServletRequest request) {
-        try {
-            // 检查用户登录状态
-            UserInfo userInfo = getSessionUser();
-            if (userInfo == null) {
-                log.warn("未登录用户尝试访问我的订单页面");
-                return "redirect:/login?returnUrl=/my-order/index";
-            }
-
-            // 获取用户的所有订单
-            List<CarOrderInfoEntity> orders = carOrderInfoService.getOrdersByUserId(userInfo.getId());
-            model.addAttribute("orders", orders);
-            model.addAttribute("ordersJson", JSONUtil.toJsonPrettyStr(orders));
-            model.addAttribute("userInfo", userInfo);
-            model.addAttribute("user", userInfo); // 添加user属性用于模板
-            model.addAttribute("CurrencyUnit", CurrencyUnit);
-            // 设置模板内容
-            model.addAttribute("content", "/my-order/index.ftl");
-            
-            // 添加菜单数据
-            addMenuData(model);
-
-            log.info("用户访问我的订单页面，用户ID: {}, 订单数量: {}", userInfo.getId(), orders.size());
-
-            return "/layout/main";
-        } catch (Exception e) {
-            log.error("显示我的订单页面异常", e);
-            model.addAttribute("error", "页面加载失败：" + e.getMessage());
-            return "/layout/main";
-        }
-    }
 
     /**
      * 获取订单详情
