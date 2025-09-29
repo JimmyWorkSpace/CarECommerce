@@ -646,7 +646,7 @@ public class CarViewController extends BaseController {
 
 		// 设置页面数据
 		model.addAttribute("itemName", itemName != null ? itemName : "汽车商品");
-		model.addAttribute("amount", amount != null ? amount : 0);
+		model.addAttribute("amount", amount != null ? amount.toString() : "0");
 		model.addAttribute("description", description != null ? description : "");
 		model.addAttribute("cartData", cartData);
 		model.addAttribute("userInfo", userInfo);
@@ -690,14 +690,14 @@ public class CarViewController extends BaseController {
 
 		// 如果是dev或test环境，金额固定为1元
 		Integer finalAmount = paymentRequest.getAmount();
-		if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
-			finalAmount = 1;
-			log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", paymentRequest.getAmount());
-		}
+		// if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
+		// 	finalAmount = 1;
+		// 	log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", paymentRequest.getAmount());
+		// }
 		model.addAttribute("orderInfoJson", "{}");
 		// 设置页面数据
 		model.addAttribute("itemName", paymentRequest.getItemName());
-		model.addAttribute("amount", finalAmount);
+		model.addAttribute("amount", finalAmount.toString());
 		model.addAttribute("description", paymentRequest.getDescription());
 		model.addAttribute("cartData", paymentRequest.getCartData());
 		model.addAttribute("userInfo", userInfo);
