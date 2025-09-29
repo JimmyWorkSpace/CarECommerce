@@ -201,11 +201,6 @@
                 </h2>
                 
                 <!-- 環境提示 -->
-                <div v-if="paymentConfig && !paymentConfig.isProduction" class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>測試環境提示：</strong>當前為{{ paymentConfig.environment }}環境，支付金額固定為0.01元
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
                 
                 <!-- 訂單重新支付提示 -->
                 <div v-if="orderId" class="alert alert-info alert-dismissible fade show" role="alert">
@@ -446,7 +441,7 @@
             data: {
                 formData: {
                     itemName: '${itemName!''}',
-                    amount: 0,
+                    amount: ${amount},
                     description: '${description!''}',
                     receiverName: '',
                     receiverMobile: '',
@@ -481,7 +476,6 @@
                         this.formData.orderType = this.orderInfo.orderType;
                         this.formData.orderNo = this.orderInfo.orderNo;
                         this.formData.orderId = this.orderInfo.id;
-                        this.formData.amount = this.orderInfo.totalAmount;
                     }
             	},
                 // 載入支付配置
