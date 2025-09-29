@@ -32,7 +32,7 @@
     </sql>
 
     <!-- 插入订单信息 -->
-    <insert id="insert" parameterType="cc.carce.sale.entity.CarOrderInfoEntity" useGeneratedKeys="true" keyProperty="id">
+    <!-- <insert id="insert" parameterType="cc.carce.sale.entity.CarOrderInfoEntity" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO car_order_info (
             orderNo, userId, totalPrice, delFlag, createTime, showOrder,
             orderStatus, receiverAddress, receiverName, receiverMobile, logicNumber,
@@ -42,14 +42,14 @@
             #{orderStatus}, #{receiverAddress}, #{receiverName}, #{receiverMobile}, #{logicNumber},
             #{orderType}, #{cvsStoreID}, #{cvsStoreName}, #{cvsAddress}, #{cvsTelephone}, #{cvsOutSide}
         )
-    </insert>
+    </insert> -->
 
     <!-- 根据ID查询订单信息 -->
-    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!-- <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM car_order_info
         WHERE id = #{id} AND delFlag = 0
-    </select>
+    </select> -->
 
     <!-- 根据订单号查询订单信息 -->
     <select id="selectByOrderNo" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -83,7 +83,7 @@
     </select>
 
     <!-- 更新订单信息 -->
-    <update id="updateById" parameterType="cc.carce.sale.entity.CarOrderInfoEntity">
+    <!-- <update id="updateById" parameterType="cc.carce.sale.entity.CarOrderInfoEntity">
         UPDATE car_order_info
         <set>
             <if test="orderNo != null">orderNo = #{orderNo},</if>
@@ -104,7 +104,7 @@
             <if test="cvsOutSide != null">CVSOutSide = #{cvsOutSide},</if>
         </set>
         WHERE id = #{id} AND delFlag = 0
-    </update>
+    </update> -->
 
     <!-- 更新订单状态 -->
     <update id="updateOrderStatus">
