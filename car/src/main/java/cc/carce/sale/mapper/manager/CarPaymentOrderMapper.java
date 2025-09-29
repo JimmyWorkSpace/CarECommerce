@@ -60,8 +60,7 @@ public interface CarPaymentOrderMapper extends Mapper<CarPaymentOrderEntity> {
      * 查询待支付的订单（用于定时任务查询状态）
      * 查询条件：支付状态为待支付(0)，创建时间在指定时间范围内，未删除
      */
-    List<CarPaymentOrderEntity> selectPendingOrdersForQuery(@Param("startTime") java.util.Date startTime, 
-                                                           @Param("endTime") java.util.Date endTime);
+    List<CarPaymentOrderEntity> selectPendingOrdersForQuery();
     
     /**
      * 删除支付订单（逻辑删除）

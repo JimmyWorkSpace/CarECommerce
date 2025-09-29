@@ -108,13 +108,10 @@
 
     <!-- 查询待支付的订单（用于定时任务查询状态） -->
     <select id="selectPendingOrdersForQuery" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
-        FROM car_payment_order
-        WHERE payment_status = 0 
-          AND del_flag = 0
-          AND create_time &gt;= #{startTime}
-          AND create_time &lt;= #{endTime}
-        ORDER BY create_time ASC
+        select p.* from car_payment_order p
+        where p.payment_status = 0
+        and EXISTS (select 1 from car_order_info o where o.orderNo = p.ecpay_trade_no and o.delFlag = 0 and o.orderStatus in (0,1))
+        order by p.create_time
     </select>
 
     <!-- 删除支付订单（逻辑删除） -->
