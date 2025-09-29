@@ -281,10 +281,6 @@ new Vue({
         handleSubmit() {
             const phone = this.phoneNumber.trim();
             const code = this.smsCode.trim();
-            if (!this.isValidPhone(phone)) {
-                alert('請輸入正確的手機號碼格式');
-                return;
-            }
             if (!this.isValidCode(code)) {
                 alert('請輸入6位數字驗證碼');
                 return;
