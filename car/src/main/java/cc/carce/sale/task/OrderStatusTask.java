@@ -1,16 +1,13 @@
 package cc.carce.sale.task;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import cc.carce.sale.dto.ECPayResultDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
 import cc.carce.sale.service.ECPayService;
@@ -39,8 +36,8 @@ public class OrderStatusTask {
      * 2. 创建时间在15分钟内
      * 3. 未删除的订单
      */
-    @PostConstruct
-//    @Scheduled(fixedRate = 60000) // 每60秒执行一次
+    // @PostConstruct
+   @Scheduled(fixedRate = 300000) // 每5分钟执行一次
     public void queryOrderStatusTask() {
         try {
             log.info("开始执行订单状态查询定时任务");
@@ -64,9 +61,9 @@ public class OrderStatusTask {
                     
                     // 查询绿界订单状态
                     log.info("查询订单状态：{}", order.getMerchantTradeNo());
-                    Map<String, String> queryResult = ecPayService.queryOrderStatusFromECPay(order.getMerchantTradeNo());
+                    ECPayResultDto queryResult = ecPayService.queryOrderStatusFromECPay(order.getMerchantTradeNo());
                     
-                    if (queryResult != null && !queryResult.isEmpty()) {
+                    if (queryResult != null) {
                         // 根据查询结果更新订单状态
                         boolean updated = ecPayService.updateOrderStatusFromQuery(order.getMerchantTradeNo(), queryResult);
                         if (updated) {

@@ -1,7 +1,6 @@
 package cc.carce.sale.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cc.carce.sale.common.R;
+import cc.carce.sale.dto.ECPayResultDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
 import cc.carce.sale.service.ECPayService;
@@ -38,14 +38,14 @@ public class TestOrderStatusController {
      * @return 查询结果
      */
     @GetMapping("/query/{merchantTradeNo}")
-    public R<Map<String, String>> queryOrderStatus(@PathVariable String merchantTradeNo) {
+    public R<ECPayResultDto> queryOrderStatus(@PathVariable String merchantTradeNo) {
         try {
             log.info("手动查询订单状态，商户订单号: {}", merchantTradeNo);
             
             // 查询绿界订单状态
-            Map<String, String> queryResult = ecPayService.queryOrderStatusFromECPay(merchantTradeNo);
+            ECPayResultDto queryResult = ecPayService.queryOrderStatusFromECPay(merchantTradeNo);
             
-            if (queryResult != null && !queryResult.isEmpty()) {
+            if (queryResult != null) {
                 // 根据查询结果更新订单状态
                 boolean updated = ecPayService.updateOrderStatusFromQuery(merchantTradeNo, queryResult);
                 

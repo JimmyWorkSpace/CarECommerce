@@ -140,6 +140,84 @@
                             </div>
                         </div>
                         
+                        <!-- 绿界支付信息 -->
+                        <div class="mt-4">
+                            <h6 class="mb-3 text-start fw-bold text-primary border-bottom pb-2">
+                                <i class="bi bi-credit-card-fill me-2"></i>綠界支付資訊
+                                <button type="button" class="btn btn-outline-primary btn-sm ms-2" 
+                                        @click="loadECPayInfo" :disabled="isLoadingECPay">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>刷新
+                                </button>
+                                <span class="badge bg-secondary ms-2" v-if="isLoadingECPay">加载中...</span>
+                            </h6>
+                            
+                            <!-- 调试信息 -->
+                            <div class="item-info bg-light rounded p-3" v-if="ecpayInfo">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-row mb-2">
+                                            <span class="info-label fw-semibold text-muted">
+                                                <i class="bi bi-receipt me-1"></i>特店交易編號：
+                                            </span>
+                                            <span class="info-value fw-bold">{{ ecpayInfo.MerchantTradeNo || '-' }}</span>
+                                        </div>
+                                        <div class="info-row mb-2">
+                                            <span class="info-label fw-semibold text-muted">
+                                                <i class="bi bi-currency-dollar me-1"></i>交易金額：
+                                            </span>
+                                            <span class="info-value fw-bold text-success">${CurrencyUnit} {{ ecpayInfo.TradeAmt || '-' }}</span>
+                                        </div>
+                                        <div class="info-row mb-2">
+                                            <span class="info-label fw-semibold text-muted">
+                                                <i class="bi bi-calendar-check me-1"></i>付款時間：
+                                            </span>
+                                            <span class="info-value fw-bold">{{ ecpayInfo.PaymentDate || '-' }}</span>
+                                        </div>
+                                        <div class="info-row mb-2">
+                                            <span class="info-label fw-semibold text-muted">
+                                                <i class="bi bi-credit-card me-1"></i>付款方式：
+                                            </span>
+                                            <span class="info-value fw-bold">{{ ecpayInfo.PaymentType || '-' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-row mb-2">
+                                            <span class="info-label fw-semibold text-muted">
+                                                <i class="bi bi-check-circle me-1"></i>交易狀態：
+                                            </span>
+                                            <span class="info-value fw-bold" :class="getECPayStatusClass(ecpayInfo.TradeStatus)">
+                                                {{ getECPayStatusText(ecpayInfo.TradeStatus) }}
+                                            </span>
+                                        </div>
+                                        <div class="info-row mb-2">
+                                            <span class="info-label fw-semibold text-muted">
+                                                <i class="bi bi-percent me-1"></i>手續費合計：
+                                            </span>
+                                            <span class="info-value fw-bold">${CurrencyUnit} {{ ecpayInfo.HandlingCharge }}</span>
+                                        </div>
+                                        <div class="info-row mb-2">
+                                            <span class="info-label fw-semibold text-muted">
+                                                <i class="bi bi-calculator me-1"></i>交易手續費：
+                                            </span>
+                                            <span class="info-value fw-bold">${CurrencyUnit} {{ ecpayInfo.PaymentTypeChargeFee }}</span>
+                                        </div>
+                                        <div class="info-row mb-2">
+                                            <span class="info-label fw-semibold text-muted">
+                                                <i class="bi bi-calendar-event me-1"></i>訂單成立時間：
+                                            </span>
+                                            <span class="info-value fw-bold">{{ ecpayInfo.TradeDate || '-' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 无数据时的提示 -->
+                            <div class="alert alert-warning" v-if="!ecpayInfo && !isLoadingECPay">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                暂无绿界支付信息，请点击刷新按钮获取最新信息。
+                            </div>
+                        </div>
+                        
                         <!-- 订单操作 -->
                         <div class="mt-4">
                             <div class="item-actions">
@@ -155,10 +233,6 @@
                                     <i class="bi bi-x-circle me-1"></i>取消訂單
                                 </button>
                                 
-                                <button type="button" class="btn btn-outline-primary btn-sm" 
-                                        @click="refreshOrder">
-                                    <i class="bi bi-arrow-clockwise me-1"></i>刷新狀態
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -190,7 +264,9 @@
         data: {
             order: null,
             orderDetails: [],
+            ecpayInfo: {},
             isLoading: true,
+            isLoadingECPay: false,
             errorMessage: '',
             successMessage: '',
             statusCheckInterval: null,
@@ -274,9 +350,10 @@
                             this.order = response.data.data;
                             this.originalOrderStatus = this.order.orderStatus;
                             this.loadOrderDetails(orderId);
+                            this.loadECPayInfo(); // 加载绿界支付信息
                             // 重新启动状态检查
-                            this.stopStatusCheck();
-                            this.startStatusCheck();
+                            //this.stopStatusCheck();
+                            //this.startStatusCheck();
                         } else {
                             this.showError(response.data.msg || '獲取訂單資訊失敗');
                         }
@@ -303,6 +380,66 @@
                     .catch(error => {
                         console.error('獲取訂單詳情失敗:', error);
                     });
+            },
+            
+            // 加载绿界支付信息
+            loadECPayInfo() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const orderId = urlParams.get('orderId');
+                
+                if (!orderId) {
+                    console.warn('订单ID为空，无法加载绿界支付信息');
+                    return;
+                }
+                
+                console.log('开始加载绿界支付信息，订单ID:', orderId);
+                this.isLoadingECPay = true;
+                this.ecpayInfo = null; // 清空之前的数据
+                axios.get('/my-order/ecpay-info?orderId=' + orderId)
+                    .then(response => {
+                        console.log('绿界支付信息API响应:', response.data);
+                        debugger;
+                        if (response.data && response.data.code === 1) {
+                            this.ecpayInfo = response.data.data;
+                            console.log('绿界支付信息设置成功:', this.ecpayInfo);
+                            console.log('ecpayInfo类型:', typeof this.ecpayInfo);
+                            console.log('ecpayInfo是否为null:', this.ecpayInfo === null);
+                            console.log('ecpayInfo是否为undefined:', this.ecpayInfo === undefined);
+                        } else {
+                            console.warn('获取绿界支付信息失败:', response.data ? response.data.msg : '未知错误');
+                            this.ecpayInfo = null;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('获取绿界支付信息失败:', error);
+                        this.ecpayInfo = null;
+                    })
+                    .finally(() => {
+                        this.isLoadingECPay = false;
+                        console.log('绿界支付信息加载完成，最终状态:', this.ecpayInfo);
+                    });
+            },
+            
+            // 获取绿界支付状态文本
+            getECPayStatusText(status) {
+                const statusMap = {
+                    '0': '未付款',
+                    '1': '已付款',
+                    '10200095': '交易失敗',
+                    '10200163': '申請失敗'
+                };
+                return statusMap[status] || '未知狀態';
+            },
+            
+            // 获取绿界支付状态样式类
+            getECPayStatusClass(status) {
+                const classMap = {
+                    '0': 'text-warning',
+                    '1': 'text-success',
+                    '10200095': 'text-danger',
+                    '10200163': 'text-danger'
+                };
+                return classMap[status] || 'text-muted';
             },
             
             // 重新支付订单

@@ -30,9 +30,9 @@ ecpay:
   merchant-id: "2000132"  # 官方测试商户编号
   hash-key: "5294y06JbISpM5x9"  # 官方测试HashKey
   hash-iv: "v77hoKGq4kWxNNIS"   # 官方测试HashIV
-  return-url: "https://sale.carce.cc/api/payment/return"
-  notify-url: "https://sale.carce.cc/api/payment/callback"
-  client-back-url: "https://sale.carce.cc/payment/result"
-  result-url: "https://sale.carce.cc/payment/result"
+  return-url: "https://carce.yanjiashuo.cn/api/payment/return"
+  notify-url: "https://carce.yanjiashuo.cn/api/payment/callback"
+  client-back-url: "https://carce.yanjiashuo.cn/my-order/detail-page?orderId="
+  result-url: "https://carce.yanjiashuo.cnc/payment/result"
   # 查询API地址配置
   query-server-url: "https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5"

@@ -16,11 +16,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
+import cc.carce.sale.dto.ECPayResultDto;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarOrderDetailEntity;
+import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.service.CarOrderInfoService;
 import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarShoppingCartService;
+import cc.carce.sale.service.ECPayService;
 import cc.carce.sale.entity.CarShoppingCartEntity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,6 +45,9 @@ public class MyOrderController extends BaseController {
     
     @Resource
     private CarShoppingCartService carShoppingCartService;
+    
+    @Resource
+    private ECPayService ecPayService;
 
 
     /**
@@ -227,6 +233,50 @@ public class MyOrderController extends BaseController {
         } catch (Exception e) {
             log.error("重新支付订单异常", e);
             return R.fail("重新支付订单异常: " + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * 获取订单的绿界支付信息
+     */
+    @GetMapping("/ecpay-info")
+    @ResponseBody
+    public R<ECPayResultDto> getECPayInfo(@RequestParam Long orderId) {
+        try {
+            // 检查用户登录状态
+            if (!isLogin()) {
+                return R.fail("请先登录", null);
+            }
+
+            UserInfo user = getSessionUser();
+            
+            // 验证订单是否属于当前用户
+            CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
+            if (order == null || !order.getUserId().equals(user.getId())) {
+                return R.fail("订单不存在或无权限访问", null);
+            }
+
+            // 获取支付订单信息
+            CarPaymentOrderEntity paymentOrder = ecPayService.getPaymentOrderByEcpayTradeNo(order.getOrderNo());
+            if (paymentOrder == null) {
+                return R.fail("未找到支付信息", null);
+            }
+
+            // 从绿界API查询最新的支付信息
+            ECPayResultDto ecpayInfo = ecPayService.queryOrderStatusFromECPay(paymentOrder.getMerchantTradeNo());
+            if (ecpayInfo == null) {
+                return R.fail("获取绿界支付信息失败", null);
+            }
+
+            ecPayService.updateOrderStatusFromQuery(paymentOrder.getMerchantTradeNo(), ecpayInfo);
+
+            log.info("获取订单绿界支付信息成功，用户ID: {}, 订单ID: {}, 商户订单号: {}", 
+                    user.getId(), orderId, paymentOrder.getMerchantTradeNo());
+
+            return R.ok("获取绿界支付信息成功", ecpayInfo);
+        } catch (Exception e) {
+            log.error("获取绿界支付信息异常", e);
+            return R.fail("获取绿界支付信息异常: " + e.getMessage(), null);
         }
     }
 }

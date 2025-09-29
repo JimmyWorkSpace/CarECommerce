@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
+import cc.carce.sale.dto.ECPayResultDto;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.form.CreatePaymentForm;
@@ -291,9 +292,9 @@ public class ECPayController extends BaseController{
             log.info("用户刷新订单状态，用户ID: {}, 订单号: {}, 商户订单号: {}", user.getId(), orderNo, merchantTradeNo);
             
             // 从绿界API查询订单状态
-            Map<String, String> queryResult = ecPayService.queryOrderStatusFromECPay(merchantTradeNo);
+            ECPayResultDto queryResult = ecPayService.queryOrderStatusFromECPay(merchantTradeNo);
             
-            if (queryResult != null && !queryResult.isEmpty()) {
+            if (queryResult != null) {
                 // 根据查询结果更新订单状态
                 boolean updated = ecPayService.updateOrderStatusFromQuery(merchantTradeNo, queryResult);
                 
