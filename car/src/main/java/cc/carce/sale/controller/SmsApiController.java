@@ -35,12 +35,12 @@ public class SmsApiController {
                 return response;
             }
             
-            // 验证手机号格式
-            if (!phoneNumber.matches("^1[3-9]\\d{9}$")) {
-                response.put("success", false);
-                response.put("message", "手機號碼格式不正確");
-                return response;
-            }
+            // // 验证手机号格式
+            // if (!phoneNumber.matches("^1[3-9]\\d{9}$")) {
+            //     response.put("success", false);
+            //     response.put("message", "手機號碼格式不正確");
+            //     return response;
+            // }
             
             // 检查是否可以重新发送
             if (!smsService.canResendCode(phoneNumber)) {

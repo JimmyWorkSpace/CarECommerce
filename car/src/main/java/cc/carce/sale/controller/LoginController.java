@@ -56,10 +56,10 @@ public class LoginController extends BaseController {
 //                return getLoginPage(model);
 //            }
             
-            // 验证验证码格式
-            if (smsCode == null || !smsCode.matches("\\d{6}")) {
-                return "redirect:/login?error=驗證碼格式不正確";
-            }
+            // // 验证验证码格式
+            // if (smsCode == null || !smsCode.matches("\\d{6}")) {
+            //     return "redirect:/login?error=驗證碼格式不正確";
+            // }
             
             // 验证短信验证码
             if (!smsService.verifySmsCode(phoneNumber, smsCode)) {
