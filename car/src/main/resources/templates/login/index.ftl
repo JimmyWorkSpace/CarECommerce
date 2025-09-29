@@ -264,10 +264,6 @@ new Vue({
         },
         async sendSms() {
             const phone = this.phoneNumber.trim();
-            if (!this.isValidPhone(phone)) {
-                alert('請輸入正確的手機號碼格式');
-                return;
-            }
             try {
                 const res = await axios.post('/api/sms/send', { phoneNumber: phone });
                 const data = res.data;
