@@ -3,8 +3,10 @@ package cc.carce.sale.controller;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +45,48 @@ public class MyOrderController extends BaseController {
 
 
     /**
-     * 获取订单详情
+     * 显示订单详情页面
+     */
+    @GetMapping("/detail-page")
+    public String showOrderDetailPage(@RequestParam Long orderId, Model model, HttpSession session) {
+        try {
+            // 检查用户登录状态
+            if (!isLogin()) {
+                log.warn("未登录用户尝试访问订单详情页面");
+                return "redirect:/login?returnUrl=/my-order/detail-page?orderId=" + orderId;
+            }
+
+            UserInfo user = getSessionUser();
+            
+            // 验证订单是否属于当前用户
+            CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
+            if (order == null || !order.getUserId().equals(user.getId())) {
+                log.warn("订单不存在或无权限访问，用户ID: {}, 订单ID: {}", user.getId(), orderId);
+                model.addAttribute("errorMessage", "订单不存在或无权限访问");
+                return "/order/detail";
+            }
+
+            // 设置页面数据
+            model.addAttribute("orderId", orderId);
+            model.addAttribute("orderNo", order.getOrderNo());
+            model.addAttribute("userInfo", user);
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
+            // 设置模板内容
+            model.addAttribute("content", "/order/detail.ftl");
+
+            log.info("用户访问订单详情页面，用户ID: {}, 订单ID: {}, 订单号: {}", 
+                    user.getId(), orderId, order.getOrderNo());
+
+            return "/layout/main";
+        } catch (Exception e) {
+            log.error("显示订单详情页面异常", e);
+            model.addAttribute("errorMessage", "获取订单详情失败");
+            return "/order/detail";
+        }
+    }
+
+    /**
+     * 获取订单详情（API接口）
      */
     @GetMapping("/detail")
     @ResponseBody
@@ -69,6 +112,33 @@ public class MyOrderController extends BaseController {
         } catch (Exception e) {
             log.error("获取订单详情异常", e);
             return R.fail("获取订单详情异常: " + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * 获取订单完整信息（API接口）
+     */
+    @GetMapping("/order-info")
+    @ResponseBody
+    public R<CarOrderInfoEntity> getOrderInfo(@RequestParam Long orderId) {
+        try {
+            // 检查用户登录状态
+            if (!isLogin()) {
+                return R.fail("请先登录", null);
+            }
+
+            UserInfo user = getSessionUser();
+            
+            // 验证订单是否属于当前用户
+            CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
+            if (order == null || !order.getUserId().equals(user.getId())) {
+                return R.fail("订单不存在或无权限访问", null);
+            }
+            
+            return R.ok("获取订单信息成功", order);
+        } catch (Exception e) {
+            log.error("获取订单信息异常", e);
+            return R.fail("获取订单信息异常: " + e.getMessage(), null);
         }
     }
 

@@ -1,4 +1,4 @@
-    <style>
+﻿    <style>
     /* 支付頁面樣式 */
     .payment-page {
         padding: 20px 0;
@@ -204,6 +204,13 @@
                 <div v-if="paymentConfig && !paymentConfig.isProduction" class="alert alert-warning alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
                     <strong>測試環境提示：</strong>當前為{{ paymentConfig.environment }}環境，支付金額固定為0.01元
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- 訂單重新支付提示 -->
+                <div v-if="orderId" class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>重新支付訂單：</strong>訂單號 {{ orderNo }}，請完成支付操作
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 
@@ -447,20 +454,35 @@
                     orderType: 1, // 1: 宅配到府, 2: 超商取貨
                     selectedStore: null
                 },
+                orderId: null,
+                orderNo: null,
+                orderInfo: ${orderInfoJson},
                 cartItems: [],
                 storeList: [], // 超商門店列表
                 isLoading: false,
                 errorMessage: '',
                 successMessage: '',
-                paymentConfig: null
+                paymentConfig: null,
+                currentOrderNo: null // 當前支付訂單號
             },
             mounted() {
                 console.log('Vue實例已掛載');
                 this.initCartItems();
                 this.loadPaymentConfig();
                 this.loadStoreList();
+                this.initData();
             },
             methods: {
+            	initData(){
+            		if(this.orderInfo && this.orderInfo.id){
+                        this.formData.receiverName = this.orderInfo.receiverName;
+                        this.formData.receiverMobile = this.orderInfo.receiverMobile;
+                        this.formData.receiverAddress = this.orderInfo.receiverAddress;
+                        this.formData.orderType = this.orderInfo.orderType;
+                        this.formData.orderNo = this.orderInfo.orderNo;
+                        this.formData.orderId = this.orderInfo.id;
+                    }
+            	},
                 // 載入支付配置
                 loadPaymentConfig() {
                     axios.get('/api/payment/config')
@@ -499,8 +521,9 @@
                     return;
                 }
                 
-                    // 顯示支付確認對話框
+                    // 同時顯示支付確認對話框和創建支付訂單
                     this.showPaymentConfirmDialog();
+                    this.proceedToPayment();
                 },
                 
                 // 顯示支付確認對話框
@@ -512,7 +535,7 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="paymentConfirmModalLabel">
-                                            <i class="bi bi-question-circle me-2"></i>支付確認
+                                            <i class="bi bi-info-circle me-2"></i>支付提示
                                         </h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
@@ -520,15 +543,18 @@
                                         <div class="mb-4">
                                             <i class="bi bi-credit-card" style="font-size: 3rem; color: #5ACFC9;"></i>
                                         </div>
-                                        <h6 class="mb-3">是否已完成支付？</h6>
-                                        <p class="text-muted">請確認您是否已經完成支付操作</p>
+                                        <h6 class="mb-3">支付頁面已在新窗口打開</h6>
+                                        <p class="text-muted">請在新窗口中完成支付操作，支付完成後請點擊下方按鈕確認</p>
+                                        <div class="alert alert-info">
+                                            <small><i class="bi bi-lightbulb me-1"></i>提示：如果新窗口沒有自動打開，請檢查瀏覽器彈窗設置</small>
+                                        </div>
                                     </div>
                                     <div class="modal-footer justify-content-center">
-                                        <button type="button" class="btn btn-outline-secondary me-3" data-bs-dismiss="modal">
-                                            <i class="bi bi-x-circle me-2"></i>未支付
+                                        <button type="button" class="btn btn-outline-secondary me-3" id="cancelPaymentBtn">
+                                            <i class="bi bi-x-circle me-2"></i>取消支付
                                         </button>
                                         <button type="button" class="btn btn-primary" id="confirmPaidBtn">
-                                            <i class="bi bi-check-circle me-2"></i>已支付
+                                            <i class="bi bi-check-circle me-2"></i>已完成支付
                                         </button>
                                     </div>
                                 </div>
@@ -552,7 +578,12 @@
                     // 綁定事件
                     document.getElementById('confirmPaidBtn').addEventListener('click', () => {
                         modal.hide();
-                        this.proceedToPayment();
+                        this.checkPaymentStatus();
+                    });
+                    
+                    document.getElementById('cancelPaymentBtn').addEventListener('click', () => {
+                        modal.hide();
+                        this.goToOrderDetail();
                     });
                     
                     // 模態框關閉時清理
@@ -577,6 +608,11 @@
                         cartData: this.cartItems
                     };
                     
+                    // 如果是重新支付訂單，添加訂單ID
+                    if (this.orderId) {
+                        paymentData.orderId = this.orderId;
+                    }
+                    
                     // 根據配送方式添加相應字段
                     if (this.formData.orderType === 1) {
                         // 宅配到府
@@ -594,8 +630,10 @@
                     
                     axios.post('/api/payment/create', paymentData)
                     .then(response => {
+                        debugger;
                         if (response.data.code === 1) {
                             // 支付訂單創建成功，在新窗口打開綠界支付頁面
+                            this.currentOrderNo = response.data.data.MerchantTradeNo;
                             this.openPaymentInNewWindow(response.data.data);
                         } else {
                             this.showError(response.data.msg || '創建支付訂單失敗');
@@ -673,71 +711,26 @@
                     // 提交表單
                     document.body.appendChild(form);
                     form.submit();
-                    
-                    // 顯示支付完成確認對話框
-                    setTimeout(() => {
-                        this.showPaymentCompleteDialog(paymentParams.merchantTradeNo);
-                    }, 2000);
                 },
                 
-                // 顯示支付完成確認對話框
-                showPaymentCompleteDialog(orderNo) {
-                    const modalHtml = `
-                        <div class="modal fade" id="paymentCompleteModal" tabindex="-1" aria-labelledby="paymentCompleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="paymentCompleteModalLabel">
-                                            <i class="bi bi-check-circle me-2"></i>支付完成確認
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-center">
-                                        <div class="mb-4">
-                                            <i class="bi bi-credit-card" style="font-size: 3rem; color: #28a745;"></i>
-                                        </div>
-                                        <h6 class="mb-3">支付是否已完成？</h6>
-                                        <p class="text-muted">請確認您是否已經完成支付操作</p>
-                                        <div class="alert alert-info">
-                                            <small>訂單號：` + orderNo + `</small>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer justify-content-center">
-                                        <button type="button" class="btn btn-outline-secondary me-3" data-bs-dismiss="modal">
-                                            <i class="bi bi-x-circle me-2"></i>未支付
-                                        </button>
-                                        <button type="button" class="btn btn-success" id="confirmPaymentCompleteBtn">
-                                            <i class="bi bi-check-circle me-2"></i>已支付
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // 移除已存在的模態框
-                    const existingModal = document.getElementById('paymentCompleteModal');
-                    if (existingModal) {
-                        existingModal.remove();
+                // 檢查支付狀態
+                checkPaymentStatus() {
+                    debugger;
+                    if (!this.currentOrderNo) {
+                        this.showError('無法獲取訂單信息，請重新支付');
+                        return;
                     }
                     
-                    // 添加模態框到頁面
-                    document.body.insertAdjacentHTML('beforeend', modalHtml);
-                    
-                    // 顯示模態框
-                    const modal = new bootstrap.Modal(document.getElementById('paymentCompleteModal'));
-                    modal.show();
-                    
-                    // 綁定事件
-                    document.getElementById('confirmPaymentCompleteBtn').addEventListener('click', () => {
-                        modal.hide();
-                        this.checkOrderStatus(orderNo);
-                    });
-                    
-                    // 模態框關閉時清理
-                    document.getElementById('paymentCompleteModal').addEventListener('hidden.bs.modal', () => {
-                        document.getElementById('paymentCompleteModal').remove();
-                    });
+                    this.checkOrderStatus(this.currentOrderNo);
+                },
+                
+                // 跳转到订单详情页面
+                goToOrderDetail() {
+                    if (this.orderId) {
+                        window.location.href = '/my-order/detail-page?orderId=' + this.orderId;
+                    } else {
+                        window.location.href = '/my-order';
+                    }
                 },
                 
                 // 檢查訂單狀態
@@ -748,17 +741,24 @@
                     axios.get('/api/payment/status/' + orderNo)
                         .then(response => {
                             if (response.data.code === 1) {
+                                this.orderId = response.data.data.orderId;
                                 const orderStatus = response.data.data;
-                                if (orderStatus.paymentStatus === 1) {
+                                //if (orderStatus.paymentStatus === 1) {
                                     // 支付成功
-                                    this.showSuccess('支付成功！正在跳轉到訂單頁面...');
+                                    debugger;
+                                    this.showSuccess('支付成功！正在跳轉到訂單詳情頁面...');
                                     setTimeout(() => {
-                                        window.location.href = '/my-order';
+                                        // 跳转到订单详情页面
+                                        if (this.orderId) {
+                                            window.location.href = '/my-order/detail-page?orderId=' + this.orderId;
+                                        } else {
+                                            window.location.href = '/my-order';
+                                        }
                                     }, 2000);
-                                } else {
+                                //} else {
                                     // 支付未完成
-                                    this.showError('支付尚未完成，請完成支付後再次確認');
-                                }
+                                //    this.showError('支付尚未完成，請完成支付後再次確認');
+                                //}
                             } else {
                                 this.showError(response.data.msg || '查詢訂單狀態失敗');
                             }

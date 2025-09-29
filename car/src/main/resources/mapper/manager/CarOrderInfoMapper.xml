@@ -16,22 +16,31 @@
         <result column="receiverName" property="receiverName" jdbcType="VARCHAR"/>
         <result column="receiverMobile" property="receiverMobile" jdbcType="VARCHAR"/>
         <result column="logicNumber" property="logicNumber" jdbcType="VARCHAR"/>
+        <result column="orderType" property="orderType" jdbcType="INTEGER"/>
+        <result column="CVSStoreID" property="cvsStoreID" jdbcType="VARCHAR"/>
+        <result column="CVSStoreName" property="cvsStoreName" jdbcType="VARCHAR"/>
+        <result column="CVSAddress" property="cvsAddress" jdbcType="VARCHAR"/>
+        <result column="CVSTelephone" property="cvsTelephone" jdbcType="VARCHAR"/>
+        <result column="CVSOutSide" property="cvsOutSide" jdbcType="INTEGER"/>
     </resultMap>
 
     <!-- 基础列名 -->
     <sql id="Base_Column_List">
         id, orderNo, userId, totalPrice, delFlag, createTime, showOrder, 
-        orderStatus, receiverAddress, receiverName, receiverMobile, logicNumber
+        orderStatus, receiverAddress, receiverName, receiverMobile, logicNumber,
+        orderType, CVSStoreID, CVSStoreName, CVSAddress, CVSTelephone, CVSOutSide
     </sql>
 
     <!-- 插入订单信息 -->
     <insert id="insert" parameterType="cc.carce.sale.entity.CarOrderInfoEntity" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO car_order_info (
             orderNo, userId, totalPrice, delFlag, createTime, showOrder,
-            orderStatus, receiverAddress, receiverName, receiverMobile, logicNumber
+            orderStatus, receiverAddress, receiverName, receiverMobile, logicNumber,
+            orderType, CVSStoreID, CVSStoreName, CVSAddress, CVSTelephone, CVSOutSide
         ) VALUES (
             #{orderNo}, #{userId}, #{totalPrice}, #{delFlag}, #{createTime}, #{showOrder},
-            #{orderStatus}, #{receiverAddress}, #{receiverName}, #{receiverMobile}, #{logicNumber}
+            #{orderStatus}, #{receiverAddress}, #{receiverName}, #{receiverMobile}, #{logicNumber},
+            #{orderType}, #{cvsStoreID}, #{cvsStoreName}, #{cvsAddress}, #{cvsTelephone}, #{cvsOutSide}
         )
     </insert>
 
@@ -87,6 +96,12 @@
             <if test="receiverName != null">receiverName = #{receiverName},</if>
             <if test="receiverMobile != null">receiverMobile = #{receiverMobile},</if>
             <if test="logicNumber != null">logicNumber = #{logicNumber},</if>
+            <if test="orderType != null">orderType = #{orderType},</if>
+            <if test="cvsStoreID != null">CVSStoreID = #{cvsStoreID},</if>
+            <if test="cvsStoreName != null">CVSStoreName = #{cvsStoreName},</if>
+            <if test="cvsAddress != null">CVSAddress = #{cvsAddress},</if>
+            <if test="cvsTelephone != null">CVSTelephone = #{cvsTelephone},</if>
+            <if test="cvsOutSide != null">CVSOutSide = #{cvsOutSide},</if>
         </set>
         WHERE id = #{id} AND delFlag = 0
     </update>

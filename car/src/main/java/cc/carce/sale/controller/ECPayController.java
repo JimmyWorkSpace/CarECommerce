@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
+import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.service.ECPayService;
@@ -264,6 +265,59 @@ public class ECPayController extends BaseController{
         } catch (Exception e) {
             log.error("处理付款结果通知时发生异常", e);
             return "0|ERROR";
+        }
+    }
+    
+    /**
+     * 刷新订单状态（从绿界API查询）
+     */
+    @PostMapping("/refresh-status/{orderNo}")
+    public R<Map<String, Object>> refreshOrderStatus(@PathVariable String orderNo) {
+        try {
+            // 检查用户登录状态
+            if (!isLogin()) {
+                return R.fail("請先登錄", null);
+            }
+            
+            UserInfo user = getSessionUser();
+            
+            // 通过orderNo查找支付订单
+            CarPaymentOrderEntity paymentOrder = ecPayService.getPaymentOrderByEcpayTradeNo(orderNo);
+            if (paymentOrder == null || !paymentOrder.getUserId().equals(user.getId())) {
+                return R.fail("訂單不存在或無權限訪問", null);
+            }
+            
+            String merchantTradeNo = paymentOrder.getMerchantTradeNo();
+            log.info("用户刷新订单状态，用户ID: {}, 订单号: {}, 商户订单号: {}", user.getId(), orderNo, merchantTradeNo);
+            
+            // 从绿界API查询订单状态
+            Map<String, String> queryResult = ecPayService.queryOrderStatusFromECPay(merchantTradeNo);
+            
+            if (queryResult != null && !queryResult.isEmpty()) {
+                // 根据查询结果更新订单状态
+                boolean updated = ecPayService.updateOrderStatusFromQuery(merchantTradeNo, queryResult);
+                
+                // 获取更新后的订单信息
+                CarPaymentOrderEntity updatedPaymentOrder = ecPayService.getPaymentOrderByEcpayTradeNo(orderNo);
+                CarOrderInfoEntity orderInfo = null;
+                if (updatedPaymentOrder != null && updatedPaymentOrder.getEcpayTradeNo() != null) {
+                    orderInfo = ecPayService.getOrderInfoService().getOrderByOrderNo(updatedPaymentOrder.getEcpayTradeNo());
+                }
+                
+                Map<String, Object> result = new HashMap<>();
+                result.put("paymentOrder", updatedPaymentOrder);
+                result.put("orderInfo", orderInfo);
+                result.put("queryResult", queryResult);
+                result.put("updated", updated);
+                
+                return R.ok("訂單狀態刷新成功", result);
+            } else {
+                return R.fail("查詢綠界訂單狀態失敗", null);
+            }
+            
+        } catch (Exception e) {
+            log.error("刷新订单状态异常，订单号: {}", orderNo, e);
+            return R.fail("刷新訂單狀態異常: " + e.getMessage(), null);
         }
     }
     

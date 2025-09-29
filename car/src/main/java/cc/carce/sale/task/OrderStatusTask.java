@@ -38,7 +38,8 @@ public class OrderStatusTask {
      * 2. 创建时间在15分钟内
      * 3. 未删除的订单
      */
-//    @Scheduled(fixedRate = 60000) // 每60秒执行一次
+    @PostConstruct
+   @Scheduled(fixedRate = 60000) // 每60秒执行一次
     public void queryOrderStatusTask() {
         try {
             log.info("开始执行订单状态查询定时任务");

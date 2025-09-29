@@ -70,4 +70,9 @@ public class CreatePaymentForm {
      * 购物车数据
      */
     private List<CartItem> cartData;
+    
+    /**
+     * 订单ID（用于重新支付）
+     */
+    private Long orderId;
 }

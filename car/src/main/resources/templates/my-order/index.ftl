@@ -46,8 +46,8 @@
                                 </div>
                             </div>
                             
-                            <!-- 订单详情 -->
-                            <div class="order-details" :id="'order-details-' + order.id">
+                            <!-- 订单详情（已弃用，现在跳转到详情页面） -->
+                            <div class="order-details" :id="'order-details-' + order.id" style="display: none;">
                                 <h6 class="mb-3">订单商品：</h6>
                                 <div v-for="detail in getOrderDetails(order.id)" :key="detail.id" class="order-detail-item">
                                     <div class="detail-item-info">
@@ -65,7 +65,7 @@
                             <!-- 订单操作 -->
                             <div class="item-actions">
                                 <button type="button" class="btn btn-outline-primary btn-sm" 
-                                        @click="toggleOrderDetails(order.id)">
+                                        @click="viewOrderDetail(order.id)">
                                     <i class="bi bi-eye me-1"></i>查看详情
                                 </button>
                                 
@@ -156,20 +156,10 @@
                     return date.toLocaleString('zh-CN');
                 },
                 
-                // 切换订单详情显示
-                toggleOrderDetails(orderId) {
-                    const detailsElement = document.getElementById('order-details-' + orderId);
-                    if (detailsElement) {
-                        if (detailsElement.style.display === 'none' || detailsElement.style.display === '') {
-                            detailsElement.style.display = 'block';
-                            // 如果还没有加载详情，则加载
-                            if (!this.orderDetails[orderId]) {
-                                this.loadOrderDetails(orderId);
-                            }
-                        } else {
-                            detailsElement.style.display = 'none';
-                        }
-                    }
+                // 查看订单详情页面
+                viewOrderDetail(orderId) {
+                    // 跳转到订单详情页面
+                    window.location.href = '/my-order/detail-page?orderId=' + orderId;
                 },
                 
                 // 加载订单详情

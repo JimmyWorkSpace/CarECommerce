@@ -28,6 +28,11 @@ import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.CarBaseInfoDto;
 import cc.carce.sale.dto.CarDealerInfoDto;
+import cc.carce.sale.entity.CarOrderInfoEntity;
+import cc.carce.sale.entity.CarOrderDetailEntity;
+import cc.carce.sale.service.CarOrderInfoService;
+import cc.carce.sale.service.CarOrderDetailService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cc.carce.sale.dto.CarEquipmentDto;
 import cc.carce.sale.dto.CarGuaranteeDto;
 import cc.carce.sale.dto.CarReportDto;
@@ -61,6 +66,7 @@ import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarShoppingCartService;
 import cc.carce.sale.service.CarUserService;
 import cc.carce.sale.service.SmsService;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -566,13 +572,76 @@ public class CarViewController extends BaseController {
 	@GetMapping("/payment/index")
 	public String showPaymentPageGet(@RequestParam(required = false) String itemName,
 			@RequestParam(required = false) Integer amount, @RequestParam(required = false) String description,
-			@RequestParam(required = false) String cartData, Model model, HttpSession session) {
+			@RequestParam(required = false) String cartData, @RequestParam(required = false) Long orderId, 
+			Model model, HttpSession session) {
 
 		// 检查用户登录状态
 		UserInfo userInfo = getSessionUser();
 		if (userInfo == null) {
 			log.warn("未登录用户尝试访问支付页面");
 			return "redirect:/login?returnUrl=/payment/index";
+		}
+
+		model.addAttribute("orderInfoJson", "{}");
+		// 如果提供了orderId，则从订单获取信息
+		if (orderId != null) {
+			try {
+				CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
+				if (order != null && order.getUserId().equals(userInfo.getId())) {
+					// 验证订单状态，只有未支付的订单才能重新支付
+					if (CarOrderInfoEntity.OrderStatus.UNPAID.getCode().equals(order.getOrderStatus())) {
+						// 从订单获取信息
+						itemName = "订单商品";
+						amount = order.getTotalPrice();
+						description = "重新支付订单";
+						
+						// 获取订单详情作为购物车数据
+						List<CarOrderDetailEntity> orderDetails = carOrderDetailService.getOrderDetailsByOrderId(orderId);
+						if (orderDetails != null && !orderDetails.isEmpty()) {
+							List<Map<String, Object>> cartItems = new ArrayList<>();
+							for (CarOrderDetailEntity detail : orderDetails) {
+								Map<String, Object> item = new HashMap<>();
+								item.put("id", detail.getId());
+								item.put("productId", detail.getProductId());
+								item.put("productName", detail.getProductName());
+								item.put("productAmount", detail.getProductAmount());
+								item.put("productPrice", detail.getProductPrice());
+								item.put("subtotal", detail.getTotalPrice());
+								cartItems.add(item);
+							}
+							Map<String, Object> orderCartData = new HashMap<>();
+							orderCartData.put("items", cartItems);
+							orderCartData.put("totalAmount", order.getTotalPrice());
+							orderCartData.put("totalQuantity", orderDetails.size());
+							try {
+								ObjectMapper objectMapper = new ObjectMapper();
+								model.addAttribute("cartData", objectMapper.writeValueAsString(orderCartData));
+							} catch (Exception e) {
+								log.error("序列化订单数据失败", e);
+								model.addAttribute("cartData", "");
+							}
+						}
+						
+						// 设置订单相关信息
+						model.addAttribute("orderId", orderId);
+						model.addAttribute("orderNo", order.getOrderNo());
+						model.addAttribute("orderInfoJson", JSONUtil.toJsonStr(order));
+						
+						log.info("用户重新支付订单，用户ID: {}, 订单ID: {}, 订单号: {}, 金额: {}", 
+								userInfo.getId(), orderId, order.getOrderNo(), amount);
+					} else {
+						log.warn("订单状态不允许重新支付，用户ID: {}, 订单ID: {}, 状态: {}", 
+								userInfo.getId(), orderId, order.getOrderStatus());
+						model.addAttribute("errorMessage", "订单状态不允许重新支付");
+					}
+				} else {
+					log.warn("订单不存在或无权限访问，用户ID: {}, 订单ID: {}", userInfo.getId(), orderId);
+					model.addAttribute("errorMessage", "订单不存在或无权限访问");
+				}
+			} catch (Exception e) {
+				log.error("获取订单信息失败，用户ID: {}, 订单ID: {}", userInfo.getId(), orderId, e);
+				model.addAttribute("errorMessage", "获取订单信息失败");
+			}
 		}
 
 		// 设置页面数据
@@ -586,8 +655,8 @@ public class CarViewController extends BaseController {
 		// 设置模板内容
 		model.addAttribute("content", "/payment/index.ftl");
 
-		log.info("用户通过GET请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}", userInfo.getId(), itemName, amount);
-
+		log.info("用户通过GET请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}, 订单ID: {}", 
+				userInfo.getId(), itemName, amount, orderId);
 
 		return "/layout/main";
 	}
@@ -625,7 +694,7 @@ public class CarViewController extends BaseController {
 			finalAmount = 1;
 			log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", paymentRequest.getAmount());
 		}
-
+		model.addAttribute("orderInfoJson", "{}");
 		// 设置页面数据
 		model.addAttribute("itemName", paymentRequest.getItemName());
 		model.addAttribute("amount", finalAmount);
