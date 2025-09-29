@@ -10,7 +10,7 @@ import com.ruoyi.car.service.ICarConfigService;
 import tk.mybatis.mapper.entity.Example;
 
 /**
- * 网站配置Service业务层处理
+ * 網站配置Service業務層處理
  * 
  * @author ruoyi
  * @date 2024-01-01
@@ -22,10 +22,10 @@ public class CarConfigServiceImpl implements ICarConfigService
     private CarConfigMapper carConfigMapper;
 
     /**
-     * 查询网站配置
+     * 查詢網站配置
      * 
-     * @param id 网站配置主键
-     * @return 网站配置
+     * @param id 網站配置主鍵
+     * @return 網站配置
      */
     @Override
     public CarConfigEntity selectCarConfigById(Long id)
@@ -34,10 +34,10 @@ public class CarConfigServiceImpl implements ICarConfigService
     }
 
     /**
-     * 查询网站配置列表
+     * 查詢網站配置列表
      * 
-     * @param carConfig 网站配置
-     * @return 网站配置
+     * @param carConfig 網站配置
+     * @return 網站配置
      */
     @Override
     public List<CarConfigEntity> selectCarConfigList(CarConfigEntity carConfig)
@@ -61,17 +61,17 @@ public class CarConfigServiceImpl implements ICarConfigService
             criteria.andEqualTo("delFlag", carConfig.getDelFlag());
         }
         
-        // 按显示顺序和ID排序
+        // 按顯示順序和ID排序
         example.orderBy("showOrder").asc().orderBy("id").asc();
         
         return carConfigMapper.selectByExample(example);
     }
 
     /**
-     * 修改网站配置（只修改value字段）
+     * 修改網站配置（只修改value字段）
      * 
-     * @param carConfig 网站配置
-     * @return 结果
+     * @param carConfig 網站配置
+     * @return 結果
      */
     @Override
     @Transactional

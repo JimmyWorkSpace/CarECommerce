@@ -1,19 +1,17 @@
 package cc.carce.sale.task;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import cc.carce.sale.dto.ECPayResultDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
 import cc.carce.sale.service.ECPayService;
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,25 +36,16 @@ public class OrderStatusTask {
      * 2. 创建时间在15分钟内
      * 3. 未删除的订单
      */
-    @PostConstruct
-   @Scheduled(fixedRate = 60000) // 每60秒执行一次
+    // @PostConstruct
+   @Scheduled(fixedRate = 300000) // 每5分钟执行一次
     public void queryOrderStatusTask() {
         try {
             log.info("开始执行订单状态查询定时任务");
             
-            // 计算时间范围：当前时间往前推15分钟
-            Date endTime = new Date();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(endTime);
-            calendar.add(Calendar.MINUTE, -15); // 15分钟前
-            Date startTime = calendar.getTime();
-            
-            log.info("查询时间范围：{} 到 {}", startTime, endTime);
-            
             // 查询待支付的订单
-            List<CarPaymentOrderEntity> pendingOrders = paymentOrderMapper.selectPendingOrdersForQuery(startTime, endTime);
+            List<CarPaymentOrderEntity> pendingOrders = paymentOrderMapper.selectPendingOrdersForQuery();
             
-            if (pendingOrders == null || pendingOrders.isEmpty()) {
+            if (CollUtil.isEmpty(pendingOrders)) {
                 log.info("没有找到需要查询状态的待支付订单");
                 return;
             }
@@ -69,23 +58,12 @@ public class OrderStatusTask {
             
             for (CarPaymentOrderEntity order : pendingOrders) {
                 try {
-                    // 检查订单是否超过15分钟
-                    long timeDiff = endTime.getTime() - order.getCreateTime().getTime();
-                    long minutesDiff = timeDiff / (1000 * 60);
-                    
-                    if (minutesDiff > 15) {
-                        // 超过15分钟，标记为超时
-                        log.warn("订单 {} 创建时间超过15分钟，标记为超时", order.getMerchantTradeNo());
-                        markOrderAsTimeout(order);
-                        timeoutCount++;
-                        continue;
-                    }
                     
                     // 查询绿界订单状态
                     log.info("查询订单状态：{}", order.getMerchantTradeNo());
-                    Map<String, String> queryResult = ecPayService.queryOrderStatusFromECPay(order.getMerchantTradeNo());
+                    ECPayResultDto queryResult = ecPayService.queryOrderStatusFromECPay(order.getMerchantTradeNo());
                     
-                    if (queryResult != null && !queryResult.isEmpty()) {
+                    if (queryResult != null) {
                         // 根据查询结果更新订单状态
                         boolean updated = ecPayService.updateOrderStatusFromQuery(order.getMerchantTradeNo(), queryResult);
                         if (updated) {

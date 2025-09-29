@@ -146,7 +146,7 @@ public class ECPayUtils {
         // === 可选参数 ===
         // 客户端返回特店网址
         if (StringUtils.isNotBlank(ecPayConfig.getClientBackUrl())) {
-            params.put("ClientBackURL", ecPayConfig.getClientBackUrl());
+            params.put("ClientBackURL", ecPayConfig.getClientBackUrl() + orderId);
         }
         
         // 客户端回传付款结果网址

@@ -1,19 +1,19 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="配置代码" prop="code">
+      <el-form-item label="配置代碼" prop="code">
         <el-input
           v-model="queryParams.code"
-          placeholder="请输入配置代码"
+          placeholder="請輸入配置代碼"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="配置名称" prop="name">
+      <el-form-item label="配置名稱" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入配置名称"
+          placeholder="請輸入配置名稱"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -22,7 +22,7 @@
       <el-form-item label="配置值" prop="value">
         <el-input
           v-model="queryParams.value"
-          placeholder="请输入配置值"
+          placeholder="請輸入配置值"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -54,18 +54,18 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['car:config:export']"
-        >导出</el-button>
+        >導出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="configList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="配置代码" align="center" prop="code" />
-      <el-table-column label="配置名称" align="center" prop="name" />
+      <el-table-column label="配置代碼" align="center" prop="code" />
+      <el-table-column label="配置名稱" align="center" prop="name" />
       <el-table-column label="配置值" align="center" prop="value" />
-      <el-table-column label="显示顺序" align="center" prop="showOrder" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="顯示順序" align="center" prop="showOrder" />
+      <el-table-column label="創建時間" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -91,24 +91,24 @@
       @pagination="getList"
     />
 
-    <!-- 修改网站配置对话框 -->
+    <!-- 修改網站配置對話框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="配置代码" prop="code">
+        <el-form-item label="配置代碼" prop="code">
           <el-input v-model="form.code" :disabled="true" />
         </el-form-item>
-        <el-form-item label="配置名称" prop="name">
+        <el-form-item label="配置名稱" prop="name">
           <el-input v-model="form.name" :disabled="true" />
         </el-form-item>
         <el-form-item label="配置值" prop="value">
-          <el-input v-model="form.value" placeholder="请输入配置值" />
+          <el-input v-model="form.value" placeholder="請輸入配置值" />
         </el-form-item>
-        <el-form-item label="显示顺序" prop="showOrder">
+        <el-form-item label="顯示順序" prop="showOrder">
           <el-input-number v-model="form.showOrder" :disabled="true" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm">確 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -122,25 +122,25 @@ export default {
   name: "Config",
   data() {
     return {
-      // 遮罩层
+      // 遮罩層
       loading: true,
-      // 选中数组
+      // 選中數組
       ids: [],
-      // 非单个禁用
+      // 非單個禁用
       single: true,
-      // 非多个禁用
+      // 非多個禁用
       multiple: true,
-      // 显示搜索条件
+      // 顯示搜索條件
       showSearch: true,
-      // 总条数
+      // 總條數
       total: 0,
-      // 网站配置表格数据
+      // 網站配置表格數據
       configList: [],
-      // 弹出层标题
+      // 彈出層標題
       title: "",
-      // 是否显示弹出层
+      // 是否顯示彈出層
       open: false,
-      // 查询参数
+      // 查詢參數
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -150,12 +150,12 @@ export default {
         showOrder: null,
         delFlag: null
       },
-      // 表单参数
+      // 表單參數
       form: {},
-      // 表单校验
+      // 表單校驗
       rules: {
         value: [
-          { required: true, message: "配置值不能为空", trigger: "blur" }
+          { required: true, message: "配置值不能為空", trigger: "blur" }
         ]
       }
     };
@@ -164,7 +164,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询网站配置列表 */
+    /** 查詢網站配置列表 */
     getList() {
       this.loading = true;
       listConfig(this.queryParams).then(response => {
@@ -173,12 +173,12 @@ export default {
         this.loading = false;
       });
     },
-    // 取消按钮
+    // 取消按鈕
     cancel() {
       this.open = false;
       this.reset();
     },
-    // 表单重置
+    // 表單重置
     reset() {
       this.form = {
         id: null,
@@ -191,33 +191,33 @@ export default {
       };
       this.resetForm("form");
     },
-    /** 搜索按钮操作 */
+    /** 搜索按鈕操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置按钮操作 */
+    /** 重置按鈕操作 */
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
+    // 多選框選中數據
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
-    /** 修改按钮操作 */
+    /** 修改按鈕操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
       getConfig(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改网站配置";
+        this.title = "修改網站配置";
       });
     },
-    /** 提交按钮 */
+    /** 提交按鈕 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -229,7 +229,7 @@ export default {
         }
       });
     },
-    /** 导出按钮操作 */
+    /** 導出按鈕操作 */
     handleExport() {
       this.download('car/config/export', {
         ...this.queryParams

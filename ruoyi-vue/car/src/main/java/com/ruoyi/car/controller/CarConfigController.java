@@ -21,7 +21,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 网站配置Controller
+ * 網站配置Controller
  * 
  * @author ruoyi
  * @date 2024-01-01
@@ -34,7 +34,7 @@ public class CarConfigController extends BaseController
     private ICarConfigService carConfigService;
 
     /**
-     * 查询网站配置列表
+     * 查詢網站配置列表
      */
     @PreAuthorize("@ss.hasPermi('car:config:list')")
     @GetMapping("/list")
@@ -46,20 +46,20 @@ public class CarConfigController extends BaseController
     }
 
     /**
-     * 导出网站配置列表
+     * 導出網站配置列表
      */
     @PreAuthorize("@ss.hasPermi('car:config:export')")
-    @Log(title = "网站配置", businessType = BusinessType.EXPORT)
+    @Log(title = "網站配置", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CarConfigEntity carConfig)
     {
         List<CarConfigEntity> list = carConfigService.selectCarConfigList(carConfig);
         ExcelUtil<CarConfigEntity> util = new ExcelUtil<CarConfigEntity>(CarConfigEntity.class);
-        util.exportExcel(response, list, "网站配置数据");
+        util.exportExcel(response, list, "網站配置數據");
     }
 
     /**
-     * 获取网站配置详细信息
+     * 獲取網站配置詳細信息
      */
     @PreAuthorize("@ss.hasPermi('car:config:query')")
     @GetMapping(value = "/{id}")
@@ -69,10 +69,10 @@ public class CarConfigController extends BaseController
     }
 
     /**
-     * 修改网站配置
+     * 修改網站配置
      */
     @PreAuthorize("@ss.hasPermi('car:config:edit')")
-    @Log(title = "网站配置", businessType = BusinessType.UPDATE)
+    @Log(title = "網站配置", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody CarConfigEntity carConfig)
     {
