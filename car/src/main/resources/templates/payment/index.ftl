@@ -446,7 +446,7 @@
             data: {
                 formData: {
                     itemName: '${itemName!''}',
-                    amount: ${amount!0},
+                    amount: 0,
                     description: '${description!''}',
                     receiverName: '',
                     receiverMobile: '',
@@ -481,6 +481,7 @@
                         this.formData.orderType = this.orderInfo.orderType;
                         this.formData.orderNo = this.orderInfo.orderNo;
                         this.formData.orderId = this.orderInfo.id;
+                        this.formData.amount = this.orderInfo.totalAmount;
                     }
             	},
                 // 載入支付配置
