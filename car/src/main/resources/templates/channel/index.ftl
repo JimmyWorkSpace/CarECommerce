@@ -23,19 +23,24 @@
                         </#list>
                     </ul>
                     
-                    <!-- 动态生成Tab内容 -->
+                    <!-- 动态生成Tab内容 - 使用iframe -->
                     <div class="tab-content channel-content" id="channelTabContent">
                         <#list channelContentList as content>
                             <div class="tab-pane fade <#if content_index == 0>show active</#if>" 
                                  id="content-${content.id}" 
                                  role="tabpanel" 
                                  aria-labelledby="tab-${content.id}">
-                                <!-- 频道内容 -->
-                                <div class="channel-content-text">
-                                    ${content.content}
+                                <!-- iframe容器 -->
+                                <div class="iframe-container">
+                                    <iframe id="iframe-${content.id}" 
+                                            src="/channel/content/${content.id}" 
+                                            frameborder="0" 
+                                            scrolling="no"
+                                            style="width: 100%; height: 600px; border: none; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                    </iframe>
                                 </div>
                                 
-                                <!-- QA模块 -->
+                                <!-- QA模块 - 放在iframe外面 -->
                                 <#if channelQAMap?? && channelQAMap[content.id?string]??>
                                     <div class="qa-section">
                                         <h3 class="qa-title">
@@ -552,5 +557,81 @@
         width: 150px;
         height: 150px;
     }
-}
+    }
+    
+    /* iframe容器样式 */
+    .iframe-container {
+        position: relative;
+        min-height: 400px;
+    }
+    
+    .iframe-container iframe {
+        transition: height 0.3s ease;
+    }
 </style>
+
+<script>
+// iframe高度自适应功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 监听来自iframe的消息
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'iframe-height-change') {
+            const channelId = event.data.channelId;
+            const height = event.data.height;
+            const iframe = document.getElementById('iframe-' + channelId);
+            
+            if (iframe) {
+                // 设置最小高度为400px，最大高度为2000px
+                const minHeight = 400;
+                const maxHeight = 2000;
+                const finalHeight = Math.max(minHeight, Math.min(maxHeight, height)); // 不使用额外缓冲
+                
+                iframe.style.height = finalHeight + 'px';
+                console.log('调整iframe高度:', channelId, '原始高度:', height, '最终高度:', finalHeight);
+            }
+        }
+    });
+    
+    // 监听tab切换事件，重新计算当前显示的iframe高度
+    const tabButtons = document.querySelectorAll('#channelTabs button[data-bs-toggle="tab"]');
+    tabButtons.forEach(function(button) {
+        button.addEventListener('shown.bs.tab', function(event) {
+            const targetId = event.target.getAttribute('data-bs-target');
+            const channelId = targetId.replace('#content-', '');
+            const iframe = document.getElementById('iframe-' + channelId);
+            
+            if (iframe) {
+                // 延迟一点时间让iframe完全显示后再调整高度
+                setTimeout(function() {
+                    try {
+                        // 尝试访问iframe内容来触发高度计算
+                        if (iframe.contentWindow) {
+                            iframe.contentWindow.postMessage({type: 'request-height'}, '*');
+                        }
+                    } catch (e) {
+                        console.log('无法访问iframe内容:', e);
+                    }
+                }, 100);
+            }
+        });
+    });
+    
+    // 页面加载完成后，为第一个tab的iframe请求高度
+    setTimeout(function() {
+        const firstTab = document.querySelector('#channelTabs .nav-link.active');
+        if (firstTab) {
+            const targetId = firstTab.getAttribute('data-bs-target');
+            const channelId = targetId.replace('#content-', '');
+            const iframe = document.getElementById('iframe-' + channelId);
+            
+            if (iframe) {
+                try {
+                    iframe.contentWindow.postMessage({type: 'request-height'}, '*');
+                } catch (e) {
+                    console.log('无法访问第一个iframe内容:', e);
+                }
+            }
+        }
+    }, 500);
+});
+</script>

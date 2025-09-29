@@ -299,33 +299,51 @@ public class CarViewController extends BaseController {
         return "/layout/main";
     }
     
-    /**
-     * 关于我们页面
-     */
-    @GetMapping("/about")
-    public String aboutPage(Model model, HttpServletRequest req) {
-        try {
-            // 检查用户登录状态
-            
-            // 从数据库获取关于页面的富文本内容
-            CarRichContentEntity aboutContent = carRichContentService.getFirstAboutContent();
-            if (aboutContent != null && aboutContent.getContent() != null) {
-                model.addAttribute("htmlContent", aboutContent.getContent());
-            }
-            
-            model.addAttribute("title", "關於我們 - 二手車銷售平台");
-            model.addAttribute("description", "了解我們的服務理念和團隊");
-            model.addAttribute("image", "/img/swipper/slide1.jpg");
-            model.addAttribute("url", req.getRequestURL().toString());
-            model.addAttribute("content", "/about/index.ftl");
-        } catch (Exception e) {
-            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
-        }
-        
-        
-        
-        return "/layout/main";
-    }
+     /**
+      * 关于我们页面
+      */
+     @GetMapping("/about")
+     public String aboutPage(Model model, HttpServletRequest req) {
+         try {
+             // 检查用户登录状态
+             
+             model.addAttribute("title", "關於我們 - 二手車銷售平台");
+             model.addAttribute("description", "了解我們的服務理念和團隊");
+             model.addAttribute("image", "/img/swipper/slide1.jpg");
+             model.addAttribute("url", req.getRequestURL().toString());
+             model.addAttribute("content", "/about/index.ftl");
+         } catch (Exception e) {
+             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
+         }
+         
+         
+         
+         return "/layout/main";
+     }
+     
+     /**
+      * 关于页面内容iframe
+      */
+     @GetMapping("/about/content")
+     public String aboutContentIframe(Model model) {
+         try {
+             // 从数据库获取关于页面的富文本内容
+             CarRichContentEntity aboutContent = carRichContentService.getFirstAboutContent();
+             if (aboutContent == null) {
+                 model.addAttribute("error", "关于页面内容不存在");
+                 return "error/index";
+             }
+             
+             model.addAttribute("aboutContent", aboutContent);
+             model.addAttribute("title", aboutContent.getTitle());
+             
+             return "about/content-iframe";
+         } catch (Exception e) {
+             log.error("获取关于页面内容iframe失败", e);
+             model.addAttribute("error", "获取数据失败");
+             return "error/index";
+         }
+     }
     
     /**
      * 返回URL测试页面
@@ -835,6 +853,30 @@ public class CarViewController extends BaseController {
 		
 		
 		return "layout/main";
+	}
+	
+	/**
+	 * 频道内容iframe页面
+	 */
+	@GetMapping("/channel/content/{channelId}")
+	public String channelContentIframe(@PathVariable Long channelId, Model model) {
+		try {
+			// 获取指定频道的内容
+			CarRichContentEntity channelContent = carRichContentService.getRichContentById(channelId);
+			if (channelContent == null) {
+				model.addAttribute("error", "频道内容不存在");
+				return "error/index";
+			}
+			
+			model.addAttribute("channelContent", channelContent);
+			model.addAttribute("title", channelContent.getTitle());
+			
+			return "channel/content-iframe";
+		} catch (Exception e) {
+			log.error("获取频道内容iframe失败", e);
+			model.addAttribute("error", "获取数据失败");
+			return "error/index";
+		}
 	}
 	
 	
