@@ -3,7 +3,7 @@ package cc.carce.sale.controller;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +21,6 @@ import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.service.CarOrderInfoService;
 import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarShoppingCartService;
-import cn.hutool.json.JSONUtil;
 import cc.carce.sale.entity.CarShoppingCartEntity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/my-order")
 public class MyOrderController extends BaseController {
 
+    private static final String CurrencyUnit = "$";
+
     @Resource
     private CarOrderInfoService carOrderInfoService;
     
@@ -42,40 +43,50 @@ public class MyOrderController extends BaseController {
     @Resource
     private CarShoppingCartService carShoppingCartService;
 
+
     /**
-     * 显示我的订单页面
+     * 显示订单详情页面
      */
-    @GetMapping("/index")
-    public String showMyOrderPage(Model model, HttpServletRequest request) {
+    @GetMapping("/detail-page")
+    public String showOrderDetailPage(@RequestParam Long orderId, Model model, HttpSession session) {
         try {
             // 检查用户登录状态
-            UserInfo userInfo = getSessionUser();
-            if (userInfo == null) {
-                log.warn("未登录用户尝试访问我的订单页面");
-                return "redirect:/login?returnUrl=/my-order/index";
+            if (!isLogin()) {
+                log.warn("未登录用户尝试访问订单详情页面");
+                return "redirect:/login?returnUrl=/my-order/detail-page?orderId=" + orderId;
             }
 
-            // 获取用户的所有订单
-            List<CarOrderInfoEntity> orders = carOrderInfoService.getOrdersByUserId(userInfo.getId());
-            model.addAttribute("orders", orders);
-            model.addAttribute("ordersJson", JSONUtil.toJsonPrettyStr(orders));
-            model.addAttribute("userInfo", userInfo);
+            UserInfo user = getSessionUser();
+            
+            // 验证订单是否属于当前用户
+            CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
+            if (order == null || !order.getUserId().equals(user.getId())) {
+                log.warn("订单不存在或无权限访问，用户ID: {}, 订单ID: {}", user.getId(), orderId);
+                model.addAttribute("errorMessage", "订单不存在或无权限访问");
+                return "/order/detail";
+            }
 
+            // 设置页面数据
+            model.addAttribute("orderId", orderId);
+            model.addAttribute("orderNo", order.getOrderNo());
+            model.addAttribute("userInfo", user);
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
             // 设置模板内容
-            model.addAttribute("content", "/my-order/index.ftl");
+            model.addAttribute("content", "/order/detail.ftl");
 
-            log.info("用户访问我的订单页面，用户ID: {}, 订单数量: {}", userInfo.getId(), orders.size());
+            log.info("用户访问订单详情页面，用户ID: {}, 订单ID: {}, 订单号: {}", 
+                    user.getId(), orderId, order.getOrderNo());
 
             return "/layout/main";
         } catch (Exception e) {
-            log.error("显示我的订单页面异常", e);
-            model.addAttribute("error", "页面加载失败：" + e.getMessage());
-            return "/layout/main";
+            log.error("显示订单详情页面异常", e);
+            model.addAttribute("errorMessage", "获取订单详情失败");
+            return "/order/detail";
         }
     }
 
     /**
-     * 获取订单详情
+     * 获取订单详情（API接口）
      */
     @GetMapping("/detail")
     @ResponseBody
@@ -101,6 +112,33 @@ public class MyOrderController extends BaseController {
         } catch (Exception e) {
             log.error("获取订单详情异常", e);
             return R.fail("获取订单详情异常: " + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * 获取订单完整信息（API接口）
+     */
+    @GetMapping("/order-info")
+    @ResponseBody
+    public R<CarOrderInfoEntity> getOrderInfo(@RequestParam Long orderId) {
+        try {
+            // 检查用户登录状态
+            if (!isLogin()) {
+                return R.fail("请先登录", null);
+            }
+
+            UserInfo user = getSessionUser();
+            
+            // 验证订单是否属于当前用户
+            CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
+            if (order == null || !order.getUserId().equals(user.getId())) {
+                return R.fail("订单不存在或无权限访问", null);
+            }
+            
+            return R.ok("获取订单信息成功", order);
+        } catch (Exception e) {
+            log.error("获取订单信息异常", e);
+            return R.fail("获取订单信息异常: " + e.getMessage(), null);
         }
     }
 

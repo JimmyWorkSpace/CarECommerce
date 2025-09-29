@@ -28,12 +28,22 @@ import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.CarBaseInfoDto;
 import cc.carce.sale.dto.CarDealerInfoDto;
+import cc.carce.sale.entity.CarOrderInfoEntity;
+import cc.carce.sale.entity.CarOrderDetailEntity;
+import cc.carce.sale.service.CarOrderInfoService;
+import cc.carce.sale.service.CarOrderDetailService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cc.carce.sale.dto.CarEquipmentDto;
 import cc.carce.sale.dto.CarGuaranteeDto;
 import cc.carce.sale.dto.CarReportDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarRichContentEntity;
 import cc.carce.sale.entity.CarQuestionAnswerEntity;
+import cc.carce.sale.entity.CarOrderInfoEntity;
+import cc.carce.sale.entity.CarOrderDetailEntity;
+import cc.carce.sale.entity.CarShoppingCartEntity;
+import cc.carce.sale.entity.CarUserEntity;
+import cc.carce.sale.entity.dto.CarConfigContent;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.entity.CarDealerEntity;
 import cc.carce.sale.form.PaymentRequestForm;
@@ -49,10 +59,20 @@ import cc.carce.sale.service.CarService;
 import cc.carce.sale.service.ECPayService;
 import cc.carce.sale.service.CarAdvertisementService;
 import cc.carce.sale.service.CarMenuService;
+import cc.carce.sale.service.CarConfigService;
+import cc.carce.sale.service.CarAppointmentService;
+import cc.carce.sale.service.CarOrderInfoService;
+import cc.carce.sale.service.CarOrderDetailService;
+import cc.carce.sale.service.CarShoppingCartService;
+import cc.carce.sale.service.CarUserService;
+import cc.carce.sale.service.SmsService;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import cc.carce.sale.common.JwtUtils;
 
 /**
  * 汽车详情页面控制器
@@ -64,6 +84,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/")
 public class CarViewController extends BaseController {
 	
+    private static final String CurrencyUnit = "$";
 	@Value("${carce.webUrl}")
 	private String webUrl;
 
@@ -96,6 +117,30 @@ public class CarViewController extends BaseController {
     
     @Resource
     private CarMenuService carMenuService;
+    
+	@Resource
+    private CarConfigService carConfigService;
+    
+    @Resource
+    private CarAppointmentService carAppointmentService;
+    
+    @Resource
+    private CarOrderInfoService carOrderInfoService;
+    
+    @Resource
+    private CarOrderDetailService carOrderDetailService;
+    
+    @Resource
+    private CarShoppingCartService carShoppingCartService;
+    
+    @Resource
+    private CarUserService carUserService;
+    
+    @Resource
+    private SmsService smsService;
+    
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
     
     /**
      * 首页
@@ -197,6 +242,7 @@ public class CarViewController extends BaseController {
             String requestUrl = req.getRequestURL().toString();
             model.addAttribute("url", requestUrl);
             
+            
             // 设置模板内容
             model.addAttribute("content", "/home/index.ftl");
             
@@ -204,8 +250,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
         
-        // 添加菜单数据
-        addMenuData(model);
+        
         
         return "/layout/main";
     }
@@ -229,8 +274,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
         
-        // 添加菜单数据
-        addMenuData(model);
+        
         
         return "/layout/main";
     }
@@ -250,45 +294,62 @@ public class CarViewController extends BaseController {
             model.addAttribute("description", "專業汽車配件商城，提供優質汽車用品");
             model.addAttribute("image", "/img/swipper/slide1.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
             model.addAttribute("content", "/mall/index.ftl");
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
         
-        // 添加菜单数据
-        addMenuData(model);
+        
         
         return "/layout/main";
     }
     
-    /**
-     * 关于我们页面
-     */
-    @GetMapping("/about")
-    public String aboutPage(Model model, HttpServletRequest req) {
-        try {
-            // 检查用户登录状态
-            
-            // 从数据库获取关于页面的富文本内容
-            CarRichContentEntity aboutContent = carRichContentService.getFirstAboutContent();
-            if (aboutContent != null && aboutContent.getContent() != null) {
-                model.addAttribute("htmlContent", aboutContent.getContent());
-            }
-            
-            model.addAttribute("title", "關於我們 - 二手車銷售平台");
-            model.addAttribute("description", "了解我們的服務理念和團隊");
-            model.addAttribute("image", "/img/swipper/slide1.jpg");
-            model.addAttribute("url", req.getRequestURL().toString());
-            model.addAttribute("content", "/about/index.ftl");
-        } catch (Exception e) {
-            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
-        }
-        
-        // 添加菜单数据
-        addMenuData(model);
-        
-        return "/layout/main";
-    }
+     /**
+      * 关于我们页面
+      */
+     @GetMapping("/about")
+     public String aboutPage(Model model, HttpServletRequest req) {
+         try {
+             // 检查用户登录状态
+             
+             model.addAttribute("title", "關於我們 - 二手車銷售平台");
+             model.addAttribute("description", "了解我們的服務理念和團隊");
+             model.addAttribute("image", "/img/swipper/slide1.jpg");
+             model.addAttribute("url", req.getRequestURL().toString());
+             model.addAttribute("content", "/about/index.ftl");
+         } catch (Exception e) {
+             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
+         }
+         
+         
+         
+         return "/layout/main";
+     }
+     
+     /**
+      * 关于页面内容iframe
+      */
+     @GetMapping("/about/content")
+     public String aboutContentIframe(Model model) {
+         try {
+             // 从数据库获取关于页面的富文本内容
+             CarRichContentEntity aboutContent = carRichContentService.getFirstAboutContent();
+             if (aboutContent == null) {
+                 model.addAttribute("error", "关于页面内容不存在");
+                 return "error/index";
+             }
+             
+             model.addAttribute("aboutContent", aboutContent);
+             model.addAttribute("title", aboutContent.getTitle());
+             
+             return "about/content-iframe";
+         } catch (Exception e) {
+             log.error("获取关于页面内容iframe失败", e);
+             model.addAttribute("error", "获取数据失败");
+             return "error/index";
+         }
+     }
     
     /**
      * 返回URL测试页面
@@ -310,8 +371,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
-        // 添加菜单数据
-        addMenuData(model);
+        
         
         return "/layout/main";
     }
@@ -336,8 +396,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
-        // 添加菜单数据
-        addMenuData(model);
+        
         
         return "/layout/main";
     }
@@ -390,9 +449,9 @@ public class CarViewController extends BaseController {
             // 设置页面标题和描述
             String title = carInfo.getSaleTitle() != null ? carInfo.getSaleTitle() : "車輛詳情";
             model.addAttribute("title", title + " - 二手車銷售平台");
-            model.addAttribute("description", carInfo.getSaleDescription() != null ? 
-                carInfo.getSaleDescription().replaceAll("<[^>]*>", "").substring(0, Math.min(150, carInfo.getSaleDescription().length())) : 
-                "專業的二手車銷售平台，提供優質二手車資訊");
+            // model.addAttribute("description", carInfo.getSaleDescription() != null ? 
+            //     carInfo.getSaleDescription().replaceAll("<[^>]*>", "").substring(0, Math.min(150, carInfo.getSaleDescription().length())) : 
+            //     "專業的二手車銷售平台，提供優質二手車資訊");
             model.addAttribute("image", images != null && !images.isEmpty() ? images.get(0) : "/img/car/car4.jpg");
             model.addAttribute("url", req.getRequestURL().toString());
             
@@ -404,8 +463,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
-        // 添加菜单数据
-        addMenuData(model);
+        
         
         return "/layout/main";
     }
@@ -472,7 +530,7 @@ public class CarViewController extends BaseController {
             // 获取当前请求的完整URL
             String requestUrl = req.getRequestURL().toString();
             model.addAttribute("url", requestUrl);
-            
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
             // 添加一些必要的属性，避免模板中的变量未定义错误
             model.addAttribute("id", ""); // 添加空的id属性
             model.addAttribute("image", "/img/swipper/slide1.jpg"); // 添加默认图片
@@ -482,8 +540,7 @@ public class CarViewController extends BaseController {
             model.addAttribute("content", "/error/index.ftl");
         }
         
-        // 添加菜单数据
-        addMenuData(model);
+        
         
         return "/layout/main";
     }
@@ -515,13 +572,76 @@ public class CarViewController extends BaseController {
 	@GetMapping("/payment/index")
 	public String showPaymentPageGet(@RequestParam(required = false) String itemName,
 			@RequestParam(required = false) Integer amount, @RequestParam(required = false) String description,
-			@RequestParam(required = false) String cartData, Model model, HttpSession session) {
+			@RequestParam(required = false) String cartData, @RequestParam(required = false) Long orderId, 
+			Model model, HttpSession session) {
 
 		// 检查用户登录状态
 		UserInfo userInfo = getSessionUser();
 		if (userInfo == null) {
 			log.warn("未登录用户尝试访问支付页面");
 			return "redirect:/login?returnUrl=/payment/index";
+		}
+
+		model.addAttribute("orderInfoJson", "{}");
+		// 如果提供了orderId，则从订单获取信息
+		if (orderId != null) {
+			try {
+				CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
+				if (order != null && order.getUserId().equals(userInfo.getId())) {
+					// 验证订单状态，只有未支付的订单才能重新支付
+					if (CarOrderInfoEntity.OrderStatus.UNPAID.getCode().equals(order.getOrderStatus())) {
+						// 从订单获取信息
+						itemName = "订单商品";
+						amount = order.getTotalPrice();
+						description = "重新支付订单";
+						
+						// 获取订单详情作为购物车数据
+						List<CarOrderDetailEntity> orderDetails = carOrderDetailService.getOrderDetailsByOrderId(orderId);
+						if (orderDetails != null && !orderDetails.isEmpty()) {
+							List<Map<String, Object>> cartItems = new ArrayList<>();
+							for (CarOrderDetailEntity detail : orderDetails) {
+								Map<String, Object> item = new HashMap<>();
+								item.put("id", detail.getId());
+								item.put("productId", detail.getProductId());
+								item.put("productName", detail.getProductName());
+								item.put("productAmount", detail.getProductAmount());
+								item.put("productPrice", detail.getProductPrice());
+								item.put("subtotal", detail.getTotalPrice());
+								cartItems.add(item);
+							}
+							Map<String, Object> orderCartData = new HashMap<>();
+							orderCartData.put("items", cartItems);
+							orderCartData.put("totalAmount", order.getTotalPrice());
+							orderCartData.put("totalQuantity", orderDetails.size());
+							try {
+								ObjectMapper objectMapper = new ObjectMapper();
+								model.addAttribute("cartData", objectMapper.writeValueAsString(orderCartData));
+							} catch (Exception e) {
+								log.error("序列化订单数据失败", e);
+								model.addAttribute("cartData", "");
+							}
+						}
+						
+						// 设置订单相关信息
+						model.addAttribute("orderId", orderId);
+						model.addAttribute("orderNo", order.getOrderNo());
+						model.addAttribute("orderInfoJson", JSONUtil.toJsonStr(order));
+						
+						log.info("用户重新支付订单，用户ID: {}, 订单ID: {}, 订单号: {}, 金额: {}", 
+								userInfo.getId(), orderId, order.getOrderNo(), amount);
+					} else {
+						log.warn("订单状态不允许重新支付，用户ID: {}, 订单ID: {}, 状态: {}", 
+								userInfo.getId(), orderId, order.getOrderStatus());
+						model.addAttribute("errorMessage", "订单状态不允许重新支付");
+					}
+				} else {
+					log.warn("订单不存在或无权限访问，用户ID: {}, 订单ID: {}", userInfo.getId(), orderId);
+					model.addAttribute("errorMessage", "订单不存在或无权限访问");
+				}
+			} catch (Exception e) {
+				log.error("获取订单信息失败，用户ID: {}, 订单ID: {}", userInfo.getId(), orderId, e);
+				model.addAttribute("errorMessage", "获取订单信息失败");
+			}
 		}
 
 		// 设置页面数据
@@ -531,14 +651,12 @@ public class CarViewController extends BaseController {
 		model.addAttribute("cartData", cartData);
 		model.addAttribute("userInfo", userInfo);
 		model.addAttribute("isDevOrTest", isDevOrTestEnvironment());
-		
+		model.addAttribute("CurrencyUnit", CurrencyUnit);
 		// 设置模板内容
 		model.addAttribute("content", "/payment/index.ftl");
 
-		log.info("用户通过GET请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}", userInfo.getId(), itemName, amount);
-
-		// 添加菜单数据
-		addMenuData(model);
+		log.info("用户通过GET请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}, 订单ID: {}", 
+				userInfo.getId(), itemName, amount, orderId);
 
 		return "/layout/main";
 	}
@@ -576,7 +694,7 @@ public class CarViewController extends BaseController {
 			finalAmount = 1;
 			log.info("开发/测试环境，支付金额固定为1元，原始金额: {}", paymentRequest.getAmount());
 		}
-
+		model.addAttribute("orderInfoJson", "{}");
 		// 设置页面数据
 		model.addAttribute("itemName", paymentRequest.getItemName());
 		model.addAttribute("amount", finalAmount);
@@ -584,15 +702,13 @@ public class CarViewController extends BaseController {
 		model.addAttribute("cartData", paymentRequest.getCartData());
 		model.addAttribute("userInfo", userInfo);
 		model.addAttribute("isDevOrTest", "dev".equals(activeProfile) || "test".equals(activeProfile));
-		
+		model.addAttribute("CurrencyUnit", CurrencyUnit);
 		// 设置模板内容
 		model.addAttribute("content", "/payment/index.ftl");
 
 		log.info("用户通过POST请求访问支付页面，用户ID: {}, 商品: {}, 金额: {}, 环境: {}", userInfo.getId(), paymentRequest.getItemName(),
 				finalAmount, activeProfile);
 
-		// 添加菜单数据
-		addMenuData(model);
 
 		return "/layout/main";
 	}
@@ -647,7 +763,11 @@ public class CarViewController extends BaseController {
         }
         
         model.addAttribute("userInfo", userInfo);
-        return "payment/result";
+        model.addAttribute("user", userInfo); // 添加user属性用于模板
+        model.addAttribute("content", "/payment/result.ftl");
+        
+        
+        return "/layout/main";
     }
 
 	/**
@@ -677,8 +797,6 @@ public class CarViewController extends BaseController {
 		model.addAttribute("content", "/report/my-reports.ftl");
 		model.addAttribute("title", "我的檢舉");
 		
-		// 添加菜单数据
-		addMenuData(model);
 		
 		return "layout/main";
 	}
@@ -802,23 +920,162 @@ public class CarViewController extends BaseController {
 			model.addAttribute("error", "获取数据失败");
 		}
 		
-		// 添加菜单数据
-		addMenuData(model);
 		
 		return "layout/main";
 	}
 	
 	/**
-	 * 添加菜单数据到Model
-	 * @param model Model对象
+	 * 频道内容iframe页面
 	 */
-	private void addMenuData(Model model) {
+	@GetMapping("/channel/content/{channelId}")
+	public String channelContentIframe(@PathVariable Long channelId, Model model) {
 		try {
-			model.addAttribute("menus", carMenuService.getVisibleMenus());
+			// 获取指定频道的内容
+			CarRichContentEntity channelContent = carRichContentService.getRichContentById(channelId);
+			if (channelContent == null) {
+				model.addAttribute("error", "频道内容不存在");
+				return "error/index";
+			}
+			
+			model.addAttribute("channelContent", channelContent);
+			model.addAttribute("title", channelContent.getTitle());
+			
+			return "channel/content-iframe";
 		} catch (Exception e) {
-			log.error("获取菜单数据失败", e);
-			// 如果获取菜单失败，设置空列表避免模板报错
-			model.addAttribute("menus", new ArrayList<>());
+			log.error("获取频道内容iframe失败", e);
+			model.addAttribute("error", "获取数据失败");
+			return "error/index";
 		}
+	}
+	
+	
+	
+	
+	/**
+	 * 预约看车页面
+	 */
+	@GetMapping("/appointment/create/{carSaleId}")
+	public String createAppointmentPage(@PathVariable Long carSaleId, Model model) {
+		try {
+			// 检查用户登录状态
+			UserInfo userInfo = getSessionUser();
+			if (userInfo == null) {
+				log.warn("未登录用户尝试访问预约页面");
+				return "redirect:/login?returnUrl=/appointment/create/" + carSaleId;
+			}
+			
+			model.addAttribute("carSaleId", carSaleId);
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("user", userInfo); // 添加user属性用于模板
+			model.addAttribute("content", "/appointment/create.ftl");
+			
+			return "/layout/main";
+		} catch (Exception e) {
+			log.error("显示预约页面异常", e);
+			model.addAttribute("error", "页面加载失败：" + e.getMessage());
+			return "/layout/main";
+		}
+	}
+
+	/**
+	 * 我的预约列表页面
+	 */
+	@GetMapping("/appointment/my-appointments")
+	public String myAppointmentsPage(Model model) {
+		try {
+			// 检查用户登录状态
+			UserInfo userInfo = getSessionUser();
+			if (userInfo == null) {
+				log.warn("未登录用户尝试访问我的预约页面");
+				return "redirect:/login?returnUrl=/appointment/my-appointments";
+			}
+			
+			// 设置用户信息
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("user", userInfo); // 添加user属性用于模板
+			
+			// 设置模板内容
+			model.addAttribute("content", "/appointment/my-appointments.ftl");
+			
+			log.info("用户访问我的预约页面，用户ID: {}", userInfo.getId());
+			
+			return "/layout/main";
+		} catch (Exception e) {
+			log.error("显示我的预约页面异常", e);
+			model.addAttribute("error", "页面加载失败：" + e.getMessage());
+			return "/layout/main";
+		}
+	}
+	
+	/**
+	 * 我的订单页面
+	 */
+	@GetMapping("/my-order/index")
+	public String showMyOrderPage(Model model, HttpServletRequest request) {
+		try {
+			// 检查用户登录状态
+			UserInfo userInfo = getSessionUser();
+			if (userInfo == null) {
+				log.warn("未登录用户尝试访问我的订单页面");
+				return "redirect:/login?returnUrl=/my-order/index";
+			}
+
+			// 获取用户的所有订单
+			List<CarOrderInfoEntity> orders = carOrderInfoService.getOrdersByUserId(userInfo.getId());
+			model.addAttribute("orders", orders);
+			model.addAttribute("ordersJson", JSONUtil.toJsonPrettyStr(orders));
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("user", userInfo); // 添加user属性用于模板
+			model.addAttribute("CurrencyUnit", CurrencyUnit);
+			// 设置模板内容
+			model.addAttribute("content", "/my-order/index.ftl");
+
+			log.info("用户访问我的订单页面，用户ID: {}, 订单数量: {}", userInfo.getId(), orders.size());
+
+			return "/layout/main";
+		} catch (Exception e) {
+			log.error("显示我的订单页面异常", e);
+			model.addAttribute("error", "页面加载失败：" + e.getMessage());
+			return "/layout/main";
+		}
+	}
+	
+	/**
+	 * 显示登录页面
+	 */
+	@GetMapping("/login")
+	public String loginPage(Model model, HttpServletRequest req) {
+		// 获取返回URL参数
+		String returnUrl = req.getParameter("returnUrl");
+		if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+			model.addAttribute("returnUrl", returnUrl);
+		}
+		
+		// 获取错误信息参数
+		String error = req.getParameter("error");
+		if (error != null && !error.trim().isEmpty()) {
+			model.addAttribute("error", error);
+		}
+		
+		// 设置页面标题和描述
+		model.addAttribute("title", "登入/註冊 - 二手車銷售平台");
+		model.addAttribute("description", "用戶登入和註冊頁面");
+		model.addAttribute("url", req.getRequestURL().toString());
+		model.addAttribute("image", "/img/swipper/slide1.jpg");
+		
+		// 设置模板内容
+		model.addAttribute("content", "/login/index.ftl");
+		
+		return "/layout/main";
+	}
+	
+	/**
+	 * 拦截器测试页面
+	 */
+	@GetMapping("/test-interceptor")
+	public String testInterceptorPage(Model model) {
+		model.addAttribute("title", "拦截器测试页面");
+		model.addAttribute("content", "/test-interceptor.ftl");
+		return "/layout/main";
 	}
 } 

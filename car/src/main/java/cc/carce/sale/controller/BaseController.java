@@ -5,7 +5,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
-import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -15,18 +14,23 @@ public class BaseController {
 	protected boolean isLogin() {
 		ServletRequestAttributes attrs =
 	            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		return attrs.getRequest().getSession().getAttribute("user") != null;
+		if (attrs != null) {
+			return attrs.getRequest().getSession().getAttribute("user") != null;
+		}
+		return false;
 	}
 	
 	protected UserInfo getSessionUser() {
 		ServletRequestAttributes attrs =
 	            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		Object userJson = attrs.getRequest().getSession().getAttribute("user");
-		if(userJson != null) {
-			try {
-				return (UserInfo) userJson;
-			}catch(Exception ex) {
-				return null;
+		if (attrs != null) {
+			Object userJson = attrs.getRequest().getSession().getAttribute("user");
+			if(userJson != null) {
+				try {
+					return (UserInfo) userJson;
+				}catch(Exception ex) {
+					return null;
+				}
 			}
 		}
 		return null;
@@ -39,4 +43,5 @@ public class BaseController {
 		}
 		return null;
 	}
+	
 }

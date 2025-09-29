@@ -87,12 +87,14 @@
                             <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
                                  @error="handleImageError($event, ad.title)">
                             <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                            <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
                         </a>
                         <!-- 內容類型广告 -->
                         <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
                             <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
                                  @error="handleImageError($event, ad.title)">
                             <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                            <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
                         </div>
                     </div>
                 </div>
@@ -122,13 +124,22 @@
             <div class="section-header">
                 <h2 class="section-title">精選店家</h2>
             </div>
-            <div class="dealers-container">
-                <#list dealers as dealer>
-                <div class="dealer-card">
-                    <img src="${dealer.image}" alt="${dealer.name}" class="dealer-image">
-                    <h3 class="dealer-name">${dealer.name}</h3>
+            <div class="marquee-container">
+                <div class="marquee-content dealers-marquee">
+                    <#list dealers as dealer>
+                    <div class="dealer-card">
+                        <img src="${dealer.image}" alt="${dealer.name}" class="dealer-image">
+                        <h3 class="dealer-name">${dealer.name}</h3>
+                    </div>
+                    </#list>
+                    <!-- 重复内容以实现无缝循环 -->
+                    <#list dealers as dealer>
+                    <div class="dealer-card">
+                        <img src="${dealer.image}" alt="${dealer.name}" class="dealer-image">
+                        <h3 class="dealer-name">${dealer.name}</h3>
+                    </div>
+                    </#list>
                 </div>
-                </#list>
             </div>
         </div>
     </div>
@@ -139,49 +150,32 @@
             <div class="section-header">
                 <h2 class="section-title">精選好車</h2>
             </div>
-            <div class="cars-container">
-                <#list cars as car>
-                <div class="car-card">
-                    <img src="${car.image}" alt="${car.model}" class="car-image">
-                    <h3 class="car-model">${car.model}</h3>
-                    <p class="car-price">$${car.price}</p>
+            <div class="marquee-container">
+                <div class="marquee-content cars-marquee">
+                    <#list cars as car>
+                    <a href="/detail/${car.id}" class="car-card-link">
+                        <div class="car-card">
+                            <img src="${car.image}" alt="${car.model}" class="car-image">
+                            <h3 class="car-model">${car.model}</h3>
+                            <p class="car-price">$${car.price}</p>
+                        </div>
+                    </a>
+                    </#list>
+                    <!-- 重复内容以实现无缝循环 -->
+                    <#list cars as car>
+                    <a href="/detail/${car.id}" class="car-card-link">
+                        <div class="car-card">
+                            <img src="${car.image}" alt="${car.model}" class="car-image">
+                            <h3 class="car-model">${car.model}</h3>
+                            <p class="car-price">$${car.price}</p>
+                        </div>
+                    </a>
+                    </#list>
                 </div>
-                </#list>
             </div>
         </div>
     </div>
 
-    <!-- 第七行：页脚 -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 col-md-4 mb-4">
-                    <h4>聯繫我們</h4>
-                    <p><i class="bi bi-telephone"></i> 客服熱線：400-123-4567</p>
-                    <p><i class="bi bi-envelope"></i> 郵箱：service@carce.cc</p>
-                    <p><i class="bi bi-geo-alt"></i> 地址：台北市信義區信義路五段7號</p>
-                </div>
-                <div class="col-12 col-md-4 mb-4">
-                    <h4>服務時間</h4>
-                    <p>週一至週五：9:00-18:00</p>
-                    <p>週六至週日：10:00-17:00</p>
-                    <p>節假日：10:00-16:00</p>
-                </div>
-                <div class="col-12 col-md-4 mb-4">
-                    <h4>關注我們</h4>
-                    <div class="social-links">
-                        <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="social-link"><i class="bi bi-youtube"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 二手車銷售平台. 保留所有權利.</p>
-            </div>
-        </div>
-    </footer>
 </div>
 
 <script>
@@ -209,12 +203,24 @@ new Vue({
                 subtitle: '專業團隊為您提供全程購車服務'
             }
         ],
-
-
+        // 跑马灯相关数据
+        marqueePaused: false,
+        resizeTimer: null
     },
     mounted() {
         this.getAdvertisement();
         this.getBanner();
+        // 检测并初始化跑马灯
+        this.$nextTick(() => {
+            this.initMarquee();
+        });
+        
+        // 监听窗口大小变化，重新检测跑马灯需求
+        window.addEventListener('resize', this.handleResize);
+    },
+    beforeDestroy() {
+        // 清理事件监听器
+        window.removeEventListener('resize', this.handleResize);
     },
     methods: {
         getBanner(){
@@ -307,6 +313,53 @@ new Vue({
                 event.target.nextElementSibling.style.display = 'block';
             }
         },
+
+        // 初始化跑马灯
+        initMarquee() {
+            this.checkMarqueeNeeded('.dealers-marquee');
+            this.checkMarqueeNeeded('.cars-marquee');
+        },
+
+        // 检测是否需要跑马灯效果
+        checkMarqueeNeeded(selector) {
+            const marqueeContent = document.querySelector(selector);
+            if (!marqueeContent) return;
+
+            const container = marqueeContent.parentElement;
+            const contentWidth = marqueeContent.scrollWidth;
+            const containerWidth = container.clientWidth;
+
+            // 如果内容宽度大于容器宽度，则启用跑马灯效果
+            if (contentWidth > containerWidth) {
+                marqueeContent.classList.add('marquee-active');
+                console.log(selector + ' 内容超出，启用跑马灯效果');
+            } else {
+                marqueeContent.classList.remove('marquee-active');
+                console.log(selector + ' 内容未超出，保持静态显示');
+            }
+        },
+
+        // 处理窗口大小变化
+        handleResize() {
+            // 防抖处理，避免频繁触发
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = setTimeout(() => {
+                this.initMarquee();
+            }, 300);
+        },
+
+        // 暂停/恢复跑马灯
+        toggleMarquee() {
+            this.marqueePaused = !this.marqueePaused;
+            const marquees = document.querySelectorAll('.marquee-content.marquee-active');
+            marquees.forEach(marquee => {
+                if (this.marqueePaused) {
+                    marquee.style.animationPlayState = 'paused';
+                } else {
+                    marquee.style.animationPlayState = 'running';
+                }
+            });
+        }
 
     }
 });

@@ -314,6 +314,9 @@
             </#if>
         </div>
         
+        <!-- 通用页脚 -->
+        <#include "/layout/footer.ftl">
+        
         <!-- 購物車懸浮按鈕 -->
         <#if user?? && user?has_content>
         <div class="cart-float-btn" id="cartFloatBtn">

@@ -23,19 +23,24 @@
                         </#list>
                     </ul>
                     
-                    <!-- 动态生成Tab内容 -->
+                    <!-- 动态生成Tab内容 - 使用iframe -->
                     <div class="tab-content channel-content" id="channelTabContent">
                         <#list channelContentList as content>
                             <div class="tab-pane fade <#if content_index == 0>show active</#if>" 
                                  id="content-${content.id}" 
                                  role="tabpanel" 
                                  aria-labelledby="tab-${content.id}">
-                                <!-- 频道内容 -->
-                                <div class="channel-content-text">
-                                    ${content.content}
+                                <!-- iframe容器 -->
+                                <div class="iframe-container">
+                                    <iframe id="iframe-${content.id}" 
+                                            src="/channel/content/${content.id}" 
+                                            frameborder="0" 
+                                            scrolling="no"
+                                            style="width: 100%; height: 600px; border: none; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                    </iframe>
                                 </div>
                                 
-                                <!-- QA模块 -->
+                                <!-- QA模块 - 放在iframe外面 -->
                                 <#if channelQAMap?? && channelQAMap[content.id?string]??>
                                     <div class="qa-section">
                                         <h3 class="qa-title">
@@ -91,31 +96,189 @@
 </div>
 
 <style>
-/* 频道页面专用样式 */
+/* 频道页面专用样式 - 现代化设计 */
 .channel-tabs {
-    border-bottom: 2px solid #5ACFC9;
-    margin-bottom: 30px;
+    border: none;
+    margin-bottom: 40px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.channel-tabs::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(90, 207, 201, 0.1) 0%, rgba(74, 184, 178, 0.1) 100%);
+    border-radius: 15px;
+    z-index: 0;
+}
+
+.channel-tabs .nav-item {
+    position: relative;
+    z-index: 1;
+    margin: 0 4px;
 }
 
 .channel-tabs .nav-link {
     border: none;
     color: #666;
-    font-weight: 500;
-    padding: 12px 20px;
-    margin-right: 5px;
-    border-radius: 8px 8px 0 0;
-    transition: all 0.3s ease;
+    font-weight: 600;
+    padding: 16px 28px;
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    background: transparent;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+.channel-tabs .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    z-index: -1;
+}
+
+.channel-tabs .nav-link::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
 }
 
 .channel-tabs .nav-link:hover {
-    color: #5ACFC9;
-    background-color: #f8f9fa;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(90, 207, 201, 0.3);
+}
+
+.channel-tabs .nav-link:hover::before {
+    opacity: 1;
+}
+
+.channel-tabs .nav-link:hover::after {
+    width: 300px;
+    height: 300px;
 }
 
 .channel-tabs .nav-link.active {
     color: white;
-    background-color: #5ACFC9;
-    border: none;
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(90, 207, 201, 0.4);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+.channel-tabs .nav-link.active::before {
+    opacity: 1;
+}
+
+.channel-tabs .nav-link.active::after {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 焦点状态和无障碍访问 */
+.channel-tabs .nav-link:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(90, 207, 201, 0.3);
+    transform: translateY(-1px);
+}
+
+.channel-tabs .nav-link:focus:not(.active) {
+    background: rgba(90, 207, 201, 0.1);
+    color: #5ACFC9;
+}
+
+/* 加载动画效果 */
+.channel-tabs .nav-link.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.channel-tabs .nav-link.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1;
+}
+
+.channel-tabs .nav-link.loading {
+    color: transparent;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 平滑的内容切换动画 */
+.channel-content {
+    min-height: 400px;
+    position: relative;
+}
+
+.tab-pane {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 增强的视觉层次 */
+.channel-tabs .nav-link {
+    position: relative;
+    z-index: 2;
+}
+
+.channel-tabs .nav-link::before {
+    z-index: -1;
+}
+
+.channel-tabs .nav-link::after {
+    z-index: -2;
 }
 
 .channel-content {
@@ -310,11 +473,40 @@
     font-weight: 500;
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 现代化移动端适配 */
 @media (max-width: 768px) {
+    .channel-tabs {
+        margin-bottom: 30px;
+        padding: 6px;
+        border-radius: 12px;
+    }
+    
+    .channel-tabs .nav-item {
+        margin: 0 2px;
+    }
+    
     .channel-tabs .nav-link {
-        padding: 10px 15px;
+        padding: 12px 18px;
         font-size: 0.9rem;
+        border-radius: 10px;
+        letter-spacing: 0.3px;
+    }
+    
+    .channel-tabs .nav-link:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(90, 207, 201, 0.25);
+    }
+    
+    .channel-tabs .nav-link.active {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(90, 207, 201, 0.35);
+        letter-spacing: 0.5px;
+    }
+    
+    .channel-tabs .nav-link:hover::after,
+    .channel-tabs .nav-link.active::after {
+        width: 200px;
+        height: 200px;
     }
     
     .channel-content-text h3 {
@@ -346,4 +538,100 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+    .channel-tabs {
+        padding: 4px;
+        border-radius: 10px;
+    }
+    
+    .channel-tabs .nav-link {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+    
+    .channel-tabs .nav-link:hover::after,
+    .channel-tabs .nav-link.active::after {
+        width: 150px;
+        height: 150px;
+    }
+    }
+    
+    /* iframe容器样式 */
+    .iframe-container {
+        position: relative;
+        min-height: 400px;
+    }
+    
+    .iframe-container iframe {
+        transition: height 0.3s ease;
+    }
 </style>
+
+<script>
+// iframe高度自适应功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 监听来自iframe的消息
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'iframe-height-change') {
+            const channelId = event.data.channelId;
+            const height = event.data.height;
+            const iframe = document.getElementById('iframe-' + channelId);
+            
+            if (iframe) {
+                // 设置最小高度为400px，最大高度为2000px
+                const minHeight = 400;
+                const maxHeight = 2000;
+                const finalHeight = Math.max(minHeight, Math.min(maxHeight, height)); // 不使用额外缓冲
+                
+                iframe.style.height = finalHeight + 'px';
+                console.log('调整iframe高度:', channelId, '原始高度:', height, '最终高度:', finalHeight);
+            }
+        }
+    });
+    
+    // 监听tab切换事件，重新计算当前显示的iframe高度
+    const tabButtons = document.querySelectorAll('#channelTabs button[data-bs-toggle="tab"]');
+    tabButtons.forEach(function(button) {
+        button.addEventListener('shown.bs.tab', function(event) {
+            const targetId = event.target.getAttribute('data-bs-target');
+            const channelId = targetId.replace('#content-', '');
+            const iframe = document.getElementById('iframe-' + channelId);
+            
+            if (iframe) {
+                // 延迟一点时间让iframe完全显示后再调整高度
+                setTimeout(function() {
+                    try {
+                        // 尝试访问iframe内容来触发高度计算
+                        if (iframe.contentWindow) {
+                            iframe.contentWindow.postMessage({type: 'request-height'}, '*');
+                        }
+                    } catch (e) {
+                        console.log('无法访问iframe内容:', e);
+                    }
+                }, 100);
+            }
+        });
+    });
+    
+    // 页面加载完成后，为第一个tab的iframe请求高度
+    setTimeout(function() {
+        const firstTab = document.querySelector('#channelTabs .nav-link.active');
+        if (firstTab) {
+            const targetId = firstTab.getAttribute('data-bs-target');
+            const channelId = targetId.replace('#content-', '');
+            const iframe = document.getElementById('iframe-' + channelId);
+            
+            if (iframe) {
+                try {
+                    iframe.contentWindow.postMessage({type: 'request-height'}, '*');
+                } catch (e) {
+                    console.log('无法访问第一个iframe内容:', e);
+                }
+            }
+        }
+    }, 500);
+});
+</script>

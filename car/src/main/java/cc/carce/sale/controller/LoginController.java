@@ -10,7 +10,6 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Controller
 @Slf4j
-public class LoginController {
+public class LoginController extends BaseController {
 
     @Resource
     private SmsService smsService;
@@ -39,28 +38,6 @@ public class LoginController {
     @Resource
     private RedisTemplate<String, String> redisTemplate;
 
-    /**
-     * 显示登录页面
-     */
-    @GetMapping("/login")
-    public String loginPage(Model model, HttpServletRequest req) {
-        // 获取返回URL参数
-        String returnUrl = req.getParameter("returnUrl");
-        if (returnUrl != null && !returnUrl.trim().isEmpty()) {
-            model.addAttribute("returnUrl", returnUrl);
-        }
-        
-        // 设置页面标题和描述
-        model.addAttribute("title", "登入/註冊 - 二手車銷售平台");
-        model.addAttribute("description", "用戶登入和註冊頁面");
-        model.addAttribute("url", req.getRequestURL().toString());
-        model.addAttribute("image", "/img/swipper/slide1.jpg");
-        
-        // 设置模板内容
-        model.addAttribute("content", "/login/index.ftl");
-        
-        return "/layout/main";
-    }
 
     /**
      * 处理登录请求
@@ -70,8 +47,7 @@ public class LoginController {
                        @RequestParam String smsCode,
                        @RequestParam(required = false) String returnUrl,
                        HttpSession session,
-                       HttpServletResponse response,
-                       Model model) {
+                       HttpServletResponse response) {
         
         try {
 //            // 验证手机号格式
@@ -82,22 +58,19 @@ public class LoginController {
             
             // 验证验证码格式
             if (smsCode == null || !smsCode.matches("\\d{6}")) {
-                model.addAttribute("error", "驗證碼格式不正確");
-                return getLoginPage(model);
+                return "redirect:/login?error=驗證碼格式不正確";
             }
             
             // 验证短信验证码
             if (!smsService.verifySmsCode(phoneNumber, smsCode)) {
-                model.addAttribute("error", "驗證碼錯誤或已過期");
-                return getLoginPage(model);
+                return "redirect:/login?error=驗證碼錯誤或已過期";
             }
             
             // 用户登录或注册
             CarUserEntity user = carUserService.loginOrRegister(phoneNumber);
             
             if (user == null) {
-                model.addAttribute("error", "用戶創建失敗");
-                return getLoginPage(model);
+                return "redirect:/login?error=用戶創建失敗";
             }
             
             String token = JwtUtils.generateToken(user.getPhoneNumber());
@@ -133,20 +106,10 @@ public class LoginController {
             
         } catch (Exception e) {
             log.error("登录失败", e);
-            model.addAttribute("error", "登入失敗：" + e.getMessage());
-            return getLoginPage(model);
+            return "redirect:/login?error=登入失敗：" + e.getMessage();
         }
     }
     
-    /**
-     * 获取登录页面
-     */
-    private String getLoginPage(Model model) {
-        model.addAttribute("title", "登入/註冊 - 二手車銷售平台");
-        model.addAttribute("description", "用戶登入和註冊頁面");
-        model.addAttribute("content", "/login/index.ftl");
-        return "/layout/main";
-    }
 
     /**
      * 验证返回URL是否有效

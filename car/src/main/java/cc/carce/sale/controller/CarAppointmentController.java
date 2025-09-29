@@ -2,14 +2,11 @@ package cc.carce.sale.controller;
 
 import cc.carce.sale.common.R;
 import cc.carce.sale.dto.CarAppointmentDto;
-import cc.carce.sale.entity.CarAppointmentEntity;
 import cc.carce.sale.form.CarAppointmentForm;
 import cc.carce.sale.service.CarAppointmentService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -29,24 +26,6 @@ public class CarAppointmentController extends BaseController {
     @Resource
     private CarAppointmentService carAppointmentService;
 
-    /**
-     * 预约看车页面
-     */
-    @GetMapping("/create/{carSaleId}")
-    public String createAppointmentPage(@PathVariable Long carSaleId, Model model) {
-        model.addAttribute("carSaleId", carSaleId);
-        return "appointment/create";
-    }
-
-    /**
-     * 我的预约列表页面
-     */
-    @GetMapping("/my-appointments")
-    public String myAppointmentsPage(Model model) {
-        // 设置模板内容
-        model.addAttribute("content", "/appointment/my-appointments.ftl");
-        return "/layout/main";
-    }
 
     /**
      * 创建预约API

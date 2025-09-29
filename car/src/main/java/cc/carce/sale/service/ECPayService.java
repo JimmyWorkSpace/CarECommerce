@@ -212,12 +212,47 @@ public class ECPayService {
                 return R.fail("支付訂單不存在", null);
             }
             
+
+            String orderNo = paymentOrder.getEcpayTradeNo();
+            CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(orderNo);
+            paymentOrder.setOrderId(orderInfo.getId());
             return R.ok(paymentOrder);
             
         } catch (Exception e) {
             log.error("查询支付订单状态异常", e);
             return R.fail("查詢支付訂單狀態異常", null);
         }
+    }
+    
+    /**
+     * 根据商户订单号获取支付订单
+     */
+    public CarPaymentOrderEntity getPaymentOrderByMerchantTradeNo(String merchantTradeNo) {
+        try {
+            return paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
+        } catch (Exception e) {
+            log.error("根据商户订单号获取支付订单异常，商户订单号: {}", merchantTradeNo, e);
+            return null;
+        }
+    }
+    
+    /**
+     * 根据绿界支付交易号获取支付订单
+     */
+    public CarPaymentOrderEntity getPaymentOrderByEcpayTradeNo(String ecpayTradeNo) {
+        try {
+            return paymentOrderMapper.selectByEcpayTradeNo(ecpayTradeNo);
+        } catch (Exception e) {
+            log.error("根据绿界支付交易号获取支付订单异常，绿界支付交易号: {}", ecpayTradeNo, e);
+            return null;
+        }
+    }
+    
+    /**
+     * 获取订单信息服务
+     */
+    public CarOrderInfoService getOrderInfoService() {
+        return carOrderInfoService;
     }
     
     /**
@@ -320,6 +355,20 @@ public class ECPayService {
             // 生成商户订单号
             String merchantTradeNo = generateMerchantTradeNo();
             
+            // 检查是否是重新支付订单
+            CarOrderInfoEntity existingOrder = null;
+            if (form.getOrderId() != null) {
+                existingOrder = carOrderInfoService.getOrderById(form.getOrderId());
+                if (existingOrder != null && existingOrder.getUserId().equals(userId)) {
+                    // 使用现有订单的订单号作为商户订单号
+                    merchantTradeNo = existingOrder.getOrderNo();
+                    log.info("重新支付订单，使用现有订单号: {}", merchantTradeNo);
+                } else {
+                    log.warn("订单不存在或无权限访问，用户ID: {}, 订单ID: {}", userId, form.getOrderId());
+                    return R.fail("订单不存在或无权限访问", null);
+                }
+            }
+            
             // 解析购物车数据并重新计算金额
             List<CarOrderDetailEntity> orderDetails = new ArrayList<>();
             int totalAmount = 0;
@@ -357,34 +406,42 @@ public class ECPayService {
             // 使用重新计算的金额
             finalAmount = totalAmount;
             
-            // 创建业务订单
-            CarOrderInfoEntity orderInfo = carOrderInfoService.createOrder(
-                userId, form.getReceiverName(), form.getReceiverMobile(), form.getReceiverAddress(), orderDetails);
-            
-            if (orderInfo == null) {
-                log.error("创建业务订单失败，用户ID: {}", userId);
-                return R.fail("創建訂單失敗", null);
+            // 创建或使用现有业务订单
+            CarOrderInfoEntity orderInfo;
+            if (existingOrder != null) {
+                // 重新支付，使用现有订单
+                orderInfo = existingOrder;
+                log.info("使用现有订单进行重新支付，订单ID: {}", orderInfo.getId());
+            } else {
+                // 新订单，创建业务订单
+                orderInfo = carOrderInfoService.createOrder(
+                    userId, form.getReceiverName(), form.getReceiverMobile(), form.getReceiverAddress(), orderDetails);
+                
+                if (orderInfo == null) {
+                    log.error("创建业务订单失败，用户ID: {}", userId);
+                    return R.fail("創建訂單失敗", null);
+                }
+                
+                // 设置订单类型和超商信息
+                if (form.getOrderType() != null) {
+                    orderInfo.setOrderType(form.getOrderType());
+                }
+                
+                // 如果是超商取货，设置超商信息
+                if (form.getOrderType() != null && form.getOrderType() == 2) {
+                    orderInfo.setCvsStoreID(form.getCvsStoreID());
+                    orderInfo.setCvsStoreName(form.getCvsStoreName());
+                    orderInfo.setCvsAddress(form.getCvsAddress());
+                    orderInfo.setCvsTelephone(form.getCvsTelephone());
+                    orderInfo.setCvsOutSide(form.getCvsOutSide());
+                }
+                
+                // 更新订单信息到数据库
+                carOrderInfoService.updateOrder(orderInfo);
             }
             
-            // 设置订单类型和超商信息
-            if (form.getOrderType() != null) {
-                orderInfo.setOrderType(form.getOrderType());
-            }
-            
-            // 如果是超商取货，设置超商信息
-            if (form.getOrderType() != null && form.getOrderType() == 2) {
-                orderInfo.setCvsStoreID(form.getCvsStoreID());
-                orderInfo.setCvsStoreName(form.getCvsStoreName());
-                orderInfo.setCvsAddress(form.getCvsAddress());
-                orderInfo.setCvsTelephone(form.getCvsTelephone());
-                orderInfo.setCvsOutSide(form.getCvsOutSide());
-            }
-            
-            // 更新订单信息到数据库
-            carOrderInfoService.updateOrder(orderInfo);
-            
-            // 删除购物车中已下单的商品
-            if (form.getCartData() != null && !form.getCartData().isEmpty()) {
+            // 删除购物车中已下单的商品（仅在新订单时）
+            if (existingOrder == null && form.getCartData() != null && !form.getCartData().isEmpty()) {
                 for (CartItem cartItem : form.getCartData()) {
                     // 这里需要根据购物车ID删除，但CartItem中没有ID
                     // 我们需要通过productId和userId来删除购物车商品

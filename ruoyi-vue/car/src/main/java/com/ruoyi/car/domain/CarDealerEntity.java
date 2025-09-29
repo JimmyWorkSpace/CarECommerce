@@ -65,7 +65,7 @@ public class CarDealerEntity {
 
   @Column(name = "u_dt")
   private Date uDt;
-  
-  @Column(name = "recommended_value")
-  private Long recommendedValue;
+//  
+//  @Column(name = "recommended_value")
+//  private Long recommendedValue;
 }

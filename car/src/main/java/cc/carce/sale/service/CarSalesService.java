@@ -19,6 +19,7 @@ import cc.carce.sale.mapper.carcecloud.CarMapper;
 import cc.carce.sale.mapper.carcecloud.CarSalesMapper;
 import cc.carce.sale.mapper.carcecloud.CarDealerMapper;
 import cc.carce.sale.mapper.manager.CarRecommandMapper;
+import cc.carce.sale.util.ImageUrlUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Example;
@@ -39,6 +40,9 @@ public class CarSalesService {
 	
 	@Resource
 	private CarDealerMapper carDealerMapper;
+	
+	@Resource
+	private ImageUrlUtil imageUrlUtil;
 
 	/**
 	 * 根据id获取uid,  如果uid为空则生成一个
@@ -110,10 +114,21 @@ public class CarSalesService {
 	 * @return 分页结果
 	 */
 	public PageInfo<CarListDto> getCarListByPage(CarSalesSearchForm form) {
-		return PageHelper.startPage(form.getPageNum(), form.getPageSize())
+		PageInfo<CarListDto> pageInfo = PageHelper.startPage(form.getPageNum(), form.getPageSize())
 		.doSelectPageInfo(() -> {
 			carMapper.selectCarListWithCover(form);
 		});
+		
+		// 处理coverImage字段，添加前缀并转换为缩略图
+		if (pageInfo.getList() != null) {
+			for (CarListDto car : pageInfo.getList()) {
+				if (StrUtil.isNotBlank(car.getCoverImage())) {
+					car.setCoverImage(imageUrlUtil.getThumbnailUrlWithPrefix(car.getCoverImage()));
+				}
+			}
+		}
+		
+		return pageInfo;
 	}
 	
 	/**

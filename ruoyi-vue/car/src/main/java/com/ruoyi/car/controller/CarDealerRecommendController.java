@@ -43,12 +43,12 @@ public class CarDealerRecommendController extends BaseController
         startPage();
         List<CarDealerEntity> list = carDealerService.selectCarDealerList(carDealer);
         
-        // 为每个经销商记录添加推荐状态
-        for (CarDealerEntity dealer : list) {
-            // 检查是否已推荐
-            boolean isRecommended = carRecommandService.selectByRecommandTypeAndId(0, dealer.getId()) != null;
-            dealer.setRecommendedValue(isRecommended ? 1L : 0L);
-        }
+//        // 为每个经销商记录添加推荐状态
+//        for (CarDealerEntity dealer : list) {
+//            // 检查是否已推荐
+//            boolean isRecommended = carRecommandService.selectByRecommandTypeAndId(0, dealer.getId()) != null;
+//            dealer.setRecommendedValue(isRecommended ? 1L : 0L);
+//        }
         
         return getDataTable(list);
     }
@@ -61,8 +61,9 @@ public class CarDealerRecommendController extends BaseController
     @PutMapping("/setRecommended")
     public AjaxResult setRecommended(@RequestBody CarDealerEntity carDealer)
     {
-        Boolean isRecommended = carDealer.getRecommendedValue() != null && carDealer.getRecommendedValue() == 1;
-        int result = carRecommandService.setRecommended(0, carDealer.getId(), isRecommended);
-        return toAjax(result);
+//        Boolean isRecommended = carDealer.getRecommendedValue() != null && carDealer.getRecommendedValue() == 1;
+//        int result = carRecommandService.setRecommended(0, carDealer.getId(), isRecommended);
+//        return toAjax(result);
+    	return null;
     }
 }

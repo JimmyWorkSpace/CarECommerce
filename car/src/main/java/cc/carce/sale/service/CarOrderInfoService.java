@@ -104,7 +104,7 @@ public class CarOrderInfoService {
      */
     public CarOrderInfoEntity getOrderById(Long id) {
         try {
-            return carOrderInfoMapper.selectById(id);
+            return carOrderInfoMapper.selectByPrimaryKey(id);
         } catch (Exception e) {
             log.error("查询订单失败，订单ID：{}", id, e);
             return null;

@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import cc.carce.sale.entity.CarSmsLogEntity;
 import cc.carce.sale.mapper.manager.CarSmsLogMapper;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -47,6 +47,8 @@ public class SmsService {
     
     // 开发环境固定验证码
     private static final String DEV_FIXED_CODE = "123456";
+    
+    private final RestTemplate restTemplate = new RestTemplate();
     
     /**
      * 发送短信验证码
@@ -175,8 +177,13 @@ public class SmsService {
                     "&password=" + password +
                     "&dstaddr=" + mobile +
                     "&smbody=" + encodedMsg;
+            String apiUrl = smsUrl + "?username=" + URLEncoder.encode(account, "Big5") +
+                    "&password=" + URLEncoder.encode(password, "Big5") +
+                    "&dstaddr=" + URLEncoder.encode(mobile, "Big5") +
+                    "&smbody=" + URLEncoder.encode(message, "Big5") +
+                    "&CharsetURL=Big5"; // 三竹API通常使用Big5编码
 
-            String result = HttpUtil.createGet(url).execute().body();
+            String result = restTemplate.getForObject(apiUrl, String.class);
             
             // 记录短信发送日志到数据库
             try {

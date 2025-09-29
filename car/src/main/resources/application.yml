@@ -108,7 +108,7 @@ springfox:
     enabled: true
 
 sms:
-  url: https://smsapi.mitake.com.tw/api/mtk/SmSend
+  url: https://smsapi.mitake.com.tw/b2c/mtk/SmSend
   account: Dweizhe
   password: carce12345
   dealer-mobile: 0912345678  # 后台管理员手机号

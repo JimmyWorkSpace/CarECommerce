@@ -66,9 +66,9 @@
                                     <span class="badge bg-secondary me-2">{{ item.brand }} {{ item.model }}</span>
                                     <span class="badge bg-info me-2">{{ item.tag }}</span>
                                     <span class="badge bg-warning me-2">{{ item.source }}</span>
-                                    <span class="badge bg-success me-2">市价: ¥{{ formatPrice(item.marketPrice) }}</span>
+                                    <span class="badge bg-success me-2">市价: ${CurrencyUnit} {{ formatPrice(item.marketPrice) }}</span>
                                 </p>
-                                <p class="cart-item-price">售价: ¥{{ formatPrice(item.productPrice) }}</p>
+                                <p class="cart-item-price">售价: ${CurrencyUnit} {{ formatPrice(item.productPrice) }}</p>
                             </div>
                             <div class="col-md-3">
                                 <div class="quantity-controls">
@@ -86,7 +86,7 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="item-total">
-                                    <strong>¥{{ formatPrice(item.subtotal) }}</strong>
+                                    <strong>${CurrencyUnit} {{ formatPrice(item.subtotal) }}</strong>
                                 </div>
                             </div>
                             <div class="col-md-1">
@@ -129,7 +129,7 @@
                                 </div>
                                 <div class="total-row total-price">
                                     <span>已選總計：</span>
-                                    <span><strong>¥{{ formatPrice(selectedTotalPrice) }}</strong></span>
+                                    <span><strong>${CurrencyUnit} {{ formatPrice(selectedTotalPrice) }}</strong></span>
                                 </div>
                                 <button class="btn btn-success btn-lg checkout-btn" 
                                         @click="checkout" 

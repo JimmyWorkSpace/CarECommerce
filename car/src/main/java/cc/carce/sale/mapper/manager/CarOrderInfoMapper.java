@@ -15,12 +15,12 @@ public interface CarOrderInfoMapper extends Mapper<CarOrderInfoEntity> {
     /**
      * 插入订单信息
      */
-    int insert(CarOrderInfoEntity orderInfo);
+    // int insert(CarOrderInfoEntity orderInfo);
     
     /**
      * 根据ID查询订单信息
      */
-    CarOrderInfoEntity selectById(@Param("id") Long id);
+    // CarOrderInfoEntity selectById(@Param("id") Long id);
     
     /**
      * 根据订单号查询订单信息
@@ -45,7 +45,7 @@ public interface CarOrderInfoMapper extends Mapper<CarOrderInfoEntity> {
     /**
      * 更新订单信息
      */
-    int updateById(CarOrderInfoEntity orderInfo);
+    // int updateById(CarOrderInfoEntity orderInfo);
     
     /**
      * 更新订单状态

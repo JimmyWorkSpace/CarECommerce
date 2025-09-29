@@ -126,28 +126,7 @@ new Vue({
             const contentFrames = document.querySelectorAll('iframe.content-frame');
             contentFrames.forEach(frame => {
                 frame.onload = () => {
-                    try {
-                        // 设置iframe高度为其内容高度
-                        frame.style.height = (frame.contentWindow.document.body.scrollHeight + 50) + 'px';
-
-                        // 设置iframe内容变化的监听
-                        const resizeObserver = new ResizeObserver(entries => {
-                            for (let entry of entries) {
-                                if (entry.target === frame.contentWindow.document.body) {
-                                    frame.style.height = (entry.target.scrollHeight + 50) + 'px';
-                                }
-                            }
-                        });
-
-                        try {
-                            // 尝试监听iframe内容变化
-                            resizeObserver.observe(frame.contentWindow.document.body);
-                        } catch (e) {
-                            console.warn('无法监听iframe内容变化', e);
-                        }
-                    } catch (e) {
-                        console.error('调整iframe高度失败', e);
-                    }
+                    this.adjustIframeHeight(frame);
                 };
 
                 // 如果iframe已经加载完成，手动触发onload事件
@@ -156,19 +135,77 @@ new Vue({
                 }
             });
         },
+        adjustIframeHeight(frame) {
+            try {
+                const frameDoc = frame.contentWindow.document;
+                const frameBody = frameDoc.body;
+                
+                if (!frameBody) return;
+                
+                // 获取内容高度，添加一些边距
+                const contentHeight = Math.max(
+                    frameBody.scrollHeight,
+                    frameBody.offsetHeight,
+                    frameDoc.documentElement.scrollHeight,
+                    frameDoc.documentElement.offsetHeight
+                );
+                
+                // 设置iframe高度，添加20px的缓冲
+                frame.style.height = (contentHeight + 20) + 'px';
+                
+                // 监听内容变化
+                this.setupIframeResizeObserver(frame);
+                
+            } catch (e) {
+                console.error('调整iframe高度失败', e);
+                // 如果无法访问iframe内容，设置一个默认高度
+                frame.style.height = '300px';
+            }
+        },
+        setupIframeResizeObserver(frame) {
+            try {
+                const frameDoc = frame.contentWindow.document;
+                const frameBody = frameDoc.body;
+                
+                if (!frameBody) return;
+                
+                // 使用MutationObserver监听内容变化
+                const observer = new MutationObserver(() => {
+                    this.adjustIframeHeight(frame);
+                });
+                
+                // 监听所有变化
+                observer.observe(frameBody, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    characterData: true
+                });
+                
+                // 监听图片加载
+                const images = frameDoc.querySelectorAll('img');
+                images.forEach(img => {
+                    img.addEventListener('load', () => {
+                        this.adjustIframeHeight(frame);
+                    });
+                });
+                
+            } catch (e) {
+                console.warn('无法设置iframe内容监听', e);
+            }
+        },
         resizeContentFrame(frameRef) {
             // 等待iframe加载完成后调整高度
             const frame = this.$refs[frameRef];
             if (frame) {
                 frame.onload = () => {
-                    try {
-                        const frameBody = frame.contentWindow.document.body;
-                        const frameHeight = frameBody.scrollHeight;
-                        frame.style.height = frameHeight + 'px';
-                    } catch (e) {
-                        console.error('调整iframe高度失败', e);
-                    }
+                    this.adjustIframeHeight(frame);
                 };
+                
+                // 如果iframe已经加载完成，立即调整高度
+                if (frame.contentDocument && frame.contentDocument.readyState === 'complete') {
+                    this.adjustIframeHeight(frame);
+                }
             }
         },
         getHtmlContent(content) {
@@ -180,70 +217,132 @@ new Vue({
                     <meta charset="utf-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1">
                     <style>
+                        * {
+                            box-sizing: border-box;
+                        }
                         body {
-                            font-family: Arial, sans-serif;
+                            font-family: 'Microsoft YaHei', Arial, sans-serif;
                             line-height: 1.6;
                             color: #333;
-                            padding: 0;
+                            padding: 15px;
                             margin: 0;
+                            background: transparent;
+                            overflow-x: hidden;
                         }
                         img {
                             max-width: 100%;
                             height: auto;
+                            display: block;
+                            margin: 10px 0;
                         }
                         table {
                             border-collapse: collapse;
                             width: 100%;
+                            margin: 10px 0;
                         }
                         td, th {
                             border: 1px solid #ddd;
                             padding: 8px;
+                            text-align: left;
+                        }
+                        th {
+                            background-color: #f5f5f5;
+                            font-weight: bold;
+                        }
+                        p {
+                            margin: 10px 0;
+                            line-height: 1.8;
+                        }
+                        h1, h2, h3, h4, h5, h6 {
+                            margin: 15px 0 10px 0;
+                            color: #5ACFC9;
+                        }
+                        ul, ol {
+                            margin: 10px 0;
+                            padding-left: 20px;
+                        }
+                        li {
+                            margin: 5px 0;
+                        }
+                        blockquote {
+                            margin: 15px 0;
+                            padding: 10px 15px;
+                            background-color: #f8f9fa;
+                            border-left: 4px solid #5ACFC9;
+                        }
+                        code {
+                            background-color: #f8f9fa;
+                            padding: 2px 4px;
+                            border-radius: 3px;
+                            font-family: 'Courier New', monospace;
+                        }
+                        pre {
+                            background-color: #f8f9fa;
+                            padding: 15px;
+                            border-radius: 5px;
+                            overflow-x: auto;
+                            margin: 10px 0;
+                        }
+                        a {
+                            color: #5ACFC9;
+                            text-decoration: none;
+                        }
+                        a:hover {
+                            text-decoration: underline;
                         }
                     </style>
                     <script>
                         // 在加载完成后通知父页面更新高度
-                        window.addEventListener('load', function() {
-                            // 通知父页面已加载完成
+                        function notifyParent() {
                             if(window.parent && window.parent.postMessage) {
+                                const height = Math.max(
+                                    document.body.scrollHeight,
+                                    document.body.offsetHeight,
+                                    document.documentElement.scrollHeight,
+                                    document.documentElement.offsetHeight
+                                );
                                 window.parent.postMessage({
                                     type: 'iframe-loaded',
-                                    height: document.body.scrollHeight
+                                    height: height
                                 }, '*');
                             }
+                        }
+                        
+                        window.addEventListener('load', function() {
+                            notifyParent();
                             
                             // 监听内容变化
                             const observer = new MutationObserver(function() {
-                                if(window.parent && window.parent.postMessage) {
-                                    window.parent.postMessage({
-                                        type: 'iframe-resized',
-                                        height: document.body.scrollHeight
-                                    }, '*');
-                                }
+                                setTimeout(notifyParent, 100); // 延迟通知，确保DOM更新完成
                             });
                             
                             // 监听body的所有变化，包括子元素
                             observer.observe(document.body, {
                                 attributes: true,
                                 childList: true,
-                                subtree: true
+                                subtree: true,
+                                characterData: true
                             });
                             
                             // 监听图片加载完成事件
                             document.querySelectorAll('img').forEach(img => {
                                 img.addEventListener('load', function() {
-                                    if(window.parent && window.parent.postMessage) {
-                                        window.parent.postMessage({
-                                            type: 'iframe-resized',
-                                            height: document.body.scrollHeight
-                                        }, '*');
-                                    }
+                                    setTimeout(notifyParent, 100);
+                                });
+                                img.addEventListener('error', function() {
+                                    setTimeout(notifyParent, 100);
                                 });
                             });
                         });
+                        
+                        // 如果页面已经加载完成，立即通知
+                        if (document.readyState === 'complete') {
+                            setTimeout(notifyParent, 100);
+                        }
                     </script>
                 </head>
                 <body>
-                    ${content || ''}
+                    ${content || '<p>暂无内容</p>'}
                 </body>
                 </html>
             `;
