@@ -65,7 +65,7 @@ ecpay:
   hash-iv: "v77hoKGq4kWxNNIS"   # 官方测试HashIV
   return-url: "http://localhost:8080/api/payment/return"
   notify-url: "http://localhost:8080/api/payment/callback"
-  client-back-url: "http://localhost:8080/payment/result"
+  client-back-url: "https://carce.yanjiashuo.cn/my-order/detail-page?orderId="
   result-url: "http://localhost:8080/payment/result"
   # 查询API地址配置
   query-production-url: "https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5"

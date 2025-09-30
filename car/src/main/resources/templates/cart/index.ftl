@@ -408,7 +408,9 @@ new Vue({
                 if (data.success) {
                     this.cartItems = (data.data || []).map(item => ({
                         ...item,
-                        selected: true // 默认选中所有商品
+                        selected: true, // 默认选中所有商品
+                        // 确保前端也有正确的subtotal计算
+                        subtotal: (item.productPrice || 0) * (item.productAmount || 0)
                     }));
                     console.log('購物車数据加载成功，商品数量:', this.cartItems.length);
                     console.log('購物車商品详情:', this.cartItems);
@@ -490,7 +492,9 @@ new Vue({
                     const item = this.cartItems.find(item => item.id === id);
                     if (item) {
                         item.productAmount = newQuantity;
-                        console.log('商品 ' + id + ' 数量已更新为: ' + newQuantity);
+                        // 更新小计金额
+                        item.subtotal = (item.productPrice || 0) * newQuantity;
+                        console.log('商品 ' + id + ' 数量已更新为: ' + newQuantity + ', 小计: ' + item.subtotal);
                     }
                     // 更新全局購物車数量
                     this.updateGlobalCartCount();
