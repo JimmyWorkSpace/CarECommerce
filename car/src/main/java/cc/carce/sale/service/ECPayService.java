@@ -58,60 +58,62 @@ public class ECPayService {
     @Resource
     private CarShoppingCartService carShoppingCartService;
     
-    /**
-     * 创建支付订单
-     */
-    @Transactional
-    public R<Map<String, String>> createPayment(Long userId, Integer amount, String itemName, String description) {
-        try {
-            // 获取当前环境配置
-            String activeProfile = System.getProperty("spring.profiles.active");
-            if (activeProfile == null) {
-                activeProfile = "dev"; // 默认使用dev环境
-            }
+    // /**
+    //  * 创建支付订单
+    //  */
+    // @Transactional
+    // public R<Map<String, String>> createPayment(Long userId, Integer amount, String itemName, String description) {
+    //     try {
+    //         // 获取当前环境配置
+    //         String activeProfile = System.getProperty("spring.profiles.active");
+    //         if (activeProfile == null) {
+    //             activeProfile = "dev"; // 默认使用dev环境
+    //         }
             
-            Integer finalAmount = amount;
+    //         Integer finalAmount = amount;
             
-            // 生成商户订单号
-            String merchantTradeNo = generateMerchantTradeNo();
+    //         // 生成商户订单号
+    //         String merchantTradeNo = generateMerchantTradeNo();
             
-            // 创建支付订单记录
-            CarPaymentOrderEntity paymentOrder = new CarPaymentOrderEntity();
-            paymentOrder.setMerchantTradeNo(merchantTradeNo);
-            paymentOrder.setUserId(userId);
-            paymentOrder.setTotalAmount(finalAmount);
-            paymentOrder.setItemName(itemName);
-            paymentOrder.setTradeDesc(description);
-            paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.PENDING.getCode());
-            paymentOrder.setCreateTime(new Date());
-            paymentOrder.setUpdateTime(new Date());
-            paymentOrder.setDelFlag(false);
+    //         // 创建支付订单记录
+    //         CarPaymentOrderEntity paymentOrder = new CarPaymentOrderEntity();
+    //         paymentOrder.setMerchantTradeNo(merchantTradeNo);
+    //         paymentOrder.setUserId(userId);
+    //         paymentOrder.setTotalAmount(finalAmount);
+    //         paymentOrder.setItemName(itemName);
+    //         paymentOrder.setTradeDesc(description);
+    //         paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.PENDING.getCode());
+    //         paymentOrder.setCreateTime(new Date());
+    //         paymentOrder.setUpdateTime(new Date());
+    //         paymentOrder.setDelFlag(false);
             
-            // 保存到数据库
-            int result = paymentOrderMapper.insert(paymentOrder);
-            if (result <= 0) {
-                log.error("保存支付订单失败，用户ID: {}, 金额: {}", userId, finalAmount);
-                return R.fail("創建支付訂單失敗", null);
-            }
+    //         // 保存到数据库
+    //         int result = paymentOrderMapper.insert(paymentOrder);
+    //         if (result <= 0) {
+    //             log.error("保存支付订单失败，用户ID: {}, 金额: {}", userId, finalAmount);
+    //             return R.fail("創建支付訂單失敗", null);
+    //         }
             
-            // 构建绿界支付参数
-            Map<String, String> paymentParams = ecPayUtils.buildPaymentParams(
-                merchantTradeNo,
-                description,
-                finalAmount,
-                itemName
-            );
+
+    //         CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(paymen);
+    //         // 构建绿界支付参数
+    //         Map<String, String> paymentParams = ecPayUtils.buildPaymentParams(
+    //             merchantTradeNo,
+    //             description,
+    //             finalAmount,
+    //             itemName
+    //         );
             
-            log.info("创建支付订单成功，商户订单号: {}, 用户ID: {}, 金额: {}, 环境: {}", 
-                    merchantTradeNo, userId, finalAmount, activeProfile);
+    //         log.info("创建支付订单成功，商户订单号: {}, 用户ID: {}, 金额: {}, 环境: {}", 
+    //                 merchantTradeNo, userId, finalAmount, activeProfile);
             
-            return R.ok(paymentParams);
+    //         return R.ok(paymentParams);
             
-        } catch (Exception e) {
-            log.error("创建支付订单异常", e);
-            return R.fail("創建支付訂單異常: " + e.getMessage(), null);
-        }
-    }
+    //     } catch (Exception e) {
+    //         log.error("创建支付订单异常", e);
+    //         return R.fail("創建支付訂單異常: " + e.getMessage(), null);
+    //     }
+    // }
     
     /**
      * 处理绿界支付回调
@@ -473,9 +475,10 @@ public class ECPayService {
                 log.error("保存支付订单失败，用户ID: {}, 金额: {}", userId, finalAmount);
                 return R.fail("創建支付訂單失敗", null);
             }
-            
+
             // 构建绿界支付参数
             Map<String, String> paymentParams = ecPayUtils.buildPaymentParams(
+                orderInfo.getId(),
                 merchantTradeNo,
                 form.getDescription(),
                 finalAmount,

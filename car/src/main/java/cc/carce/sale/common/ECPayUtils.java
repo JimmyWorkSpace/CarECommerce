@@ -116,7 +116,7 @@ public class ECPayUtils {
      * 构建全方位金流支付参数
      * 根据绿界支付官方API文档：https://developers.ecpay.com.tw/?p=2862
      */
-    public Map<String, String> buildPaymentParams(String orderId, String description, 
+    public Map<String, String> buildPaymentParams(Long orderId, String merchantTradeNo, String description, 
                                                  Integer totalAmount, String itemName) {
         Map<String, String> params = new HashMap<>();
         
@@ -124,7 +124,7 @@ public class ECPayUtils {
         // 特店编号
         params.put("MerchantID", ecPayConfig.getMerchantId());
         // 特店订单编号（唯一值，不可重复）
-        params.put("MerchantTradeNo", orderId);
+        params.put("MerchantTradeNo", merchantTradeNo);
         // 特店交易时间（格式：yyyy/MM/dd HH:mm:ss）
         params.put("MerchantTradeDate", formatDate(new Date()));
         // 交易类型（固定填入 aio）
@@ -147,10 +147,6 @@ public class ECPayUtils {
         // 客户端返回特店网址
         if (StringUtils.isNotBlank(ecPayConfig.getClientBackUrl())) {
             params.put("ClientBackURL", ecPayConfig.getClientBackUrl() + orderId);
-        }
-        
-        // 客户端回传付款结果网址
-        if (StringUtils.isNotBlank(ecPayConfig.getClientBackUrl())) {
             params.put("OrderResultURL", ecPayConfig.getClientBackUrl() + orderId);
         }
         
@@ -175,7 +171,7 @@ public class ECPayUtils {
         // params.put("CustomField3", "客制化栏位3");
         // params.put("CustomField4", "客制化栏位4");
         
-        log.info("构建支付参数 - 订单号: {}, 金额: {}, 商品: {}", orderId, totalAmount, itemName);
+        log.info("构建支付参数 - 订单号: {}, 金额: {}, 商品: {}", merchantTradeNo, totalAmount, itemName);
         
         // 生成签名
         String signature = generateSignature(params);
