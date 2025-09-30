@@ -33,7 +33,7 @@ public class CarShoppingCartDto {
     /**
      * 产品价格
      */
-    private Integer productPrice;
+    private Long productPrice;
     
     /**
      * 产品名称

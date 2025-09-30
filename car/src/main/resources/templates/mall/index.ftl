@@ -98,9 +98,7 @@
                 </div>
                 <div class="product-price">
                     <span class="price-symbol">${CurrencyUnit}</span>
-                    <span class="price-amount">{{ formatPrice(product.price) }}</span>
-                    <span v-if="product.marketPrice && product.marketPrice > product.price" 
-                          class="market-price">${CurrencyUnit} {{ formatPrice(product.marketPrice) }}</span>
+                    <span class="price-amount">{{ formatPrice(product.marketPrice) }}</span>
                 </div>
             </div>
         </div>

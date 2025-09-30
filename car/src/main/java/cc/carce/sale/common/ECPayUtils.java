@@ -36,7 +36,7 @@ public class ECPayUtils {
             // 1. 过滤空值参数和CheckMacValue，并按字母顺序排序
             Map<String, String> filteredParams = new TreeMap<>();
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                if (StringUtils.isNotBlank(entry.getValue()) && !"CheckMacValue".equals(entry.getKey())) {
+                if (!"CheckMacValue".equals(entry.getKey())) {
                     filteredParams.put(entry.getKey(), entry.getValue());
                 }
             }
@@ -150,8 +150,8 @@ public class ECPayUtils {
         }
         
         // 客户端回传付款结果网址
-        if (StringUtils.isNotBlank(ecPayConfig.getReturnUrl())) {
-            params.put("OrderResultURL", ecPayConfig.getReturnUrl());
+        if (StringUtils.isNotBlank(ecPayConfig.getClientBackUrl())) {
+            params.put("OrderResultURL", ecPayConfig.getClientBackUrl() + orderId);
         }
         
         // 语言设定（预设为中文）

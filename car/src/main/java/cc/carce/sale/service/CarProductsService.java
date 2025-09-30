@@ -1,15 +1,14 @@
 package cc.carce.sale.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import cc.carce.sale.dto.CarProductListDto;
 import cc.carce.sale.entity.CarProductsEntity;
 import cc.carce.sale.mapper.carcecloud.CarProductsMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ public class CarProductsService {
     /**
      * 获取已发布的商品列表
      */
-    public List<Map<String, Object>> getPublicProducts() {
+    public List<CarProductListDto> getPublicProducts() {
         try {
             Example example = new Example(CarProductsEntity.class);
             example.createCriteria()
@@ -37,35 +36,34 @@ public class CarProductsService {
             example.orderBy("cDt").desc();
             
             List<CarProductsEntity> products = carProductsMapper.selectByExample(example);
-            List<Map<String, Object>> result = new ArrayList<>();
+            List<CarProductListDto> result = new ArrayList<>();
             
             for (CarProductsEntity product : products) {
-                Map<String, Object> productMap = new HashMap<>();
-                productMap.put("id", product.getId());
-                productMap.put("name", product.getName());
-                productMap.put("alias", product.getAlias());
-                productMap.put("model", product.getModel());
-                productMap.put("price", product.getPrice());
-                productMap.put("marketPrice", product.getMarketPrice());
-                productMap.put("brand", product.getBrand());
-                productMap.put("tag", product.getTag());
-                productMap.put("source", product.getSource());
-                productMap.put("memo", product.getMemo());
-                productMap.put("cDt", product.getCDt());
+                CarProductListDto dto = new CarProductListDto();
+                dto.setId(product.getId());
+                dto.setName(product.getName());
+                dto.setAlias(product.getAlias());
+                dto.setModel(product.getModel());
+                dto.setMarketPrice(product.getMarketPrice());
+                dto.setBrand(product.getBrand());
+                dto.setTag(product.getTag());
+                dto.setSource(product.getSource());
+                dto.setMemo(product.getMemo());
+                dto.setCDt(product.getCDt());
                 
                 // 根据商品ID获取图片
                 String imageUrl = getProductImageUrl(product.getId());
-                productMap.put("image", imageUrl);
+                dto.setImage(imageUrl);
                 
                 // 设置商品分类（根据tag字段）
                 String category = mapTagToCategory(product.getTag());
-                productMap.put("category", category);
+                dto.setCategory(category);
                 
                 // 设置商品描述
                 String description = buildProductDescription(product);
-                productMap.put("description", description);
+                dto.setDescription(description);
                 
-                result.add(productMap);
+                result.add(dto);
             }
             
             return result;
@@ -90,15 +88,15 @@ public class CarProductsService {
     /**
      * 根据分类获取商品
      */
-    public List<Map<String, Object>> getProductsByCategory(String category) {
-        List<Map<String, Object>> allProducts = getPublicProducts();
+    public List<CarProductListDto> getProductsByCategory(String category) {
+        List<CarProductListDto> allProducts = getPublicProducts();
         
         if ("all".equals(category)) {
             return allProducts;
         }
         
         return allProducts.stream()
-            .filter(product -> category.equals(product.get("category")))
+            .filter(product -> category.equals(product.getCategory()))
             .collect(java.util.stream.Collectors.toList());
     }
     

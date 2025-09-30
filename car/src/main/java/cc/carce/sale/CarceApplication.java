@@ -44,7 +44,7 @@ public class CarceApplication extends SpringBootServletInitializer {
     	System.out.println(result);
     }
 
-    @PostConstruct
+    // @PostConstruct
     public void testECPay() {
         ECPayResultDto  dto = ecPayService.queryOrderStatusFromECPay("202509181022115593");
         log.info("ECPayResultDto: {}", JSONUtil.toJsonStr(dto));

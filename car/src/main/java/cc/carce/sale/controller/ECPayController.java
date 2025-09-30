@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.ECPayResultDto;
+import cc.carce.sale.dto.ECPayReturnResultDto;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.service.ECPayService;
+import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -212,6 +214,7 @@ public class ECPayController extends BaseController{
             
             // 获取所有请求参数
             Map<String, String[]> parameterMap = request.getParameterMap();
+            JSONObject json = new JSONObject();
             
             // 记录接收到的参数（用于调试）
             StringBuilder paramsLog = new StringBuilder("付款结果通知参数: ");
@@ -220,26 +223,15 @@ public class ECPayController extends BaseController{
                 String[] values = entry.getValue();
                 if (values != null && values.length > 0) {
                     paramsLog.append(key).append("=").append(values[0]).append(", ");
+                    json.set(key, values[0]);
                 }
             }
             log.info(paramsLog.toString());
             
-            // 提取关键参数
-            String merchantId = request.getParameter("MerchantID");
-            String merchantTradeNo = request.getParameter("MerchantTradeNo");
-            String rtnCode = request.getParameter("RtnCode");
-            String rtnMsg = request.getParameter("RtnMsg");
-            String tradeNo = request.getParameter("TradeNo");
-            String tradeAmt = request.getParameter("TradeAmt");
-            String paymentDate = request.getParameter("PaymentDate");
-            String paymentType = request.getParameter("PaymentType");
-            String checkMacValue = request.getParameter("CheckMacValue");
-            
-            log.info("付款结果通知 - 特店编号: {}, 特店交易编号: {}, 交易状态: {}, 交易消息: {}, 绿界交易编号: {}, 交易金额: {}, 付款时间: {}, 付款方式: {}", 
-                    merchantId, merchantTradeNo, rtnCode, rtnMsg, tradeNo, tradeAmt, paymentDate, paymentType);
+            ECPayReturnResultDto dto = json.toBean(ECPayReturnResultDto.class);
             
             // 验证必要参数
-            if (merchantId == null || merchantTradeNo == null || rtnCode == null) {
+            if (dto.getMerchantID() == null || dto.getTradeNo() == null || dto.getRtnCode() == null) {
                 log.error("付款结果通知缺少必要参数");
                 return "0|ERROR";
             }
@@ -252,16 +244,13 @@ public class ECPayController extends BaseController{
             }
             
             // 处理付款结果
-            boolean processResult = ecPayService.processPaymentResult(
-                merchantId, merchantTradeNo, rtnCode, rtnMsg, tradeNo, 
-                tradeAmt, paymentDate, paymentType, checkMacValue
-            );
+            boolean processResult = ecPayService.processPaymentResult(dto);
             
             if (processResult) {
-                log.info("付款结果处理成功 - 特店交易编号: {}", merchantTradeNo);
+                log.info("付款结果处理成功 - 特店交易编号: {}", dto.getMerchantTradeNo());
                 return "1|OK";
             } else {
-                log.error("付款结果处理失败 - 特店交易编号: {}", merchantTradeNo);
+                log.error("付款结果处理失败 - 特店交易编号: {}", dto.getMerchantTradeNo());
                 return "0|ERROR";
             }
             

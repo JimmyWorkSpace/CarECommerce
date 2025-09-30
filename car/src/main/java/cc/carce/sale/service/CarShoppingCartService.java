@@ -176,7 +176,6 @@ public class CarShoppingCartService {
 		dto.setUserId(entity.getUserId());
 		dto.setProductId(entity.getProductId());
 		dto.setProductAmount(entity.getProductAmount());
-		dto.setProductPrice(entity.getProductPrice());
 		dto.setProductName(entity.getProductName());
 		dto.setCreateTime(entity.getCreateTime());
 		
@@ -187,6 +186,7 @@ public class CarShoppingCartService {
 			dto.setAlias(product.getAlias());
 			dto.setModel(product.getModel());
 			dto.setMarketPrice(product.getMarketPrice());
+			dto.setProductPrice(product.getMarketPrice());
 			dto.setBrand(product.getBrand());
 			dto.setTag(product.getTag());
 			// 设置商品图片路径
