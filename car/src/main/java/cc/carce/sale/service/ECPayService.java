@@ -8,18 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-
 import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 
 import cc.carce.sale.common.ECPayUtils;
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.ECPayConfig;
 import cc.carce.sale.dto.ECPayResultDto;
-import cn.hutool.json.JSONUtil;
+import cc.carce.sale.dto.ECPayReturnResultDto;
 import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
@@ -27,6 +25,9 @@ import cc.carce.sale.entity.CarProductsEntity;
 import cc.carce.sale.form.CartItem;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -552,11 +553,10 @@ public class ECPayService {
      * @return 处理是否成功
      */
     @Transactional
-    public boolean processPaymentResult(String merchantId, String merchantTradeNo, String rtnCode, 
-                                      String rtnMsg, String tradeNo, String tradeAmt, 
-                                      String paymentDate, String paymentType, String checkMacValue) {
+    public boolean processPaymentResult(ECPayReturnResultDto dto) {
         try {
-            log.info("开始处理付款结果 - 特店交易编号: {}, 交易状态: {}", merchantTradeNo, rtnCode);
+            String merchantTradeNo = dto.getMerchantTradeNo();
+            log.info("开始处理付款结果 - 特店交易编号: {}, 交易状态: {}", dto.getMerchantTradeNo(), dto.getRtnCode());
             
             // 查找支付订单
             CarPaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
@@ -572,13 +572,13 @@ public class ECPayService {
             }
             
             // 根据交易状态更新订单
-            if ("1".equals(rtnCode)) {
+            if ("1".equals(dto.getRtnCode())) {
                 // 付款成功
                 paymentOrder.setPaymentStatus(1); // 1表示已支付
                 paymentOrder.setPaymentTime(new Date());
-                paymentOrder.setEcpayTradeNo(tradeNo);
-                paymentOrder.setPaymentType(paymentType);
-                paymentOrder.setPaymentMessage(rtnMsg);
+                paymentOrder.setEcpayTradeNo(dto.getTradeNo());
+                paymentOrder.setPaymentType(dto.getPaymentType());
+                paymentOrder.setPaymentMessage(dto.getRtnMsg());
                 
                 // 更新支付订单
                 paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
@@ -595,13 +595,13 @@ public class ECPayService {
                 }
                 
                 log.info("付款成功处理完成 - 特店交易编号: {}, 绿界交易编号: {}, 交易金额: {}", 
-                        merchantTradeNo, tradeNo, tradeAmt);
+                        merchantTradeNo, dto.getTradeNo(), dto.getTradeAmt());
                 
             } else {
                 // 付款失败
                 paymentOrder.setPaymentStatus(2); // 2表示支付失败
-                paymentOrder.setPaymentMessage(rtnMsg);
-                paymentOrder.setEcpayTradeNo(tradeNo);
+                paymentOrder.setPaymentMessage(dto.getRtnMsg());
+                paymentOrder.setEcpayTradeNo(dto.getTradeNo());
                 
                 // 更新支付订单
                 paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
@@ -618,13 +618,13 @@ public class ECPayService {
                 }
                 
                 log.warn("付款失败处理完成 - 特店交易编号: {}, 交易状态: {}, 失败原因: {}", 
-                        merchantTradeNo, rtnCode, rtnMsg);
+                        merchantTradeNo, dto.getRtnCode(), dto.getRtnMsg());
             }
             
             return true;
             
         } catch (Exception e) {
-            log.error("处理付款结果时发生异常 - 特店交易编号: {}", merchantTradeNo, e);
+            log.error("处理付款结果时发生异常 - 特店交易编号: {}", dto.getMerchantTradeNo(), e);
             return false;
         }
     }
