@@ -28,6 +28,9 @@ public class CarSmsLogEntity {
      */
     @Column(name = "smsContent", columnDefinition = "VARCHAR(1000) COMMENT '短信内容'")
     private String smsContent;
+    
+    @Column(name = "smsResponse", columnDefinition = "VARCHAR(1000) COMMENT '短信api返回结果'")
+    private String smsResponse;
 
     /**
      * 发送时间
