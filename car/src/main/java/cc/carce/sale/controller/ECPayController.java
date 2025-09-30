@@ -21,6 +21,8 @@ import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.service.ECPayService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 /**
  * 绿界支付控制器
@@ -322,4 +324,13 @@ public class ECPayController extends BaseController{
         }
     }
     
+    @GetMapping("getPayStatus/{orderNo}")
+    public ECPayResultDto getPayStatus(@PathVariable String orderNo) {
+        try {
+            return ecPayService.queryOrderStatusFromECPay(orderNo);
+        } catch (Exception e) {
+            log.error("获取支付状态异常，订单号: {}", orderNo, e);
+            return null;
+        }
+    }
 }
