@@ -27,9 +27,9 @@ spring:
 ecpay:
   # 测试环境配置
   production: false
-  merchant-id: "2000132"  # 官方测试商户编号
-  hash-key: "5294y06JbISpM5x9"  # 官方测试HashKey
-  hash-iv: "v77hoKGq4kWxNNIS"   # 官方测试HashIV
+  merchant-id: "3002607"  # 官方测试商户编号
+  hash-key: "pwFHCqoQZGmho4w6"  # 官方测试HashKey
+  hash-iv: "EkRm7iFT261dpevs"   # 官方测试HashIV
   return-url: "https://carce.yanjiashuo.cn/ecpay/return"
   notify-url: "https://carce.yanjiashuo.cn/ecpay/callback"
   client-back-url: "https://carce.yanjiashuo.cn/my-order/detail-page?orderId="
