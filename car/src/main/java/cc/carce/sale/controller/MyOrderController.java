@@ -11,20 +11,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.ECPayResultDto;
-import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarOrderDetailEntity;
+import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
-import cc.carce.sale.service.CarOrderInfoService;
+import cc.carce.sale.entity.CarShoppingCartEntity;
 import cc.carce.sale.service.CarOrderDetailService;
+import cc.carce.sale.service.CarOrderInfoService;
 import cc.carce.sale.service.CarShoppingCartService;
 import cc.carce.sale.service.ECPayService;
-import cc.carce.sale.entity.CarShoppingCartEntity;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -53,7 +54,7 @@ public class MyOrderController extends BaseController {
     /**
      * 显示订单详情页面
      */
-    @GetMapping("/detail-page")
+    @RequestMapping(value = "/detail-page", method = {RequestMethod.GET, RequestMethod.POST})
     public String showOrderDetailPage(@RequestParam Long orderId, Model model, HttpSession session) {
         try {
             // 检查用户登录状态
