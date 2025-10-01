@@ -219,7 +219,7 @@ public class ECPayService {
             }
             
 
-            String orderNo = paymentOrder.getEcpayTradeNo();
+            String orderNo = paymentOrder.getMerchantTradeNo();
             CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(orderNo);
             paymentOrder.setOrderId(orderInfo.getId());
             return R.ok(paymentOrder);
