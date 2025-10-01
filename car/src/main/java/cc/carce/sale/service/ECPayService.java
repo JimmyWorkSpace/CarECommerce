@@ -25,6 +25,7 @@ import cc.carce.sale.entity.CarProductsEntity;
 import cc.carce.sale.form.CartItem;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
@@ -218,7 +219,7 @@ public class ECPayService {
             }
             
 
-            String orderNo = paymentOrder.getEcpayTradeNo();
+            String orderNo = paymentOrder.getMerchantTradeNo();
             CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(orderNo);
             paymentOrder.setOrderId(orderInfo.getId());
             return R.ok(paymentOrder);
@@ -587,8 +588,8 @@ public class ECPayService {
                 paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
                 
                 // 更新关联的订单状态
-                if (paymentOrder.getOrderId() != null) {
-                    CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderById(paymentOrder.getOrderId());
+                if (StrUtil.isNotBlank(merchantTradeNo)) {
+                    CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(merchantTradeNo);
                     if (orderInfo != null) {
                         carOrderInfoService.updateOrderStatus(orderInfo.getId(), 2); // 2表示已支付
                         
