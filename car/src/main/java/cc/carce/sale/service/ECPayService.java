@@ -420,7 +420,7 @@ public class ECPayService {
             } else {
                 // 新订单，创建业务订单
                 orderInfo = carOrderInfoService.createOrder(
-                    userId, form.getReceiverName(), form.getReceiverMobile(), form.getReceiverAddress(), orderDetails);
+                    userId, merchantTradeNo, form.getReceiverName(), form.getReceiverMobile(), form.getReceiverAddress(), orderDetails);
                 
                 if (orderInfo == null) {
                     log.error("创建业务订单失败，用户ID: {}", userId);

@@ -34,12 +34,9 @@ public class CarOrderInfoService {
      * 创建订单
      */
     @Transactional
-    public CarOrderInfoEntity createOrder(Long userId, String receiverName, String receiverMobile, 
+    public CarOrderInfoEntity createOrder(Long userId, String orderNo, String receiverName, String receiverMobile, 
                                         String receiverAddress, List<CarOrderDetailEntity> orderDetails) {
         try {
-            // 生成订单号
-            String orderNo = generateOrderNo();
-            
             // 计算总价格
             Integer totalPrice = calculateTotalPrice(orderDetails);
             
