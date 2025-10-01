@@ -258,7 +258,7 @@ public class MyOrderController extends BaseController {
             }
 
             // 获取支付订单信息
-            CarPaymentOrderEntity paymentOrder = ecPayService.getPaymentOrderByEcpayTradeNo(order.getOrderNo());
+            CarPaymentOrderEntity paymentOrder = ecPayService.getPaymentOrderByMerchantTradeNo(order.getOrderNo());
             if (paymentOrder == null) {
                 return R.fail("未找到支付信息", null);
             }
