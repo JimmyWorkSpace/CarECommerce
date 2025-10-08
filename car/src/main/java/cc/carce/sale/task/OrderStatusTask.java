@@ -37,7 +37,7 @@ public class OrderStatusTask {
      * 3. 未删除的订单
      */
     // @PostConstruct
-   @Scheduled(fixedRate = 300000) // 每5分钟执行一次
+//    @Scheduled(fixedRate = 300000) // 每5分钟执行一次
     public void queryOrderStatusTask() {
         try {
             log.info("开始执行订单状态查询定时任务");

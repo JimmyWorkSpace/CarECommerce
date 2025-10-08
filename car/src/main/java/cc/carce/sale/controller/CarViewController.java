@@ -447,13 +447,16 @@ public class CarViewController extends BaseController {
             model.addAttribute("saleId", saleId);
             
             // 设置页面标题和描述
-            String title = dealerInfo.getDealerName() + " / " + carInfo.getManufactureYear() + "年 " + carInfo.getBrand() + ' ' + carInfo.getCustomModel();
+            String title = dealerInfo.getDealerName() + " / " + carInfo.getManufactureYear() + "年 " + carInfo.getBrand() + "," + carInfo.getCustomModel();
+            String ogTitle = dealerInfo.getDealerName() + "," + carInfo.getBrand() + "," + carInfo.getCustomModel();
             model.addAttribute("title", title);
+            model.addAttribute("ogTitle", ogTitle);
+            model.addAttribute("ogDescription", ogTitle + "," + carInfo.getSaleTitle());
             // model.addAttribute("description", carInfo.getSaleDescription() != null ? 
             //     carInfo.getSaleDescription().replaceAll("<[^>]*>", "").substring(0, Math.min(150, carInfo.getSaleDescription().length())) : 
             //     "專業的二手車銷售平台，提供優質二手車資訊");
-            model.addAttribute("image", images != null && !images.isEmpty() ? images.get(0) : "/img/car/car4.jpg");
-            model.addAttribute("url", req.getRequestURL().toString());
+            model.addAttribute("ogImage", images != null && !images.isEmpty() ? images.get(0) : "/img/car/car4.jpg");
+            model.addAttribute("ogUrl", req.getRequestURL().toString());
             
             model.addAttribute("content", "/car/detail.ftl");
             

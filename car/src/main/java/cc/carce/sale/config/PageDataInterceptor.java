@@ -130,24 +130,28 @@ public class PageDataInterceptor implements HandlerInterceptor {
             if (!modelAndView.getModel().containsKey("title")) {
                 modelAndView.addObject("title", "車勢汽車交易網");
             }
+
+            if (!modelAndView.getModel().containsKey("ogTitle")) {
+                modelAndView.addObject("ogTitle", "車勢汽車交易網");
+            }
             
             // 添加description变量，如果不存在则使用默认值
-            if (!modelAndView.getModel().containsKey("description")) {
-                modelAndView.addObject("description", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
+            if (!modelAndView.getModel().containsKey("ogDescription")) {
+                modelAndView.addObject("ogDescription", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
             }
             
             // 添加url变量，如果不存在则使用当前请求URL
-            if (!modelAndView.getModel().containsKey("url")) {
+            if (!modelAndView.getModel().containsKey("ogUrl")) {
                 String currentUrl = request.getRequestURL().toString();
                 if (request.getQueryString() != null) {
                     currentUrl += "?" + request.getQueryString();
                 }
-                modelAndView.addObject("url", currentUrl);
+                modelAndView.addObject("ogUrl", currentUrl);
             }
             
             // 添加image变量，如果不存在则使用默认图片
-            if (!modelAndView.getModel().containsKey("image")) {
-                modelAndView.addObject("image", "/img/title.png");
+            if (!modelAndView.getModel().containsKey("ogImage")) {
+                modelAndView.addObject("ogImage", "https://testcloud.carce.cc/img/car_sale/banner/61a9d426-c81e-4e84-89ec-8ce53b793be4.jpg");
             }
             
             log.debug("已添加OG标签相关数据到ModelAndView");

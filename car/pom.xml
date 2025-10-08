@@ -7,7 +7,7 @@
     <groupId>cc.carce.sale</groupId>
     <artifactId>car</artifactId>
     <version>1.0</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>car</name>
     <description>Carce</description>
 
@@ -282,7 +282,7 @@
     </pluginRepositories>
     
     <build>
-        <finalName>ROOT</finalName>
+        <finalName>mall.carce</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
