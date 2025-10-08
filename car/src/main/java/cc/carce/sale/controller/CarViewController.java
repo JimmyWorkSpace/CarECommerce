@@ -447,8 +447,8 @@ public class CarViewController extends BaseController {
             model.addAttribute("saleId", saleId);
             
             // 设置页面标题和描述
-            String title = carInfo.getSaleTitle() != null ? carInfo.getSaleTitle() : "車輛詳情";
-            model.addAttribute("title", title + " - 二手車銷售平台");
+            String title = dealerInfo.getDealerName() + " / " + carInfo.getManufactureYear() + "年 " + carInfo.getBrand() + ' ' + carInfo.getCustomModel();
+            model.addAttribute("title", title);
             // model.addAttribute("description", carInfo.getSaleDescription() != null ? 
             //     carInfo.getSaleDescription().replaceAll("<[^>]*>", "").substring(0, Math.min(150, carInfo.getSaleDescription().length())) : 
             //     "專業的二手車銷售平台，提供優質二手車資訊");
