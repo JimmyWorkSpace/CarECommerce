@@ -6,6 +6,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -29,8 +31,8 @@ public class PageDataInterceptor implements HandlerInterceptor {
     private CarConfigService carConfigService;
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, 
-                          Object handler, ModelAndView modelAndView) throws Exception {
+    public void postHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, 
+                          @NonNull Object handler, @Nullable ModelAndView modelAndView) throws Exception {
         
         // 只处理返回视图的请求（非REST API）
         if (modelAndView != null && !isRestApiRequest(request)) {
@@ -41,7 +43,10 @@ public class PageDataInterceptor implements HandlerInterceptor {
                 // 添加页脚数据
                 addFooterData(modelAndView);
                 
-                log.debug("页面数据拦截器已为请求 {} 添加菜单和页脚数据", request.getRequestURI());
+                // 添加OG标签相关数据
+                addOgData(modelAndView, request);
+                
+                log.debug("页面数据拦截器已为请求 {} 添加菜单、页脚和OG标签数据", request.getRequestURI());
             } catch (Exception e) {
                 log.error("页面数据拦截器处理失败", e);
                 // 即使失败也不影响页面正常显示，只是没有菜单和页脚数据
@@ -113,6 +118,41 @@ public class PageDataInterceptor implements HandlerInterceptor {
             log.error("获取页脚配置数据失败", e);
             // 如果获取配置失败，设置空对象避免模板报错
             modelAndView.addObject("config", new java.util.HashMap<>());
+        }
+    }
+
+    /**
+     * 添加OG标签相关数据到ModelAndView
+     */
+    private void addOgData(ModelAndView modelAndView, HttpServletRequest request) {
+        try {
+            // 添加title变量，如果不存在则使用默认值
+            if (!modelAndView.getModel().containsKey("title")) {
+                modelAndView.addObject("title", "車勢汽車交易網");
+            }
+            
+            // 添加description变量，如果不存在则使用默认值
+            if (!modelAndView.getModel().containsKey("description")) {
+                modelAndView.addObject("description", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
+            }
+            
+            // 添加url变量，如果不存在则使用当前请求URL
+            if (!modelAndView.getModel().containsKey("url")) {
+                String currentUrl = request.getRequestURL().toString();
+                if (request.getQueryString() != null) {
+                    currentUrl += "?" + request.getQueryString();
+                }
+                modelAndView.addObject("url", currentUrl);
+            }
+            
+            // 添加image变量，如果不存在则使用默认图片
+            if (!modelAndView.getModel().containsKey("image")) {
+                modelAndView.addObject("image", "/img/title.png");
+            }
+            
+            log.debug("已添加OG标签相关数据到ModelAndView");
+        } catch (Exception e) {
+            log.error("添加OG标签数据失败", e);
         }
     }
 }
