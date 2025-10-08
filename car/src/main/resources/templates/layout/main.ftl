@@ -2,12 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>${title!'二手車銷售平台'}</title>
-    <meta property="og:title" content="${title!'二手車銷售平台'}" />
+    <title>${title}</title>
+    <meta property="og:title" content="${ogTitle}" />
     <meta property="og:type" content="website" />
-    <meta property="og:description" content="${description!'專業的二手車銷售平台'}" />
-    <meta property="og:url" content="${url!''}" />
-    <meta property="og:image" content="${image!''}" />
+    <meta property="og:ogDescription" content="${ogDescription}" />
+    <meta property="og:url" content="${ogUrl!''}" />
+    <meta property="og:image" content="${ogImage!''}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
     <!-- Bootstrap CSS -->
