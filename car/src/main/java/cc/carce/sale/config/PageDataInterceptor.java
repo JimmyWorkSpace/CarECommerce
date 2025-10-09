@@ -128,11 +128,11 @@ public class PageDataInterceptor implements HandlerInterceptor {
         try {
             // 添加title变量，如果不存在则使用默认值
             if (!modelAndView.getModel().containsKey("title")) {
-                modelAndView.addObject("title", "車勢汽車交易網");
+                modelAndView.addObject("title", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
             }
 
             if (!modelAndView.getModel().containsKey("ogTitle")) {
-                modelAndView.addObject("ogTitle", "車勢汽車交易網");
+                modelAndView.addObject("ogTitle", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
             }
             
             // 添加description变量，如果不存在则使用默认值

@@ -156,17 +156,32 @@
             color: #6c757d;
         }
         
-        /* 導航欄品牌圖片樣式 */
-        .navbar-brand-img {
-            height: 40px;
-            width: auto;
-            max-width: 200px;
-            object-fit: contain;
+        /* 導航欄品牌文字樣式 */
+        body .navbar .navbar-brand .brand-text {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            color: #354AA5 !important;
+            text-decoration: none;
+        }
+        
+        .brand-main {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        
+        .brand-sub {
+            font-size: 0.9rem;
+            font-weight: normal;
+            opacity: 0.9;
+            white-space: nowrap;
         }
         
         /* 導航欄字體樣式 */
-        .navbar-nav .nav-link {
-            color: white !important;
+        body .navbar .navbar-nav .nav-link {
+            color: #354AA5 !important;
             font-weight: 600;
             font-size: 1rem;
             transition: all 0.3s ease;
@@ -177,16 +192,27 @@
             transform: translateY(-1px);
         }
         
-        .navbar-nav .nav-item.active .nav-link {
-            color: #f8f9fa !important;
+        body .navbar .navbar-nav .nav-item.active .nav-link {
+            color: #354AA5 !important;
             font-weight: 700;
         }
         
         /* 響應式設計 */
         @media (max-width: 768px) {
-            .navbar-brand-img {
-                height: 35px;
-                max-width: 150px;
+            .brand-text {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .brand-main {
+                font-size: 1.2rem;
+                margin-right: 0;
+                margin-bottom: 2px;
+            }
+            
+            .brand-sub {
+                font-size: 0.8rem;
+                line-height: 1.2;
             }
             
             .cart-float-btn {
@@ -249,7 +275,10 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
                 <a class="navbar-brand" href="/">
-                    <img src="/img/title.png" alt="二手車銷售平台" class="navbar-brand-img">
+                    <div class="brand-text">
+                        <span class="brand-main">車勢汽車交易網</span>
+                        <span class="brand-sub">最保障消費者的一站式買賣二手車平台</span>
+                    </div>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
