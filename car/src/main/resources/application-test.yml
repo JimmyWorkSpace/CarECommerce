@@ -13,15 +13,15 @@ spring:
     carcecloud:
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: org.mariadb.jdbc.Driver
-      url: jdbc:mariadb://localhost:4416/car?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
-      username: root
-      password: "Wbf6XkTS3h55MC88eSRr"
+      url: jdbc:mariadb://localhost:3306/test_carce_cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+      username: test_cloud
+      password: "oP9m7_2h"
     manager:
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: org.mariadb.jdbc.Driver
-      url: jdbc:mariadb://localhost:4416/ry?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
-      username: root
-      password: "Wbf6XkTS3h55MC88eSRr"
+      url: jdbc:mariadb://localhost:3306/carbuy_cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+      username: carbuy_cloud
+      password: "L2k~5HR?v9wewdgl"
 
 # 绿界支付配置
 ecpay:
