@@ -1,6 +1,12 @@
 <template>
   <div class="app-container">
-    <el-form style="display: none;" :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="類型" prop="advType">
+        <el-select v-model="queryParams.advType" placeholder="請選擇類型" clearable>
+          <el-option label="廣告" :value="0" />
+          <el-option label="網站介紹" :value="1" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="跳轉地址" prop="linkUrl">
         <el-input
           v-model="queryParams.linkUrl"
@@ -11,12 +17,8 @@
       </el-form-item>
       <el-form-item label="是否跳轉" prop="isLink">
         <el-select v-model="queryParams.isLink" placeholder="請選擇是否跳轉" clearable>
-          <el-option
-            v-for="dict in dict.type.sys_yes_no_num"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
+          <el-option label="否" :value="0" />
+          <el-option label="是" :value="1" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -92,6 +94,13 @@
         </template>
       </el-table-column>
       <el-table-column label="標題" align="center" prop="title" width="150" :show-overflow-tooltip="true" />
+      <el-table-column label="類型" align="center" prop="advType" width="100">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.advType === 0 ? 'primary' : 'success'">
+            {{ scope.row.advType === 0 ? '廣告' : '網站介紹' }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="是否跳轉" align="center" prop="isLink" width="100">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_yes_no_num" :value="scope.row.isLink"/>
@@ -135,31 +144,51 @@
     <!-- 添加或修改廣告對話框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="圖片地址" prop="imageUrl">
-          <el-input v-model="form.imageUrl" placeholder="請輸入圖片地址" />
-          <el-upload
-            class="upload-demo"
-            :action="uploadUrl"
-            :headers="uploadHeaders"
-            :on-success="handleUploadSuccess"
-            :on-error="handleUploadError"
-            :before-upload="beforeUpload"
-            :show-file-list="false"
-            style="margin-top: 10px;">
-            <el-button size="small" type="primary">點擊上傳</el-button>
-            <div slot="tip" class="el-upload__tip">只能上傳jpg/png/gif檔案，且不超過2MB</div>
-          </el-upload>
+        <el-form-item label="標題類型" prop="titleType">
+          <el-radio-group v-model="form.titleType" @change="handleTitleTypeChange">
+            <el-radio :label="0">圖片標題</el-radio>
+            <el-radio :label="1">富文本標題</el-radio>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item label="標題" prop="title">
-          <el-input v-model="form.title" placeholder="請輸入標題" />
+        
+        <!-- 圖片標題模式 -->
+        <template v-if="form.titleType === 0">
+          <el-form-item label="圖片地址" prop="imageUrl">
+            <el-input v-model="form.imageUrl" placeholder="請輸入圖片地址" />
+            <el-upload
+              class="upload-demo"
+              :action="uploadUrl"
+              :headers="uploadHeaders"
+              :on-success="handleUploadSuccess"
+              :on-error="handleUploadError"
+              :before-upload="beforeUpload"
+              :show-file-list="false"
+              style="margin-top: 10px;">
+              <el-button size="small" type="primary">點擊上傳</el-button>
+              <div slot="tip" class="el-upload__tip">只能上傳jpg/png/gif檔案，且不超過2MB</div>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="標題" prop="title">
+            <el-input v-model="form.title" placeholder="請輸入標題" />
+          </el-form-item>
+        </template>
+        
+        <!-- 富文本標題模式 -->
+        <template v-if="form.titleType === 1">
+          <el-form-item label="富文本標題" prop="titleHtml">
+            <editor v-model="form.titleHtml" :min-height="192"/>
+          </el-form-item>
+        </template>
+        <el-form-item label="類型" prop="advType">
+          <el-radio-group v-model="form.advType">
+            <el-radio :label="0">廣告</el-radio>
+            <el-radio :label="1">網站介紹</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="是否跳轉" prop="isLink">
           <el-radio-group v-model="form.isLink" @change="handleIsLinkChange">
-            <el-radio
-              v-for="dict in dict.type.sys_yes_no_num"
-              :key="parseInt(dict.value)"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
+            <el-radio :label="0">否</el-radio>
+            <el-radio :label="1">是</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="跳轉地址" prop="linkUrl" v-if="form.isLink === 1">
@@ -170,11 +199,8 @@
         </el-form-item>
         <el-form-item label="是否刪除" prop="delFlag">
           <el-radio-group v-model="form.delFlag">
-            <el-radio
-              v-for="dict in dict.type.sys_yes_no_num"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
+            <el-radio :label="0">否</el-radio>
+            <el-radio :label="1">是</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -220,6 +246,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        advType: null,
         linkUrl: null,
         isLink: null
       },
@@ -227,11 +254,8 @@ export default {
       form: {},
       // 表單校驗
       rules: {
-        imageUrl: [
-          { required: true, message: "圖片地址不能為空", trigger: "blur" }
-        ],
-        title: [
-          { required: true, message: "標題不能為空", trigger: "blur" }
+        titleType: [
+          { required: true, message: "請選擇標題類型", trigger: "change" }
         ]
       },
       // 上傳相關
@@ -268,11 +292,14 @@ export default {
     reset() {
       this.form = {
         id: null,
+        titleType: 0,
+        titleHtml: null,
         imageUrl: null,
         linkUrl: null,
         isLink: 0,
         content: null,
         title: null,
+        advType: 0,
         delFlag: 0
       };
       this.resetForm("form");
@@ -311,6 +338,32 @@ export default {
     },
     /** 提交按鈕 */
     submitForm() {
+      // 動態驗證
+      let isValid = true;
+      let errorMessage = "";
+      
+      if (this.form.titleType === 0) {
+        // 圖片標題模式驗證
+        if (!this.form.imageUrl) {
+          isValid = false;
+          errorMessage = "圖片地址不能為空";
+        } else if (!this.form.title) {
+          isValid = false;
+          errorMessage = "標題不能為空";
+        }
+      } else if (this.form.titleType === 1) {
+        // 富文本標題模式驗證
+        if (!this.form.titleHtml) {
+          isValid = false;
+          errorMessage = "富文本標題內容不能為空";
+        }
+      }
+      
+      if (!isValid) {
+        this.$modal.msgError(errorMessage);
+        return;
+      }
+      
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
@@ -458,6 +511,11 @@ export default {
         // 選擇不跳轉時，清空跳轉地址
         this.form.linkUrl = null;
       }
+    },
+    /** 標題類型變化處理 */
+    handleTitleTypeChange(value) {
+      // 保留所有內容，不進行清空操作
+      // 用戶可以在不同類型之間切換而不會丟失已輸入的信息
     }
   }
 };

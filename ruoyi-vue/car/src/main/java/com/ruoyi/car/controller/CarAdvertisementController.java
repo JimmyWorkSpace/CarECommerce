@@ -44,7 +44,7 @@ public class CarAdvertisementController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(CarAdvertisementEntity carAdvertisement) {
         startPage();
-        List<CarAdvertisementEntity> list = carAdvertisementService.selectAllAdvertisements();
+        List<CarAdvertisementEntity> list = carAdvertisementService.selectAdvertisementList(carAdvertisement);
         return getDataTable(list);
     }
 
@@ -55,7 +55,7 @@ public class CarAdvertisementController extends BaseController {
     @Log(title = "广告位", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CarAdvertisementEntity carAdvertisement) {
-        List<CarAdvertisementEntity> list = carAdvertisementService.selectAllAdvertisements();
+        List<CarAdvertisementEntity> list = carAdvertisementService.selectAdvertisementList(carAdvertisement);
         ExcelUtil<CarAdvertisementEntity> util = new ExcelUtil<CarAdvertisementEntity>(CarAdvertisementEntity.class);
         util.exportExcel(response, list, "广告位数据");
     }

@@ -6,24 +6,47 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="com.ruoyi.car.domain.CarAdvertisementEntity" id="CarAdvertisementResult">
         <id     property="id"           column="id"           />
+        <result property="titleType"     column="titleType"   />
+        <result property="titleHtml"     column="titleHtml"   />
         <result property="imageUrl"      column="imageUrl"    />
         <result property="linkUrl"       column="linkUrl"     />
         <result property="isLink"        column="isLink"      />
         <result property="content"       column="content"     />
         <result property="title"         column="title"       />
+        <result property="advType"       column="advType"     />
         <result property="showOrder"     column="showOrder"   />
         <result property="delFlag"       column="delFlag"     />
         <result property="createTime"    column="createTime"  />
     </resultMap>
     
     <sql id="selectCarAdvertisementVo">
-        select id, imageUrl, linkUrl, isLink, content, title, showOrder, delFlag, createTime 
+        select id, titleType, titleHtml, imageUrl, linkUrl, isLink, content, title, advType, showOrder, delFlag, createTime 
         from car_advertisement
     </sql>
     
     <select id="selectAllOrderByShowOrder" resultMap="CarAdvertisementResult">
         <include refid="selectCarAdvertisementVo"/>
         where delFlag = 0 or delFlag is null
+        order by showOrder asc, createTime desc
+    </select>
+    
+    <select id="selectAdvertisementList" parameterType="com.ruoyi.car.domain.CarAdvertisementEntity" resultMap="CarAdvertisementResult">
+        <include refid="selectCarAdvertisementVo"/>
+        <where>
+            <if test="advType != null">
+                and advType = #{advType}
+            </if>
+            <if test="linkUrl != null and linkUrl != ''">
+                and linkUrl like concat('%', #{linkUrl}, '%')
+            </if>
+            <if test="isLink != null">
+                and isLink = #{isLink}
+            </if>
+            <if test="title != null and title != ''">
+                and title like concat('%', #{title}, '%')
+            </if>
+            and (delFlag = 0 or delFlag is null)
+        </where>
         order by showOrder asc, createTime desc
     </select>
     

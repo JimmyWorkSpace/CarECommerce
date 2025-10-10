@@ -16,6 +16,13 @@ public class CarAdvertisementEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "titleType", columnDefinition = "INT(11) COMMENT '标题类型 0 图片 1 富文本'")
+    private Integer titleType;
+
+    @Column(name = "titleHtml", columnDefinition = "LONGTEXT COMMENT '当标题类型为1富文本时，富文本内容'")
+    private String titleHtml;
+
+
     @Column(name = "imageUrl")
     private String imageUrl;
 
@@ -30,6 +37,9 @@ public class CarAdvertisementEntity {
 
     @Column(name = "title")
     private String title;
+    
+    @Column(name = "advType")
+    private Integer advType;
 
     @Column(name = "showOrder")
     private Integer showOrder;
