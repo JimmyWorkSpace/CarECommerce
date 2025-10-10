@@ -26,9 +26,6 @@ public class CarAdvertisementService {
                 .andEqualTo("delFlag", 0);  // 0表示未删除
         example.orderBy("showOrder").asc();    // 按排序字段升序排列
         List<CarAdvertisementEntity> result = carAdvertisementMapper.selectByExample(example);
-        if(result.size() > 2) {
-        	return result.subList(0, 2);
-        }
         return result;
     }
 

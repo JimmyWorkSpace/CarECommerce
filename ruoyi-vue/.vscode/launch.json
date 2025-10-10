@@ -22,7 +22,8 @@
             "name": "RuoYiApplication",
             "request": "launch",
             "mainClass": "com.ruoyi.RuoYiApplication",
-            "projectName": "ruoyi-admin"
+            "projectName": "ruoyi-admin",
+            "args": "--spring.profiles.active=druid"
         },
         {
             "type": "java",

@@ -26,6 +26,11 @@ public class CarAdvertisementServiceImpl implements CarAdvertisementService {
     }
 
     @Override
+    public List<CarAdvertisementEntity> selectAdvertisementList(CarAdvertisementEntity carAdvertisement) {
+        return carAdvertisementMapper.selectAdvertisementList(carAdvertisement);
+    }
+
+    @Override
     public CarAdvertisementEntity selectAdvertisementById(Long id) {
         return carAdvertisementMapper.selectByPrimaryKey(id);
     }
@@ -42,6 +47,12 @@ public class CarAdvertisementServiceImpl implements CarAdvertisementService {
         }
         if (carAdvertisement.getIsLink() == null) {
             carAdvertisement.setIsLink(0);
+        }
+        if (carAdvertisement.getAdvType() == null) {
+            carAdvertisement.setAdvType(0);
+        }
+        if (carAdvertisement.getTitleType() == null) {
+            carAdvertisement.setTitleType(0);
         }
         return carAdvertisementMapper.insert(carAdvertisement);
     }

@@ -1,6 +1,119 @@
 <link href="/css/home.css" rel="stylesheet">
 <link href="/assets/swiper/css/swiper.min.css" rel="stylesheet">
 <script src="/assets/swiper/js/swiper.min.js"></script>
+<style>
+.feature-iframe-container {
+    width: calc(100% - 30px);
+    height: calc(100% - 30px);
+    min-height: 300px;
+    margin: 15px;
+    box-sizing: border-box;
+}
+
+.feature-iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    border: none;
+    display: block;
+}
+
+.features-section .container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.feature-card {
+    padding: 0;
+}
+
+.ad-section .container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.ad-card {
+    padding: 0;
+}
+
+.ad-image, .feature-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.ad-card, .feature-card {
+    position: relative;
+    overflow: visible;
+    height: 250px;
+}
+
+.feature-card:has(.feature-iframe-container) {
+    height: auto;
+    min-height: 330px;
+    padding-bottom: 0;
+}
+
+.feature-image-container {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+
+.features-section .row > div,
+.ad-section .row > div {
+    padding-left: 0;
+    padding-right: 0;
+    margin-bottom: 0;
+}
+
+.ad-section .row > div:not(:last-child) {
+    padding-right: 0.5rem;
+}
+
+.ad-section .row > div:not(:first-child) {
+    padding-left: 0.5rem;
+}
+
+.ad-section .row > div:first-child {
+    padding-left: 0.5rem;
+}
+
+.ad-section .row > div:last-child {
+    padding-right: 0.5rem;
+}
+
+.features-section .row > div:not(:last-child) {
+    padding-right: 0.5rem;
+}
+
+.features-section .row > div:not(:first-child) {
+    padding-left: 0.5rem;
+}
+
+.features-section .row > div:first-child {
+    padding-left: 0.5rem;
+}
+
+.features-section .row > div:last-child {
+    padding-right: 0.5rem;
+}
+
+.ad-title-bottom, .feature-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    color: white;
+    padding: 1rem;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+</style>
 <div class="home-page" id="app">
     <!-- 第一行：輪播圖 -->
     <div class="hero-section">
@@ -45,13 +158,24 @@
     <div class="features-section">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-md-4 mb-3" v-for="(feature, index) in features" :key="index">
+                <div class="col-12 mb-3" 
+                     :class="getFeatureColumnClass(features.length)" 
+                     v-for="(feature, index) in features.slice(0, 4)" :key="feature.id">
                     <div class="feature-card">
-                        <div class="feature-icon">
-                            <i :class="feature.icon"></i>
-                        </div>
-                        <h3 class="feature-title" v-text="feature.title"></h3>
-                        <p class="feature-subtitle" v-text="feature.subtitle"></p>
+                        <!-- titleType=0 时显示图片和标题 -->
+                        <template v-if="feature.titleType === 0">
+                            <div class="feature-image-container">
+                                <img :src="feature.imageUrl" :alt="feature.title" class="feature-image" 
+                                     @error="handleImageError($event, feature.title)">
+                                <h3 class="feature-title" v-text="feature.title"></h3>
+                            </div>
+                        </template>
+                        <!-- titleType=1 时显示iframe -->
+                        <template v-else-if="feature.titleType === 1">
+                            <div class="feature-iframe-container">
+                                <iframe :srcdoc="feature.titleHtml" class="feature-iframe" frameborder="0" scrolling="no"></iframe>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -80,7 +204,9 @@
         <div class="container">
             <div class="row">
                 <!-- 使用 Vue.js 動態展示廣告數據 -->
-                <div class="col-12 col-md-6 mb-4" v-for="(ad, index) in advertisements" :key="ad.id">
+                <div class="col-12 mb-3" 
+                     :class="getAdColumnClass(advertisements.length)" 
+                     v-for="(ad, index) in advertisements.slice(0, 2)" :key="ad.id">
                     <div class="ad-card" :data-ad-id="ad.id">
                         <!-- 連結類型广告 -->
                         <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
@@ -101,14 +227,14 @@
                 
                 <!-- 當沒有廣告數據时顯示默認内容 -->
                 <template v-if="!advertisements || advertisements.length === 0">
-                    <div class="col-12 col-md-6 mb-4">
+                    <div class="col-12 col-md-6 mb-3">
                         <div class="ad-card">
                             <img src="/img/ad1.jpg" alt="专业检测" class="ad-image" 
                                  @error="handleImageError($event, '專業檢測')">
                             <div class="ad-title-overlay" style="display: none;">專業檢測</div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 mb-4">
+                    <div class="col-12 col-md-6 mb-3">
                         <div class="ad-card">
                             <iframe src="/ad-content.html" class="ad-iframe" frameborder="0"></iframe>
                         </div>
@@ -185,30 +311,15 @@ new Vue({
         searchKeyword: '',
         advertisements: [],
         banners: [],
+        features: [],
         heroSwiper: null,
-        features: [
-            {
-                icon: 'bi bi-shield-check',
-                title: '品質保證',
-                subtitle: '所有車輛均經過專業檢測，確保車況良好'
-            },
-            {
-                icon: 'bi bi-currency-dollar',
-                title: '價格透明',
-                subtitle: '明碼標價，無隱藏費用，讓您購車更放心'
-            },
-            {
-                icon: 'bi bi-headset',
-                title: '專業服務',
-                subtitle: '專業團隊為您提供全程購車服務'
-            }
-        ],
         // 跑马灯相关数据
         marqueePaused: false,
         resizeTimer: null
     },
     mounted() {
         this.getAdvertisement();
+        this.getFeatures();
         this.getBanner();
         // 检测并初始化跑马灯
         this.$nextTick(() => {
@@ -251,11 +362,85 @@ new Vue({
                 url: '/api/advertisement/list',
                 method: 'GET',
                 success: (data) => {
-                    _this.advertisements = data.data;
+                    // 过滤出 advType=0 的前两条数据
+                    const filteredAds = data.data.filter(ad => ad.advType === 0).slice(0, 2);
+                    _this.advertisements = filteredAds;
                 },
                 error: (error) => {
                     console.log(error);
                 }
+            });
+        },
+        getFeatures(){
+            let _this = this;
+            $.ajax({
+                url: '/api/advertisement/list',
+                method: 'GET',
+                success: (data) => {
+                    // 过滤出 advType=1 的数据
+                    const filteredFeatures = data.data.filter(ad => ad.advType === 1);
+                    _this.features = filteredFeatures;
+                    // 数据加载完成后调整iframe高度
+                    _this.$nextTick(() => {
+                        _this.adjustIframeHeights();
+                    });
+                },
+                error: (error) => {
+                    console.log(error);
+                }
+            });
+        },
+        getFeatureColumnClass(count) {
+            // 最多取前4个
+            const actualCount = Math.min(count, 4);
+            
+            if (actualCount === 1) {
+                return 'col-md-12'; // 1个时占满整行
+            } else if (actualCount === 2) {
+                return 'col-md-6'; // 2个时各占一半
+            } else if (actualCount === 3) {
+                return 'col-md-4'; // 3个时各占1/3
+            } else if (actualCount === 4) {
+                return 'col-md-6'; // 4个时分两行，每行2个
+            } else {
+                return 'col-md-4'; // 默认情况
+            }
+        },
+        getAdColumnClass(count) {
+            // 最多取前2个
+            const actualCount = Math.min(count, 2);
+            
+            if (actualCount === 1) {
+                return 'col-md-12'; // 1个时占满整行
+            } else if (actualCount === 2) {
+                return 'col-md-6'; // 2个时各占一半
+            } else {
+                return 'col-md-6'; // 默认情况
+            }
+        },
+        adjustIframeHeights() {
+            // 调整所有iframe的高度
+            const iframes = document.querySelectorAll('.feature-iframe');
+            iframes.forEach(iframe => {
+                iframe.onload = function() {
+                    try {
+                        // 尝试获取iframe内容的高度
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        const height = iframeDoc.body.scrollHeight;
+                        if (height > 0) {
+                            iframe.style.height = height + 'px';
+                            // 同时调整容器高度
+                            const container = iframe.closest('.feature-iframe-container');
+                            if (container) {
+                                container.style.height = (height + 30) + 'px'; // 加上margin空间
+                            }
+                        }
+                    } catch (e) {
+                        // 如果无法访问iframe内容，使用默认高度
+                        console.log('无法调整iframe高度:', e);
+                        iframe.style.height = '300px';
+                    }
+                };
             });
         },
         performSearch() {

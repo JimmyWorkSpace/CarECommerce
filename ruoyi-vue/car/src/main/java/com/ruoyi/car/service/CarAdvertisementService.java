@@ -11,6 +11,11 @@ public interface CarAdvertisementService {
     List<CarAdvertisementEntity> selectAllAdvertisements();
     
     /**
+     * 查询广告列表（支持条件查询）
+     */
+    List<CarAdvertisementEntity> selectAdvertisementList(CarAdvertisementEntity carAdvertisement);
+    
+    /**
      * 根据ID查询广告
      */
     CarAdvertisementEntity selectAdvertisementById(Long id);
