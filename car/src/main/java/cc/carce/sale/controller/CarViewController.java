@@ -154,15 +154,10 @@ public class CarViewController extends BaseController {
             model.addAttribute("user", user);
             
             // 设置页面标题和描述
-            model.addAttribute("title", "二手車銷售平台 - 精選好車，值得信賴");
-            model.addAttribute("description", "專業的二手車銷售平台，提供優質二手車資訊，讓您輕鬆找到心儀的座駕");
-            
             // 设置网站图标
             model.addAttribute("favicon", webUrl + "/favicon.ico");
             
             // 设置首页主图
-            model.addAttribute("image", "/img/swipper/slide1.jpg");
-            
             
             // 设置精选好车数据 - 从数据库查询推荐车辆
             List<Map<String, String>> cars = new ArrayList<>();
@@ -238,11 +233,6 @@ public class CarViewController extends BaseController {
             
             model.addAttribute("dealers", dealers);
             
-            // 获取当前请求的完整URL
-            String requestUrl = req.getRequestURL().toString();
-            model.addAttribute("url", requestUrl);
-            
-            
             // 设置模板内容
             model.addAttribute("content", "/home/index.ftl");
             
@@ -265,10 +255,6 @@ public class CarViewController extends BaseController {
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
             
-            model.addAttribute("title", "我要買車 - 二手車銷售平台");
-            model.addAttribute("description", "瀏覽精選二手車，找到您的理想座駕");
-            model.addAttribute("image", "/img/swipper/slide1.jpg");
-            model.addAttribute("url", req.getRequestURL().toString());
             model.addAttribute("content", "/buy-cars/index.ftl");
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
@@ -291,9 +277,6 @@ public class CarViewController extends BaseController {
             
             // 设置页面基本信息
             model.addAttribute("title", "商城 - 汽車配件專營店");
-            model.addAttribute("description", "專業汽車配件商城，提供優質汽車用品");
-            model.addAttribute("image", "/img/swipper/slide1.jpg");
-            model.addAttribute("url", req.getRequestURL().toString());
             model.addAttribute("CurrencyUnit", CurrencyUnit);
             model.addAttribute("content", "/mall/index.ftl");
         } catch (Exception e) {
