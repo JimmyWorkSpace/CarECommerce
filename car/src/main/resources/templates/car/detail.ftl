@@ -117,11 +117,17 @@
                 </div>
             </div>
             <div class="action-buttons d-flex w-100 mb-3">
-                <a href="/检车报告.pdf" target="_blank" class="btn btn-report flex-fill me-2">
-                    <i class="bi bi-file-earmark-text"></i> 檢車報告
-                </a>
+                <button class="btn btn-line flex-fill ms-2" @click="openLineContact">
+                    <i class="bi bi-chat-dots"></i> 加LINE
+                </button>
+                <button class="btn btn-phone flex-fill ms-2" @click="openPhoneContact">
+                    <i class="bi bi-telephone"></i> 電話聯絡
+                </button>
                 <button class="btn btn-appointment flex-fill ms-2" @click="openAppointmentModal">
                     <i class="bi bi-calendar-check"></i> 預約看車
+                </button>
+                <button class="btn btn-report flex-fill ms-2" @click="openReportModal">
+                    <i class="bi bi-exclamation-triangle"></i> 檢舉店家
                 </button>
             </div>
             <div class="dealer-info mt-3 text-left">
@@ -130,16 +136,72 @@
                     賞車地址： {{ dealerInfo.publicAddress || '台北市信義區信義路五段7號' }}
                     📍<a :href="'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(dealerInfo.publicAddress || '台北市信義區信義路五段7號')" target="_blank">查看地圖</a>
                 </div>
-                <div class="report-section mt-2">
-                    <button class="btn btn-outline-danger btn-sm" @click="openReportModal">
-                        <i class="bi bi-flag"></i> 檢舉
-                    </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 第三行：功能块和广告块 -->
+    <div class="features-ads-section mb-4">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- 左侧功能块区域 (2/3) -->
+                <div class="col-md-8" style="padding: 2px">
+                    <div class="features-section">
+                        <div class="row">
+                            <div class="col-12 mb-3" 
+                                 v-for="(feature, index) in features" :key="feature.id">
+                                <div class="feature-card">
+                                    <!-- titleType=0 时显示图片和标题 -->
+                                    <template v-if="feature.titleType === 0">
+                                        <div class="feature-image-container">
+                                            <img :src="feature.imageUrl" :alt="feature.title" class="feature-image" 
+                                                 @error="handleImageError($event, feature.title)">
+                                            <h3 class="feature-title" v-text="feature.title"></h3>
+                                        </div>
+                                    </template>
+                                    <!-- titleType=1 时显示HTML内容 -->
+                                    <template v-else-if="feature.titleType === 1">
+                                        <div class="feature-html-container">
+                                            <div class="feature-html-content" v-html="feature.titleHtml"></div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧广告块区域 (1/3) -->
+                <div class="col-md-4">
+                    <div class="ad-section">
+                        <div class="row">
+                            <div class="col-12 mb-3" 
+                                 v-for="(ad, index) in advertisements" :key="ad.id">
+                                <div class="ad-card" :data-ad-id="ad.id">
+                                    <!-- 連結類型广告 -->
+                                    <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
+                                        <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
+                                             @error="handleImageError($event, ad.title)">
+                                        <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                                        <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                                    </a>
+                                    <!-- 內容類型广告 -->
+                                    <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                                        <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
+                                             @error="handleImageError($event, ad.title)">
+                                        <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                                        <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- 第三行：Tab页 -->
+    <!-- 第四行：Tab页 -->
     <div class="tabs">
         <ul class="nav nav-tabs">
             <li class="nav-item" v-for="(tab, index) in tabs" :key="index">
@@ -409,7 +471,9 @@ try {
         carGuarantees: <#if guaranteesJson??>${guaranteesJson}<#else>[]</#if>,
         lineIdHover: false,
         autoPlayTimer: null,
-        autoPlayInterval: 5000
+        autoPlayInterval: 5000,
+        features: [],
+        advertisements: []
     },
     mounted() {
         console.log('车辆详情页Vue实例已挂载');
@@ -419,6 +483,8 @@ try {
         
         this.initializePage();
         this.startAutoPlay();
+        this.getFeatures();
+        this.getAdvertisements();
         
         // 测试Vue实例是否正常工作
         setTimeout(() => {
@@ -511,10 +577,93 @@ try {
             }
         },
         
+        // 打开LINE联系
+        openLineContact() {
+            if (!this.dealerInfo.lineId) {
+                alert('店家未提供LINE ID');
+                return;
+            }
+            
+            // 检测设备类型
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // 移动设备：直接打开LINE应用
+                window.location.href = 'https://line.me/ti/p/' + this.dealerInfo.lineId;
+            } else {
+                // PC设备：打开LINE网页版
+                window.open('https://line.me/ti/p/' + this.dealerInfo.lineId, '_blank');
+            }
+        },
+        
+        // 打开电话联系
+        openPhoneContact() {
+            if (!this.dealerInfo.companyMobile) {
+                alert('店家未提供联系电话');
+                return;
+            }
+            
+            // 检测设备类型
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // 移动设备：直接拨号
+                window.location.href = 'tel:' + this.dealerInfo.companyMobile;
+            } else {
+                // PC设备：显示电话号码
+                alert('联系电话：' + this.dealerInfo.companyMobile);
+            }
+        },
+        
         // 处理图片加载失败
         handleImageError(event) {
             console.log('图片加载失败，使用默认图片');
             event.target.src = '/img/car/car4.jpg';
+        },
+        
+        // 获取功能块数据
+        getFeatures() {
+            let _this = this;
+            $.ajax({
+                url: '/api/advertisement/list',
+                method: 'GET',
+                success: (data) => {
+                    // 过滤出 advType=1 的数据，取前2个
+                    const filteredFeatures = data.data.filter(ad => ad.advType === 1).slice(0, 2);
+                    _this.features = filteredFeatures;
+                },
+                error: (error) => {
+                    console.log('获取功能块数据失败:', error);
+                }
+            });
+        },
+        
+        // 获取广告数据
+        getAdvertisements() {
+            let _this = this;
+            $.ajax({
+                url: '/api/advertisement/list',
+                method: 'GET',
+                success: (data) => {
+                    // 过滤出 advType=0 的数据，取前2个
+                    const filteredAds = data.data.filter(ad => ad.advType === 0).slice(0, 2);
+                    _this.advertisements = filteredAds;
+                },
+                error: (error) => {
+                    console.log('获取广告数据失败:', error);
+                }
+            });
+        },
+        
+        // 顯示廣告內容
+        showAdContent(adId, title, content) {
+            // 檢查adId是否有效
+            if (!adId || adId === 'null' || adId === '') {
+                console.error('廣告ID無效:', adId);
+                return;
+            }
+            // 打開新窗口顯示廣告內容頁面
+            window.open('/ad-content/' + adId, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
         },
         
         // 获取缩略图URL
@@ -915,6 +1064,167 @@ try {
     .specs .row > div {
         padding: 0.25rem 0.5rem;
     }
+}
+
+/* 功能块和广告块样式 */
+.features-ads-section {
+    padding: 20px 0;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 8px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+    overflow: visible;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.feature-image-container {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+
+.feature-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.feature-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    color: white;
+    padding: 1rem;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.feature-html-container {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-html-content {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: auto;
+    text-align: left;
+}
+
+.feature-card:has(.feature-html-container) {
+    height: auto;
+    padding-bottom: 0;
+}
+
+.ad-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    height: 200px;
+    position: relative;
+    padding: 0;
+}
+
+.ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.ad-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ad-title-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ad-card:hover .ad-title-overlay {
+    opacity: 1;
+}
+
+.ad-title-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 20px 15px 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.ad-card:hover .ad-title-bottom {
+    transform: translateY(-5px);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+}
+
+.ad-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+}
+
+.ad-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.ad-content-link {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 @media (max-width: 576px) {
