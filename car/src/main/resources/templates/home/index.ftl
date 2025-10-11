@@ -159,7 +159,6 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 mb-3" 
-                     :class="getFeatureColumnClass(features.length)" 
                      v-for="(feature, index) in features.slice(0, 4)" :key="feature.id">
                     <div class="feature-card">
                         <!-- titleType=0 时显示图片和标题 -->
