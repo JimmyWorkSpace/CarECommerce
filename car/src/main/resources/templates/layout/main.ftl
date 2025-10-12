@@ -5,7 +5,7 @@
     <title>${title}</title>
     <meta property="og:title" content="${ogTitle}" />
     <meta property="og:type" content="website" />
-    <meta property="og:ogDescription" content="${ogDescription}" />
+    <meta property="og:description" content="${ogDescription}" />
     <meta property="og:url" content="${ogUrl!''}" />
     <meta property="og:image" content="${ogImage!''}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

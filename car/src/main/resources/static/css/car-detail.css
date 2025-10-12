@@ -322,11 +322,54 @@
 }
 .car-detail .action-buttons .btn-appointment {
   background-color: #5ACFC9;
+  border-radius: 3px;
 }
 .car-detail .action-buttons .btn-appointment:hover {
   background-color: #4AB8B2;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
+}
+
+/* LINE按钮样式 */
+.car-detail .action-buttons .btn-line {
+  background-color: #00C300;
+  color: white;
+  border: none;
+  border-radius: 3px;
+}
+
+.car-detail .action-buttons .btn-line:hover {
+  background-color: #00A300;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 195, 0, 0.4);
+}
+
+/* 电话按钮样式 */
+.car-detail .action-buttons .btn-phone {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 3px;
+}
+
+.car-detail .action-buttons .btn-phone:hover {
+  background-color: #0056B3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+/* 检举按钮样式 */
+.car-detail .action-buttons .btn-report {
+  background-color: #DC3545;
+  color: white;
+  border: none;
+  border-radius: 3px;
+}
+
+.car-detail .action-buttons .btn-report:hover {
+  background-color: #C82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
 }
 .car-detail .action-buttons .btn-primary {
   background-color: #CD001D;

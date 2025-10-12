@@ -142,7 +142,7 @@
     />
 
     <!-- 添加或修改廣告對話框 -->
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="80%" append-to-body :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="標題類型" prop="titleType">
           <el-radio-group v-model="form.titleType" @change="handleTitleTypeChange">
@@ -176,7 +176,7 @@
         <!-- 富文本標題模式 -->
         <template v-if="form.titleType === 1">
           <el-form-item label="富文本標題" prop="titleHtml">
-            <editor v-model="form.titleHtml" :min-height="192"/>
+            <wang-editor v-model="form.titleHtml" :min-height="192" :height="200"/>
           </el-form-item>
         </template>
         <el-form-item label="類型" prop="advType">
@@ -195,7 +195,7 @@
           <el-input v-model="form.linkUrl" placeholder="請輸入跳轉地址" />
         </el-form-item>
         <el-form-item label="顯示內容" prop="content" v-if="form.isLink === 0">
-          <editor v-model="form.content" :min-height="192"/>
+          <wang-editor v-model="form.content" :min-height="192" :height="200"/>
         </el-form-item>
         <el-form-item label="是否刪除" prop="delFlag">
           <el-radio-group v-model="form.delFlag">
@@ -214,13 +214,13 @@
 
 <script>
 import { listAdvertisement, getAdvertisement, delAdvertisement, addAdvertisement, updateAdvertisement, updateAdvertisementOrder } from "@/api/car/advertisement";
-import Editor from "@/components/Editor";
+import WangEditor from "@/components/WangEditor";
 
 export default {
   name: "Advertisement",
   dicts: ['sys_yes_no_num'],
   components: {
-    Editor
+    WangEditor
   },
   data() {
     return {

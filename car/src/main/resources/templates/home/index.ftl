@@ -2,20 +2,22 @@
 <link href="/assets/swiper/css/swiper.min.css" rel="stylesheet">
 <script src="/assets/swiper/js/swiper.min.js"></script>
 <style>
-.feature-iframe-container {
-    width: calc(100% - 30px);
-    height: calc(100% - 30px);
-    min-height: 300px;
-    margin: 15px;
+.feature-html-container {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 15px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
-.feature-iframe {
+.feature-html-content {
     width: 100%;
-    height: 100%;
-    min-height: 300px;
-    border: none;
+    height: auto;
     display: block;
+    overflow: auto;
+    text-align: left;
 }
 
 .features-section .container {
@@ -43,15 +45,19 @@
     object-position: center;
 }
 
-.ad-card, .feature-card {
+.ad-card {
     position: relative;
     overflow: visible;
     height: 250px;
 }
 
-.feature-card:has(.feature-iframe-container) {
+.feature-card {
+    position: relative;
+    overflow: visible;
+}
+
+.feature-card:has(.feature-html-container) {
     height: auto;
-    min-height: 330px;
     padding-bottom: 0;
 }
 
@@ -159,7 +165,6 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 mb-3" 
-                     :class="getFeatureColumnClass(features.length)" 
                      v-for="(feature, index) in features.slice(0, 4)" :key="feature.id">
                     <div class="feature-card">
                         <!-- titleType=0 时显示图片和标题 -->
@@ -170,10 +175,10 @@
                                 <h3 class="feature-title" v-text="feature.title"></h3>
                             </div>
                         </template>
-                        <!-- titleType=1 时显示iframe -->
+                        <!-- titleType=1 时显示HTML内容 -->
                         <template v-else-if="feature.titleType === 1">
-                            <div class="feature-iframe-container">
-                                <iframe :srcdoc="feature.titleHtml" class="feature-iframe" frameborder="0" scrolling="no"></iframe>
+                            <div class="feature-html-container">
+                                <div class="feature-html-content" v-html="feature.titleHtml"></div>
                             </div>
                         </template>
                     </div>
@@ -380,10 +385,6 @@ new Vue({
                     // 过滤出 advType=1 的数据
                     const filteredFeatures = data.data.filter(ad => ad.advType === 1);
                     _this.features = filteredFeatures;
-                    // 数据加载完成后调整iframe高度
-                    _this.$nextTick(() => {
-                        _this.adjustIframeHeights();
-                    });
                 },
                 error: (error) => {
                     console.log(error);
@@ -418,31 +419,7 @@ new Vue({
                 return 'col-md-6'; // 默认情况
             }
         },
-        adjustIframeHeights() {
-            // 调整所有iframe的高度
-            const iframes = document.querySelectorAll('.feature-iframe');
-            iframes.forEach(iframe => {
-                iframe.onload = function() {
-                    try {
-                        // 尝试获取iframe内容的高度
-                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                        const height = iframeDoc.body.scrollHeight;
-                        if (height > 0) {
-                            iframe.style.height = height + 'px';
-                            // 同时调整容器高度
-                            const container = iframe.closest('.feature-iframe-container');
-                            if (container) {
-                                container.style.height = (height + 30) + 'px'; // 加上margin空间
-                            }
-                        }
-                    } catch (e) {
-                        // 如果无法访问iframe内容，使用默认高度
-                        console.log('无法调整iframe高度:', e);
-                        iframe.style.height = '300px';
-                    }
-                };
-            });
-        },
+        
         performSearch() {
             if (this.searchKeyword.trim()) {
                 // 執行搜尋邏輯
