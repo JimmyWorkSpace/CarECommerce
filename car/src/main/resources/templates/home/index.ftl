@@ -315,8 +315,8 @@
         <a href="${baseUrl}/channel">频道</a>
         
         <!-- 车辆详情页面链接 -->
-        <#list cars as car>
-        <a href="${baseUrl}/detail/${car.id}">${car.model}详情</a>
+        <#list allCars as car>
+        <a href="${baseUrl}/detail/${car.id}">${car.brand},${car.model},${car.saleTitle},${car.dealerName}</a>
         </#list>
     </div>
 </div>

@@ -203,6 +203,7 @@ public class CarViewController extends BaseController {
             }
             
             model.addAttribute("cars", cars);
+			model.addAttribute("allCars", carSalesService.getAllCars());
             
             // 设置精选店家数据 - 从数据库查询推荐店家
             List<Map<String, String>> dealers = new ArrayList<>();
