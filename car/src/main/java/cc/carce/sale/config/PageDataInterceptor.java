@@ -126,6 +126,26 @@ public class PageDataInterceptor implements HandlerInterceptor {
      */
     private void addOgData(ModelAndView modelAndView, HttpServletRequest request) {
         try {
+            // 构建基础URL，参考RobotsController的方法
+            String scheme = request.getScheme();
+            String serverName = request.getServerName();
+            int serverPort = request.getServerPort();
+            
+            String baseUrl = scheme + "://" + serverName;
+            if ((scheme.equals("http") && serverPort != 80) || 
+                (scheme.equals("https") && serverPort != 443)) {
+                baseUrl += ":" + serverPort;
+            }
+            
+            // 添加baseUrl变量，供所有页面使用
+            modelAndView.addObject("baseUrl", baseUrl);
+            
+            // 添加当前页面完整URL
+            String currentUrl = baseUrl + request.getRequestURI();
+            if (request.getQueryString() != null) {
+                currentUrl += "?" + request.getQueryString();
+            }
+            
             // 添加title变量，如果不存在则使用默认值
             if (!modelAndView.getModel().containsKey("title")) {
                 modelAndView.addObject("title", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
@@ -142,10 +162,6 @@ public class PageDataInterceptor implements HandlerInterceptor {
             
             // 添加url变量，如果不存在则使用当前请求URL
             if (!modelAndView.getModel().containsKey("ogUrl")) {
-                String currentUrl = request.getRequestURL().toString();
-                if (request.getQueryString() != null) {
-                    currentUrl += "?" + request.getQueryString();
-                }
                 modelAndView.addObject("ogUrl", currentUrl);
             }
             
@@ -154,7 +170,7 @@ public class PageDataInterceptor implements HandlerInterceptor {
                 modelAndView.addObject("ogImage", "https://testcloud.carce.cc/img/car_sale/banner/61a9d426-c81e-4e84-89ec-8ce53b793be4.jpg");
             }
             
-            log.debug("已添加OG标签相关数据到ModelAndView");
+            log.debug("已添加OG标签相关数据和baseUrl到ModelAndView");
         } catch (Exception e) {
             log.error("添加OG标签数据失败", e);
         }

@@ -17,6 +17,9 @@
     <meta property="og:type" content="website" />
     <meta property="og:locate" content="zh_TW" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="canonical" href="${ogUrl!''}">
+    
     <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
     <!-- Bootstrap CSS -->
     <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
