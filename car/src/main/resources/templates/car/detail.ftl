@@ -430,7 +430,12 @@
             </div>
         </div>
     </div>
- </div>
+    
+    <!-- SEO描述 -->
+    <section class="seo-description" style="display:none">
+        <p><#if carInfo.saleDescription??>${carInfo.saleDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if><#if carInfo.saleDescription?? && ogDescription??>,</#if><#if ogDescription??>${ogDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if></p>
+    </section>
+</div>
 <script>
 console.log('Vue版本:', Vue.version);
 console.log('开始初始化Vue实例...');
@@ -494,6 +499,16 @@ try {
                 console.log('找到测试按钮');
             }
         }, 3000);
+    },
+    computed: {
+        // 获取纯文本描述
+        plainTextDescription() {
+            if (!this.carInfo.saleDescription) return '';
+            // 创建临时div元素来解析HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = this.carInfo.saleDescription;
+            return tempDiv.textContent || tempDiv.innerText || '';
+        }
     },
     methods: {
         // 初始化页面
@@ -568,6 +583,15 @@ try {
         getHtmlContent(htmlContent) {
             if (!htmlContent) return '';
             return htmlContent;
+        },
+        
+        // 获取纯文本内容（去除HTML标签）
+        getPlainText(htmlContent) {
+            if (!htmlContent) return '';
+            // 创建临时div元素来解析HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            return tempDiv.textContent || tempDiv.innerText || '';
         },
         
         // 联系Line
