@@ -306,7 +306,19 @@
             </div>
         </div>
     </div>
-
+    <div class="all-link" style="display: none">
+        <!-- 主要页面链接 -->
+        <a href="${baseUrl}/">首页</a>
+        <a href="${baseUrl}/buy-cars">买车</a>
+        <a href="${baseUrl}/mall">商城</a>
+        <a href="${baseUrl}/about">关于我们</a>
+        <a href="${baseUrl}/channel">频道</a>
+        
+        <!-- 车辆详情页面链接 -->
+        <#list cars as car>
+        <a href="${baseUrl}/detail/${car.id}">${car.model}详情</a>
+        </#list>
+    </div>
 </div>
 
 <script>
