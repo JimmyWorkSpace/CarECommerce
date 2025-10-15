@@ -1,4 +1,5 @@
 <link href="/css/car-detail.css" rel="stylesheet">
+<link rel="canonical" href="${ogUrl!''}">
 <div class="car-detail" id="app">
     <div class="main-title-container">
         <div class="first-title">

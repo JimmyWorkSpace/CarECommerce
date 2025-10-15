@@ -157,18 +157,6 @@ public class CarViewController extends BaseController {
             // 设置网站图标
             model.addAttribute("favicon", webUrl + "/favicon.ico");
             
-            // 构建基础URL，参考RobotsController的方法
-            String scheme = req.getScheme();
-            String serverName = req.getServerName();
-            int serverPort = req.getServerPort();
-            
-            String baseUrl = scheme + "://" + serverName;
-            if ((scheme.equals("http") && serverPort != 80) || 
-                (scheme.equals("https") && serverPort != 443)) {
-                baseUrl += ":" + serverPort;
-            }
-            model.addAttribute("baseUrl", baseUrl);
-            
             // 设置首页主图
             
             // 设置精选好车数据 - 从数据库查询推荐车辆
