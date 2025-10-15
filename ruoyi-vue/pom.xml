@@ -292,7 +292,7 @@
         </repository>
     </repositories>
 
-    <pluginRepositories>
+    <!-- <pluginRepositories>
         <pluginRepository>
             <id>public</id>
             <name>aliyun nexus</name>
@@ -304,6 +304,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
-    </pluginRepositories>
+    </pluginRepositories> -->
 
 </project>
