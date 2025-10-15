@@ -7,6 +7,7 @@
     <title>${title}</title>
 
     <meta name="title" content="${ogDescription}" />
+    <meta name="description" content="${ogDescription}" />
     <meta name="keywords" content="${ogDescription}" />
     
     <meta property="og:title" content="${ogTitle}" />
