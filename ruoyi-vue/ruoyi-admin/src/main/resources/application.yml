@@ -24,7 +24,7 @@ spring:
   messages:
     basename: i18n/messages
   profiles:
-    active: prod
+    active: test
   servlet:
     multipart:
       max-file-size: 10MB
