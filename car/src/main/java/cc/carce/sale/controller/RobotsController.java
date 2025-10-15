@@ -5,6 +5,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cc.carce.sale.dto.CarListDto;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -130,8 +132,8 @@ public class RobotsController {
             // 添加汽车详情页面
             try {
                 // 获取推荐车辆列表，限制数量避免sitemap过大
-                List<cc.carce.sale.entity.CarSalesEntity> cars = carSalesService.getRecommendedCars(100);
-                for (cc.carce.sale.entity.CarSalesEntity car : cars) {
+                List<CarListDto> cars = carSalesService.getAllCars();
+                for (CarListDto car : cars) {
                     sitemapContent.append("  <url>\n");
                     sitemapContent.append("    <loc>").append(baseUrl).append("/detail/").append(car.getId()).append("</loc>\n");
                     sitemapContent.append("    <lastmod>").append(currentTime).append("</lastmod>\n");

@@ -2,6 +2,9 @@ package cc.carce.sale.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -9,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+
+import tk.mybatis.mapper.entity.Example;
 
 import cc.carce.sale.dto.CarListDto;
 import cc.carce.sale.entity.CarSalesEntity;
@@ -234,4 +239,48 @@ public class CarSalesService {
 		
 		return orderedDealerList;
 	}
+
+    public List<CarListDto> getAllCars() {
+        CarSalesSearchForm form = new CarSalesSearchForm();
+        form.setPageNum(1);
+        form.setPageSize(1000);
+        List<CarListDto> list = getCarListByPage(form).getList();
+        
+        // 批量查询经销商信息，避免N+1查询问题
+        if (list != null && !list.isEmpty()) {
+            // 收集所有需要查询的garageId
+            List<Long> garageIds = list.stream()
+                .map(CarListDto::getGarageId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+            
+            if (!garageIds.isEmpty()) {
+                // 批量查询经销商信息
+                Example dealerExample = new Example(CarDealerEntity.class);
+                dealerExample.createCriteria().andIn("idGarage", garageIds);
+                List<CarDealerEntity> dealers = carDealerMapper.selectByExample(dealerExample);
+                
+                // 创建ID到经销商名称的映射
+                Map<Long, String> dealerNameMap = dealers.stream()
+                    .collect(Collectors.toMap(
+                        CarDealerEntity::getIdGarage,
+                        CarDealerEntity::getDealerName,
+                        (existing, replacement) -> existing
+                    ));
+                
+                // 设置经销商名称
+                for (CarListDto car : list) {
+                    if (car.getGarageId() != null) {
+                        String dealerName = dealerNameMap.get(car.getGarageId());
+                        if (dealerName != null) {
+                            car.setDealerName(dealerName);
+                        }
+                    }
+                }
+            }
+        }
+        
+		return list;
+    }
 }

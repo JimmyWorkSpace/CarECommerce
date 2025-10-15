@@ -28,4 +28,6 @@ public class CarListDto {
     private String coverImage;          // 封面图片URL
     private String status;              // 状态
     private Long garageId;              // 店家ID
+    @Builder.Default
+    private String dealerName = "";              // 经销商名称
 }
