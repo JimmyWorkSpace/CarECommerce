@@ -297,10 +297,10 @@ public class CarViewController extends BaseController {
          try {
              // 检查用户登录状态
              
-             model.addAttribute("title", "關於我們 - 二手車銷售平台");
-             model.addAttribute("description", "了解我們的服務理念和團隊");
-             model.addAttribute("image", "/img/swipper/slide1.jpg");
-             model.addAttribute("url", req.getRequestURL().toString());
+             model.addAttribute("ogTitle", "關於我們 - 二手車銷售平台");
+             model.addAttribute("ogDescription", "了解我們的服務理念和團隊");
+             model.addAttribute("ogImage", "/img/swipper/slide1.jpg");
+             model.addAttribute("ogUrl", req.getRequestURL().toString());
              model.addAttribute("content", "/about/index.ftl");
          } catch (Exception e) {
              model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
