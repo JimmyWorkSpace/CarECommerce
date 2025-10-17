@@ -131,7 +131,7 @@ public class PageDataInterceptor implements HandlerInterceptor {
             String serverName = request.getServerName();
             int serverPort = request.getServerPort();
             
-            String baseUrl = scheme + "://" + serverName;
+            String baseUrl = "https://" + serverName;
             if ((scheme.equals("http") && serverPort != 80) || 
                 (scheme.equals("https") && serverPort != 443)) {
                 baseUrl += ":" + serverPort;
