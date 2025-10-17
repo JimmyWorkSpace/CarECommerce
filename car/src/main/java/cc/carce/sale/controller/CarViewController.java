@@ -300,7 +300,6 @@ public class CarViewController extends BaseController {
              model.addAttribute("ogTitle", "關於我們 - 二手車銷售平台");
              model.addAttribute("ogDescription", "了解我們的服務理念和團隊");
              model.addAttribute("ogImage", "/img/swipper/slide1.jpg");
-             model.addAttribute("ogUrl", req.getRequestURL().toString());
              model.addAttribute("content", "/about/index.ftl");
          } catch (Exception e) {
              model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
@@ -440,7 +439,6 @@ public class CarViewController extends BaseController {
             //     carInfo.getSaleDescription().replaceAll("<[^>]*>", "").substring(0, Math.min(150, carInfo.getSaleDescription().length())) : 
             //     "專業的二手車銷售平台，提供優質二手車資訊");
             model.addAttribute("ogImage", images != null && !images.isEmpty() ? images.get(0) : "/img/car/car4.jpg");
-            model.addAttribute("ogUrl", req.getRequestURL().toString());
             
             model.addAttribute("content", "/car/detail.ftl");
             
