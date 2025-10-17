@@ -1,7 +1,7 @@
 <!DOCTYPE html>
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <html lang="zh-TW">
 
     <title>${title}</title>
 
