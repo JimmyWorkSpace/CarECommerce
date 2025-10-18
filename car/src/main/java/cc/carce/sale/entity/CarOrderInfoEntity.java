@@ -61,6 +61,24 @@ public class CarOrderInfoEntity {
     private Integer orderStatus;
 
     /**
+     * 收件人县市
+     */
+    @Column(name = "receiverCity", columnDefinition = "VARCHAR(1000) COMMENT '收件人县市'")
+    private String receiverCity;
+
+    /**
+     * 收件人区镇
+     */
+    @Column(name = "receiverDistrict", columnDefinition = "VARCHAR(1000) COMMENT '收件人区镇'")
+    private String receiverDistrict;
+
+    /**
+     * 收件人邮编
+     */
+    @Column(name = "receiverZipCode", columnDefinition = "VARCHAR(1000) COMMENT '收件人邮编'")
+    private String receiverZipCode;
+
+    /**
      * 收件人地址
      */
     @Column(name = "receiverAddress", columnDefinition = "VARCHAR(1000) COMMENT '收件人地址'")
@@ -124,8 +142,7 @@ public class CarOrderInfoEntity {
      * 订单类型枚举
      */
     public enum OrderType {
-        HOME_DELIVERY(1, "宅配到府"),
-        CONVENIENCE_STORE(2, "超商取货");
+        HOME_DELIVERY(1, "宅配到府"), CONVENIENCE_STORE(2, "超商取货");
 
         private final Integer code;
         private final String description;
@@ -157,15 +174,8 @@ public class CarOrderInfoEntity {
      * 订单状态枚举
      */
     public enum OrderStatus {
-        UNPAID(0, "未支付"),
-        PAYING(1, "支付中"),
-        PAID(2, "已支付"),
-        CANCELLED(3, "已取消"),
-        PAYMENT_FAILED(4, "支付失败"),
-        SHIPPED(5, "已发货"),
-        COMPLETED(6, "已完成"),
-        RETURNING(7, "退货中"),
-        RETURNED(8, "已退货");
+        UNPAID(0, "未支付"), PAYING(1, "支付中"), PAID(2, "已支付"), CANCELLED(3, "已取消"), PAYMENT_FAILED(4, "支付失败"),
+        SHIPPED(5, "已发货"), COMPLETED(6, "已完成"), RETURNING(7, "退货中"), RETURNED(8, "已退货");
 
         private final Integer code;
         private final String description;

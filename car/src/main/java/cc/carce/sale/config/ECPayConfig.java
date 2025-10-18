@@ -27,6 +27,15 @@ public class ECPayConfig {
      */
     private String queryServerUrl = "https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5";
     
+    /**
+     * 绿界物流API地址（测试环境）
+     */
+    private String logisticsApiUrl = "https://logistics-stage.ecpay.com.tw";
+    
+    /**
+     * 绿界物流API地址（正式环境）
+     */
+    private String logisticsProductionUrl = "https://logistics.ecpay.com.tw";
     
     /**
      * 商户编号
@@ -68,6 +77,13 @@ public class ECPayConfig {
      */
     public String getCurrentServerUrl() {
         return production ? productionUrl : serverUrl;
+    }
+    
+    /**
+     * 获取当前环境的物流API地址
+     */
+    public String getCurrentLogisticsApiUrl() {
+        return production ? logisticsProductionUrl : logisticsApiUrl;
     }
     
 }

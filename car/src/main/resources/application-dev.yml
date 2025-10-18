@@ -68,4 +68,7 @@ ecpay:
   client-back-url: "https://carce.yanjiashuo.cn/my-order/detail-page?orderId="
   result-url: "http://localhost:8080/payment/result"
   # 查询API地址配置
-  query-production-url: "https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5"
+  query-server-url: "https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5"
+  # 物流API地址配置
+  logistics-api-url: "https://logistics-stage.ecpay.com.tw"
+  logistics-production-url: "https://logistics.ecpay.com.tw"

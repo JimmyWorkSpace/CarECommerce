@@ -244,9 +244,9 @@
                                             </button>
                                         </li>
                                         <li class="nav-item" role="presentation">
-                                            <button class="nav-link" id="store-pickup-tab" data-bs-toggle="tab" 
-                                                    data-bs-target="#store-pickup" type="button" role="tab" 
-                                                    aria-controls="store-pickup" aria-selected="false"
+                                            <button class="nav-link" id="store-receiver-tab" data-bs-toggle="tab" 
+                                                    data-bs-target="#store-receiver" type="button" role="tab" 
+                                                    aria-controls="store-receiver" aria-selected="false"
                                                     @click="switchDeliveryType(2)">
                                                 <i class="bi bi-shop me-2"></i>超商取貨
                                             </button>
@@ -273,10 +273,26 @@
                                                                v-model="formData.receiverMobile" required>
                                                     </div>
                                                 </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="receiverCity" class="form-label">縣市 <span class="text-danger">*</span></label>
+                                                        <select class="form-control" id="receiverCity" v-model="formData.receiverCity" @change="onCityChange" required>
+                                                            <option value="">請選擇縣市</option>
+                                                            <option v-for="city in cityList" :key="city" :value="city">{{ city }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="receiverDistrict" class="form-label">區鎮 <span class="text-danger">*</span></label>
+                                                        <select class="form-control" id="receiverDistrict" v-model="formData.receiverDistrict" @change="onDistrictChange" required>
+                                                            <option value="">請選擇區鎮</option>
+                                                            <option v-for="district in districtList" :key="district" :value="district">{{ district }}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
                                                 <div class="mb-3">
-                                                    <label for="receiverAddress" class="form-label">收件人地址 <span class="text-danger">*</span></label>
+                                                    <label for="receiverAddress" class="form-label">詳細地址 <span class="text-danger">*</span></label>
                                                     <textarea class="form-control" id="receiverAddress" 
-                                                              rows="3" placeholder="請輸入詳細的收件人地址" 
+                                                              rows="3" placeholder="請輸入詳細的收件人地址（街道、門牌號等）" 
                                                               v-model="formData.receiverAddress" required></textarea>
                                                 </div>
                                                 <div class="mb-3">
@@ -289,29 +305,45 @@
                                         </div>
                                         
                                         <!-- 超商取貨 -->
-                                        <div class="tab-pane fade" id="store-pickup" role="tabpanel" 
-                                             aria-labelledby="store-pickup-tab">
+                                        <div class="tab-pane fade" id="store-receiver" role="tabpanel" 
+                                             aria-labelledby="store-receiver-tab">
                                             <form @submit.prevent="submitPayment">
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="pickupName" class="form-label">取貨人姓名 <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="pickupName" 
+                                                        <label for="receiverName" class="form-label">取貨人姓名 <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" id="receiverName" 
                                                                placeholder="請輸入取貨人姓名" 
                                                                v-model="formData.receiverName" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="pickupMobile" class="form-label">取貨人手機號 <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="pickupMobile" 
+                                                        <label for="receiverMobile" class="form-label">取貨人手機號 <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" id="receiverMobile" 
                                                                placeholder="請輸入取貨人手機號" 
                                                                v-model="formData.receiverMobile" required>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="receiverCity" class="form-label">縣市 <span class="text-danger">*</span></label>
+                                                        <select class="form-control" id="receiverCity" v-model="formData.receiverCity" @change="onPickupCityChange" required>
+                                                            <option value="">請選擇縣市</option>
+                                                            <option v-for="city in cityList" :key="city" :value="city">{{ city }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="receiverDistrict" class="form-label">區鎮 <span class="text-danger">*</span></label>
+                                                        <select class="form-control" id="receiverDistrict" v-model="formData.receiverDistrict" @change="onPickupDistrictChange" required>
+                                                            <option value="">請選擇區鎮</option>
+                                                            <option v-for="district in receiverDistrictList" :key="district" :value="district">{{ district }}</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="storeSelect" class="form-label">選擇取貨門店 <span class="text-danger">*</span></label>
                                                     <select class="form-control" id="storeSelect" v-model="formData.selectedStore" required>
                                                         <option value="">請選擇取貨門店</option>
-                                                        <option v-for="store in storeList" :key="store.storeId" :value="store">
-                                                            {{ store.storeName }} - {{ store.storeAddress }}
+                                                        <option v-for="store in filteredStoreList" :key="store.storeId" :value="store">
+                                                            {{ store.csvName }} - {{ store.storeName }} - {{ store.storeAddr }}
                                                         </option>
                                                     </select>
                                                 </div>
@@ -326,8 +358,9 @@
                                                 <div v-if="formData.selectedStore" class="alert alert-info">
                                                     <h6><i class="bi bi-info-circle me-2"></i>門店資訊</h6>
                                                     <p class="mb-1"><strong>門店名稱：</strong>{{ formData.selectedStore.storeName }}</p>
-                                                    <p class="mb-1"><strong>門店地址：</strong>{{ formData.selectedStore.storeAddress }}</p>
-                                                    <p class="mb-0"><strong>聯繫電話：</strong>{{ formData.selectedStore.storeTelephone }}</p>
+                                                    <p class="mb-1"><strong>門店類型：</strong>{{ formData.selectedStore.csvName }}</p>
+                                                    <p class="mb-1"><strong>門店地址：</strong>{{ formData.selectedStore.storeAddr }}</p>
+                                                    <p class="mb-0"><strong>聯繫電話：</strong>{{ formData.selectedStore.storePhone }}</p>
                                                 </div>
                                             </form>
                                         </div>
@@ -369,7 +402,7 @@
                                         </div>
                                         <div class="info-row" v-if="formData.orderType === 1">
                                             <span class="info-label">收貨地址：</span>
-                                            <span class="info-value" v-text="formData.receiverAddress || '-'"></span>
+                                            <span class="info-value" v-text="getFullAddress()"></span>
                                         </div>
                                         <div class="info-row" v-if="formData.orderType === 2 && formData.selectedStore">
                                             <span class="info-label">取貨門店：</span>
@@ -377,7 +410,7 @@
                                         </div>
                                         <div class="info-row" v-if="formData.orderType === 2 && formData.selectedStore">
                                             <span class="info-label">門店地址：</span>
-                                            <span class="info-value" v-text="formData.selectedStore.storeAddress"></span>
+                                            <span class="info-value" v-text="formData.selectedStore.storeAddr"></span>
                                         </div>
                     </div>
                     
@@ -434,6 +467,7 @@
         </div>
     </div>
 </div>
+    <script src="/js/address.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             new Vue({
@@ -446,6 +480,12 @@
                     receiverName: '',
                     receiverMobile: '',
                     receiverAddress: '',
+                    receiverCity: '',
+                    receiverDistrict: '',
+                    receiverZipCode: '',
+                    receiverCity: '',
+                    receiverDistrict: '',
+                    receiverZipCode: '',
                     orderType: 1, // 1: 宅配到府, 2: 超商取貨
                     selectedStore: null
                 },
@@ -454,6 +494,12 @@
                 orderInfo: ${orderInfoJson},
                 cartItems: [],
                 storeList: [], // 超商門店列表
+                cityList: [], // 縣市列表
+                districtList: [], // 區鎮列表（宅配用）
+                zipcodeList: [], // 郵編列表（宅配用）
+                receiverDistrictList: [], // 區鎮列表（超商取貨用）
+                receiverZipCodeList: [], // 郵編列表（超商取貨用）
+                filteredStoreList: [], // 篩選後的門店列表
                 isLoading: false,
                 errorMessage: '',
                 successMessage: '',
@@ -464,7 +510,7 @@
                 console.log('Vue實例已掛載');
                 this.initCartItems();
                 this.loadPaymentConfig();
-                this.loadStoreList();
+                this.initAddressData();
                 this.initData();
             },
             methods: {
@@ -477,6 +523,125 @@
                         this.formData.orderNo = this.orderInfo.orderNo;
                         this.formData.orderId = this.orderInfo.id;
                     }
+            	},
+            	
+            	// 初始化地址數據
+            	initAddressData() {
+            	    // 從address.js中獲取縣市列表
+            	    this.cityList = Object.keys(allAddressData);
+            	    // 初始化時清空門店列表，等待用戶選擇縣市後再載入
+            	    this.filteredStoreList = [];
+            	},
+            	
+            	// 宅配縣市變更
+            	onCityChange() {
+            	    this.formData.receiverZipCode = '';
+            	    this.formData.receiverDistrict = '';
+            	    if (this.formData.receiverCity && allAddressData[this.formData.receiverCity]) {
+            	        // 獲取該縣市的所有區鎮
+            	        this.districtList = Object.values(allAddressData[this.formData.receiverCity]);
+            	    } else {
+            	        this.districtList = [];
+            	    }
+            	},
+            	
+            	// 宅配區鎮變更
+            	onDistrictChange() {
+            	    // 根據區鎮自動獲取對應的郵編
+            	    if (this.formData.receiverCity && this.formData.receiverDistrict && allAddressData[this.formData.receiverCity]) {
+            	        // 查找對應的郵編
+            	        for (let zipcode in allAddressData[this.formData.receiverCity]) {
+            	            if (allAddressData[this.formData.receiverCity][zipcode] === this.formData.receiverDistrict) {
+            	                this.formData.receiverZipCode = zipcode;
+            	                break;
+            	            }
+            	        }
+            	    }
+            	},
+            	
+            	// 超商取貨縣市變更
+            	onPickupCityChange() {
+            	    this.formData.receiverZipCode = '';
+            	    this.formData.receiverDistrict = '';
+            	    this.formData.selectedStore = null;
+            	    if (this.formData.receiverCity && allAddressData[this.formData.receiverCity]) {
+            	        // 獲取該縣市的所有區鎮
+            	        this.receiverDistrictList = Object.values(allAddressData[this.formData.receiverCity]);
+            	    } else {
+            	        this.receiverDistrictList = [];
+            	    }
+            	    this.filteredStoreList = [];
+            	},
+            	
+            	// 超商取貨區鎮變更
+            	onPickupDistrictChange() {
+            	    this.formData.selectedStore = null;
+            	    // 根據區鎮自動獲取對應的郵編
+            	    if (this.formData.receiverCity && this.formData.receiverDistrict && allAddressData[this.formData.receiverCity]) {
+            	        // 查找對應的郵編
+            	        for (let zipcode in allAddressData[this.formData.receiverCity]) {
+            	            if (allAddressData[this.formData.receiverCity][zipcode] === this.formData.receiverDistrict) {
+            	                this.formData.receiverZipCode = zipcode;
+            	                break;
+            	            }
+            	        }
+            	    }
+            	    this.loadStoreListByLocation();
+            	},
+            	
+            	// 根據縣市和區鎮載入門店列表
+            	loadStoreListByLocation() {
+                    let _this = this;
+            	    // 必須同時選擇縣市和區鎮才查詢門店
+            	    if (!this.formData.receiverCity || !this.formData.receiverDistrict) {
+            	        this.filteredStoreList = [];
+            	        return;
+            	    }
+            	    
+            	    // 構建查詢參數
+            	    let city = this.formData.receiverCity;
+            	    let district = this.formData.receiverDistrict;
+            	    
+            	    // 調用接口獲取門店列表
+            	    axios.get('/api/logistics/stores', {
+            	        params: {
+            	            city: city,
+            	            district: district
+            	        }
+            	    })
+            	    .then(response => {
+            	        if (response.data.code === 1) {
+            	            _this.filteredStoreList = response.data.data || [];
+            	            console.log('根據位置載入門店列表成功:', _this.filteredStoreList);
+            	        } else {
+            	            console.error('獲取門店列表失敗:', response.data.msg);
+            	            _this.showError('獲取門店列表失敗');
+            	            _this.filteredStoreList = [];
+            	        }
+            	    })
+            	    .catch(error => {
+            	        console.error('獲取門店列表異常:', error);
+            	        _this.showError('獲取門店列表異常');
+            	        _this.filteredStoreList = [];
+            	    });
+            	},
+            	
+            	// 獲取完整地址
+            	getFullAddress() {
+            	    if (this.formData.orderType === 1) {
+            	        let address = '';
+            	        if (this.formData.receiverCity) {
+            	            address += this.formData.receiverCity;
+            	        }
+            	        if (this.formData.receiverDistrict) {
+            	            address += this.formData.receiverDistrict;
+            	        }
+            	        if (this.formData.receiverAddress) {
+            	            address += this.formData.receiverAddress;
+            	        }
+            	        return address || '-';
+            	    }
+            	    return '-';
             	},
                 // 載入支付配置
                 loadPaymentConfig() {
@@ -608,20 +773,28 @@
                         paymentData.orderId = this.orderId;
                     }
                     
-                    // 根據配送方式添加相應字段
-                    if (this.formData.orderType === 1) {
-                        // 宅配到府
-                        paymentData.receiverAddress = this.formData.receiverAddress;
-                    } else {
-                        // 超商取貨
-                        if (this.formData.selectedStore) {
-                            paymentData.cvsStoreID = this.formData.selectedStore.storeId;
-                            paymentData.cvsStoreName = this.formData.selectedStore.storeName;
-                            paymentData.cvsAddress = this.formData.selectedStore.storeAddress;
-                            paymentData.cvsTelephone = this.formData.selectedStore.storeTelephone;
-                            paymentData.cvsOutSide = this.formData.selectedStore.outSide || 0;
-                        }
-                    }
+                     // 根據配送方式添加相應字段
+                     if (this.formData.orderType === 1) {
+                         // 宅配到府
+                         paymentData.receiverCity = this.formData.receiverCity;
+                         paymentData.receiverDistrict = this.formData.receiverDistrict;
+                         paymentData.receiverZipCode = this.formData.receiverZipCode;
+                         paymentData.receiverAddress = this.formData.receiverAddress;
+                     } else {
+                         // 超商取貨
+                         if (this.formData.selectedStore) {
+                             paymentData.cvsStoreID = this.formData.selectedStore.storeId;
+                             paymentData.cvsStoreName = this.formData.selectedStore.storeName;
+                             paymentData.cvsAddress = this.formData.selectedStore.storeAddr;
+                             paymentData.cvsTelephone = this.formData.selectedStore.storePhone;
+                             paymentData.cvsOutSide = this.formData.selectedStore.outSide || 0;
+                             
+                             // 添加縣市、郵編和區鎮
+                             paymentData.receiverCity = this.formData.receiverCity;
+                             paymentData.receiverZipCode = this.formData.receiverZipCode;
+                             paymentData.receiverDistrict = this.formData.receiverDistrict;
+                         }
+                     }
                     
                     axios.post('/api/payment/create', paymentData)
                     .then(response => {
@@ -668,12 +841,28 @@
                     // 根據配送方式驗證相應字段
                     if (this.formData.orderType === 1) {
                         // 宅配到府，驗證地址
+                        if (!this.formData.receiverCity || this.formData.receiverCity.trim() === '') {
+                            this.showError('請選擇收件縣市');
+                            return false;
+                        }
+                        if (!this.formData.receiverDistrict || this.formData.receiverDistrict.trim() === '') {
+                            this.showError('請選擇收件區鎮');
+                            return false;
+                        }
                         if (!this.formData.receiverAddress || this.formData.receiverAddress.trim() === '') {
-                            this.showError('收件人地址不能為空');
+                            this.showError('收件人詳細地址不能為空');
                             return false;
                         }
                     } else {
                         // 超商取貨，驗證門店選擇
+                        if (!this.formData.receiverCity || this.formData.receiverCity.trim() === '') {
+                            this.showError('請選擇取貨縣市');
+                            return false;
+                        }
+                        if (!this.formData.receiverDistrict || this.formData.receiverDistrict.trim() === '') {
+                            this.showError('請選擇取貨區鎮');
+                            return false;
+                        }
                         if (!this.formData.selectedStore) {
                             this.showError('請選擇取貨門店');
                             return false;
@@ -790,31 +979,22 @@
                     this.formData.orderType = orderType;
                     // 清空相關字段
                     if (orderType === 1) {
-                        // 宅配到府，清空門店選擇
+                        // 宅配到府，清空門店選擇和超商取貨相關字段
                         this.formData.selectedStore = null;
+                        this.formData.receiverCity = '';
+                        this.formData.receiverZipCode = '';
+                        this.formData.receiverDistrict = '';
+                        this.filteredStoreList = [];
                     } else {
-                        // 超商取貨，清空地址
+                        // 超商取貨，清空宅配地址相關字段
                         this.formData.receiverAddress = '';
+                        this.formData.receiverCity = '';
+                        this.formData.receiverZipCode = '';
+                        this.formData.receiverDistrict = '';
+                        this.filteredStoreList = [];
                     }
                 },
                 
-                // 載入超商門店列表
-                loadStoreList() {
-                    axios.get('/api/logistics/stores')
-                        .then(response => {
-                            if (response.data.code === 1) {
-                                this.storeList = response.data.data || [];
-                                console.log('門店列表載入成功:', this.storeList);
-                            } else {
-                                console.error('獲取門店列表失敗:', response.data.msg);
-                                this.showError('獲取門店列表失敗');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('獲取門店列表異常:', error);
-                            this.showError('獲取門店列表異常');
-                        });
-                }
             }
         });
         });

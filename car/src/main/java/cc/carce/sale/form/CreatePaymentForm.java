@@ -35,7 +35,12 @@ public class CreatePaymentForm {
      * 收件人地址
      */
     private String receiverAddress;
+
+    private String receiverCity;
+
+    private String receiverDistrict;
     
+    private String receiverZipCode;
     /**
      * 订单类型 1 宅配到府 2 超商取货
      */

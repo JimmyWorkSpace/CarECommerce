@@ -28,10 +28,10 @@ public class ECPayUtils {
      * 2. 参数最前面加上HashKey、最后面加上HashIV
      * 3. 将整串字串进行URL encode（按照.NET编码(ecpay)规则）
      * 4. 转为小写
-     * 5. 以SHA256加密方式来产生杂凑值
+     * 5. 以MD5加密方式来产生杂凑值
      * 6. 再转大写产生CheckMacValue
      */
-    public String generateSignature(Map<String, String> params) {
+    public String generateSignatureWithSha256(Map<String, String> params) {
         try {
             // 1. 过滤空值参数和CheckMacValue，并按字母顺序排序
             Map<String, String> filteredParams = new TreeMap<>();
@@ -78,9 +78,72 @@ public class ECPayUtils {
             String lowerString = encodedString.toLowerCase();
             log.info("绿界支付签名生成 - 步骤5 小写转换后: {}", lowerString);
             
-            // 7. SHA256加密
+            // 7. MD5加密
             String signature = DigestUtils.sha256Hex(lowerString);
-            log.info("绿界支付签名生成 - 步骤6 SHA256加密后: {}", signature);
+            log.info("绿界支付签名生成 - 步骤6 MD5加密后: {}", signature);
+            
+            // 8. 转换为大写
+            String finalSignature = signature.toUpperCase();
+            log.info("绿界支付签名生成 - 步骤7 最终签名: {}", finalSignature);
+            
+            return finalSignature;
+            
+        } catch (Exception e) {
+            log.error("生成绿界支付签名失败", e);
+            throw new RuntimeException("生成支付签名失败", e);
+        }
+    }
+
+    public String generateSignatureWithMd5(Map<String, Object> params) {
+        try {
+            // 1. 过滤空值参数和CheckMacValue，并按字母顺序排序
+            Map<String, Object> filteredParams = new TreeMap<>();
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                if (!"CheckMacValue".equals(entry.getKey())) {
+                    filteredParams.put(entry.getKey(), entry.getValue());
+                }
+            }
+            
+            // 2. 构建查询字符串（参数已按字母顺序排序）
+            StringBuilder queryString = new StringBuilder();
+            for (Map.Entry<String, Object> entry : filteredParams.entrySet()) {
+                if (queryString.length() > 0) {
+                    queryString.append("&");
+                }
+                queryString.append(entry.getKey()).append("=").append(entry.getValue());
+            }
+            
+            // 3. 获取HashKey和HashIV
+            String hashKey = ecPayConfig.getHashKey();
+            String hashIv = ecPayConfig.getHashIv();
+            
+            // 4. 构建待签名字符串：HashKey=xxx&参数串&HashIV=xxx
+            String signString = "HashKey=" + hashKey + "&" + queryString + "&HashIV=" + hashIv;
+            
+            log.info("绿界支付签名生成 - 步骤1 过滤后参数: {}", filteredParams);
+            log.info("绿界支付签名生成 - 步骤2 查询字符串: {}", queryString.toString());
+            log.info("绿界支付签名生成 - 步骤3 待签名字符串: {}", signString);
+            
+            // 5. URL编码（UTF-8）- 按照绿界支付官方文档要求
+            // 根据官方文档：https://developers.ecpay.com.tw/?p=2902
+            // 需要按照.NET编码(ecpay)规则进行URL编码
+            String encodedString = URLEncoder.encode(signString, StandardCharsets.UTF_8.name())
+                    .replace("%2d", "-")   // 连字符
+                    .replace("%5f", "_")   // 下划线
+                    .replace("%2e", ".")   // 点号
+                    .replace("%21", "!")   // 感叹号
+                    .replace("%2a", "*")   // 星号
+                    .replace("%28", "(")   // 左括号
+                    .replace("%29", ")");  // 右括号
+            log.info("绿界支付签名生成 - 步骤4 URL编码后: {}", encodedString);
+            
+            // 6. 转换为小写
+            String lowerString = encodedString.toLowerCase();
+            log.info("绿界支付签名生成 - 步骤5 小写转换后: {}", lowerString);
+            
+            // 7. MD5加密
+            String signature = DigestUtils.md5Hex(lowerString);
+            log.info("绿界支付签名生成 - 步骤6 MD5加密后: {}", signature);
             
             // 8. 转换为大写
             String finalSignature = signature.toUpperCase();
@@ -99,7 +162,7 @@ public class ECPayUtils {
      */
     public boolean verifySignature(Map<String, String> params, String signature) {
         try {
-            String calculatedSignature = generateSignature(params);
+            String calculatedSignature = generateSignatureWithSha256(params);
             boolean isValid = calculatedSignature.equalsIgnoreCase(signature);
             
             log.debug("绿界支付签名验证 - 计算签名: {}, 接收签名: {}, 验证结果: {}", 
@@ -174,7 +237,7 @@ public class ECPayUtils {
         log.info("构建支付参数 - 订单号: {}, 金额: {}, 商品: {}", merchantTradeNo, totalAmount, itemName);
         
         // 生成签名
-        String signature = generateSignature(params);
+        String signature = generateSignatureWithSha256(params);
         params.put("CheckMacValue", signature);
         
         log.info("支付参数构建完成，包含 {} 个参数", params.size());
