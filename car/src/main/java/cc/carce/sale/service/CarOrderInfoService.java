@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cc.carce.sale.entity.CarOrderInfoEntity;
+import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.mapper.manager.CarOrderInfoMapper;
 import cc.carce.sale.mapper.manager.CarOrderDetailMapper;
@@ -34,8 +35,7 @@ public class CarOrderInfoService {
      * 创建订单
      */
     @Transactional
-    public CarOrderInfoEntity createOrder(Long userId, String orderNo, String receiverName, String receiverMobile, 
-                                        String receiverAddress, List<CarOrderDetailEntity> orderDetails) {
+    public CarOrderInfoEntity createOrder(Long userId, String orderNo, CreatePaymentForm form, List<CarOrderDetailEntity> orderDetails) {
         try {
             // 计算总价格
             Integer totalPrice = calculateTotalPrice(orderDetails);
@@ -50,9 +50,12 @@ public class CarOrderInfoService {
             orderInfo.setShowOrder(0);
             orderInfo.setOrderStatus(CarOrderInfoEntity.OrderStatus.UNPAID.getCode());
             orderInfo.setOrderType(1); // 默认宅配到府
-            orderInfo.setReceiverName(receiverName);
-            orderInfo.setReceiverMobile(receiverMobile);
-            orderInfo.setReceiverAddress(receiverAddress);
+            orderInfo.setReceiverName(form.getReceiverName());
+            orderInfo.setReceiverMobile(form.getReceiverMobile());
+            orderInfo.setReceiverAddress(form.getReceiverAddress());
+            orderInfo.setReceiverCity(form.getReceiverCity());
+            orderInfo.setReceiverDistrict(form.getReceiverDistrict());
+            orderInfo.setReceiverZipCode(form.getReceiverZipCode());
             
             // 插入订单主表
             carOrderInfoMapper.insert(orderInfo);

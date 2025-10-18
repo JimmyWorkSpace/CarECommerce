@@ -3,6 +3,7 @@ package cc.carce.sale.mapper.manager;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import tk.mybatis.mapper.common.Mapper;
@@ -66,4 +67,7 @@ public interface CarPaymentOrderMapper extends Mapper<CarPaymentOrderEntity> {
      * 删除支付订单（逻辑删除）
      */
     int deleteById(@Param("id") Long id);
+
+    @Select("SELECT * FROM car_payment_order WHERE merchant_trade_no = #{orderNo} AND del_flag = 0")
+    CarPaymentOrderEntity getPaymentOrderByOrderNo(@Param("orderNo") String orderNo);
 }

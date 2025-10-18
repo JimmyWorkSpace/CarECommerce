@@ -421,7 +421,7 @@ public class ECPayService {
             } else {
                 // 新订单，创建业务订单
                 orderInfo = carOrderInfoService.createOrder(
-                    userId, merchantTradeNo, form.getReceiverName(), form.getReceiverMobile(), form.getReceiverAddress(), orderDetails);
+                    userId, merchantTradeNo, form, orderDetails);
                 
                 if (orderInfo == null) {
                     log.error("创建业务订单失败，用户ID: {}", userId);
@@ -525,7 +525,7 @@ public class ECPayService {
             }
             
             // 使用ECPayUtils验证检查码
-            String calculatedCheckMac = ecPayUtils.generateSignature(params);
+            String calculatedCheckMac = ecPayUtils.generateSignatureWithSha256(params);
             
             boolean isValid = checkMacValue.equals(calculatedCheckMac);
             if (!isValid) {
@@ -651,7 +651,7 @@ public class ECPayService {
             params.put("TimeStamp", String.valueOf(System.currentTimeMillis() / 1000));
             
             // 生成检查码
-            String checkMacValue = ecPayUtils.generateSignature(params);
+            String checkMacValue = ecPayUtils.generateSignatureWithSha256(params);
             params.put("CheckMacValue", checkMacValue);
             
             // 从配置文件获取查询API地址
