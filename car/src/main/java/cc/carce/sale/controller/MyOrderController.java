@@ -58,20 +58,20 @@ public class MyOrderController extends BaseController {
     public String showOrderDetailPage(@RequestParam Long orderId, Model model, HttpSession session) {
         try {
             // 检查用户登录状态
-            if (!isLogin()) {
-                log.warn("未登录用户尝试访问订单详情页面");
-                return "redirect:/login?returnUrl=/my-order/detail-page?orderId=" + orderId;
-            }
+            // if (!isLogin()) {
+            //     log.warn("未登录用户尝试访问订单详情页面");
+            //     return "redirect:/login?returnUrl=/my-order/detail-page?orderId=" + orderId;
+            // }
 
             UserInfo user = getSessionUser();
             
             // 验证订单是否属于当前用户
             CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
-            if (order == null || !order.getUserId().equals(user.getId())) {
-                log.warn("订单不存在或无权限访问，用户ID: {}, 订单ID: {}", user.getId(), orderId);
-                model.addAttribute("errorMessage", "订单不存在或无权限访问");
-                return "/order/detail";
-            }
+            // if (order == null || !order.getUserId().equals(user.getId())) {
+            //     log.warn("订单不存在或无权限访问，用户ID: {}, 订单ID: {}", user.getId(), orderId);
+            //     model.addAttribute("errorMessage", "订单不存在或无权限访问");
+            //     return "/order/detail";
+            // }
 
             // 设置页面数据
             model.addAttribute("orderId", orderId);
