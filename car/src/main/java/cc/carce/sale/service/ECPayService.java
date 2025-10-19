@@ -172,7 +172,7 @@ public class ECPayService {
                 new Date()
             );
 
-            logisticsService.createLogisticsByOrderNo(merchantTradeNo);
+            // logisticsService.createLogisticsByOrderNo(merchantTradeNo);
             
             if (updateResult > 0) {
                 log.info("支付订单状态更新成功，商户订单号: {}, 状态: {}", 
@@ -588,6 +588,9 @@ public class ECPayService {
                 paymentOrder.setEcpayTradeNo(dto.getTradeNo());
                 paymentOrder.setPaymentType(dto.getPaymentType());
                 paymentOrder.setPaymentMessage(dto.getRtnMsg());
+
+                logisticsService.createLogisticsByOrderNo(merchantTradeNo);
+
                 
                 // 更新支付订单
                 paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
