@@ -437,6 +437,30 @@
         <p><#if carInfo.saleDescription??>${carInfo.saleDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if><#if carInfo.saleDescription?? && ogDescription??>,</#if><#if ogDescription??>${ogDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if></p>
     </section>
 </div>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "${ogTitle}",
+  "image": "https://testcloud.carce.cc/img/car_sale/sell_car_68d4ac5db7cc01.55690246.jpg",
+  "description": "<#if carInfo.saleDescription??>${carInfo.saleDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if><#if carInfo.saleDescription?? && ogDescription??>,</#if><#if ogDescription??>${ogDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if>",
+  "brand": {
+    "@type": "Brand",
+    "name": "${carInfo.brand}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "${ogUrl}",
+    "priceCurrency": "TWD",
+    "price": "50000",
+    "availability": "https://schema.org/InStock",
+    "seller": {
+      "@type": "Organization",
+      "name": "小明二手車"
+    }
+  }
+}
+</script>
 <script>
 console.log('Vue版本:', Vue.version);
 console.log('开始初始化Vue实例...');
