@@ -81,8 +81,8 @@ public class MyOrderController extends BaseController {
             // 设置模板内容
             model.addAttribute("content", "/order/detail.ftl");
 
-            log.info("用户访问订单详情页面，用户ID: {}, 订单ID: {}, 订单号: {}", 
-                    user.getId(), orderId, order.getOrderNo());
+            // log.info("用户访问订单详情页面，用户ID: {}, 订单ID: {}, 订单号: {}", 
+            //         user.getId(), orderId, order.getOrderNo());
 
             return "/layout/main";
         } catch (Exception e) {
