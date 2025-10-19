@@ -44,6 +44,14 @@
                                     <span class="info-label">收货地址：</span>
                                     <span class="info-value">{{ order.receiverAddress || '-' }}</span>
                                 </div>
+                                
+                                <!-- 物流状态显示（仅已支付订单显示） -->
+                                <div v-if="order.orderStatus === 2" class="info-row">
+                                    <span class="info-label">物流状态：</span>
+                                    <span class="info-value logistics-status" :class="getLogisticsStatusClass(order)">
+                                        <i class="bi bi-truck me-1"></i>{{ getLogisticsStatusText(order) }}
+                                    </span>
+                                </div>
                             </div>
                             
                             <!-- 订单详情（已弃用，现在跳转到详情页面） -->
@@ -146,6 +154,80 @@
                         8: 'status-cancelled'
                     };
                     return classMap[status] || 'status-unpaid';
+                },
+                
+                // 获取物流状态文本
+                getLogisticsStatusText(order) {
+                    try {
+                        // 安全地获取属性值
+                        const statusCode = order && order.logicStatusCode ? order.logicStatusCode : null;
+                        const msg = order && order.logicMsg ? order.logicMsg : null;
+                        
+                        // 如果有物流状态码，根据状态码显示
+                        if (statusCode && statusCode !== null && statusCode !== '') {
+                            const statusMap = {
+                                '300': '訂單建立',
+                                '301': '待收件',
+                                '302': '已收件',
+                                '303': '配送中',
+                                '304': '已取件',
+                                '305': '已送達',
+                                '306': '退貨中',
+                                '307': '已退貨',
+                                '308': '配送異常',
+                                '309': '已取消'
+                            };
+                            return statusMap[statusCode] || '未知状态(' + statusCode + ')';
+                        }
+                        // 如果没有状态码但有物流消息，显示物流消息
+                        else if (msg && msg !== null && msg !== '') {
+                            return msg;
+                        }
+                        // 都没有则显示默认状态
+                        else {
+                            return '物流信息待更新';
+                        }
+                    } catch (error) {
+                        console.error('获取物流状态文本时出错:', error);
+                        return '物流信息待更新';
+                    }
+                },
+                
+                // 获取物流状态样式类
+                getLogisticsStatusClass(order) {
+                    try {
+                        // 安全地获取属性值
+                        const statusCode = order && order.logicStatusCode ? order.logicStatusCode : null;
+                        const msg = order && order.logicMsg ? order.logicMsg : null;
+                        
+                        // 如果有物流状态码，根据状态码设置样式
+                        if (statusCode && statusCode !== null && statusCode !== '') {
+                            const classMap = {
+                                '300': 'logistics-created',
+                                '301': 'logistics-pending',
+                                '302': 'logistics-received',
+                                '303': 'logistics-shipping',
+                                '304': 'logistics-picked',
+                                '305': 'logistics-delivered',
+                                '306': 'logistics-returning',
+                                '307': 'logistics-returned',
+                                '308': 'logistics-error',
+                                '309': 'logistics-cancelled'
+                            };
+                            return classMap[statusCode] || 'logistics-unknown';
+                        }
+                        // 如果有物流消息，可能是错误信息
+                        else if (msg && msg !== null && msg !== '') {
+                            return 'logistics-message';
+                        }
+                        // 默认状态
+                        else {
+                            return 'logistics-default';
+                        }
+                    } catch (error) {
+                        console.error('获取物流状态样式类时出错:', error);
+                        return 'logistics-default';
+                    }
                 },
                 
                 // 格式化日期

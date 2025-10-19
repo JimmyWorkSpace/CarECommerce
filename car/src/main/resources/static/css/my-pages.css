@@ -159,6 +159,98 @@
     border: 1px solid #bee5eb;
 }
 
+/* 物流状态样式 */
+.logistics-status {
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 物流状态码对应的样式 */
+.logistics-created {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.logistics-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.logistics-received {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b3d7ff;
+}
+
+.logistics-shipping {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.logistics-picked {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.logistics-delivered {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    font-weight: 600;
+}
+
+.logistics-returning {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.logistics-returned {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.logistics-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    font-weight: 600;
+}
+
+.logistics-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.logistics-unknown {
+    background-color: #e9ecef;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.logistics-message {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+    font-style: italic;
+}
+
+.logistics-default {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
 /* 操作按钮区域 */
 .item-actions {
     display: flex;

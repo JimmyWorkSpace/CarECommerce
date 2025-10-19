@@ -200,6 +200,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                </div>
                                 
                                 <!-- 商品信息 -->
                                 <div class="row mt-3" v-if="logisticsInfo.goodsName">
@@ -413,6 +414,7 @@
         </div>
     </div>
 </div>
+</div>
 
 <script>
     new Vue({
@@ -543,6 +545,7 @@
             
             // 加载绿界支付信息
             loadECPayInfo() {
+                let _this = this;
                 const urlParams = new URLSearchParams(window.location.search);
                 const orderId = urlParams.get('orderId');
                 
@@ -558,19 +561,19 @@
                     .then(response => {
                         console.log('绿界支付信息API响应:', response.data);
                         if (response.data && response.data.code === 1) {
-                            this.ecpayInfo = response.data.data;
+                            _this.ecpayInfo = response.data.data;
                             console.log('绿界支付信息设置成功:', this.ecpayInfo);
                             console.log('ecpayInfo类型:', typeof this.ecpayInfo);
                             console.log('ecpayInfo是否为null:', this.ecpayInfo === null);
                             console.log('ecpayInfo是否为undefined:', this.ecpayInfo === undefined);
                         } else {
                             console.warn('获取绿界支付信息失败:', response.data ? response.data.msg : '未知错误');
-                            this.ecpayInfo = null;
+                            _this.ecpayInfo = null;
                         }
                     })
                     .catch(error => {
                         console.error('获取绿界支付信息失败:', error);
-                        this.ecpayInfo = null;
+                        _this.ecpayInfo = null;
                     })
                     .finally(() => {
                         this.isLoadingECPay = false;
@@ -597,7 +600,6 @@
                             _this.logisticsInfo = response.data.data;
                             console.log('物流信息设置成功:', _this.logisticsInfo);
                         } else {
-                            console.warn('获取物流信息失败:', response.data ? response.data.msg : '未知错误');
                             _this.logisticsInfo = {};
                         }
                     })
