@@ -179,7 +179,29 @@ public class CarOrderInfoService {
                                      String receiverMobile, String receiverAddress) {
         try {
             int result = carOrderInfoMapper.updateLogisticsInfo(orderId, logicNumber, receiverName, 
-                                                              receiverMobile, receiverAddress);
+                                                              receiverMobile, receiverAddress, null, null, null);
+            if (result > 0) {
+                log.info("更新物流信息成功，订单ID：{}，物流单号：{}", orderId, logicNumber);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("更新物流信息失败，订单ID：{}，物流单号：{}", orderId, logicNumber, e);
+            return false;
+        }
+    }
+
+    /**
+     * 更新物流信息（包含完整收件人信息）
+     */
+    @Transactional
+    public boolean updateLogisticsInfo(Long orderId, String logicNumber, String receiverName, 
+                                     String receiverMobile, String receiverAddress, String receiverCity,
+                                     String receiverDistrict, String receiverZipCode) {
+        try {
+            int result = carOrderInfoMapper.updateLogisticsInfo(orderId, logicNumber, receiverName, 
+                                                              receiverMobile, receiverAddress, receiverCity,
+                                                              receiverDistrict, receiverZipCode);
             if (result > 0) {
                 log.info("更新物流信息成功，订单ID：{}，物流单号：{}", orderId, logicNumber);
                 return true;

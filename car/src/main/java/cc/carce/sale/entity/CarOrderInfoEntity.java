@@ -2,7 +2,6 @@ package cc.carce.sale.entity;
 
 import lombok.Data;
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -137,6 +136,24 @@ public class CarOrderInfoEntity {
      */
     @Column(name = "CVSOutSide", columnDefinition = "INT(11) COMMENT '使用者選擇的超商店舖是否為離島店鋪.0：本島,1：離島'")
     private Integer cvsOutSide;
+
+    /**
+     * 物流状态码
+     */
+    @Column(name = "logicStatusCode", columnDefinition = "VARCHAR(20) COMMENT '物流状态码'")
+    private String logicStatusCode;
+
+    /**
+     * 物流信息
+     */
+    @Column(name = "logicMsg", columnDefinition = "VARCHAR(255) COMMENT '物流信息'")
+    private String logicMsg;
+
+    /**
+     * 物流结果完整信息
+     */
+    @Column(name = "logicMsgJson", columnDefinition = "LONGTEXT COMMENT '物流结果完整信息'")
+    private String logicMsgJson;
 
     /**
      * 订单类型枚举
