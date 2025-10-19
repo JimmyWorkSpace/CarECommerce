@@ -8,6 +8,8 @@
     <meta name="title" content="${ogDescription}" />
     <meta name="description" content="${ogDescription}" />
     <meta name="keywords" content="${ogDescription}" />
+
+    <meta name="robots" content="index, follow">
     
     <meta property="og:title" content="${ogTitle}" />
     <meta property="og:description" content="${ogDescription}" />
@@ -17,7 +19,7 @@
     <meta property="og:locate" content="zh_TW" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="canonical" href="${ogUrl!''}">
+    <link rel="canonical" hreflang="zh-TW" href="${ogUrl!''}">
     
     <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
     <!-- Bootstrap CSS -->
@@ -171,7 +173,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            color: #354AA5 !important;
+            color: white !important;
             text-decoration: none;
         }
         
@@ -191,7 +193,7 @@
         
         /* 導航欄字體樣式 */
         body .navbar .navbar-nav .nav-link {
-            color: #354AA5 !important;
+            color: white !important;
             font-weight: 600;
             font-size: 1rem;
             transition: all 0.3s ease;
@@ -203,7 +205,7 @@
         }
         
         body .navbar .navbar-nav .nav-item.active .nav-link {
-            color: #354AA5 !important;
+            color: white !important;
             font-weight: 700;
         }
         
