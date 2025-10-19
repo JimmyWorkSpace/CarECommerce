@@ -12,12 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BaseController {
 
 	protected boolean isLogin() {
-		ServletRequestAttributes attrs =
-	            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		if (attrs != null) {
-			return attrs.getRequest().getSession().getAttribute("user") != null;
-		}
-		return false;
+		return getCurrentUserId() != null;
 	}
 	
 	protected UserInfo getSessionUser() {
