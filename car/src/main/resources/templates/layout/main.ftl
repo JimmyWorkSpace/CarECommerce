@@ -17,6 +17,7 @@
     <meta property="og:image" content="${ogImage!''}" />
     <meta property="og:type" content="website" />
     <meta property="og:locate" content="zh_TW" />
+    <meta property="og:site_namesite_name" content="車勢汽車交易網 CarBuy" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="canonical" hreflang="zh-TW" href="${ogUrl!''}">
