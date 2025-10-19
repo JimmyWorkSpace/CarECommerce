@@ -18,10 +18,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locate" content="zh_TW" />
     <meta property="og:site_name" content="車勢汽車交易網 CarBuy" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="canonical" href="${ogUrl!''}">
     <link rel="alternate" hreflang="zh-TW" href="${ogUrl!''}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
     <!-- Bootstrap CSS -->
