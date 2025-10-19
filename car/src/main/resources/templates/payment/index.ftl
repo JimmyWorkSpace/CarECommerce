@@ -798,7 +798,6 @@
                     
                     axios.post('/api/payment/create', paymentData)
                     .then(response => {
-                        debugger;
                         if (response.data.code === 1) {
                             // 支付訂單創建成功，在新窗口打開綠界支付頁面
                             this.currentOrderNo = response.data.data.MerchantTradeNo;
@@ -899,7 +898,6 @@
                 
                 // 檢查支付狀態
                 checkPaymentStatus() {
-                    debugger;
                     if (!this.currentOrderNo) {
                         this.showError('無法獲取訂單信息，請重新支付');
                         return;
@@ -929,7 +927,6 @@
                                 const orderStatus = response.data.data;
                                 //if (orderStatus.paymentStatus === 1) {
                                     // 支付成功
-                                    debugger;
                                     this.showSuccess('支付成功！正在跳轉到訂單詳情頁面...');
                                     setTimeout(() => {
                                         // 跳转到订单详情页面

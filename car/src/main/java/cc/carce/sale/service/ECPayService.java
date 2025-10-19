@@ -58,6 +58,9 @@ public class ECPayService {
     
     @Resource
     private CarShoppingCartService carShoppingCartService;
+
+    @Resource
+    private LogisticsService logisticsService;
     
     // /**
     //  * 创建支付订单
@@ -168,6 +171,8 @@ public class ECPayService {
                 ecpayStatusDesc,
                 new Date()
             );
+
+            logisticsService.createLogisticsByOrderNo(merchantTradeNo);
             
             if (updateResult > 0) {
                 log.info("支付订单状态更新成功，商户订单号: {}, 状态: {}", 

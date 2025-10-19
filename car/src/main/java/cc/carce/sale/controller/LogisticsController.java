@@ -7,10 +7,12 @@ import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cc.carce.sale.common.R;
 import cc.carce.sale.dto.CarStoreInfoDto;
+import cc.carce.sale.dto.LogisticsQueryResultDto;
 import cc.carce.sale.entity.CarStoreInfoEntity;
 import cc.carce.sale.service.CarStoreInfoService;
 import cc.carce.sale.service.LogisticsService;
@@ -41,6 +43,36 @@ public class LogisticsController {
         } catch (Exception e) {
             log.error("获取超商门店列表异常", e);
             return R.fail("获取超商门店列表异常: " + e.getMessage(), null);
+        }
+    }
+    
+    /**
+     * 根据订单号查询物流信息
+     */
+    @GetMapping("/query")
+    public R<LogisticsQueryResultDto> queryLogisticsByOrderNo(@RequestParam String orderNo) {
+        try {
+            log.info("根据订单号查询物流信息，订单号：{}", orderNo);
+            
+            // 验证参数
+            if (orderNo == null || orderNo.trim().isEmpty()) {
+                return R.fail("订单号不能为空", null);
+            }
+            
+            // 调用服务层查询物流信息
+            LogisticsQueryResultDto result = logisticsService.queryLogisticsByOrderNo(orderNo);
+            
+            if (result != null) {
+                log.info("物流信息查询成功，订单号：{}，物流状态：{}", orderNo, result.getLogisticsStatus());
+                return R.ok("物流信息查询成功", result);
+            } else {
+                log.warn("未找到物流信息，订单号：{}", orderNo);
+                return R.fail("未找到物流信息", null);
+            }
+            
+        } catch (Exception e) {
+            log.error("查询物流信息异常，订单号：{}", orderNo, e);
+            return R.fail("查询物流信息异常: " + e.getMessage(), null);
         }
     }
     

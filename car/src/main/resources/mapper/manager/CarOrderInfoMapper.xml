@@ -12,9 +12,12 @@
         <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="showOrder" property="showOrder" jdbcType="INTEGER"/>
         <result column="orderStatus" property="orderStatus" jdbcType="INTEGER"/>
+        <result column="receiverCity" property="receiverCity" jdbcType="VARCHAR"/>
+        <result column="receiverDistrict" property="receiverDistrict" jdbcType="VARCHAR"/>
         <result column="receiverAddress" property="receiverAddress" jdbcType="VARCHAR"/>
         <result column="receiverName" property="receiverName" jdbcType="VARCHAR"/>
         <result column="receiverMobile" property="receiverMobile" jdbcType="VARCHAR"/>
+        <result column="receiverZipCode" property="receiverZipCode" jdbcType="VARCHAR"/>
         <result column="logicNumber" property="logicNumber" jdbcType="VARCHAR"/>
         <result column="orderType" property="orderType" jdbcType="INTEGER"/>
         <result column="CVSStoreID" property="cvsStoreID" jdbcType="VARCHAR"/>
@@ -22,13 +25,18 @@
         <result column="CVSAddress" property="cvsAddress" jdbcType="VARCHAR"/>
         <result column="CVSTelephone" property="cvsTelephone" jdbcType="VARCHAR"/>
         <result column="CVSOutSide" property="cvsOutSide" jdbcType="INTEGER"/>
+        <result column="logicStatusCode" property="logicStatusCode" jdbcType="VARCHAR"/>
+        <result column="logicMsg" property="logicMsg" jdbcType="VARCHAR"/>
+        <result column="logicMsgJson" property="logicMsgJson" jdbcType="LONGVARCHAR"/>
     </resultMap>
 
     <!-- 基础列名 -->
     <sql id="Base_Column_List">
         id, orderNo, userId, totalPrice, delFlag, createTime, showOrder, 
-        orderStatus, receiverAddress, receiverName, receiverMobile, logicNumber,
-        orderType, CVSStoreID, CVSStoreName, CVSAddress, CVSTelephone, CVSOutSide
+        orderStatus, receiverCity, receiverDistrict, receiverAddress, receiverName, 
+        receiverMobile, receiverZipCode, logicNumber, orderType, CVSStoreID, 
+        CVSStoreName, CVSAddress, CVSTelephone, CVSOutSide, logicStatusCode, 
+        logicMsg, logicMsgJson
     </sql>
 
     <!-- 插入订单信息 -->
@@ -119,7 +127,13 @@
         SET logicNumber = #{logicNumber},
             receiverName = #{receiverName},
             receiverMobile = #{receiverMobile},
-            receiverAddress = #{receiverAddress}
+            receiverAddress = #{receiverAddress},
+            receiverCity = #{receiverCity},
+            receiverDistrict = #{receiverDistrict},
+            receiverZipCode = #{receiverZipCode},
+            logicStatusCode = #{logicStatusCode},
+            logicMsg = #{logicMsg},
+            logicMsgJson = #{logicMsgJson}
         WHERE id = #{id} AND delFlag = 0
     </update>
 

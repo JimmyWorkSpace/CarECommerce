@@ -28,6 +28,7 @@ import cc.carce.sale.common.R;
 import cc.carce.sale.config.DsConstants;
 import cc.carce.sale.config.ECPayConfig;
 import cc.carce.sale.dto.ECPayStoreResponseDto;
+import cc.carce.sale.dto.LogisticsQueryResultDto;
 import cc.carce.sale.dto.StoreInfoDto;
 import cc.carce.sale.dto.StoreListDto;
 import cc.carce.sale.entity.CarOrderDetailEntity;
@@ -36,6 +37,8 @@ import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarStoreInfoEntity;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
 import cc.carce.sale.mapper.manager.CarStoreInfoMapper;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
@@ -44,13 +47,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 物流服务
  * 
- * 主要功能： 
- * 1. 生成宅配到府物流单（基于绿界科技API）
- * 2. 生成超商取货物流单（基于绿界科技API）
- * 3. 根据订单类型自动选择物流单创建方法（推荐使用）
- * 4. 查询物流订单信息（基于绿界科技API）
- * 5. 获取超商门店列表
- * 6. 物流单状态查询和更新
+ * 主要功能： 1. 生成宅配到府物流单（基于绿界科技API） 2. 生成超商取货物流单（基于绿界科技API） 3.
+ * 根据订单类型自动选择物流单创建方法（推荐使用） 4. 查询物流订单信息（基于绿界科技API） 5. 获取超商门店列表 6. 物流单状态查询和更新
  * 
  * 使用示例：
  * 
@@ -123,10 +121,8 @@ public class LogisticsService {
 
     private static final String STORE_LIST_KEY = "ecpay:store:list";
 
-
     /**
-     * 调用绿界门店查询API（实际实现）
-     * 根据绿界文档：https://developers.ecpay.com.tw/?p=47496
+     * 调用绿界门店查询API（实际实现） 根据绿界文档：https://developers.ecpay.com.tw/?p=47496
      * 获取所有合作超商的门店清单
      * 
      * @param cvsType 超商类别，可选值：All, FAMI, UNIMART, HILIFE, OKMART, UNIMARTFREEZE
@@ -153,10 +149,8 @@ public class LogisticsService {
             log.info("调用绿界门店查询API，URL：{}", apiUrl);
 
             // 发送POST请求
-            HttpResponse response = HttpRequest.post(apiUrl)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Accept", "text/html")
-                    .form(params).timeout(30000) // 30秒超时
+            HttpResponse response = HttpRequest.post(apiUrl).header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Accept", "text/html").form(params).timeout(30000) // 30秒超时
                     .execute();
 
             if (response.isOk()) {
@@ -167,9 +161,8 @@ public class LogisticsService {
                 ECPayStoreResponseDto result = JSONUtil.toBean(responseBody, ECPayStoreResponseDto.class);
 
                 if (result != null && result.getRtnCode() != null && result.getRtnCode() == 1) {
-                    log.info("绿界门店查询成功，共{}个超商类别", 
-                            result.getStoreList() != null ? result.getStoreList().size() : 0);
-                    
+                    log.info("绿界门店查询成功，共{}个超商类别", result.getStoreList() != null ? result.getStoreList().size() : 0);
+
                     storeList = result.getStoreList();
                 } else {
                     String errorMsg = result != null ? result.getRtnMsg() : "未知错误";
@@ -181,12 +174,11 @@ public class LogisticsService {
         } catch (Exception e) {
             log.error("调用绿界门店查询API异常，超商类别：{}", cvsType, e);
         }
-        
+
         // 如果请求的不是所有门店，需要过滤
-        if(!"All".equalsIgnoreCase(cvsType) && storeList != null){
-            storeList = storeList.stream()
-                .filter(storeListDto -> storeListDto.getCvsType().equalsIgnoreCase(cvsType))
-                .collect(Collectors.toList());
+        if (!"All".equalsIgnoreCase(cvsType) && storeList != null) {
+            storeList = storeList.stream().filter(storeListDto -> storeListDto.getCvsType().equalsIgnoreCase(cvsType))
+                    .collect(Collectors.toList());
         }
         return storeList;
     }
@@ -238,15 +230,15 @@ public class LogisticsService {
             String apiUrl = getLogisticsApiUrl() + "/Express/Create";
             log.info("调用绿界宅配API，URL：{}", apiUrl);
 
-            HttpResponse response = HttpRequest.post(apiUrl)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Accept", "text/html")
-                    .form(params).timeout(30000) // 30秒超时
+            HttpResponse response = HttpRequest.post(apiUrl).header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Accept", "text/html").form(params).timeout(30000) // 30秒超时
                     .execute();
 
             if (response.isOk()) {
                 String responseBody = response.body();
                 log.info("绿界订单状态查询成功，响应: {}", responseBody);
+
+                dealResponse(responseBody, orderInfo);
 
                 // 解析响应结果
                 Map<String, Object> result = parseLogisticsResponse(responseBody);
@@ -270,11 +262,40 @@ public class LogisticsService {
                 return null;
             }
 
-
         } catch (Exception e) {
             log.error("创建宅配物流单异常，订单号：{}", orderInfo.getOrderNo(), e);
             return R.fail("创建宅配物流单异常：" + e.getMessage(), null);
         }
+    }
+
+
+    private void dealResponse(String responseBody, CarOrderInfoEntity orderInfo){
+        if(StrUtil.isBlank(responseBody)){
+            return;
+        }
+        if(responseBody.contains("move")) {
+            
+        } else if(responseBody.contains("alert")) {
+            // 提取alert中的内容
+            String alertMessage = extractAlertMessage(responseBody);
+            log.warn("物流API返回alert消息：{}", alertMessage);
+            // 可以在这里处理alert消息，比如抛出异常或记录日志
+            orderInfo.setLogicMsg(alertMessage);
+            carOrderInfoService.updateOrder(orderInfo);
+        } else {
+            orderInfo.setLogicMsg(responseBody);
+            carOrderInfoService.updateOrder(orderInfo);
+        }
+
+        ThreadUtil.execute(() -> {
+            try{
+                Thread.sleep(5000);
+
+            } catch (Exception e) {
+                log.error("查询物流订单异常，订单号：{}", orderInfo.getOrderNo(), e);
+            }
+            queryLogisticsOrder(orderInfo.getOrderNo());
+        });
     }
 
     /**
@@ -305,12 +326,13 @@ public class LogisticsService {
         // 收件人信息
         params.put("ReceiverName", orderInfo.getReceiverName());
         params.put("ReceiverPhone", orderInfo.getReceiverMobile());
-        params.put("ReceiverAddress", orderInfo.getReceiverAddress());
-        params.put("ReceiverZipCode", "10041");
+        params.put("ReceiverAddress",
+                orderInfo.getReceiverCity() + orderInfo.getReceiverDistrict() + orderInfo.getReceiverAddress());
+        params.put("ReceiverZipCode", orderInfo.getReceiverZipCode());
 
         // 寄件人信息（从配置或固定值获取）
         params.put("SenderName", "汽车商城");
-        params.put("SenderPhone", "02-1234-5678");
+        params.put("SenderPhone", "0912345678");
         params.put("SenderAddress", "台北市信义区信义路五段7号");
         params.put("SenderZipCode", "10041");
 
@@ -458,7 +480,6 @@ public class LogisticsService {
         }
     }
 
-
     /**
      * 生成超商取货物流单 基于绿界科技超商取货API：https://developers.ecpay.com.tw/?p=8809
      * 
@@ -494,10 +515,10 @@ public class LogisticsService {
             }
 
             // 构建绿界API请求参数
-            Map<String, String> params = buildConvenienceStoreParams(orderInfo, orderDetails, paymentOrder);
+            Map<String, Object> params = buildConvenienceStoreParams(orderInfo, orderDetails, paymentOrder);
 
             // 生成检查码
-            String checkMacValue = ecPayUtils.generateSignatureWithSha256(params);
+            String checkMacValue = ecPayUtils.generateSignatureWithMd5(params);
             params.put("CheckMacValue", checkMacValue);
 
             // 调用绿界超商API
@@ -505,25 +526,30 @@ public class LogisticsService {
             log.info("调用绿界超商API，URL：{}", apiUrl);
 
             // 构建请求体
-            MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-            for (Map.Entry<String, String> entry : params.entrySet()) {
+            MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
                 requestBody.add(entry.getKey(), entry.getValue());
             }
 
             // 设置请求头，按照绿界API文档要求
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            headers.set("Accept", "text/html");
 
             // 创建HTTP实体
-            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
             // 发送POST请求
-            String response = restTemplate.postForObject(apiUrl, requestEntity, String.class);
-            log.info("绿界超商API响应：{}", response);
+            // String response = restTemplate.postForObject(apiUrl, requestEntity,
+            // String.class);
 
+            HttpResponse response = HttpRequest.post(apiUrl).header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Accept", "text/html").form(params).timeout(30000) // 30秒超时
+                    .execute();
+            log.info("绿界超商API响应：{}", response.body());
+
+            dealResponse(response.body(), orderInfo);
             // 解析响应结果
-            Map<String, Object> result = parseLogisticsResponse(response);
+            Map<String, Object> result = parseLogisticsResponse(response.body());
 
             if (result != null && "1".equals(result.get("RtnCode"))) {
                 // 成功创建物流单
@@ -549,9 +575,9 @@ public class LogisticsService {
     /**
      * 构建超商取货API请求参数
      */
-    private Map<String, String> buildConvenienceStoreParams(CarOrderInfoEntity orderInfo,
+    private Map<String, Object> buildConvenienceStoreParams(CarOrderInfoEntity orderInfo,
             List<CarOrderDetailEntity> orderDetails, CarPaymentOrderEntity paymentOrder) {
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
 
         // 必填参数
         params.put("MerchantID", ecPayConfig.getMerchantId());
@@ -582,15 +608,16 @@ public class LogisticsService {
         // 收件人门店代码
         params.put("ReceiverStoreID", orderInfo.getCvsStoreID());
 
-        // 退货车门店代码（可选，仅7-ELEVEN C2C适用）
-        if ("UNIMART".equals(logisticsSubType) && orderInfo.getCvsStoreID() != null) {
-            params.put("ReturnStoreID", orderInfo.getCvsStoreID());
-        }
+        // // 退货车门店代码（可选，仅7-ELEVEN C2C适用）
+        // if ("UNIMART".equals(logisticsSubType) && orderInfo.getCvsStoreID() != null)
+        // {
+        // params.put("ReturnStoreID", orderInfo.getCvsStoreID());
+        // }
 
         // 寄件人信息（从配置或固定值获取）
         params.put("SenderName", "汽车商城");
         params.put("SenderPhone", "02-1234-5678");
-        params.put("SenderCellPhone", "02-1234-5678");
+        params.put("SenderCellPhone", "0912345678");
         params.put("SenderAddress", "台北市信义区信义路五段7号");
 
         // 商品信息
@@ -622,22 +649,11 @@ public class LogisticsService {
      * 根据门店代码判断物流子类型
      */
     private String determineLogisticsSubType(String storeId) {
-        if (storeId == null || storeId.trim().isEmpty()) {
-            return "UNIMART"; // 默认7-ELEVEN
+        CarStoreInfoEntity storeInfo = carStoreInfoMapper.selectByStoreId(storeId);
+        if (storeInfo == null) {
+            return "UNKNOWN";
         }
-
-        // 根据门店代码前缀判断超商类型
-        if (storeId.startsWith("131") || storeId.startsWith("896")) {
-            return "UNIMART"; // 7-ELEVEN
-        } else if (storeId.startsWith("006") || storeId.startsWith("F")) {
-            return "FAMI"; // 全家
-        } else if (storeId.startsWith("132") || storeId.startsWith("OK")) {
-            return "OKMART"; // OK超商
-        } else if (storeId.startsWith("H") || storeId.startsWith("L")) {
-            return "HILIFE"; // 莱尔富
-        } else {
-            return "UNIMART"; // 默认7-ELEVEN
-        }
+        return storeInfo.getCvsType();
     }
 
     /**
@@ -674,36 +690,6 @@ public class LogisticsService {
         } catch (Exception e) {
             log.error("通过订单ID创建超商取货物流单异常，订单ID：{}", orderId, e);
             return R.fail("创建超商取货物流单异常：" + e.getMessage(), null);
-        }
-    }
-
-    /**
-     * 测试超商取货参数构建功能（用于调试）
-     * 
-     * @param orderInfo    订单信息
-     * @param orderDetails 订单详情列表
-     * @param paymentOrder 支付订单信息
-     * @return 构建的参数
-     */
-    public R<Map<String, String>> testBuildConvenienceStoreParams(CarOrderInfoEntity orderInfo,
-            List<CarOrderDetailEntity> orderDetails, CarPaymentOrderEntity paymentOrder) {
-        try {
-            log.info("测试构建超商取货物流单参数，订单号：{}", orderInfo.getOrderNo());
-
-            // 验证必要参数
-            if (orderInfo == null || orderDetails == null || paymentOrder == null) {
-                return R.fail("订单信息、订单详情或支付订单信息不能为空", null);
-            }
-
-            // 构建参数
-            Map<String, String> params = buildConvenienceStoreParams(orderInfo, orderDetails, paymentOrder);
-
-            log.info("超商取货参数构建成功，共{}个参数", params.size());
-            return R.ok("超商取货参数构建成功", params);
-
-        } catch (Exception e) {
-            log.error("测试超商取货参数构建异常，订单号：{}", orderInfo.getOrderNo(), e);
-            return R.fail("超商取货参数构建异常：" + e.getMessage(), null);
         }
     }
 
@@ -821,179 +807,181 @@ public class LogisticsService {
     }
 
     /**
-     * 查询物流订单信息
-     * 基于绿界科技物流查询API：https://developers.ecpay.com.tw/?p=7418
+     * 查询物流订单信息 基于绿界科技物流查询API：https://developers.ecpay.com.tw/?p=7418
      * 
      * @param merchantTradeNo 商户交易编号
      * @return 物流订单查询结果
      */
-    public R<Map<String, Object>> queryLogisticsOrder(String merchantTradeNo) {
+    public LogisticsQueryResultDto queryLogisticsOrder(String merchantTradeNo) {
         try {
             log.info("开始查询物流订单信息，商户交易编号：{}", merchantTradeNo);
-            
+
             // 验证必要参数
             if (merchantTradeNo == null || merchantTradeNo.trim().isEmpty()) {
-                return R.fail("商户交易编号不能为空", null);
+                return null;
             }
-            
+
             // 构建绿界API请求参数
             Map<String, Object> params = buildLogisticsQueryParams(merchantTradeNo);
-            
+
             log.info("物流查询参数: {}", JSONUtil.toJsonStr(params));
-            
+
             // 生成检查码
             String checkMacValue = ecPayUtils.generateSignatureWithMd5(params);
             params.put("CheckMacValue", checkMacValue);
-            
+
             // 调用绿界物流查询API
             String apiUrl = getLogisticsApiUrl() + "/Helper/QueryLogisticsTradeInfo/V5";
             log.info("调用绿界物流查询API，URL：{}", apiUrl);
-            
+
             // 发送POST请求
-            HttpResponse response = HttpRequest.post(apiUrl)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Accept", "text/html")
-                    .form(params).timeout(30000) // 30秒超时
+            HttpResponse response = HttpRequest.post(apiUrl).header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Accept", "text/html").form(params).timeout(30000) // 30秒超时
                     .execute();
-            
+
             if (response.isOk()) {
                 String responseBody = response.body();
                 log.info("绿界物流查询成功，响应: {}", responseBody);
-                
+
                 // 解析响应结果
-                Map<String, Object> result = parseLogisticsQueryResponse(responseBody);
-                
+                LogisticsQueryResultDto result = parseLogisticsQueryResponse(responseBody);
+
                 if (result != null) {
-                    log.info("物流订单查询成功，商户交易编号：{}，物流状态：{}", 
-                            merchantTradeNo, result.get("LogisticsStatus"));
-                    return R.ok("物流订单查询成功", result);
+                    log.info("物流订单查询成功，商户交易编号：{}，物流状态：{}", merchantTradeNo, result.getLogisticsStatus());
+                    CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(merchantTradeNo);
+                    if (orderInfo != null) {
+                        orderInfo.setLogicMsg(null);
+                        orderInfo.setLogicNumber(result.getShipmentNo());
+                        orderInfo.setLogicStatusCode(result.getLogisticsStatus());
+                        orderInfo.setLogicMsgJson(JSONUtil.toJsonStr(result));
+                        carOrderInfoService.updateOrder(orderInfo);
+                    }
+
+                    return result;
                 } else {
                     log.error("解析物流查询响应失败，商户交易编号：{}", merchantTradeNo);
-                    return R.fail("解析物流查询响应失败", null);
+                    return null;
                 }
             } else {
                 log.error("绿界物流查询失败，状态码: {}, 响应: {}", response.getStatus(), response.body());
-                return R.fail("物流查询API调用失败，状态码：" + response.getStatus(), null);
+                return null;
             }
-            
+
         } catch (Exception e) {
             log.error("查询物流订单异常，商户交易编号：{}", merchantTradeNo, e);
-            return R.fail("查询物流订单异常：" + e.getMessage(), null);
+            return null;
         }
     }
-    
+
     /**
      * 根据绿界物流单号查询物流信息
      * 
      * @param allPayLogisticsId 绿界物流交易编号
      * @return 物流订单查询结果
      */
-    public R<Map<String, Object>> queryLogisticsOrderByAllPayId(String allPayLogisticsId) {
+    public LogisticsQueryResultDto queryLogisticsOrderByAllPayId(String allPayLogisticsId) {
         try {
             log.info("开始根据绿界物流单号查询物流信息，绿界物流单号：{}", allPayLogisticsId);
-            
+
             // 验证必要参数
             if (allPayLogisticsId == null || allPayLogisticsId.trim().isEmpty()) {
-                return R.fail("绿界物流单号不能为空", null);
+                return null;
             }
-            
+
             // 构建绿界API请求参数
             Map<String, Object> params = buildLogisticsQueryParamsByAllPayId(allPayLogisticsId);
-            
+
             log.info("物流查询参数: {}", JSONUtil.toJsonStr(params));
-            
+
             // 生成检查码
             String checkMacValue = ecPayUtils.generateSignatureWithMd5(params);
             params.put("CheckMacValue", checkMacValue);
-            
+
             // 调用绿界物流查询API
             String apiUrl = getLogisticsApiUrl() + "/Helper/QueryLogisticsTradeInfo/V5";
             log.info("调用绿界物流查询API，URL：{}", apiUrl);
-            
+
             // 发送POST请求
-            HttpResponse response = HttpRequest.post(apiUrl)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Accept", "text/html")
-                    .form(params).timeout(30000) // 30秒超时
+            HttpResponse response = HttpRequest.post(apiUrl).header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Accept", "text/html").form(params).timeout(30000) // 30秒超时
                     .execute();
-            
+
             if (response.isOk()) {
                 String responseBody = response.body();
                 log.info("绿界物流查询成功，响应: {}", responseBody);
-                
+
                 // 解析响应结果
-                Map<String, Object> result = parseLogisticsQueryResponse(responseBody);
-                
+                LogisticsQueryResultDto result = parseLogisticsQueryResponse(responseBody);
+
                 if (result != null) {
-                    log.info("物流订单查询成功，绿界物流单号：{}，物流状态：{}", 
-                            allPayLogisticsId, result.get("LogisticsStatus"));
-                    return R.ok("物流订单查询成功", result);
+                    log.info("物流订单查询成功，绿界物流单号：{}，物流状态：{}", allPayLogisticsId, result.getLogisticsStatus());
+                    return result;
                 } else {
                     log.error("解析物流查询响应失败，绿界物流单号：{}", allPayLogisticsId);
-                    return R.fail("解析物流查询响应失败", null);
+                    return null;
                 }
             } else {
                 log.error("绿界物流查询失败，状态码: {}, 响应: {}", response.getStatus(), response.body());
-                return R.fail("物流查询API调用失败，状态码：" + response.getStatus(), null);
+                return null;
             }
-            
+
         } catch (Exception e) {
             log.error("查询物流订单异常，绿界物流单号：{}", allPayLogisticsId, e);
-            return R.fail("查询物流订单异常：" + e.getMessage(), null);
+            return null;
         }
     }
-    
+
     /**
      * 构建物流查询API请求参数（根据商户交易编号）
      */
     private Map<String, Object> buildLogisticsQueryParams(String merchantTradeNo) {
         Map<String, Object> params = new TreeMap<>();
-        
+
         // 必填参数
         params.put("MerchantID", ecPayConfig.getMerchantId());
         params.put("MerchantTradeNo", merchantTradeNo);
-        
+
         // 验证时间戳（Unix时间戳）
         long timestamp = System.currentTimeMillis() / 1000;
         params.put("TimeStamp", timestamp);
-        
+
         // 特约合作平台商代号（一般厂商为空）
         params.put("PlatformID", "");
-        
+
         return params;
     }
-    
+
     /**
      * 构建物流查询API请求参数（根据绿界物流单号）
      */
     private Map<String, Object> buildLogisticsQueryParamsByAllPayId(String allPayLogisticsId) {
         Map<String, Object> params = new TreeMap<>();
-        
+
         // 必填参数
         params.put("MerchantID", ecPayConfig.getMerchantId());
         params.put("AllPayLogisticsID", allPayLogisticsId);
-        
+
         // 验证时间戳（Unix时间戳）
         long timestamp = System.currentTimeMillis() / 1000;
         params.put("TimeStamp", timestamp);
-        
+
         // 特约合作平台商代号（一般厂商为空）
         params.put("PlatformID", "");
-        
+
         return params;
     }
-    
+
     /**
      * 解析物流查询API响应
      */
-    private Map<String, Object> parseLogisticsQueryResponse(String response) {
+    private LogisticsQueryResultDto parseLogisticsQueryResponse(String response) {
         try {
             Map<String, Object> result = new HashMap<>();
-            
+
             if (response == null || response.trim().isEmpty()) {
                 return null;
             }
-            
+
             // 绿界API返回格式：参数=值&参数=值&参数=值
             String[] paramPairs = response.split("&");
             for (String pair : paramPairs) {
@@ -1001,49 +989,49 @@ public class LogisticsService {
                 if (keyValue.length == 2) {
                     String key = keyValue[0];
                     String value = keyValue[1];
-                    
+
                     // 处理特殊值
                     if ("null".equals(value)) {
                         value = null;
                     }
-                    
+
                     result.put(key, value);
                 }
             }
-            
-            return result;
-            
+
+            return JSONUtil.toBean(JSONUtil.toJsonStr(result), LogisticsQueryResultDto.class);
+
         } catch (Exception e) {
             log.error("解析绿界物流查询API响应异常：{}", response, e);
             return null;
         }
     }
-    
+
     /**
      * 根据订单号查询物流信息（便捷方法）
      * 
      * @param orderNo 订单号
      * @return 物流订单查询结果
      */
-    public R<Map<String, Object>> queryLogisticsByOrderNo(String orderNo) {
+    public LogisticsQueryResultDto queryLogisticsByOrderNo(String orderNo) {
         try {
             log.info("根据订单号查询物流信息，订单号：{}", orderNo);
-            
+
             // 查询支付订单信息获取商户交易编号
             CarPaymentOrderEntity paymentOrder = carPaymentOrderMapper.getPaymentOrderByOrderNo(orderNo);
             if (paymentOrder == null) {
-                return R.fail("支付订单不存在", null);
+                return null;
             }
-            
+
             // 调用物流查询接口
             return queryLogisticsOrder(paymentOrder.getMerchantTradeNo());
-            
+
         } catch (Exception e) {
             log.error("根据订单号查询物流信息异常，订单号：{}", orderNo, e);
-            return R.fail("查询物流信息异常：" + e.getMessage(), null);
+            return null;
         }
     }
-    
+
     /**
      * 获取物流状态描述
      * 
@@ -1054,36 +1042,35 @@ public class LogisticsService {
         if (logisticsStatus == null) {
             return "未知状态";
         }
-        
+
         switch (logisticsStatus) {
-            case "300":
-                return "訂單建立";
-            case "301":
-                return "待收件";
-            case "302":
-                return "已收件";
-            case "303":
-                return "配送中";
-            case "304":
-                return "已取件";
-            case "305":
-                return "已送達";
-            case "306":
-                return "退貨中";
-            case "307":
-                return "已退貨";
-            case "308":
-                return "配送異常";
-            case "309":
-                return "已取消";
-            default:
-                return "未知状态：" + logisticsStatus;
+        case "300":
+            return "訂單建立";
+        case "301":
+            return "待收件";
+        case "302":
+            return "已收件";
+        case "303":
+            return "配送中";
+        case "304":
+            return "已取件";
+        case "305":
+            return "已送達";
+        case "306":
+            return "退貨中";
+        case "307":
+            return "已退貨";
+        case "308":
+            return "配送異常";
+        case "309":
+            return "已取消";
+        default:
+            return "未知状态：" + logisticsStatus;
         }
     }
-    
 
     @Transactional(rollbackFor = Exception.class, transactionManager = DsConstants.tranManager)
-    public void getAndSaveStoreList(){
+    public void getAndSaveStoreList() {
         List<CarStoreInfoEntity> list = new ArrayList<>();
         List<StoreListDto> storeList = callECPayStoreAPI("ALL");
         for (StoreListDto store : storeList) {
@@ -1103,8 +1090,33 @@ public class LogisticsService {
 
     @PostConstruct
     public void test() {
-        // createLogisticsByOrderNo("202510160111246740");
-        queryLogisticsByOrderNo("202510160111246740");
+        // createLogisticsByOrderNo("202510181403399891");
+        // queryLogisticsByOrderNo("202510181403399891");
         // getAndSaveStoreList();
+        
+        // 测试alert消息提取功能
+        String testResponse = "<script type='text/javascript' language='javascript'>alert('廠商訂單編號重覆，請重新設定，請回到原廠商頁面重新操作，本視窗即將關閉。');window.open('', '_self', ''); window.close();</Script>";
+        String alertMessage = extractAlertMessage(testResponse);
+        log.info("测试alert消息提取结果：{}", alertMessage);
+    }
+
+    /**
+     * 从响应体中提取alert消息内容
+     * @param responseBody 响应体内容
+     * @return alert中的消息内容，如果未找到则返回null
+     */
+    private String extractAlertMessage(String responseBody) {
+        try {
+            // 使用正则表达式匹配alert('...')中的内容
+            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("alert\\s*\\(\\s*['\"]([^'\"]*)['\"]\\s*\\)");
+            java.util.regex.Matcher matcher = pattern.matcher(responseBody);
+            
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+        } catch (Exception e) {
+            log.error("提取alert消息时发生异常", e);
+        }
+        return null;
     }
 }

@@ -59,7 +59,10 @@ public interface CarOrderInfoMapper extends Mapper<CarOrderInfoEntity> {
                            @Param("logicNumber") String logicNumber,
                            @Param("receiverName") String receiverName,
                            @Param("receiverMobile") String receiverMobile,
-                           @Param("receiverAddress") String receiverAddress);
+                           @Param("receiverAddress") String receiverAddress,
+                           @Param("receiverCity") String receiverCity,
+                           @Param("receiverDistrict") String receiverDistrict,
+                           @Param("receiverZipCode") String receiverZipCode);
     
     /**
      * 删除订单（逻辑删除）
