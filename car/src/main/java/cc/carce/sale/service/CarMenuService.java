@@ -31,4 +31,13 @@ public class CarMenuService {
         
         return carMenuMapper.selectByExample(example);
     }
+    
+    /**
+     * 根据ID获取菜单项
+     * @param id 菜单ID
+     * @return 菜单实体
+     */
+    public CarMenuEntity getMenuById(Long id) {
+        return carMenuMapper.selectByPrimaryKey(id);
+    }
 }

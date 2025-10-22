@@ -13,10 +13,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="isShow"    column="isShow"    />
         <result property="canDel"    column="canDel"    />
         <result property="linkUrl"    column="linkUrl"    />
+        <result property="linkType"    column="linkType"    />
+        <result property="content"    column="content"    />
     </resultMap>
 
     <sql id="selectCarMenuVo">
-        select id, title, showOrder, delFlag, createTime, isShow, canDel, linkUrl from car_menu
+        select id, title, showOrder, delFlag, createTime, isShow, canDel, linkUrl, linkType, content from car_menu
     </sql>
 
     <select id="selectCarMenuList" parameterType="com.ruoyi.car.domain.CarMenuEntity" resultMap="CarMenuResult">
@@ -29,6 +31,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isShow != null "> and isShow = #{isShow}</if>
             <if test="canDel != null "> and canDel = #{canDel}</if>
             <if test="linkUrl != null  and linkUrl != ''"> and linkUrl = #{linkUrl}</if>
+            <if test="linkType != null "> and linkType = #{linkType}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
         </where>
         order by showOrder asc, createTime desc
     </select>
@@ -48,6 +52,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isShow != null">isShow,</if>
             <if test="canDel != null">canDel,</if>
             <if test="linkUrl != null">linkUrl,</if>
+            <if test="linkType != null">linkType,</if>
+            <if test="content != null">content,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="title != null and title != ''">#{title},</if>
@@ -57,6 +63,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isShow != null">#{isShow},</if>
             <if test="canDel != null">#{canDel},</if>
             <if test="linkUrl != null">#{linkUrl},</if>
+            <if test="linkType != null">#{linkType},</if>
+            <if test="content != null">#{content},</if>
          </trim>
     </insert>
 
@@ -70,6 +78,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isShow != null">isShow = #{isShow},</if>
             <if test="canDel != null">canDel = #{canDel},</if>
             <if test="linkUrl != null">linkUrl = #{linkUrl},</if>
+            <if test="linkType != null">linkType = #{linkType},</if>
+            <if test="content != null">content = #{content},</if>
         </trim>
         where id = #{id}
     </update>

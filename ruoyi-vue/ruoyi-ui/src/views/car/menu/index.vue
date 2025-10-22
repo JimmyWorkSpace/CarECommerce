@@ -118,7 +118,20 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="鏈接地址" align="center" prop="linkUrl" show-overflow-tooltip />
+      <el-table-column label="菜單類型" align="center" prop="linkType" width="100">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.linkType === 0 ? 'primary' : 'success'">
+            {{ scope.row.linkType === 0 ? '鏈接' : '富文本' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="鏈接地址" align="center" prop="linkUrl" show-overflow-tooltip v-if="false" />
+      <el-table-column label="內容" align="center" prop="content" show-overflow-tooltip>
+        <template slot-scope="scope">
+          <span v-if="scope.row.linkType === 0">{{ scope.row.linkUrl }}</span>
+          <span v-else-if="scope.row.linkType === 1" v-html="scope.row.content ? scope.row.content.substring(0, 50) + '...' : ''"></span>
+        </template>
+      </el-table-column>
       <el-table-column label="創建時間" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -153,8 +166,8 @@
     />
 
     <!-- 添加或修改菜單維護對話框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+    <el-dialog :title="title" :visible.sync="open" width="70%" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="菜單名稱" prop="title">
           <el-input v-model="form.title" placeholder="請輸入菜單名稱" />
         </el-form-item>
@@ -173,8 +186,17 @@
             <el-radio :label="0">不可刪除</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="鏈接地址" prop="linkUrl">
+        <el-form-item label="菜單類型" prop="linkType">
+          <el-radio-group v-model="form.linkType" @change="handleLinkTypeChange">
+            <el-radio :label="0">鏈接</el-radio>
+            <el-radio :label="1">富文本</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="鏈接地址" prop="linkUrl" v-if="form.linkType === 0">
           <el-input v-model="form.linkUrl" type="textarea" placeholder="請輸入鏈接地址" />
+        </el-form-item>
+        <el-form-item label="富文本內容" prop="content" v-if="form.linkType === 1">
+          <editor v-model="form.content" :min-height="400"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -234,6 +256,9 @@ export default {
         ],
         canDel: [
           { required: true, message: "是否可刪除不能為空", trigger: "change" }
+        ],
+        linkType: [
+          { required: true, message: "菜單類型不能為空", trigger: "change" }
         ]
       }
     };
@@ -269,7 +294,9 @@ export default {
         createTime: null,
         isShow: 1,
         canDel: 1,
-        linkUrl: null
+        linkUrl: null,
+        linkType: 0,
+        content: null
       };
       this.resetForm("form");
     },
@@ -307,6 +334,9 @@ export default {
     },
     /** 提交按鈕 */
     submitForm() {
+      // 动态设置验证规则
+      this.setDynamicRules();
+      
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
@@ -324,6 +354,33 @@ export default {
           }
         }
       });
+    },
+    /** 设置动态验证规则 */
+    setDynamicRules() {
+      // 清除之前的动态规则
+      this.$refs["form"].clearValidate(['linkUrl', 'content']);
+      
+      if (this.form.linkType === 0) {
+        // 链接类型，验证链接地址
+        this.rules.linkUrl = [
+          { required: true, message: "鏈接地址不能為空", trigger: "blur" }
+        ];
+        this.rules.content = [];
+      } else if (this.form.linkType === 1) {
+        // 富文本类型，验证富文本内容
+        this.rules.content = [
+          { required: true, message: "富文本內容不能為空", trigger: "blur" }
+        ];
+        this.rules.linkUrl = [];
+      }
+    },
+    /** 处理菜单类型变化 */
+    handleLinkTypeChange(value) {
+      // 清除相关字段的验证状态
+      this.$refs["form"].clearValidate(['linkUrl', 'content']);
+      
+      // 不再清空字段内容，保留用户输入的数据
+      // 这样用户可以在链接和富文本之间切换而不丢失数据
     },
     /** 刪除按鈕操作 */
     handleDelete(row) {

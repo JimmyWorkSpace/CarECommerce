@@ -518,8 +518,29 @@
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+    .features-section {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    
+    .search-section {
+        margin-left: 12px;
+        margin-right: 12px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    .ad-section {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    
     .hero-section {
-        height: 300px;
+        height: calc(100vw / 2.4);
+    }
+    
+    .hero-swiper .swiper-slide {
+        height: calc(100vw / 2.4);
     }
     
     .hero-title {
@@ -584,7 +605,11 @@
 
 @media (max-width: 576px) {
     .hero-section {
-        height: 250px;
+        height: calc(100vw / 2.4);
+    }
+    
+    .hero-swiper .swiper-slide {
+        height: calc(100vw / 2.4);
     }
     
     .hero-title {
