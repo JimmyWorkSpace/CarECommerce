@@ -143,7 +143,7 @@ public class LoginController extends BaseController {
      * 处理登出请求
      */
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session, HttpServletResponse response) {
         // 使用Sa-Token登出
         if(session.getAttribute("user") != null) {
         	try {
@@ -156,6 +156,13 @@ public class LoginController extends BaseController {
         
         // 清除session中的用户信息
         session.removeAttribute("user");
+        
+        // 清除Cookie中的token
+        Cookie tokenCookie = new Cookie("token", null);
+        tokenCookie.setPath("/");
+        tokenCookie.setMaxAge(0);  // 设置为0立即删除
+        tokenCookie.setHttpOnly(true);
+        response.addCookie(tokenCookie);
         
         log.info("用户登出成功");
         

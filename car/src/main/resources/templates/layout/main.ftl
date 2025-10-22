@@ -225,8 +225,7 @@
             }
             
             .brand-sub {
-                font-size: 0.8rem;
-                line-height: 1.2;
+                display: none;
             }
             
             .cart-float-btn {
@@ -302,7 +301,13 @@
                         <#if menus?? && menus?has_content>
                             <#list menus as menu>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="${menu.linkUrl!''}">${menu.title!''}</a>
+                                    <#if menu.linkType?? && menu.linkType == 1>
+                                        <!-- 富文本类型菜单，跳转到富文本显示页面 -->
+                                        <a class="nav-link" href="/menu-content/${menu.id}">${menu.title!''}</a>
+                                    <#else>
+                                        <!-- 普通链接类型菜单，跳转到指定URL -->
+                                        <a class="nav-link" href="${menu.linkUrl!''}">${menu.title!''}</a>
+                                    </#if>
                                 </li>
                             </#list>
                         </#if>
@@ -329,7 +334,7 @@
                                         <i class="bi bi-flag me-2"></i>我的檢舉
                                     </a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/logout">
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn">
                                         <i class="bi bi-box-arrow-right me-2"></i>退出登錄
                                     </a></li>
                                 </ul>
@@ -545,6 +550,21 @@
                 window.addEventListener('cartUpdated', function() {
                     window.cartManager.refreshCartCount();
                 });
+                
+                // 退出登錄按鈕事件
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // 清除本地存储的購物車數據
+                        localStorage.removeItem('cart');
+                        localStorage.removeItem('redirectAfterLogin');
+                        
+                        // 跳轉到退出登錄接口
+                        window.location.href = '/logout';
+                    });
+                }
             });
             
             // 暴露給全局使用

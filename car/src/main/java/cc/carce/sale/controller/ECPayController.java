@@ -63,8 +63,27 @@ public class ECPayController extends BaseController{
                 return R.fail("收件人姓名不能為空", null);
             }
             
+            // 验证收件人姓名长度（4~10个字元，中文算2个字元）
+            String receiverName = form.getReceiverName().trim();
+            int nameLength = calculateStringLength(receiverName);
+            if (nameLength < 4 || nameLength > 10) {
+                return R.fail("收件人姓名字元限制為4~10個字元（中文2~5個字，英文4~10個字）", null);
+            }
+            
             if (form.getReceiverMobile() == null || form.getReceiverMobile().trim().isEmpty()) {
                 return R.fail("收件人手機號不能為空", null);
+            }
+            
+            // 验证手机号格式：只允许数字、长度限制10碼、必须以09开头
+            String receiverMobile = form.getReceiverMobile().trim();
+            if (!receiverMobile.matches("^\\d+$")) {
+                return R.fail("手機號只能包含數字", null);
+            }
+            if (receiverMobile.length() != 10) {
+                return R.fail("手機號長度必須為10碼", null);
+            }
+            if (!receiverMobile.startsWith("09")) {
+                return R.fail("手機號必須以09開頭", null);
             }
             
             // 根据订单类型验证相应字段
@@ -321,5 +340,37 @@ public class ECPayController extends BaseController{
             log.error("获取支付状态异常，订单号: {}", orderNo, e);
             return null;
         }
+    }
+    
+    /**
+     * 计算字符串长度（中文2个字元，英文1个字元）
+     * @param str 要计算的字符串
+     * @return 字元总数
+     */
+    private int calculateStringLength(String str) {
+        if (str == null || str.isEmpty()) {
+            return 0;
+        }
+        
+        int length = 0;
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            // 判断是否为中文字符（包含繁体中文）
+            // Unicode范围：
+            // \u4e00-\u9fa5: 基本中文字符
+            // \u3400-\u4dbf: 扩展A区
+            // \uf900-\ufaff: 兼容字符
+            // \u3300-\u33ff: CJK兼容字符
+            if ((c >= 0x4e00 && c <= 0x9fa5) || 
+                (c >= 0x3400 && c <= 0x4dbf) || 
+                (c >= 0xf900 && c <= 0xfaff) || 
+                (c >= 0x3300 && c <= 0x33ff)) {
+                length += 2; // 中文字符算2个字元
+            } else {
+                length += 1; // 英文或其他字符算1个字元
+            }
+        }
+        
+        return length;
     }
 }

@@ -36,4 +36,10 @@ public class CarMenuEntity {
 
     @Column(name = "linkUrl")
     private String linkUrl;
+
+    @Column(name = "linkType")
+    private Integer linkType;
+
+    @Column(name = "content")
+    private String content;
 }

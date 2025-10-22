@@ -39,6 +39,7 @@ import cc.carce.sale.dto.CarReportDto;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarRichContentEntity;
 import cc.carce.sale.entity.CarQuestionAnswerEntity;
+import cc.carce.sale.entity.CarMenuEntity;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.entity.CarShoppingCartEntity;
@@ -380,7 +381,6 @@ public class CarViewController extends BaseController {
             }
             
              model.addAttribute("richContent", richContent);
-             model.addAttribute("title", richContent.getTitle());
  			model.addAttribute("content", "/rich-content/content-iframe.ftl");
 
         } catch (Exception e) {
@@ -391,54 +391,50 @@ public class CarViewController extends BaseController {
     }
     
     /**
-     * 返回URL测试页面
+     * 菜单富文本内容显示页面
      */
-    @GetMapping("/test-return-url")
-    public String testReturnUrl(Model model, HttpServletRequest req) {
+    @GetMapping("/menu-content/{id}")
+    public String menuContent(@PathVariable Long id, Model model, HttpServletRequest req) {
         try {
             // 检查用户登录状态
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
             
-            model.addAttribute("title", "返回URL測試 - 二手車銷售平台");
-            model.addAttribute("description", "測試登入後返回URL功能");
-            model.addAttribute("image", "/img/swipper/slide1.jpg");
-            model.addAttribute("url", req.getRequestURL().toString());
-            model.addAttribute("content", "/test/return-url-test.ftl");
+            // 从数据库获取菜单信息
+            CarMenuEntity menu = carMenuService.getMenuById(id);
+            if (menu == null) {
+                model.addAttribute("error", "菜单不存在");
+                return "/error/index";
+            }
+            
+            // 检查菜单是否显示
+            if (menu.getIsShow() != 1 || menu.getDelFlag() != 0) {
+                model.addAttribute("error", "菜单不可访问");
+                return "/error/index";
+            }
+            
+            // 检查是否为富文本类型
+            if (menu.getLinkType() == null || menu.getLinkType() != 1) {
+                model.addAttribute("error", "该菜单不是富文本类型");
+                return "/error/index";
+            }
+
+			CarRichContentEntity richContent = new CarRichContentEntity();
+			richContent.setContent(menu.getContent());
+            
+            // 设置页面数据
+            model.addAttribute("richContent", richContent);
+ 			model.addAttribute("content", "/rich-content/content-iframe.ftl");
+            
         } catch (Exception e) {
-            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
+            log.error("获取菜单富文本内容失败，ID: {}", id, e);
+            model.addAttribute("error", "页面加载失败：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
-        
-        
         
         return "/layout/main";
     }
     
-    /**
-     * 静态详情页演示
-     */
-    @GetMapping("/static-demo")
-    public String staticCarDetail(Model model, HttpServletRequest req) {
-        try {
-            // 检查用户登录状态
-            Object user = req.getSession().getAttribute("user");
-            model.addAttribute("user", user);
-            
-            model.addAttribute("title", "2020年 Toyota Camry 2.5L 豪華版 - 二手車銷售平台");
-            model.addAttribute("description", "2020年 Toyota Camry 2.5L 豪華版，車況極佳，里程僅45,000公里");
-            model.addAttribute("image", "/img/car/car4.jpg");
-            model.addAttribute("url", req.getRequestURL().toString());
-            model.addAttribute("content", "/car/detail-static.ftl");
-        } catch (Exception e) {
-            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
-            model.addAttribute("content", "/error/index.ftl");
-        }
-        
-        
-        
-        return "/layout/main";
-    }
     
     /**
      * 跳转到汽车详情页面

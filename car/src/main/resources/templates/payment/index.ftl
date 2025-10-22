@@ -1,4 +1,4 @@
-﻿    <style>
+﻿<style>
     /* 支付頁面樣式 */
     .payment-page {
         padding: 20px 0;
@@ -264,13 +264,20 @@
                                                         <label for="receiverName" class="form-label">收件人姓名 <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="receiverName" 
                                                                placeholder="請輸入收件人姓名" 
-                                                               v-model="formData.receiverName" required>
+                                                               v-model="formData.receiverName" 
+                                                               maxlength="10" 
+                                                               required>
+                                                        <div class="form-text">字元限制為4~10個字元（中文2~5個字，英文4~10個字）</div>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="receiverMobile" class="form-label">收件人手機號 <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="receiverMobile" 
-                                                               placeholder="請輸入收件人手機號" 
-                                                               v-model="formData.receiverMobile" required>
+                                                               placeholder="請輸入收件人手機號（09開頭）" 
+                                                               v-model="formData.receiverMobile" 
+                                                               maxlength="10" 
+                                                               @input="validateMobileInput" 
+                                                               required>
+                                                        <div class="form-text">必須為10碼數字，以09開頭</div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -310,16 +317,23 @@
                                             <form @submit.prevent="submitPayment">
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="receiverName" class="form-label">取貨人姓名 <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="receiverName" 
+                                                        <label for="storeReceiverName" class="form-label">取貨人姓名 <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" id="storeReceiverName" 
                                                                placeholder="請輸入取貨人姓名" 
-                                                               v-model="formData.receiverName" required>
+                                                               v-model="formData.receiverName" 
+                                                               maxlength="10" 
+                                                               required>
+                                                        <div class="form-text">字元限制為4~10個字元（中文2~5個字，英文4~10個字）</div>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="receiverMobile" class="form-label">取貨人手機號 <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="receiverMobile" 
-                                                               placeholder="請輸入取貨人手機號" 
-                                                               v-model="formData.receiverMobile" required>
+                                                        <label for="storeReceiverMobile" class="form-label">取貨人手機號 <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" id="storeReceiverMobile" 
+                                                               placeholder="請輸入取貨人手機號（09開頭）" 
+                                                               v-model="formData.receiverMobile" 
+                                                               maxlength="10" 
+                                                               @input="validateMobileInput" 
+                                                               required>
+                                                        <div class="form-text">必須為10碼數字，以09開頭</div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -827,13 +841,47 @@
                         return false;
                     }
                     
+                    // 驗證收件人姓名
                     if (!this.formData.receiverName || this.formData.receiverName.trim() === '') {
                         this.showError('收件人姓名不能為空');
                         return false;
                     }
                     
+                    // 驗證收件人姓名長度（4~10個字元，中文算2個字元）
+                    const receiverName = this.formData.receiverName.trim();
+                    let nameLength = 0;
+                    for (let i = 0; i < receiverName.length; i++) {
+                        const char = receiverName.charAt(i);
+                        // 判斷是否為中文字符（包含繁體中文）
+                        if (char.match(/[\u4e00-\u9fa5\u3400-\u4dbf\u{20000}-\u{2a6df}\u{2a700}-\u{2b73f}\u{2b740}-\u{2b81f}\u{2b820}-\u{2ceaf}\uf900-\ufaff\u3300-\u33ff\ufe30-\ufe4f\uf900-\ufaff\u{2f800}-\u{2fa1f}]/u)) {
+                            nameLength += 2; // 中文字符算2個字元
+                        } else {
+                            nameLength += 1; // 英文或其他字符算1個字元
+                        }
+                    }
+                    if (nameLength < 4 || nameLength > 10) {
+                        this.showError('收件人姓名字元限制為4~10個字元（中文2~5個字，英文4~10個字）');
+                        return false;
+                    }
+                    
+                    // 驗證收件人手機號
                     if (!this.formData.receiverMobile || this.formData.receiverMobile.trim() === '') {
                         this.showError('收件人手機號不能為空');
+                        return false;
+                    }
+                    
+                    // 驗證手機號格式：只允許數字、長度限制10碼、必須以09開頭
+                    const receiverMobile = this.formData.receiverMobile.trim();
+                    if (!/^\d+$/.test(receiverMobile)) {
+                        this.showError('手機號只能包含數字');
+                        return false;
+                    }
+                    if (receiverMobile.length !== 10) {
+                        this.showError('手機號長度必須為10碼');
+                        return false;
+                    }
+                    if (!receiverMobile.startsWith('09')) {
+                        this.showError('手機號必須以09開頭');
                         return false;
                     }
                     
@@ -990,6 +1038,12 @@
                         this.formData.receiverDistrict = '';
                         this.filteredStoreList = [];
                     }
+                },
+                
+                // 實時校驗手機號輸入（只允許數字）
+                validateMobileInput(event) {
+                    // 移除非數字字符
+                    this.formData.receiverMobile = this.formData.receiverMobile.replace(/\D/g, '');
                 },
                 
             }
