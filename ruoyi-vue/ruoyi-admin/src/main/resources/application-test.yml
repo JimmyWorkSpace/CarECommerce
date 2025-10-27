@@ -11,14 +11,14 @@ carce:
 spring:
   datasource:
     master:
-      db-name: ruoyi_car
+      db-name: carbuy_cloud
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: org.mariadb.jdbc.Driver
       jdbc-url: jdbc:mariadb://localhost:3306/test_carce_cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
       username: test_cloud
       password: "oP9m7_2h"
     carcecloud:
-      db-name: carce_cloud
+      db-name: test_carce_cloud
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: org.mariadb.jdbc.Driver
       jdbc-url: jdbc:mariadb://localhost:3306/carbuy_cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
