@@ -97,7 +97,7 @@
       <el-table-column label="類型" align="center" prop="advType" width="100">
         <template slot-scope="scope">
           <el-tag :type="scope.row.advType === 0 ? 'primary' : 'success'">
-            {{ scope.row.advType === 0 ? '廣告' : '網站介紹' }}
+            {{ scope.row.advType === 0 ? '廣告' : (scope.row.advType === 1 ? '網站介紹' : '詳情頁網站介紹') }}
           </el-tag>
         </template>
       </el-table-column>
@@ -183,6 +183,7 @@
           <el-radio-group v-model="form.advType">
             <el-radio :label="0">廣告</el-radio>
             <el-radio :label="1">網站介紹</el-radio>
+            <el-radio :label="2">詳情頁網站介紹</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否跳轉" prop="isLink">
