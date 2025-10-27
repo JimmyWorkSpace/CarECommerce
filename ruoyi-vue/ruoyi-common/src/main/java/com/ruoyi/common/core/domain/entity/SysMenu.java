@@ -20,10 +20,10 @@ public class SysMenu extends BaseEntity
     /** 菜单ID */
     private Long menuId;
 
-    /** 菜单名称 */
+    /** 菜单名稱 */
     private String menuName;
 
-    /** 父菜单名称 */
+    /** 父菜单名稱 */
     private String parentName;
 
     /** 父菜单ID */
@@ -47,13 +47,13 @@ public class SysMenu extends BaseEntity
     /** 是否缓存（0缓存 1不缓存） */
     private String isCache;
 
-    /** 类型（M目录 C菜单 F按钮） */
+    /** 類型（M目录 C菜单 F按钮） */
     private String menuType;
 
-    /** 显示状态（0显示 1隐藏） */
+    /** 显示狀態（0显示 1隐藏） */
     private String visible;
     
-    /** 菜单状态（0显示 1隐藏） */
+    /** 菜单狀態（0显示 1隐藏） */
     private String status;
 
     /** 权限字符串 */
@@ -75,8 +75,8 @@ public class SysMenu extends BaseEntity
         this.menuId = menuId;
     }
 
-    @NotBlank(message = "菜单名称不能为空")
-    @Size(min = 0, max = 50, message = "菜单名称长度不能超过50个字符")
+    @NotBlank(message = "菜单名稱不能为空")
+    @Size(min = 0, max = 50, message = "菜单名稱长度不能超过50个字符")
     public String getMenuName()
     {
         return menuName;
@@ -170,7 +170,7 @@ public class SysMenu extends BaseEntity
         this.isCache = isCache;
     }
 
-    @NotBlank(message = "菜单类型不能为空")
+    @NotBlank(message = "菜单類型不能为空")
     public String getMenuType()
     {
         return menuType;

@@ -10,7 +10,7 @@ import com.ruoyi.car.service.ICarOrderInfoService;
 import tk.mybatis.mapper.entity.Example;
 
 /**
- * 订单信息Service业务层处理
+ * 訂單信息Service业务层处理
  * 
  * @author ruoyi
  * @date 2024-01-01
@@ -22,10 +22,10 @@ public class CarOrderInfoServiceImpl implements ICarOrderInfoService
     private CarOrderInfoMapper carOrderInfoMapper;
 
     /**
-     * 查询订单信息
+     * 查询訂單信息
      * 
-     * @param id 订单信息主键
-     * @return 订单信息
+     * @param id 訂單信息主键
+     * @return 訂單信息
      */
     @Override
     public CarOrderInfoEntity selectCarOrderInfoById(Long id)
@@ -34,10 +34,10 @@ public class CarOrderInfoServiceImpl implements ICarOrderInfoService
     }
 
     /**
-     * 查询订单信息列表
+     * 查询訂單信息列表
      * 
-     * @param carOrderInfo 订单信息
-     * @return 订单信息
+     * @param carOrderInfo 訂單信息
+     * @return 訂單信息
      */
     @Override
     public List<CarOrderInfoEntity> selectCarOrderInfoList(CarOrderInfoEntity carOrderInfo)
@@ -65,19 +65,19 @@ public class CarOrderInfoServiceImpl implements ICarOrderInfoService
             criteria.andLike("receiverMobile", "%" + carOrderInfo.getReceiverMobile() + "%");
         }
         
-        // 排除已删除的记录
+        // 排除已刪除的记录
         criteria.andEqualTo("delFlag", false);
         
-        // 按创建时间倒序排列
+        // 按建立時間倒序排列
         example.orderBy("createTime").desc();
         
         return carOrderInfoMapper.selectByExample(example);
     }
 
     /**
-     * 新增订单信息
+     * 新增訂單信息
      * 
-     * @param carOrderInfo 订单信息
+     * @param carOrderInfo 訂單信息
      * @return 结果
      */
     @Override
@@ -89,9 +89,9 @@ public class CarOrderInfoServiceImpl implements ICarOrderInfoService
     }
 
     /**
-     * 修改订单信息
+     * 修改訂單信息
      * 
-     * @param carOrderInfo 订单信息
+     * @param carOrderInfo 訂單信息
      * @return 结果
      */
     @Override
@@ -101,9 +101,9 @@ public class CarOrderInfoServiceImpl implements ICarOrderInfoService
     }
 
     /**
-     * 批量删除订单信息
+     * 批量刪除訂單信息
      * 
-     * @param ids 需要删除的订单信息主键
+     * @param ids 需要刪除的訂單信息主键
      * @return 结果
      */
     @Override
@@ -120,9 +120,9 @@ public class CarOrderInfoServiceImpl implements ICarOrderInfoService
     }
 
     /**
-     * 删除订单信息信息
+     * 刪除訂單信息信息
      * 
-     * @param id 订单信息主键
+     * @param id 訂單信息主键
      * @return 结果
      */
     @Override

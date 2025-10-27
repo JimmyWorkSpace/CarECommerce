@@ -11,7 +11,7 @@ public class CarBaseInfoDto {
   private Long id;
 
   @Column(name = "custom_model")
-  private String customModel; // 型号
+  private String customModel; // 型號
 
   @Column(name = "manufacture_year")
   private Integer manufactureYear; // 出厂年
@@ -45,7 +45,7 @@ public class CarBaseInfoDto {
   private BigDecimal salePrice; // 售价
 
   @Column(name = "sale_title")
-  private String saleTitle; // 标题
+  private String saleTitle; // 標題
 
   @Column(name = "sale_description")
   private String saleDescription; // 详情

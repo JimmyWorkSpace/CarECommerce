@@ -11,30 +11,30 @@ import com.ruoyi.system.domain.SysLogininfor;
 public interface SysLogininforMapper
 {
     /**
-     * 新增系统登录日志
+     * 新增系统登入日志
      * 
      * @param logininfor 访问日志对象
      */
     public void insertLogininfor(SysLogininfor logininfor);
 
     /**
-     * 查询系统登录日志集合
+     * 查询系统登入日志集合
      * 
      * @param logininfor 访问日志对象
-     * @return 登录记录集合
+     * @return 登入记录集合
      */
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor);
 
     /**
-     * 批量删除系统登录日志
+     * 批量刪除系统登入日志
      * 
-     * @param infoIds 需要删除的登录日志ID
+     * @param infoIds 需要刪除的登入日志ID
      * @return 结果
      */
     public int deleteLogininforByIds(Long[] infoIds);
 
     /**
-     * 清空系统登录日志
+     * 清空系统登入日志
      * 
      * @return 结果
      */

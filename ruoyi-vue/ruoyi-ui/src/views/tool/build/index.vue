@@ -127,7 +127,7 @@
 
     <code-type-dialog
       :visible.sync="dialogVisible"
-      title="选择生成类型"
+      title="选择生成類型"
       :show-file-name="showFileName"
       @confirm="generate"
     />

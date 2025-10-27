@@ -13,7 +13,7 @@ public class AjaxResult extends HashMap<String, Object>
 {
     private static final long serialVersionUID = 1L;
 
-    /** 状态码 */
+    /** 狀態码 */
     public static final String CODE_TAG = "code";
 
     /** 返回内容 */
@@ -32,7 +32,7 @@ public class AjaxResult extends HashMap<String, Object>
     /**
      * 初始化一个新创建的 AjaxResult 对象
      * 
-     * @param code 状态码
+     * @param code 狀態码
      * @param msg 返回内容
      */
     public AjaxResult(int code, String msg)
@@ -44,7 +44,7 @@ public class AjaxResult extends HashMap<String, Object>
     /**
      * 初始化一个新创建的 AjaxResult 对象
      * 
-     * @param code 状态码
+     * @param code 狀態码
      * @param msg 返回内容
      * @param data 数据对象
      */
@@ -137,7 +137,7 @@ public class AjaxResult extends HashMap<String, Object>
     /**
      * 返回错误消息
      * 
-     * @param code 状态码
+     * @param code 狀態码
      * @param msg 返回内容
      * @return 警告消息
      */

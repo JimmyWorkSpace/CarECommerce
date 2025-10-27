@@ -21,8 +21,8 @@
       </el-form-item>
       
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -46,8 +46,8 @@
       <el-table-column label="經銷商名稱" align="center" prop="dealerName" :show-overflow-tooltip="true" />
       <el-table-column label="註冊名稱" align="center" prop="registeredName" :show-overflow-tooltip="true" />
       <el-table-column label="聯繫人" align="center" prop="contactPerson" />
-      <!-- <el-table-column label="公司电话" align="center" prop="companyPhone" />
-      <el-table-column label="公司手机" align="center" prop="companyMobile" /> -->
+      <!-- <el-table-column label="公司電話" align="center" prop="companyPhone" />
+      <el-table-column label="公司手機" align="center" prop="companyMobile" /> -->
       <el-table-column label="推薦狀態" align="center" width="120">
         <template slot-scope="scope">
           <el-switch
@@ -59,7 +59,7 @@
           />
         </template>
       </el-table-column>
-      <!-- <el-table-column label="创建时间" align="center" prop="cDt" width="180">
+      <!-- <el-table-column label="建立時間" align="center" prop="cDt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.cDt, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -85,29 +85,29 @@
       @pagination="getList"
     />
 
-    <!-- 查看经销商详情对话框 -->
-    <el-dialog title="经销商详情" :visible.sync="viewOpen" width="800px" append-to-body>
+    <!-- 查看經銷商详情对话框 -->
+    <el-dialog title="經銷商详情" :visible.sync="viewOpen" width="800px" append-to-body>
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="经销商ID">{{ viewData.id }}</el-descriptions-item>
+        <el-descriptions-item label="經銷商ID">{{ viewData.id }}</el-descriptions-item>
         <el-descriptions-item label="店家ID">{{ viewData.idGarage }}</el-descriptions-item>
-        <el-descriptions-item label="经销商名称">{{ viewData.dealerName }}</el-descriptions-item>
-        <el-descriptions-item label="注册名称">{{ viewData.registeredName }}</el-descriptions-item>
-        <el-descriptions-item label="税号">{{ viewData.taxId || '暂无' }}</el-descriptions-item>
+        <el-descriptions-item label="經銷商名稱">{{ viewData.dealerName }}</el-descriptions-item>
+        <el-descriptions-item label="註冊名稱">{{ viewData.registeredName }}</el-descriptions-item>
+        <el-descriptions-item label="税號">{{ viewData.taxId || '暂无' }}</el-descriptions-item>
         <el-descriptions-item label="Line ID">{{ viewData.lineId || '暂无' }}</el-descriptions-item>
         <el-descriptions-item label="负责人">{{ viewData.owner || '暂无' }}</el-descriptions-item>
-        <el-descriptions-item label="联系人">{{ viewData.contactPerson || '暂无' }}</el-descriptions-item>
-        <el-descriptions-item label="注册地址" :span="2">{{ viewData.registeredAddress || '暂无' }}</el-descriptions-item>
+        <el-descriptions-item label="聯繫人">{{ viewData.contactPerson || '暂无' }}</el-descriptions-item>
+        <el-descriptions-item label="註冊地址" :span="2">{{ viewData.registeredAddress || '暂无' }}</el-descriptions-item>
         <el-descriptions-item label="公开地址" :span="2">{{ viewData.publicAddress || '暂无' }}</el-descriptions-item>
-        <el-descriptions-item label="公司电话">{{ viewData.companyPhone || '暂无' }}</el-descriptions-item>
-        <el-descriptions-item label="公司手机">{{ viewData.companyMobile || '暂无' }}</el-descriptions-item>
+        <el-descriptions-item label="公司電話">{{ viewData.companyPhone || '暂无' }}</el-descriptions-item>
+        <el-descriptions-item label="公司手機">{{ viewData.companyMobile || '暂无' }}</el-descriptions-item>
         <el-descriptions-item label="网站">{{ viewData.website || '暂无' }}</el-descriptions-item>
-        <el-descriptions-item label="营业时间">{{ viewData.businessHours || '暂无' }}</el-descriptions-item>
-        <el-descriptions-item label="推荐状态">
+        <el-descriptions-item label="营业時間">{{ viewData.businessHours || '暂无' }}</el-descriptions-item>
+        <el-descriptions-item label="推薦狀態">
           <el-tag :type="viewData.recommendedValue === 1 ? 'success' : 'info'">
-            {{ viewData.recommendedValue === 1 ? '已推荐' : '未推荐' }}
+            {{ viewData.recommendedValue === 1 ? '已推薦' : '未推薦' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="创建时间">{{ parseTime(viewData.cDt, '{y}-{m}-{d} {h}:{i}:{s}') }}</el-descriptions-item>
+        <el-descriptions-item label="建立時間">{{ parseTime(viewData.cDt, '{y}-{m}-{d} {h}:{i}:{s}') }}</el-descriptions-item>
         <el-descriptions-item label="描述" :span="2">{{ viewData.description || '暂无描述' }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -133,9 +133,9 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 经销商表格数据
+      // 經銷商表格数据
       dealerList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 是否显示查看弹出层
       viewOpen: false,
@@ -155,7 +155,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询经销商列表 */
+    /** 查询經銷商列表 */
     getList() {
       this.loading = true;
       listDealerRecommend(this.queryParams).then(response => {
@@ -180,17 +180,17 @@ export default {
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
-    /** 推荐状态改变 */
+    /** 推薦狀態改变 */
     handleRecommendChange(row) {
       const data = {
         id: row.id,
         recommendedValue: row.recommendedValue
       };
       setDealerRecommended(data).then(response => {
-        this.$modal.msgSuccess(row.recommendedValue === 1 ? "设置推荐成功" : "取消推荐成功");
+        this.$modal.msgSuccess(row.recommendedValue === 1 ? "设置推薦成功" : "取消推薦成功");
         this.getList();
       }).catch(() => {
-        // 如果失败，恢复原状态
+        // 如果失败，恢复原狀態
         row.recommendedValue = row.recommendedValue === 1 ? 0 : 1;
       });
     },

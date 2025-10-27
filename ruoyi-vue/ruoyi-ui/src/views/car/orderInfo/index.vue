@@ -1,18 +1,18 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="订单号" prop="orderNo">
+      <el-form-item label="訂單號" prop="orderNo">
         <el-input
           v-model="queryParams.orderNo"
-          placeholder="请输入订单号"
+          placeholder="请输入訂單號"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       
-      <el-form-item label="订单状态" prop="orderStatus">
-        <el-select v-model="queryParams.orderStatus" placeholder="请选择订单状态" clearable size="small">
+      <el-form-item label="訂單狀態" prop="orderStatus">
+        <el-select v-model="queryParams.orderStatus" placeholder="请选择訂單狀態" clearable size="small">
           <el-option
             v-for="dict in dict.type.order_status"
             :key="dict.value"
@@ -21,8 +21,8 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="订单类型" prop="orderType">
-        <el-select v-model="queryParams.orderType" placeholder="请选择订单类型" clearable size="small">
+      <el-form-item label="訂單類型" prop="orderType">
+        <el-select v-model="queryParams.orderType" placeholder="请选择訂單類型" clearable size="small">
           <el-option
             v-for="dict in dict.type.order_type"
             :key="dict.value"
@@ -40,18 +40,18 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="收件人电话" prop="receiverMobile">
+      <el-form-item label="收件人電話" prop="receiverMobile">
         <el-input
           v-model="queryParams.receiverMobile"
-          placeholder="请输入收件人电话"
+          placeholder="请输入收件人電話"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -76,7 +76,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['car:orderInfo:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -93,22 +93,22 @@
 
     <el-table v-loading="loading" :data="orderInfoList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="订单号" align="center" prop="orderNo" />
-      <el-table-column label="总价格" align="center" prop="totalPrice" />
-      <el-table-column label="订单状态" align="center" prop="orderStatus">
+      <el-table-column label="訂單號" align="center" prop="orderNo" />
+      <el-table-column label="總價格" align="center" prop="totalPrice" />
+      <el-table-column label="訂單狀態" align="center" prop="orderStatus">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.order_status" :value="scope.row.orderStatus"/>
         </template>
       </el-table-column>
       <el-table-column label="收件人" align="center" prop="receiverName" />
-      <el-table-column label="收件人电话" align="center" prop="receiverMobile" />
-      <el-table-column label="物流单号" align="center" prop="logicNumber" />
-      <el-table-column label="订单类型" align="center" prop="orderType">
+      <el-table-column label="收件人電話" align="center" prop="receiverMobile" />
+      <el-table-column label="物流單號" align="center" prop="logicNumber" />
+      <el-table-column label="訂單類型" align="center" prop="orderType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.order_type" :value="scope.row.orderType"/>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="建立時間" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
@@ -135,7 +135,7 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['car:orderInfo:remove']"
-          >删除</el-button>
+          >刪除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -148,13 +148,13 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改订单信息对话框 -->
+    <!-- 添加或修改訂單信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="订单号" prop="orderNo">
-              <el-input v-model="form.orderNo" placeholder="请输入订单号" />
+            <el-form-item label="訂單號" prop="orderNo">
+              <el-input v-model="form.orderNo" placeholder="请输入訂單號" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -165,13 +165,13 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="总价格" prop="totalPrice">
-              <el-input v-model="form.totalPrice" placeholder="请输入总价格" />
+            <el-form-item label="總價格" prop="totalPrice">
+              <el-input v-model="form.totalPrice" placeholder="请输入總價格" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="订单状态" prop="orderStatus">
-              <el-select v-model="form.orderStatus" placeholder="请选择订单状态">
+            <el-form-item label="訂單狀態" prop="orderStatus">
+              <el-select v-model="form.orderStatus" placeholder="请选择訂單狀態">
                 <el-option
                   v-for="dict in dict.type.order_status"
                   :key="dict.value"
@@ -189,8 +189,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="收件人电话" prop="receiverMobile">
-              <el-input v-model="form.receiverMobile" placeholder="请输入收件人电话" />
+            <el-form-item label="收件人電話" prop="receiverMobile">
+              <el-input v-model="form.receiverMobile" placeholder="请输入收件人電話" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -199,13 +199,13 @@
         </el-form-item>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="物流单号" prop="logicNumber">
-              <el-input v-model="form.logicNumber" placeholder="请输入物流单号" />
+            <el-form-item label="物流單號" prop="logicNumber">
+              <el-input v-model="form.logicNumber" placeholder="请输入物流單號" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="订单类型" prop="orderType">
-              <el-select v-model="form.orderType" placeholder="请选择订单类型">
+            <el-form-item label="訂單類型" prop="orderType">
+              <el-select v-model="form.orderType" placeholder="请选择訂單類型">
                 <el-option
                   v-for="dict in dict.type.order_type"
                   :key="dict.value"
@@ -257,25 +257,25 @@
       </div>
     </el-dialog>
 
-    <!-- 订单详情对话框 -->
-    <el-dialog title="订单详情" :visible.sync="detailOpen" width="1000px" append-to-body>
+    <!-- 訂單详情对话框 -->
+    <el-dialog title="訂單详情" :visible.sync="detailOpen" width="1000px" append-to-body>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>订单基本信息</span>
+              <span>訂單基本信息</span>
             </div>
             <el-descriptions :column="1" border>
-              <el-descriptions-item label="订单号">{{ orderDetail.orderNo }}</el-descriptions-item>
+              <el-descriptions-item label="訂單號">{{ orderDetail.orderNo }}</el-descriptions-item>
               <el-descriptions-item label="用户ID">{{ orderDetail.userId }}</el-descriptions-item>
-              <el-descriptions-item label="总价格">¥{{ orderDetail.totalPrice }}</el-descriptions-item>
-              <el-descriptions-item label="订单状态">
+              <el-descriptions-item label="總價格">¥{{ orderDetail.totalPrice }}</el-descriptions-item>
+              <el-descriptions-item label="訂單狀態">
                 <dict-tag :options="dict.type.order_status" :value="orderDetail.orderStatus"/>
               </el-descriptions-item>
-              <el-descriptions-item label="订单类型">
+              <el-descriptions-item label="訂單類型">
                 <dict-tag :options="dict.type.order_type" :value="orderDetail.orderType"/>
               </el-descriptions-item>
-              <el-descriptions-item label="创建时间">{{ parseTime(orderDetail.createTime) }}</el-descriptions-item>
+              <el-descriptions-item label="建立時間">{{ parseTime(orderDetail.createTime) }}</el-descriptions-item>
             </el-descriptions>
           </el-card>
         </el-col>
@@ -286,9 +286,9 @@
             </div>
             <el-descriptions :column="1" border>
               <el-descriptions-item label="收件人">{{ orderDetail.receiverName }}</el-descriptions-item>
-              <el-descriptions-item label="收件人电话">{{ orderDetail.receiverMobile }}</el-descriptions-item>
+              <el-descriptions-item label="收件人電話">{{ orderDetail.receiverMobile }}</el-descriptions-item>
               <el-descriptions-item label="收件人地址" :span="2">{{ orderDetail.receiverAddress }}</el-descriptions-item>
-              <el-descriptions-item label="物流单号">{{ orderDetail.logicNumber || '暂无' }}</el-descriptions-item>
+              <el-descriptions-item label="物流單號">{{ orderDetail.logicNumber || '暂无' }}</el-descriptions-item>
             </el-descriptions>
           </el-card>
         </el-col>
@@ -298,7 +298,7 @@
         <el-col :span="24">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>超商取货信息</span>
+              <span>超商取貨信息</span>
             </div>
             <el-descriptions :column="2" border>
               <el-descriptions-item label="超商店舖編號">{{ orderDetail.cvsStoreID }}</el-descriptions-item>
@@ -319,11 +319,11 @@
         <el-col :span="24">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>订单商品详情</span>
+              <span>訂單商品详情</span>
             </div>
             <el-table :data="orderDetailList" border>
               <el-table-column label="产品ID" align="center" prop="productId" />
-              <el-table-column label="产品名称" align="center" prop="productName" />
+              <el-table-column label="产品名稱" align="center" prop="productName" />
               <el-table-column label="产品数量" align="center" prop="productAmount" />
               <el-table-column label="单价" align="center" prop="productPrice">
                 <template slot-scope="scope">
@@ -368,17 +368,17 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 订单信息表格数据
+      // 訂單信息表格数据
       orderInfoList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 是否显示弹出层
       open: false,
       // 是否显示详情弹出层
       detailOpen: false,
-      // 订单详情数据
+      // 訂單详情数据
       orderDetail: {},
-      // 订单详情列表
+      // 訂單详情列表
       orderDetailList: [],
       // 查询参数
       queryParams: {
@@ -396,16 +396,16 @@ export default {
       // 表单校验
       rules: {
         orderNo: [
-          { required: true, message: "订单号不能为空", trigger: "blur" }
+          { required: true, message: "訂單號不能为空", trigger: "blur" }
         ],
         userId: [
           { required: true, message: "用户ID不能为空", trigger: "blur" }
         ],
         orderStatus: [
-          { required: true, message: "订单状态不能为空", trigger: "change" }
+          { required: true, message: "訂單狀態不能为空", trigger: "change" }
         ],
         orderType: [
-          { required: true, message: "订单类型不能为空", trigger: "change" }
+          { required: true, message: "訂單類型不能为空", trigger: "change" }
         ]
       }
     };
@@ -414,7 +414,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询订单信息列表 */
+    /** 查询訂單信息列表 */
     getList() {
       this.loading = true;
       listOrderInfo(this.queryParams).then(response => {
@@ -472,7 +472,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加订单信息";
+      this.title = "添加訂單信息";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -481,7 +481,7 @@ export default {
       getOrderInfo(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改订单信息";
+        this.title = "修改訂單信息";
       });
     },
     /** 提交按钮 */
@@ -504,14 +504,14 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除订单信息编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认刪除訂單信息编號为"' + ids + '"的数据项？').then(function() {
         return delOrderInfo(ids);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("删除成功");
+        this.$modal.msgSuccess("刪除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
@@ -524,7 +524,7 @@ export default {
     handleDetail(row) {
       this.orderDetail = row;
       this.detailOpen = true;
-      // 查询订单详情列表
+      // 查询訂單详情列表
       listOrderDetail({ orderId: row.id }).then(response => {
         this.orderDetailList = response.rows;
       });

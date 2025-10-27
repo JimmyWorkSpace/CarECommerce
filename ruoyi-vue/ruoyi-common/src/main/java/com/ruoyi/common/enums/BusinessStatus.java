@@ -1,7 +1,7 @@
 package com.ruoyi.common.enums;
 
 /**
- * 操作状态
+ * 操作狀態
  * 
  * @author ruoyi
  *

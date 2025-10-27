@@ -18,7 +18,7 @@ public class TableDataInfo implements Serializable
     /** 列表数据 */
     private List<?> rows;
 
-    /** 消息状态码 */
+    /** 消息狀態码 */
     private int code;
 
     /** 消息内容 */

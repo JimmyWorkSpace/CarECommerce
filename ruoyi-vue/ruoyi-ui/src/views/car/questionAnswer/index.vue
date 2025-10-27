@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="频道" prop="channelId">
-        <el-select v-model="queryParams.channelId" placeholder="请选择频道" clearable size="small">
+      <el-form-item label="頻道" prop="channelId">
+        <el-select v-model="queryParams.channelId" placeholder="请选择頻道" clearable size="small">
           <el-option
             v-for="channel in channelList"
             :key="channel.id"
@@ -11,18 +11,18 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="问题" prop="question">
+      <el-form-item label="問題" prop="question">
         <el-input
           v-model="queryParams.question"
-          placeholder="请输入问题"
+          placeholder="请输入問題"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -57,7 +57,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['car:questionAnswer:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <!-- <el-col :span="1.5">
         <el-button
@@ -74,11 +74,11 @@
 
     <el-table v-loading="loading" :data="questionAnswerList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="频道" align="center" prop="channelTitle" />
-      <el-table-column label="问题" align="center" prop="question" show-overflow-tooltip />
+      <el-table-column label="頻道" align="center" prop="channelTitle" />
+      <el-table-column label="問題" align="center" prop="question" show-overflow-tooltip />
       <!-- <el-table-column label="回答" align="center" prop="answer" show-overflow-tooltip /> -->
       <el-table-column label="排序" align="center" prop="showOrder" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="建立時間" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -98,7 +98,7 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['car:questionAnswer:remove']"
-          >删除</el-button>
+          >刪除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -116,8 +116,8 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="频道" prop="channelId">
-              <el-select v-model="form.channelId" placeholder="请选择频道" style="width: 100%">
+            <el-form-item label="頻道" prop="channelId">
+              <el-select v-model="form.channelId" placeholder="请选择頻道" style="width: 100%">
                 <el-option
                   v-for="channel in channelList"
                   :key="channel.id"
@@ -133,8 +133,8 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="问题" prop="question">
-          <el-input v-model="form.question" type="textarea" :rows="3" placeholder="请输入问题" />
+        <el-form-item label="問題" prop="question">
+          <el-input v-model="form.question" type="textarea" :rows="3" placeholder="请输入問題" />
         </el-form-item>
         <el-form-item label="回答" prop="answer">
           <editor v-model="form.answer" :min-height="300"/>
@@ -170,9 +170,9 @@ export default {
       total: 0,
       // 问答模块表格数据
       questionAnswerList: [],
-      // 频道列表
+      // 頻道列表
       channelList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 是否显示弹出层
       open: false,
@@ -188,10 +188,10 @@ export default {
       // 表单校验
       rules: {
         channelId: [
-          { required: true, message: "频道不能为空", trigger: "change" }
+          { required: true, message: "頻道不能为空", trigger: "change" }
         ],
         question: [
-          { required: true, message: "问题不能为空", trigger: "blur" }
+          { required: true, message: "問題不能为空", trigger: "blur" }
         ],
         answer: [
           { required: true, message: "回答不能为空", trigger: "blur" }
@@ -204,9 +204,9 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询频道列表 */
+    /** 查询頻道列表 */
     getChannelList() {
-      const query = { contentType: 2 }; // 查询频道类型的内容
+      const query = { contentType: 2 }; // 查询頻道類型的内容
       listRichContent(query).then(response => {
         this.channelList = response.rows || [];
       });
@@ -219,10 +219,10 @@ export default {
         this.total = response.total;
         this.loading = false;
         
-        // 为每个问答项添加频道标题
+        // 为每个问答项添加頻道標題
         this.questionAnswerList.forEach(item => {
           const channel = this.channelList.find(c => c.id === item.channelId);
-          item.channelTitle = channel ? channel.title : '未知频道';
+          item.channelTitle = channel ? channel.title : '未知頻道';
         });
       });
     },
@@ -258,14 +258,14 @@ export default {
         this.title = "修改问答";
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除问答编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认刪除问答编號为"' + ids + '"的数据项？').then(function() {
         return delQuestionAnswer(ids);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("删除成功");
+        this.$modal.msgSuccess("刪除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */

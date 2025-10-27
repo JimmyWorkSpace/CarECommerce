@@ -22,7 +22,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 推荐管理Controller
+ * 推薦管理Controller
  * 
  * @author ruoyi
  * @date 2024-01-01
@@ -35,7 +35,7 @@ public class CarRecommandController extends BaseController
     private ICarRecommandService carRecommandService;
 
     /**
-     * 查询推荐管理列表
+     * 查询推薦管理列表
      */
     @PreAuthorize("@ss.hasPermi('car:recommand:list')")
     @GetMapping("/list")
@@ -47,20 +47,20 @@ public class CarRecommandController extends BaseController
     }
 
     /**
-     * 导出推荐管理列表
+     * 导出推薦管理列表
      */
     @PreAuthorize("@ss.hasPermi('car:recommand:export')")
-    @Log(title = "推荐管理", businessType = BusinessType.EXPORT)
+    @Log(title = "推薦管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CarRecommandEntity carRecommand)
     {
         List<CarRecommandEntity> list = carRecommandService.selectCarRecommandList(carRecommand);
         ExcelUtil<CarRecommandEntity> util = new ExcelUtil<CarRecommandEntity>(CarRecommandEntity.class);
-        util.exportExcel(response, list, "推荐管理数据");
+        util.exportExcel(response, list, "推薦管理数据");
     }
 
     /**
-     * 获取推荐管理详细信息
+     * 获取推薦管理详细信息
      */
     @PreAuthorize("@ss.hasPermi('car:recommand:query')")
     @GetMapping(value = "/{id}")
@@ -70,10 +70,10 @@ public class CarRecommandController extends BaseController
     }
 
     /**
-     * 新增推荐管理
+     * 新增推薦管理
      */
     @PreAuthorize("@ss.hasPermi('car:recommand:add')")
-    @Log(title = "推荐管理", businessType = BusinessType.INSERT)
+    @Log(title = "推薦管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody CarRecommandEntity carRecommand)
     {
@@ -81,10 +81,10 @@ public class CarRecommandController extends BaseController
     }
 
     /**
-     * 修改推荐管理
+     * 修改推薦管理
      */
     @PreAuthorize("@ss.hasPermi('car:recommand:edit')")
-    @Log(title = "推荐管理", businessType = BusinessType.UPDATE)
+    @Log(title = "推薦管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody CarRecommandEntity carRecommand)
     {
@@ -92,10 +92,10 @@ public class CarRecommandController extends BaseController
     }
 
     /**
-     * 删除推荐管理
+     * 刪除推薦管理
      */
     @PreAuthorize("@ss.hasPermi('car:recommand:remove')")
-    @Log(title = "推荐管理", businessType = BusinessType.DELETE)
+    @Log(title = "推薦管理", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
@@ -103,10 +103,10 @@ public class CarRecommandController extends BaseController
     }
     
     /**
-     * 设置推荐状态
+     * 设置推薦狀態
      */
     @PreAuthorize("@ss.hasPermi('car:recommand:edit')")
-    @Log(title = "推荐管理", businessType = BusinessType.UPDATE)
+    @Log(title = "推薦管理", businessType = BusinessType.UPDATE)
     @PutMapping("/setRecommended")
     public AjaxResult setRecommended(@RequestBody CarRecommandEntity carRecommand)
     {

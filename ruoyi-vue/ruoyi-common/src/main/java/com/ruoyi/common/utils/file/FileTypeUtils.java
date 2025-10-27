@@ -4,14 +4,14 @@ import java.io.File;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * 文件类型工具类
+ * 文件類型工具类
  *
  * @author ruoyi
  */
 public class FileTypeUtils
 {
     /**
-     * 获取文件类型
+     * 获取文件類型
      * <p>
      * 例如: ruoyi.txt, 返回: txt
      * 
@@ -28,7 +28,7 @@ public class FileTypeUtils
     }
 
     /**
-     * 获取文件类型
+     * 获取文件類型
      * <p>
      * 例如: ruoyi.txt, 返回: txt
      *
@@ -46,7 +46,7 @@ public class FileTypeUtils
     }
 
     /**
-     * 获取文件类型
+     * 获取文件類型
      * 
      * @param photoByte 文件字节码
      * @return 后缀（不含".")

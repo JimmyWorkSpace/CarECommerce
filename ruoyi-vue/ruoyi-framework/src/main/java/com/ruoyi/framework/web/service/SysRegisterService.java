@@ -18,7 +18,7 @@ import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 
 /**
- * 注册校验方法
+ * 註冊校验方法
  * 
  * @author ruoyi
  */
@@ -35,7 +35,7 @@ public class SysRegisterService
     private RedisCache redisCache;
 
     /**
-     * 注册
+     * 註冊
      */
     public String register(RegisterBody registerBody)
     {
@@ -68,7 +68,7 @@ public class SysRegisterService
         }
         else if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(username)))
         {
-            msg = "保存用户'" + username + "'失败，注册账号已存在";
+            msg = "保存用户'" + username + "'失败，註冊账號已存在";
         }
         else
         {
@@ -79,7 +79,7 @@ public class SysRegisterService
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag)
             {
-                msg = "注册失败,请联系系统管理人员";
+                msg = "註冊失败,请聯繫系统管理人员";
             }
             else
             {

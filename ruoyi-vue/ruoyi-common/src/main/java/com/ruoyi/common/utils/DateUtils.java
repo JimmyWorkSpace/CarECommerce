@@ -12,7 +12,7 @@ import java.util.Date;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
- * 时间工具类
+ * 時間工具类
  * 
  * @author ruoyi
  */
@@ -128,7 +128,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
     /**
-     * 获取服务器启动时间
+     * 获取服务器启动時間
      */
     public static Date getServerStartDate()
     {
@@ -145,7 +145,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
     /**
-     * 计算两个时间差
+     * 计算两个時間差
      */
     public static String getDatePoor(Date endDate, Date nowDate)
     {
@@ -153,7 +153,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         long nh = 1000 * 60 * 60;
         long nm = 1000 * 60;
         // long ns = 1000;
-        // 获得两个时间的毫秒时间差异
+        // 获得两个時間的毫秒時間差异
         long diff = endDate.getTime() - nowDate.getTime();
         // 计算差多少天
         long day = diff / nd;

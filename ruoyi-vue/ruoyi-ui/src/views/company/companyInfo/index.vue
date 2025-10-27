@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
-      <el-form-item label="公司名称" prop="name">
+      <el-form-item label="公司名稱" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入公司名称"
+          placeholder="请输入公司名稱"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -28,8 +28,8 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="公司类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择公司类型" clearable size="small">
+      <el-form-item label="公司類型" prop="type">
+        <el-select v-model="queryParams.type" placeholder="请选择公司類型" clearable size="small">
           <el-option
             v-for="dict in typeOptions"
             :key="dict.dictValue"
@@ -59,8 +59,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -95,7 +95,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['company:companyInfo:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -112,10 +112,10 @@
 
     <el-table v-loading="loading" :data="companyInfoList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" prop="id"/>
-      <el-table-column label="公司名称" align="left" prop="name" width="300"/>
+      <el-table-column label="公司名稱" align="left" prop="name" width="300"/>
       <el-table-column label="公司所在地" align="center" prop="area" />
       <el-table-column label="简称" align="center" prop="shortName" />
-      <el-table-column label="公司类型" align="center" prop="type" :formatter="typeFormat" />
+      <el-table-column label="公司類型" align="center" prop="type" :formatter="typeFormat" />
       <el-table-column label="东营市" align="center" prop="dys" :formatter="yesNoFormat" />
       <el-table-column label="胜利工区" align="center" prop="slgq" :formatter="yesNoFormat" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -133,7 +133,7 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['company:companyInfo:remove']"
-          >删除</el-button>
+          >刪除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -149,8 +149,8 @@
     <!-- 添加或修改公司信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
-        <el-form-item label="公司名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入公司名称" />
+        <el-form-item label="公司名稱" prop="name">
+          <el-input v-model="form.name" placeholder="请输入公司名稱" />
         </el-form-item>
         <el-form-item label="公司所在地" prop="area">
           <el-input v-model="form.area" placeholder="请输入公司所在地" />
@@ -158,8 +158,8 @@
         <el-form-item label="简称" prop="shortName">
           <el-input v-model="form.shortName" placeholder="请输入简称" />
         </el-form-item>
-        <el-form-item label="公司类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择公司类型">
+        <el-form-item label="公司類型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择公司類型">
             <el-option
               v-for="dict in typeOptions"
               :key="dict.dictValue"
@@ -225,11 +225,11 @@ export default {
       total: 0,
       // 公司信息表格数据
       companyInfoList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 是否显示弹出层
       open: false,
-      // 公司类型字典
+      // 公司類型字典
       typeOptions: [],
       // 东营市字典
       dysOptions: [],
@@ -276,7 +276,7 @@ export default {
         this.loading = false;
       });
     },
-    // 公司类型字典翻译
+    // 公司類型字典翻译
     typeFormat(row, column) {
       return this.selectDictLabel(this.typeOptions, row.type);
     },
@@ -360,10 +360,10 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除公司信息编号为"' + ids + '"的数据项?', "警告", {
+      this.$confirm('是否确认刪除公司信息编號为"' + ids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -371,7 +371,7 @@ export default {
           return delCompanyInfo(ids);
         }).then(() => {
           this.getList();
-          this.$modal.msgSuccess("删除成功");
+          this.$modal.msgSuccess("刪除成功");
         })
     },
     /** 导出按钮操作 */

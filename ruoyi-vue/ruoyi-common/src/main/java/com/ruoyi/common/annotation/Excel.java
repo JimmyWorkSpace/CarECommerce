@@ -32,7 +32,7 @@ public @interface Excel
     public String dateFormat() default "";
 
     /**
-     * 如果是字典类型，请设置字典的type值 (如: sys_user_sex)
+     * 如果是字典類型，请设置字典的type值 (如: sys_user_sex)
      */
     public String dictType() default "";
 
@@ -57,7 +57,7 @@ public @interface Excel
     public int roundingMode() default BigDecimal.ROUND_HALF_EVEN;
 
     /**
-     * 导出类型（0数字 1字符串）
+     * 导出類型（0数字 1字符串）
      */
     public ColumnType cellType() default ColumnType.STRING;
 
@@ -92,12 +92,12 @@ public @interface Excel
     public String[] combo() default {};
 
     /**
-     * 是否导出数据,应对需求:有时我们需要导出一份模板,这是标题需要但内容需要用户手工填写.
+     * 是否导出数据,应对需求:有时我们需要导出一份模板,这是標題需要但内容需要用户手工填写.
      */
     public boolean isExport() default true;
 
     /**
-     * 另一个类中的属性名称,支持多级获取,以小数点隔开
+     * 另一个类中的属性名稱,支持多级获取,以小数点隔开
      */
     public String targetAttr() default "";
 
@@ -138,7 +138,7 @@ public @interface Excel
     }
 
     /**
-     * 字段类型（0：导出导入；1：仅导出；2：仅导入）
+     * 字段類型（0：导出导入；1：仅导出；2：仅导入）
      */
     Type type() default Type.ALL;
 

@@ -45,15 +45,15 @@ public interface CarReportService
     public int updateCarReport(CarReportEntity carReport);
 
     /**
-     * 批量删除車輛檢舉
+     * 批量刪除車輛檢舉
      * 
-     * @param ids 需要删除的車輛檢舉主键集合
+     * @param ids 需要刪除的車輛檢舉主键集合
      * @return 结果
      */
     public int deleteCarReportByIds(Long[] ids);
 
     /**
-     * 删除車輛檢舉信息
+     * 刪除車輛檢舉信息
      * 
      * @param id 車輛檢舉主键
      * @return 结果

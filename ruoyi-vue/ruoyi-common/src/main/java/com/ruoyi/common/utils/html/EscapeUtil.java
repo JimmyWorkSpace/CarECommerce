@@ -21,11 +21,11 @@ public class EscapeUtil
         }
 
         // special HTML characters
-        TEXT['\''] = "&#039;".toCharArray(); // 单引号
-        TEXT['"'] = "&#34;".toCharArray(); // 双引号
+        TEXT['\''] = "&#039;".toCharArray(); // 单引號
+        TEXT['"'] = "&#34;".toCharArray(); // 双引號
         TEXT['&'] = "&#38;".toCharArray(); // &符
-        TEXT['<'] = "&#60;".toCharArray(); // 小于号
-        TEXT['>'] = "&#62;".toCharArray(); // 大于号
+        TEXT['<'] = "&#60;".toCharArray(); // 小于號
+        TEXT['>'] = "&#62;".toCharArray(); // 大于號
     }
 
     /**
@@ -51,7 +51,7 @@ public class EscapeUtil
     }
 
     /**
-     * 清除所有HTML标签，但是不删除标签内的内容
+     * 清除所有HTML标签，但是不刪除标签内的内容
      * 
      * @param content 文本
      * @return 清除标签后的文本

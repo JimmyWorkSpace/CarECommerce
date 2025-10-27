@@ -71,7 +71,7 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 根据角色编号获取详细信息
+     * 根据角色编號获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping(value = "/{roleId}")
@@ -91,7 +91,7 @@ public class SysRoleController extends BaseController
     {
         if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role)))
         {
-            return AjaxResult.error("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
+            return AjaxResult.error("新增角色'" + role.getRoleName() + "'失败，角色名稱已存在");
         }
         else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role)))
         {
@@ -114,7 +114,7 @@ public class SysRoleController extends BaseController
         roleService.checkRoleDataScope(role.getRoleId());
         if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role)))
         {
-            return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
+            return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，角色名稱已存在");
         }
         else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role)))
         {
@@ -134,7 +134,7 @@ public class SysRoleController extends BaseController
             }
             return AjaxResult.success();
         }
-        return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
+        return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，请聯繫管理员");
     }
 
     /**
@@ -151,7 +151,7 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 状态修改
+     * 狀態修改
      */
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
@@ -165,7 +165,7 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 删除角色
+     * 刪除角色
      */
     @PreAuthorize("@ss.hasPermi('system:role:remove')")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)

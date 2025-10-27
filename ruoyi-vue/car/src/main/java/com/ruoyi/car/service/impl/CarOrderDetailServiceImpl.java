@@ -9,7 +9,7 @@ import com.ruoyi.car.service.ICarOrderDetailService;
 import tk.mybatis.mapper.entity.Example;
 
 /**
- * 订单详情Service业务层处理
+ * 訂單详情Service业务层处理
  * 
  * @author ruoyi
  * @date 2024-01-01
@@ -21,10 +21,10 @@ public class CarOrderDetailServiceImpl implements ICarOrderDetailService
     private CarOrderDetailMapper carOrderDetailMapper;
 
     /**
-     * 查询订单详情列表
+     * 查询訂單详情列表
      * 
-     * @param carOrderDetail 订单详情
-     * @return 订单详情
+     * @param carOrderDetail 訂單详情
+     * @return 訂單详情
      */
     @Override
     public List<CarOrderDetailEntity> selectCarOrderDetailList(CarOrderDetailEntity carOrderDetail)
@@ -43,10 +43,10 @@ public class CarOrderDetailServiceImpl implements ICarOrderDetailService
             criteria.andLike("productName", "%" + carOrderDetail.getProductName() + "%");
         }
         
-        // 排除已删除的记录
+        // 排除已刪除的记录
         criteria.andEqualTo("delFlag", false);
         
-        // 按创建时间倒序排列
+        // 按建立時間倒序排列
         example.orderBy("createTime").desc();
         
         return carOrderDetailMapper.selectByExample(example);

@@ -74,12 +74,12 @@ public class MemoryCache {
     }
     
     /**
-     * 缓存基本的对象，带过期时间
+     * 缓存基本的对象，带过期時間
      *
      * @param key 缓存的键值
      * @param value 缓存的值
-     * @param timeout 时间
-     * @param timeUnit 时间颗粒度
+     * @param timeout 時間
+     * @param timeUnit 時間颗粒度
      */
     public <T> void setCacheObject(final String key, final T value, final Integer timeout, final TimeUnit timeUnit) {
         long expireTime = System.currentTimeMillis() + timeUnit.toMillis(timeout);
@@ -87,10 +87,10 @@ public class MemoryCache {
     }
     
     /**
-     * 设置有效时间
+     * 设置有效時間
      *
      * @param key 缓存键
-     * @param timeout 超时时间
+     * @param timeout 超时時間
      * @return true=设置成功；false=设置失败
      */
     public boolean expire(final String key, final long timeout) {
@@ -98,11 +98,11 @@ public class MemoryCache {
     }
     
     /**
-     * 设置有效时间
+     * 设置有效時間
      *
      * @param key 缓存键
-     * @param timeout 超时时间
-     * @param unit 时间单位
+     * @param timeout 超时時間
+     * @param unit 時間单位
      * @return true=设置成功；false=设置失败
      */
     public boolean expire(final String key, final long timeout, final TimeUnit unit) {
@@ -135,7 +135,7 @@ public class MemoryCache {
     }
     
     /**
-     * 删除单个对象
+     * 刪除单个对象
      *
      * @param key 缓存键
      */
@@ -144,10 +144,10 @@ public class MemoryCache {
     }
     
     /**
-     * 删除集合对象
+     * 刪除集合对象
      *
      * @param collection 多个对象
-     * @return 删除的数量
+     * @return 刪除的数量
      */
     public long deleteObject(final Collection<String> collection) {
         AtomicLong count = new AtomicLong(0);
@@ -277,7 +277,7 @@ public class MemoryCache {
     }
     
     /**
-     * 删除Hash中的数据
+     * 刪除Hash中的数据
      * 
      * @param key 缓存键
      * @param hkey Hash键

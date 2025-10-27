@@ -44,15 +44,15 @@ public interface ICarUserService
     public int updateCarUser(CarUserEntity carUser);
 
     /**
-     * 批量删除用户管理
+     * 批量刪除用户管理
      * 
-     * @param ids 需要删除的用户管理主键集合
+     * @param ids 需要刪除的用户管理主键集合
      * @return 结果
      */
     public int deleteCarUserByIds(Long[] ids);
 
     /**
-     * 删除用户管理信息
+     * 刪除用户管理信息
      * 
      * @param id 用户管理主键
      * @return 结果

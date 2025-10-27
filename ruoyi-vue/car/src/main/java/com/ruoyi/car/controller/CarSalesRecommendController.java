@@ -55,7 +55,7 @@ public class CarSalesRecommendController extends BaseController
     }
     
     /**
-     * 设置车辆推荐状态
+     * 设置车辆推薦狀態
      */
     @PreAuthorize("@ss.hasPermi('car:salesRecommend:edit')")
     @Log(title = "精选好车", businessType = BusinessType.UPDATE)

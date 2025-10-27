@@ -45,7 +45,7 @@ public interface SysDeptMapper
     public List<SysDept> selectChildrenDeptById(Long deptId);
 
     /**
-     * 根据ID查询所有子部门（正常状态）
+     * 根据ID查询所有子部门（正常狀態）
      * 
      * @param deptId 部门ID
      * @return 子部门数
@@ -69,9 +69,9 @@ public interface SysDeptMapper
     public int checkDeptExistUser(Long deptId);
 
     /**
-     * 校验部门名称是否唯一
+     * 校验部门名稱是否唯一
      * 
-     * @param deptName 部门名称
+     * @param deptName 部门名稱
      * @param parentId 父部门ID
      * @return 结果
      */
@@ -94,7 +94,7 @@ public interface SysDeptMapper
     public int updateDept(SysDept dept);
 
     /**
-     * 修改所在部门正常状态
+     * 修改所在部门正常狀態
      * 
      * @param deptIds 部门ID组
      */
@@ -109,7 +109,7 @@ public interface SysDeptMapper
     public int updateDeptChildren(@Param("depts") List<SysDept> depts);
 
     /**
-     * 删除部门管理信息
+     * 刪除部门管理信息
      * 
      * @param deptId 部门ID
      * @return 结果

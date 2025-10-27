@@ -45,7 +45,7 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 根据通知公告编号获取详细信息
+     * 根据通知公告编號获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:notice:query')")
     @GetMapping(value = "/{noticeId}")
@@ -79,7 +79,7 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 删除通知公告
+     * 刪除通知公告
      */
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)

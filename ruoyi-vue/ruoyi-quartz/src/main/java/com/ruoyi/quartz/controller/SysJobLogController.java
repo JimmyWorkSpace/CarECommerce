@@ -57,7 +57,7 @@ public class SysJobLogController extends BaseController
     }
     
     /**
-     * 根据调度编号获取详细信息
+     * 根据调度编號获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('monitor:job:query')")
     @GetMapping(value = "/{configId}")
@@ -68,7 +68,7 @@ public class SysJobLogController extends BaseController
 
 
     /**
-     * 删除定时任务调度日志
+     * 刪除定时任务调度日志
      */
     @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
     @Log(title = "定时任务调度日志", businessType = BusinessType.DELETE)

@@ -58,9 +58,9 @@ public interface ISysConfigService
     public int updateConfig(SysConfig config);
 
     /**
-     * 批量删除参数信息
+     * 批量刪除参数信息
      * 
-     * @param configIds 需要删除的参数ID
+     * @param configIds 需要刪除的参数ID
      */
     public void deleteConfigByIds(Long[] configIds);
 

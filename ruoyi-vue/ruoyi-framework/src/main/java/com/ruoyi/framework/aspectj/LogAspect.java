@@ -86,7 +86,7 @@ public class LogAspect
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
                 operLog.setErrorMsg(StringUtils.substring(e.getMessage(), 0, 2000));
             }
-            // 设置方法名称
+            // 设置方法名稱
             String className = joinPoint.getTarget().getClass().getName();
             String methodName = joinPoint.getSignature().getName();
             operLog.setMethod(className + "." + methodName + "()");
@@ -117,7 +117,7 @@ public class LogAspect
     {
         // 设置action动作
         operLog.setBusinessType(log.businessType().ordinal());
-        // 设置标题
+        // 设置標題
         operLog.setTitle(log.title());
         // 设置操作人类别
         operLog.setOperatorType(log.operatorType().ordinal());

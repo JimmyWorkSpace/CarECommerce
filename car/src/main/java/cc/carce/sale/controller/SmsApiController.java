@@ -44,8 +44,10 @@ public class SmsApiController {
             
             // 检查是否可以重新发送
             if (!smsService.canResendCode(phoneNumber)) {
+                int remainingTime = smsService.getRemainingWaitTime(phoneNumber);
                 response.put("success", false);
-                response.put("message", "請稍後再發送驗證碼");
+                response.put("message", "請稍後再發送驗證碼，還需等待 " + remainingTime + " 秒");
+                response.put("remainingTime", remainingTime);
                 return response;
             }
             

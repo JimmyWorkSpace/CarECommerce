@@ -15,7 +15,7 @@ import tk.mybatis.mapper.common.Mapper;
 public interface CarAppointmentMapper extends Mapper<CarAppointmentEntity> {
 
     /**
-     * 查询预约看车列表（带车辆销售标题）
+     * 查询预约看车列表（带车辆销售標題）
      * @param carAppointment 预约看车查询条件
      * @return 预约看车列表
      */

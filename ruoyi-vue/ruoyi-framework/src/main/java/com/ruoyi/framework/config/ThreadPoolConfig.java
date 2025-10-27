@@ -26,7 +26,7 @@ public class ThreadPoolConfig
     // 队列最大长度
     private int queueCapacity = 1000;
 
-    // 线程池维护线程所允许的空闲时间
+    // 线程池维护线程所允许的空闲時間
     private int keepAliveSeconds = 300;
 
     @Bean(name = "threadPoolTaskExecutor")

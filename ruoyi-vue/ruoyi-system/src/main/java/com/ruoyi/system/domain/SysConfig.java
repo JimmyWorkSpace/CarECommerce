@@ -21,8 +21,8 @@ public class SysConfig extends BaseEntity
     @Excel(name = "参数主键", cellType = ColumnType.NUMERIC)
     private Long configId;
 
-    /** 参数名称 */
-    @Excel(name = "参数名称")
+    /** 参数名稱 */
+    @Excel(name = "参数名稱")
     private String configName;
 
     /** 参数键名 */
@@ -47,8 +47,8 @@ public class SysConfig extends BaseEntity
         this.configId = configId;
     }
 
-    @NotBlank(message = "参数名称不能为空")
-    @Size(min = 0, max = 100, message = "参数名称不能超过100个字符")
+    @NotBlank(message = "参数名稱不能为空")
+    @Size(min = 0, max = 100, message = "参数名稱不能超过100个字符")
     public String getConfigName()
     {
         return configName;

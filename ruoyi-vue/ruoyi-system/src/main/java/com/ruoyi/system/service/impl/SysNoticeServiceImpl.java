@@ -67,7 +67,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     }
 
     /**
-     * 删除公告对象
+     * 刪除公告对象
      * 
      * @param noticeId 公告ID
      * @return 结果
@@ -79,9 +79,9 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     }
 
     /**
-     * 批量删除公告信息
+     * 批量刪除公告信息
      * 
-     * @param noticeIds 需要删除的公告ID
+     * @param noticeIds 需要刪除的公告ID
      * @return 结果
      */
     @Override

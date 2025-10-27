@@ -29,12 +29,12 @@ public interface CarQuestionAnswerMapper extends Mapper<CarQuestionAnswerEntity>
     int updateById(CarQuestionAnswerEntity entity);
 
     /**
-     * 根据ID删除问答（逻辑删除）
+     * 根据ID刪除问答（逻辑刪除）
      */
     int deleteById(@Param("id") Long id);
 
     /**
-     * 根据频道ID查询问答列表
+     * 根据頻道ID查询问答列表
      */
     List<CarQuestionAnswerEntity> selectByChannelId(@Param("channelId") Long channelId);
 
@@ -44,7 +44,7 @@ public interface CarQuestionAnswerMapper extends Mapper<CarQuestionAnswerEntity>
     List<CarQuestionAnswerEntity> selectAll();
 
     /**
-     * 根据频道ID查询问答列表（按排序）
+     * 根据頻道ID查询问答列表（按排序）
      */
     List<CarQuestionAnswerEntity> selectByChannelIdOrderByShowOrder(@Param("channelId") Long channelId);
 }

@@ -31,12 +31,12 @@ public class BaseController
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * 将前台传递过来的日期格式的字符串，自动转化为Date类型
+     * 将前台传递过来的日期格式的字符串，自动转化为Date類型
      */
     @InitBinder
     public void initBinder(WebDataBinder binder)
     {
-        // Date 类型转换
+        // Date 類型转换
         binder.registerCustomEditor(Date.class, new PropertyEditorSupport()
         {
             @Override
@@ -153,7 +153,7 @@ public class BaseController
     }
 
     /**
-     * 获取登录用户id
+     * 获取登入用户id
      */
     public Long getUserId()
     {
@@ -161,7 +161,7 @@ public class BaseController
     }
 
     /**
-     * 获取登录部门id
+     * 获取登入部门id
      */
     public Long getDeptId()
     {
@@ -169,7 +169,7 @@ public class BaseController
     }
 
     /**
-     * 获取登录用户名
+     * 获取登入用户名
      */
     public String getUsername()
     {

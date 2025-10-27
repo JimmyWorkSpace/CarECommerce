@@ -26,7 +26,7 @@ public interface CarBannerService {
     int updateBanner(CarBannerEntity carBanner);
     
     /**
-     * 删除轮播图
+     * 刪除轮播图
      */
     int deleteBanner(Long id);
     

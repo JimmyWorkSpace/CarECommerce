@@ -18,7 +18,7 @@
           label-width="100px"
         >
           <el-col :span="24">
-            <el-form-item label="生成类型" prop="type">
+            <el-form-item label="生成類型" prop="type">
               <el-radio-group v-model="formData.type">
                 <el-radio-button
                   v-for="(item, index) in typeOptions"
@@ -66,7 +66,7 @@ export default {
         }],
         type: [{
           required: true,
-          message: '生成类型不能为空',
+          message: '生成類型不能为空',
           trigger: 'change'
         }]
       },

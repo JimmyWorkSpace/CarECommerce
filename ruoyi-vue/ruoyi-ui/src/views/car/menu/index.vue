@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="菜單名稱" prop="title">
+      <el-form-item label="選單名稱" prop="title">
         <el-input
           v-model="queryParams.title"
-          placeholder="請輸入菜單名稱"
+          placeholder="請輸入選單名稱"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -17,8 +17,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -61,7 +61,7 @@
           size="mini"
           :disabled="!orderChanged"
           @click="handleSaveOrder"
-        >保存排序</el-button>
+        >儲存排序</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -85,22 +85,12 @@
           v-hasPermi="['car:menu:remove']"
         >刪除</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['car:menu:export']"
-        >導出</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="menuList" @selection-change="handleSelectionChange" style="width: 100%">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="菜單名稱" align="center" prop="title" />
+      <el-table-column label="選單名稱" align="center" prop="title" />
       <el-table-column label="是否顯示" align="center" prop="isShow" width="100">
         <template slot-scope="scope">
           <el-switch
@@ -118,7 +108,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="菜單類型" align="center" prop="linkType" width="100">
+      <el-table-column label="選單類型" align="center" prop="linkType" width="100">
         <template slot-scope="scope">
           <el-tag :type="scope.row.linkType === 0 ? 'primary' : 'success'">
             {{ scope.row.linkType === 0 ? '鏈接' : '富文本' }}
@@ -132,7 +122,7 @@
           <span v-else-if="scope.row.linkType === 1" v-html="scope.row.content ? scope.row.content.substring(0, 50) + '...' : ''"></span>
         </template>
       </el-table-column>
-      <el-table-column label="創建時間" align="center" prop="createTime" width="180">
+      <el-table-column label="建立時間" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -165,11 +155,11 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改菜單維護對話框 -->
+    <!-- 添加或修改選單維護對話框 -->
     <el-dialog :title="title" :visible.sync="open" width="70%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="菜單名稱" prop="title">
-          <el-input v-model="form.title" placeholder="請輸入菜單名稱" />
+        <el-form-item label="選單名稱" prop="title">
+          <el-input v-model="form.title" placeholder="請輸入選單名稱" />
         </el-form-item>
         <el-form-item label="顯示順序" prop="showOrder">
           <el-input-number v-model="form.showOrder" :min="0" :max="999" placeholder="請輸入顯示順序" />
@@ -186,7 +176,7 @@
             <el-radio :label="0">不可刪除</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="菜單類型" prop="linkType">
+        <el-form-item label="選單類型" prop="linkType">
           <el-radio-group v-model="form.linkType" @change="handleLinkTypeChange">
             <el-radio :label="0">鏈接</el-radio>
             <el-radio :label="1">富文本</el-radio>
@@ -226,7 +216,7 @@ export default {
       showSearch: true,
       // 總條數
       total: 0,
-      // 菜單維護表格數據
+      // 選單維護表格數據
       menuList: [],
       // 排序是否改變
       orderChanged: false,
@@ -246,7 +236,7 @@ export default {
       // 表單校驗
       rules: {
         title: [
-          { required: true, message: "菜單名稱不能為空", trigger: "blur" }
+          { required: true, message: "選單名稱不能為空", trigger: "blur" }
         ],
         showOrder: [
           { required: true, message: "顯示順序不能為空", trigger: "blur" }
@@ -258,7 +248,7 @@ export default {
           { required: true, message: "是否可刪除不能為空", trigger: "change" }
         ],
         linkType: [
-          { required: true, message: "菜單類型不能為空", trigger: "change" }
+          { required: true, message: "選單類型不能為空", trigger: "change" }
         ]
       }
     };
@@ -267,7 +257,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查詢菜單維護列表 */
+    /** 查詢選單維護列表 */
     getList() {
       this.loading = true;
       listMenu(this.queryParams).then(response => {
@@ -320,7 +310,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加菜單維護";
+      this.title = "添加選單維護";
     },
     /** 修改按鈕操作 */
     handleUpdate(row) {
@@ -329,7 +319,7 @@ export default {
       getMenu(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改菜單維護";
+        this.title = "修改選單維護";
       });
     },
     /** 提交按鈕 */
@@ -361,22 +351,22 @@ export default {
       this.$refs["form"].clearValidate(['linkUrl', 'content']);
       
       if (this.form.linkType === 0) {
-        // 链接类型，验证链接地址
+        // 链接類型，验证链接地址
         this.rules.linkUrl = [
           { required: true, message: "鏈接地址不能為空", trigger: "blur" }
         ];
         this.rules.content = [];
       } else if (this.form.linkType === 1) {
-        // 富文本类型，验证富文本内容
+        // 富文本類型，验证富文本内容
         this.rules.content = [
           { required: true, message: "富文本內容不能為空", trigger: "blur" }
         ];
         this.rules.linkUrl = [];
       }
     },
-    /** 处理菜单类型变化 */
+    /** 处理菜单類型变化 */
     handleLinkTypeChange(value) {
-      // 清除相关字段的验证状态
+      // 清除相关字段的验证狀態
       this.$refs["form"].clearValidate(['linkUrl', 'content']);
       
       // 不再清空字段内容，保留用户输入的数据
@@ -385,7 +375,7 @@ export default {
     /** 刪除按鈕操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否確認刪除菜單維護編號為"' + ids + '"的數據項？').then(function() {
+      this.$modal.confirm('是否確認刪除選單維護編號為"' + ids + '"的數據項？').then(function() {
         return delMenu(ids);
       }).then(() => {
         this.getList();
@@ -401,7 +391,7 @@ export default {
     /** 顯示狀態修改 */
     handleShowStatusChange(row) {
       let text = row.isShow === 1 ? "啟用" : "停用";
-      this.$modal.confirm('確認要"' + text + '""' + row.title + '"菜單嗎？').then(function() {
+      this.$modal.confirm('確認要"' + text + '""' + row.title + '"選單嗎？').then(function() {
         return updateMenuShowStatus(row);
       }).then(() => {
         this.$modal.msgSuccess(text + "成功");

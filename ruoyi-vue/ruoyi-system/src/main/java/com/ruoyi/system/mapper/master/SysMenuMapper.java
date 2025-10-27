@@ -99,7 +99,7 @@ public interface SysMenuMapper
     public int updateMenu(SysMenu menu);
 
     /**
-     * 删除菜单管理信息
+     * 刪除菜单管理信息
      *
      * @param menuId 菜单ID
      * @return 结果
@@ -107,9 +107,9 @@ public interface SysMenuMapper
     public int deleteMenuById(Long menuId);
 
     /**
-     * 校验菜单名称是否唯一
+     * 校验菜单名稱是否唯一
      *
-     * @param menuName 菜单名称
+     * @param menuName 菜单名稱
      * @param parentId 父菜单ID
      * @return 结果
      */

@@ -11,7 +11,7 @@ import com.ruoyi.system.domain.SysUserPost;
 public interface SysUserPostMapper
 {
     /**
-     * 通过用户ID删除用户和岗位关联
+     * 通过用户ID刪除用户和岗位关联
      * 
      * @param userId 用户ID
      * @return 结果
@@ -27,9 +27,9 @@ public interface SysUserPostMapper
     public int countUserPostById(Long postId);
 
     /**
-     * 批量删除用户和岗位关联
+     * 批量刪除用户和岗位关联
      * 
-     * @param ids 需要删除的数据ID
+     * @param ids 需要刪除的数据ID
      * @return 结果
      */
     public int deleteUserPost(Long[] ids);

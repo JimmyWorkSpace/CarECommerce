@@ -12,7 +12,7 @@ import com.ruoyi.car.domain.CarOrderDetailEntity;
 import com.ruoyi.car.service.ICarOrderDetailService;
 
 /**
- * 订单详情Controller
+ * 訂單详情Controller
  * 
  * @author ruoyi
  * @date 2024-01-01
@@ -25,7 +25,7 @@ public class CarOrderDetailController extends BaseController
     private ICarOrderDetailService carOrderDetailService;
 
     /**
-     * 查询订单详情列表
+     * 查询訂單详情列表
      */
     @PreAuthorize("@ss.hasPermi('car:orderDetail:list')")
     @GetMapping("/list")

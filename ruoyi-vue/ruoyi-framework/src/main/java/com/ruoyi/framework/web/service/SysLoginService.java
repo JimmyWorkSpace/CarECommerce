@@ -26,7 +26,7 @@ import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 
 /**
- * 登录校验方法
+ * 登入校验方法
  * 
  * @author ruoyi
  */
@@ -49,7 +49,7 @@ public class SysLoginService
     private ISysConfigService configService;
 
     /**
-     * 登录验证
+     * 登入验证
      * 
      * @param username 用户名
      * @param password 密码
@@ -119,7 +119,7 @@ public class SysLoginService
     }
 
     /**
-     * 记录登录信息
+     * 记录登入信息
      *
      * @param userId 用户ID
      */

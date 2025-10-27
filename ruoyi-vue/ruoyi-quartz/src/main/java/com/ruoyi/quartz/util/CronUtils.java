@@ -43,10 +43,10 @@ public class CronUtils
     }
 
     /**
-     * 返回下一个执行时间根据给定的Cron表达式
+     * 返回下一个执行時間根据给定的Cron表达式
      *
      * @param cronExpression Cron表达式
-     * @return Date 下次Cron表达式执行时间
+     * @return Date 下次Cron表达式执行時間
      */
     public static Date getNextExecution(String cronExpression)
     {

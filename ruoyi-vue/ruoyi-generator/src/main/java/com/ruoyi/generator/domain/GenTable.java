@@ -17,11 +17,11 @@ public class GenTable extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 编号 */
+    /** 编號 */
     private Long tableId;
 
-    /** 表名称 */
-    @NotBlank(message = "表名称不能为空")
+    /** 表名稱 */
+    @NotBlank(message = "表名稱不能为空")
     private String tableName;
 
     /** 表描述 */
@@ -34,8 +34,8 @@ public class GenTable extends BaseEntity
     /** 本表关联父表的外键名 */
     private String subTableFkName;
 
-    /** 实体类名称(首字母大写) */
-    @NotBlank(message = "实体类名称不能为空")
+    /** 实体类名稱(首字母大写) */
+    @NotBlank(message = "实体类名稱不能为空")
     private String className;
 
     /** 使用的模板（crud单表操作 tree树表操作 sub主子表操作） */
@@ -86,13 +86,13 @@ public class GenTable extends BaseEntity
     /** 树父编码字段 */
     private String treeParentCode;
 
-    /** 树名称字段 */
+    /** 树名稱字段 */
     private String treeName;
 
     /** 上级菜单ID字段 */
     private String parentMenuId;
 
-    /** 上级菜单名称字段 */
+    /** 上级菜单名稱字段 */
     private String parentMenuName;
 
     public Long getTableId()

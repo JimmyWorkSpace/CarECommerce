@@ -66,7 +66,7 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
     }
 
     /**
-     * 获取类型 4（伪随机生成的）UUID 的静态工厂。 使用加密的本地线程伪随机数生成器生成该 UUID。
+     * 获取類型 4（伪随机生成的）UUID 的静态工厂。 使用加密的本地线程伪随机数生成器生成该 UUID。
      * 
      * @return 随机生成的 {@code UUID}
      */
@@ -76,7 +76,7 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
     }
 
     /**
-     * 获取类型 4（伪随机生成的）UUID 的静态工厂。 使用加密的强伪随机数生成器生成该 UUID。
+     * 获取類型 4（伪随机生成的）UUID 的静态工厂。 使用加密的强伪随机数生成器生成该 UUID。
      * 
      * @return 随机生成的 {@code UUID}
      */
@@ -86,7 +86,7 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
     }
 
     /**
-     * 获取类型 4（伪随机生成的）UUID 的静态工厂。 使用加密的强伪随机数生成器生成该 UUID。
+     * 获取類型 4（伪随机生成的）UUID 的静态工厂。 使用加密的强伪随机数生成器生成该 UUID。
      * 
      * @param isSecure 是否使用{@link SecureRandom}如果是可以获得更安全的随机码，否则可以得到更好的性能
      * @return 随机生成的 {@code UUID}
@@ -105,7 +105,7 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
     }
 
     /**
-     * 根据指定的字节数组获取类型 3（基于名称的）UUID 的静态工厂。
+     * 根据指定的字节数组获取類型 3（基于名稱的）UUID 的静态工厂。
      *
      * @param name 用于构造 UUID 的字节数组。
      *
@@ -184,17 +184,17 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
     }
 
     /**
-     * 与此 {@code UUID} 相关联的版本号. 版本号描述此 {@code UUID} 是如何生成的。
+     * 与此 {@code UUID} 相关联的版本號. 版本號描述此 {@code UUID} 是如何生成的。
      * <p>
-     * 版本号具有以下含意:
+     * 版本號具有以下含意:
      * <ul>
-     * <li>1 基于时间的 UUID
+     * <li>1 基于時間的 UUID
      * <li>2 DCE 安全 UUID
-     * <li>3 基于名称的 UUID
+     * <li>3 基于名稱的 UUID
      * <li>4 随机生成的 UUID
      * </ul>
      *
-     * @return 此 {@code UUID} 的版本号
+     * @return 此 {@code UUID} 的版本號
      */
     public int version()
     {
@@ -203,9 +203,9 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
     }
 
     /**
-     * 与此 {@code UUID} 相关联的变体号。变体号描述 {@code UUID} 的布局。
+     * 与此 {@code UUID} 相关联的变体號。变体號描述 {@code UUID} 的布局。
      * <p>
-     * 变体号具有以下含意：
+     * 变体號具有以下含意：
      * <ul>
      * <li>0 为 NCS 向后兼容保留
      * <li>2 <a href="http://www.ietf.org/rfc/rfc4122.txt">IETF&nbsp;RFC&nbsp;4122</a>(Leach-Salz), 用于此类
@@ -213,7 +213,7 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
      * <li>7 保留供以后定义使用
      * </ul>
      *
-     * @return 此 {@code UUID} 相关联的变体号
+     * @return 此 {@code UUID} 相关联的变体號
      */
     public int variant()
     {
@@ -226,15 +226,15 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
     }
 
     /**
-     * 与此 UUID 相关联的时间戳值。
+     * 与此 UUID 相关联的時間戳值。
      *
      * <p>
-     * 60 位的时间戳值根据此 {@code UUID} 的 time_low、time_mid 和 time_hi 字段构造。<br>
-     * 所得到的时间戳以 100 毫微秒为单位，从 UTC（通用协调时间） 1582 年 10 月 15 日零时开始。
+     * 60 位的時間戳值根据此 {@code UUID} 的 time_low、time_mid 和 time_hi 字段构造。<br>
+     * 所得到的時間戳以 100 毫微秒为单位，从 UTC（通用协调時間） 1582 年 10 月 15 日零时开始。
      *
      * <p>
-     * 时间戳值仅在在基于时间的 UUID（其 version 类型为 1）中才有意义。<br>
-     * 如果此 {@code UUID} 不是基于时间的 UUID，则此方法抛出 UnsupportedOperationException。
+     * 時間戳值仅在在基于時間的 UUID（其 version 類型为 1）中才有意义。<br>
+     * 如果此 {@code UUID} 不是基于時間的 UUID，则此方法抛出 UnsupportedOperationException。
      *
      * @throws UnsupportedOperationException 如果此 {@code UUID} 不是 version 为 1 的 UUID。
      */
@@ -250,9 +250,9 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
      * 与此 UUID 相关联的时钟序列值。
      *
      * <p>
-     * 14 位的时钟序列值根据此 UUID 的 clock_seq 字段构造。clock_seq 字段用于保证在基于时间的 UUID 中的时间唯一性。
+     * 14 位的时钟序列值根据此 UUID 的 clock_seq 字段构造。clock_seq 字段用于保证在基于時間的 UUID 中的時間唯一性。
      * <p>
-     * {@code clockSequence} 值仅在基于时间的 UUID（其 version 类型为 1）中才有意义。 如果此 UUID 不是基于时间的 UUID，则此方法抛出
+     * {@code clockSequence} 值仅在基于時間的 UUID（其 version 類型为 1）中才有意义。 如果此 UUID 不是基于時間的 UUID，则此方法抛出
      * UnsupportedOperationException。
      *
      * @return 此 {@code UUID} 的时钟序列
@@ -271,8 +271,8 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
      * <p>
      * 48 位的节点值根据此 UUID 的 node 字段构造。此字段旨在用于保存机器的 IEEE 802 地址，该地址用于生成此 UUID 以保证空间唯一性。
      * <p>
-     * 节点值仅在基于时间的 UUID（其 version 类型为 1）中才有意义。<br>
-     * 如果此 UUID 不是基于时间的 UUID，则此方法抛出 UnsupportedOperationException。
+     * 节点值仅在基于時間的 UUID（其 version 類型为 1）中才有意义。<br>
+     * 如果此 UUID 不是基于時間的 UUID，则此方法抛出 UnsupportedOperationException。
      *
      * @return 此 {@code UUID} 的节点值
      *

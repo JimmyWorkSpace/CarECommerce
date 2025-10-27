@@ -35,8 +35,8 @@ public class RedisCache
      *
      * @param key 缓存的键值
      * @param value 缓存的值
-     * @param timeout 时间
-     * @param timeUnit 时间颗粒度
+     * @param timeout 時間
+     * @param timeUnit 時間颗粒度
      */
     public <T> void setCacheObject(final String key, final T value, final Integer timeout, final TimeUnit timeUnit)
     {
@@ -44,10 +44,10 @@ public class RedisCache
     }
 
     /**
-     * 设置有效时间
+     * 设置有效時間
      *
      * @param key Redis键
-     * @param timeout 超时时间
+     * @param timeout 超时時間
      * @return true=设置成功；false=设置失败
      */
     public boolean expire(final String key, final long timeout)
@@ -56,11 +56,11 @@ public class RedisCache
     }
 
     /**
-     * 设置有效时间
+     * 设置有效時間
      *
      * @param key Redis键
-     * @param timeout 超时时间
-     * @param unit 时间单位
+     * @param timeout 超时時間
+     * @param unit 時間单位
      * @return true=设置成功；false=设置失败
      */
     public boolean expire(final String key, final long timeout, final TimeUnit unit)
@@ -80,7 +80,7 @@ public class RedisCache
     }
 
     /**
-     * 删除单个对象
+     * 刪除单个对象
      *
      * @param key
      */
@@ -90,7 +90,7 @@ public class RedisCache
     }
 
     /**
-     * 删除集合对象
+     * 刪除集合对象
      *
      * @param collection 多个对象
      * @return
@@ -197,7 +197,7 @@ public class RedisCache
     }
 
     /**
-     * 删除Hash中的数据
+     * 刪除Hash中的数据
      * 
      * @param key
      * @param hkey

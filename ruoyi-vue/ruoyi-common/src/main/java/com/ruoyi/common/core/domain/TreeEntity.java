@@ -12,7 +12,7 @@ public class TreeEntity extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 父菜单名称 */
+    /** 父菜单名稱 */
     private String parentName;
 
     /** 父菜单ID */

@@ -47,33 +47,33 @@ public class GenImageThumbTask {
 	
 //	@PostConstruct
 	public void execute() {
-//		获取要生成缩略图的图片信息
+//		获取要生成缩略图的圖片信息
 		List<CarSalePhotoEntity> list = carSalePhotoMapper.getNotThumbedImage();
 		if(CollUtil.isNotEmpty(list)) {
 			for(CarSalePhotoEntity photo : list) {
-				// 使用多线程处理每张图片
+				// 使用多线程处理每张圖片
 				es.submit(() -> processImage(photo));
 			}
 		}
 	}
 	
 	/**
-	 * 处理单张图片，生成缩略图并上传
+	 * 处理单张圖片，生成缩略图并上传
 	 * 
-	 * @param photo 图片信息
+	 * @param photo 圖片信息
 	 */
 	private void processImage(CarSalePhotoEntity photo) {
 		try {
 			String imageUrl = imagePrefix + photo.getPhotoUrl();
-			log.info("开始处理图片: {}", imageUrl);
+			log.info("开始处理圖片: {}", imageUrl);
 			
-			// 1. 检查图片是否存在
+			// 1. 检查圖片是否存在
 			if (!isImageExists(imageUrl)) {
-				log.warn("图片不存在: {}", imageUrl);
+				log.warn("圖片不存在: {}", imageUrl);
 				return;
 			}
 			
-			// 2. 读取图片并生成缩略图
+			// 2. 读取圖片并生成缩略图
 			byte[] thumbnailBytes = generateThumbnail(imageUrl, 256);
 			if (thumbnailBytes == null) {
 				log.error("生成缩略图失败: {}", imageUrl);
@@ -98,14 +98,14 @@ public class GenImageThumbTask {
 			}
 			
 		} catch (Exception e) {
-			log.error("处理图片失败: {}", photo.getPhotoUrl(), e);
+			log.error("处理圖片失败: {}", photo.getPhotoUrl(), e);
 		}
 	}
 	
 	/**
-	 * 检查图片URL是否存在
+	 * 检查圖片URL是否存在
 	 * 
-	 * @param imageUrl 图片URL
+	 * @param imageUrl 圖片URL
 	 * @return 是否存在
 	 */
 	private boolean isImageExists(String imageUrl) {
@@ -119,7 +119,7 @@ public class GenImageThumbTask {
 			int responseCode = connection.getResponseCode();
 			return responseCode == HttpURLConnection.HTTP_OK;
 		} catch (Exception e) {
-			log.error("检查图片存在性失败: {}", imageUrl, e);
+			log.error("检查圖片存在性失败: {}", imageUrl, e);
 			return false;
 		}
 	}
@@ -141,7 +141,7 @@ public class GenImageThumbTask {
 			
 			BufferedImage originalImage = ImageIO.read(connection.getInputStream());
 			if (originalImage == null) {
-				log.error("无法读取图片: {}", imageUrl);
+				log.error("无法读取圖片: {}", imageUrl);
 				return null;
 			}
 			
@@ -167,7 +167,7 @@ public class GenImageThumbTask {
 			g2d.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_QUALITY);
 			g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
 			
-			// 绘制缩放后的图片
+			// 绘制缩放后的圖片
 			Image scaledImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
 			g2d.drawImage(scaledImage, 0, 0, null);
 			g2d.dispose();
@@ -187,10 +187,10 @@ public class GenImageThumbTask {
 	}
 	
 	/**
-	 * 获取图片格式
+	 * 获取圖片格式
 	 * 
-	 * @param imageUrl 图片URL
-	 * @return 图片格式
+	 * @param imageUrl 圖片URL
+	 * @return 圖片格式
 	 */
 	private String getImageFormat(String imageUrl) {
 		String extension = getFileExtension(imageUrl).toLowerCase();

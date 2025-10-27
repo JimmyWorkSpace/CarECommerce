@@ -58,7 +58,7 @@ public class SysConfigController extends BaseController
     }
 
     /**
-     * 根据参数编号获取详细信息
+     * 根据参数编號获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
@@ -109,7 +109,7 @@ public class SysConfigController extends BaseController
     }
 
     /**
-     * 删除参数配置
+     * 刪除参数配置
      */
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)

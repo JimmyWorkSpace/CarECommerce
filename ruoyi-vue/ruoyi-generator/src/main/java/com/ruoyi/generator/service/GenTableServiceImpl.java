@@ -94,7 +94,7 @@ public class GenTableServiceImpl implements IGenTableService
     /**
      * 查询据库列表
      * 
-     * @param tableNames 表名称组
+     * @param tableNames 表名稱组
      * @return 数据库表集合
      */
     @Override
@@ -137,9 +137,9 @@ public class GenTableServiceImpl implements IGenTableService
     }
 
     /**
-     * 删除业务对象
+     * 刪除业务对象
      * 
-     * @param tableIds 需要删除的数据ID
+     * @param tableIds 需要刪除的数据ID
      * @return 结果
      */
     @Override
@@ -188,7 +188,7 @@ public class GenTableServiceImpl implements IGenTableService
     /**
      * 预览代码
      * 
-     * @param tableId 表编号
+     * @param tableId 表编號
      * @return 预览数据列表
      */
     @Override
@@ -221,7 +221,7 @@ public class GenTableServiceImpl implements IGenTableService
     /**
      * 生成代码（下载方式）
      * 
-     * @param tableName 表名称
+     * @param tableName 表名稱
      * @return 数据
      */
     @Override
@@ -237,7 +237,7 @@ public class GenTableServiceImpl implements IGenTableService
     /**
      * 生成代码（自定义路径）
      * 
-     * @param tableName 表名称
+     * @param tableName 表名稱
      */
     @Override
     public void generatorCode(String tableName)
@@ -279,7 +279,7 @@ public class GenTableServiceImpl implements IGenTableService
     /**
      * 同步数据库
      * 
-     * @param tableName 表名称
+     * @param tableName 表名稱
      */
     @Override
     @Transactional
@@ -304,7 +304,7 @@ public class GenTableServiceImpl implements IGenTableService
                 column.setColumnId(prevColumn.getColumnId());
                 if (column.isList())
                 {
-                    // 如果是列表，继续保留查询方式/字典类型选项
+                    // 如果是列表，继续保留查询方式/字典類型选项
                     column.setDictType(prevColumn.getDictType());
                     column.setQueryType(prevColumn.getQueryType());
                 }
@@ -312,7 +312,7 @@ public class GenTableServiceImpl implements IGenTableService
                         && (column.isInsert() || column.isEdit())
                         && ((column.isUsableColumn()) || (!column.isSuperColumn())))
                 {
-                    // 如果是(新增/修改&非主键/非忽略及父属性)，继续保留必填/显示类型选项
+                    // 如果是(新增/修改&非主键/非忽略及父属性)，继续保留必填/显示類型选项
                     column.setIsRequired(prevColumn.getIsRequired());
                     column.setHtmlType(prevColumn.getHtmlType());
                 }
@@ -412,7 +412,7 @@ public class GenTableServiceImpl implements IGenTableService
             }
             else if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_NAME)))
             {
-                throw new ServiceException("树名称字段不能为空");
+                throw new ServiceException("树名稱字段不能为空");
             }
             else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory()))
             {

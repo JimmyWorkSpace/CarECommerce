@@ -21,17 +21,17 @@ public class CarConfigContent {
     private String dizhi;
 
     /**
-     * 服务时间1
+     * 服务時間1
      */
     private String fwsj1;
 
     /**
-     * 服务时间2
+     * 服务時間2
      */
     private String fwsj2;
 
     /**
-     * 服务时间3
+     * 服务時間3
      */
     private String fwsj3;
 

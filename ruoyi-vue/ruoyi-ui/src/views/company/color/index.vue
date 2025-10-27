@@ -9,7 +9,7 @@
         <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate" v-hasPermi="['company:color:edit']">修改</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete" v-hasPermi="['company:color:remove']">删除</el-button>
+        <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete" v-hasPermi="['company:color:remove']">刪除</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -17,7 +17,7 @@
     <el-table v-loading="loading" :data="colorList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" prop="id" />
       <el-table-column label="等级数值" align="center" prop="level" />
-      <el-table-column label="比较类型" align="center" prop="type" :formatter="typeFormatter" />
+      <el-table-column label="比较類型" align="center" prop="type" :formatter="typeFormatter" />
       <el-table-column label="颜色" align="center" prop="color">
         <template slot-scope="scope">
           <div class="colorArea">
@@ -28,7 +28,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['company:color:edit']">修改</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['company:color:remove']">删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['company:color:remove']">刪除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -41,7 +41,7 @@
         <el-form-item label="等级数值" prop="level">
           <el-input-number v-model="form.level" placeholder="请输入等级数值" />
         </el-form-item>
-        <el-form-item label="比较类型" prop="type">
+        <el-form-item label="比较類型" prop="type">
           <el-radio-group v-model="form.type">
             <el-radio :label="0">等于</el-radio>
             <el-radio :label="1">大于</el-radio>
@@ -87,7 +87,7 @@ export default {
       total: 0,
       // 等级颜色定义表格数据
       colorList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: '',
       predefineColors: [
         '#ff4500',
@@ -214,17 +214,17 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$modal
-        .confirm('是否确认删除等级颜色定义编号为"' + ids + '"的数据项？')
+        .confirm('是否确认刪除等级颜色定义编號为"' + ids + '"的数据项？')
         .then(function () {
           return delColor(ids);
         })
         .then(() => {
           this.getList();
-          this.$modal.msgSuccess('删除成功');
+          this.$modal.msgSuccess('刪除成功');
         })
         .catch(() => {});
     },

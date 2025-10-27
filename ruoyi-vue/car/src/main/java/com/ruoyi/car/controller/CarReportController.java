@@ -92,7 +92,7 @@ public class CarReportController extends BaseController
     }
 
     /**
-     * 删除車輛檢舉
+     * 刪除車輛檢舉
      */
     @PreAuthorize("@ss.hasPermi('car:report:remove')")
     @Log(title = "車輛檢舉", businessType = BusinessType.DELETE)

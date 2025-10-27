@@ -24,7 +24,7 @@ public @interface RateLimiter
     public String key() default Constants.RATE_LIMIT_KEY;
 
     /**
-     * 限流时间,单位秒
+     * 限流時間,单位秒
      */
     public int time() default 60;
 
@@ -34,7 +34,7 @@ public @interface RateLimiter
     public int count() default 100;
 
     /**
-     * 限流类型
+     * 限流類型
      */
     public LimitType limitType() default LimitType.DEFAULT;
 }

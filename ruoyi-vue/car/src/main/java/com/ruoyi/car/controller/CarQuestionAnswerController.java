@@ -92,7 +92,7 @@ public class CarQuestionAnswerController extends BaseController
     }
 
     /**
-     * 删除问答模块
+     * 刪除问答模块
      */
     @PreAuthorize("@ss.hasPermi('car:questionAnswer:remove')")
     @Log(title = "问答模块", businessType = BusinessType.DELETE)

@@ -145,7 +145,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
     }
 
     /**
-     * * 判断一个对象是否是数组类型（Java基本型别的数组）
+     * * 判断一个对象是否是数组類型（Java基本型别的数组）
      * 
      * @param object 对象
      * @return true：是数组 false：不是数组

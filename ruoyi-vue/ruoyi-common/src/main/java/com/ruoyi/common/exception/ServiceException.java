@@ -27,7 +27,7 @@ public final class ServiceException extends RuntimeException
     private String detailMessage;
 
     /**
-     * 空构造方法，避免反序列化问题
+     * 空构造方法，避免反序列化問題
      */
     public ServiceException()
     {

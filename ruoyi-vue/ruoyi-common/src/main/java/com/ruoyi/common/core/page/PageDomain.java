@@ -72,7 +72,7 @@ public class PageDomain
     {
         if (StringUtils.isNotEmpty(isAsc))
         {
-            // 兼容前端排序类型
+            // 兼容前端排序類型
             if ("ascending".equals(isAsc))
             {
                 isAsc = "asc";

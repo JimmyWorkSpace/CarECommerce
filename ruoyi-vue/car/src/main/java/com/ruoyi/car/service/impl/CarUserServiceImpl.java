@@ -86,9 +86,9 @@ public class CarUserServiceImpl implements ICarUserService
     }
 
     /**
-     * 批量删除用户管理
+     * 批量刪除用户管理
      * 
-     * @param ids 需要删除的用户管理主键
+     * @param ids 需要刪除的用户管理主键
      * @return 结果
      */
     @Override
@@ -98,7 +98,7 @@ public class CarUserServiceImpl implements ICarUserService
         Example.Criteria criteria = example.createCriteria();
         criteria.andIn("id", java.util.Arrays.asList(ids));
         
-        // 逻辑删除，设置delFlag为true
+        // 逻辑刪除，设置delFlag为true
         CarUserEntity updateEntity = new CarUserEntity();
         updateEntity.setDelFlag(true);
         
@@ -106,7 +106,7 @@ public class CarUserServiceImpl implements ICarUserService
     }
 
     /**
-     * 删除用户管理信息
+     * 刪除用户管理信息
      * 
      * @param id 用户管理主键
      * @return 结果
@@ -114,7 +114,7 @@ public class CarUserServiceImpl implements ICarUserService
     @Override
     public int deleteCarUserById(Long id)
     {
-        // 逻辑删除，设置delFlag为true
+        // 逻辑刪除，设置delFlag为true
         CarUserEntity updateEntity = new CarUserEntity();
         updateEntity.setId(id);
         updateEntity.setDelFlag(true);

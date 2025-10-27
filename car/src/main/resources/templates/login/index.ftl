@@ -249,7 +249,7 @@ new Vue({
             this.smsCode = value;
         },
         startCountdown() {
-            this.countdown = 60;
+            this.countdown = 30; // 改为30秒倒计时
             if (this.countdownTimer) {
                 clearInterval(this.countdownTimer);
             }
@@ -264,6 +264,13 @@ new Vue({
         },
         async sendSms() {
             const phone = this.phoneNumber.trim();
+            
+            // 验证手机号格式
+            if (!this.isValidPhone(phone)) {
+                alert('請輸入手機號碼');
+                return;
+            }
+            
             try {
                 const res = await axios.post('/api/sms/send', { phoneNumber: phone });
                 const data = res.data;
@@ -271,7 +278,15 @@ new Vue({
                     this.startCountdown();
                     alert('驗證碼已發送，請查看控制台輸出');
                 } else {
-                    alert(data.message || '發送失敗，請稍後重試');
+                    // 如果服务器返回剩余等待时间，显示更友好的提示
+                    if (data.remainingTime) {
+                        alert(`請等待 ${data.remainingTime} 秒後再發送驗證碼`);
+                        // 如果服务器返回剩余时间，设置前端倒计时
+                        this.countdown = data.remainingTime;
+                        this.startCountdown();
+                    } else {
+                        alert(data.message || '發送失敗，請稍後重試');
+                    }
                 }
             } catch (err) {
                 console.error(err);

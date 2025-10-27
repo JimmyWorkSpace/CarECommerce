@@ -67,15 +67,15 @@ public interface ISysUserService
     public String selectUserPostGroup(String userName);
 
     /**
-     * 校验用户名称是否唯一
+     * 校验用户名稱是否唯一
      * 
-     * @param userName 用户名称
+     * @param userName 用户名稱
      * @return 结果
      */
     public String checkUserNameUnique(String userName);
 
     /**
-     * 校验手机号码是否唯一
+     * 校验手機號码是否唯一
      *
      * @param user 用户信息
      * @return 结果
@@ -113,7 +113,7 @@ public interface ISysUserService
     public int insertUser(SysUser user);
 
     /**
-     * 注册用户信息
+     * 註冊用户信息
      * 
      * @param user 用户信息
      * @return 结果
@@ -137,7 +137,7 @@ public interface ISysUserService
     public void insertUserAuth(Long userId, Long[] roleIds);
 
     /**
-     * 修改用户状态
+     * 修改用户狀態
      * 
      * @param user 用户信息
      * @return 结果
@@ -179,7 +179,7 @@ public interface ISysUserService
     public int resetUserPwd(String userName, String password);
 
     /**
-     * 通过用户ID删除用户
+     * 通过用户ID刪除用户
      * 
      * @param userId 用户ID
      * @return 结果
@@ -187,9 +187,9 @@ public interface ISysUserService
     public int deleteUserById(Long userId);
 
     /**
-     * 批量删除用户信息
+     * 批量刪除用户信息
      * 
-     * @param userIds 需要删除的用户ID
+     * @param userIds 需要刪除的用户ID
      * @return 结果
      */
     public int deleteUserByIds(Long[] userIds);

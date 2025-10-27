@@ -48,7 +48,7 @@ import { getToken } from "@/utils/auth";
 export default {
   props: {
     value: [String, Object, Array],
-    // 图片数量限制
+    // 圖片数量限制
     limit: {
       type: Number,
       default: 5,
@@ -58,7 +58,7 @@ export default {
        type: Number,
       default: 5,
     },
-    // 文件类型, 例如['png', 'jpg', 'jpeg']
+    // 文件類型, 例如['png', 'jpg', 'jpeg']
     fileType: {
       type: Array,
       default: () => ["png", "jpg", "jpeg"],
@@ -77,7 +77,7 @@ export default {
       dialogVisible: false,
       hideUpload: false,
       baseUrl: process.env.VUE_APP_BASE_API,
-      uploadImgUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
+      uploadImgUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的圖片服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -117,7 +117,7 @@ export default {
     },
   },
   methods: {
-    // 删除图片
+    // 刪除圖片
     handleRemove(file, fileList) {
       const findex = this.fileList.map(f => f.name).indexOf(file.name);
       if(findex > -1) {
@@ -154,17 +154,17 @@ export default {
       }
 
       if (!isImg) {
-        this.$modal.msgError(`文件格式不正确, 请上传${this.fileType.join("/")}图片格式文件!`);
+        this.$modal.msgError(`文件格式不正确, 请上传${this.fileType.join("/")}圖片格式文件!`);
         return false;
       }
       if (this.fileSize) {
         const isLt = file.size / 1024 / 1024 < this.fileSize;
         if (!isLt) {
-          this.$modal.msgError(`上传头像图片大小不能超过 ${this.fileSize} MB!`);
+          this.$modal.msgError(`上传头像圖片大小不能超过 ${this.fileSize} MB!`);
           return false;
         }
       }
-      this.$modal.loading("正在上传图片，请稍候...");
+      this.$modal.loading("正在上传圖片，请稍候...");
       this.number++;
     },
     // 文件个数超出
@@ -173,7 +173,7 @@ export default {
     },
     // 上传失败
     handleUploadError() {
-      this.$modal.msgError("上传图片失败，请重试");
+      this.$modal.msgError("上传圖片失败，请重试");
       this.$modal.closeLoading();
     },
     // 预览
@@ -194,7 +194,7 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-// .el-upload--picture-card 控制加号部分
+// .el-upload--picture-card 控制加號部分
 ::v-deep.hide .el-upload--picture-card {
     display: none;
 }

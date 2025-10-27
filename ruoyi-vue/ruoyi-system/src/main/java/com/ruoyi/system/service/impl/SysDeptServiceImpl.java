@@ -118,7 +118,7 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 根据ID查询所有子部门（正常状态）
+     * 根据ID查询所有子部门（正常狀態）
      * 
      * @param deptId 部门ID
      * @return 子部门数
@@ -156,7 +156,7 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 校验部门名称是否唯一
+     * 校验部门名稱是否唯一
      * 
      * @param dept 部门信息
      * @return 结果
@@ -203,7 +203,7 @@ public class SysDeptServiceImpl implements ISysDeptService
     public int insertDept(SysDept dept)
     {
         SysDept info = deptMapper.selectDeptById(dept.getParentId());
-        // 如果父节点不为正常状态,则不允许新增子节点
+        // 如果父节点不为正常狀態,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus()))
         {
             throw new ServiceException("部门停用，不允许新增");
@@ -234,14 +234,14 @@ public class SysDeptServiceImpl implements ISysDeptService
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
                 && !StringUtils.equals("0", dept.getAncestors()))
         {
-            // 如果该部门是启用状态，则启用该部门的所有上级部门
+            // 如果该部门是启用狀態，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
         }
         return result;
     }
 
     /**
-     * 修改该部门的父级部门状态
+     * 修改该部门的父级部门狀態
      * 
      * @param dept 当前部门
      */
@@ -273,7 +273,7 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 删除部门管理信息
+     * 刪除部门管理信息
      * 
      * @param deptId 部门ID
      * @return 结果

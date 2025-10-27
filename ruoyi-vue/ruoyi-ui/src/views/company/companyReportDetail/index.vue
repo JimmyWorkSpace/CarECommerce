@@ -22,8 +22,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -58,7 +58,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['company:companyReportDetail:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -110,7 +110,7 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['company:companyReportDetail:remove']"
-          >删除</el-button>
+          >刪除</el-button>
         </template>
       </el-table-column> -->
     </el-table>
@@ -221,7 +221,7 @@ export default {
       total: 0,
       // 改制企业综合评价明细表格数据
       companyReportDetailList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 是否显示弹出层
       open: false,
@@ -364,10 +364,10 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除改制企业综合评价明细编号为"' + ids + '"的数据项?', "警告", {
+      this.$confirm('是否确认刪除改制企业综合评价明细编號为"' + ids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -375,7 +375,7 @@ export default {
           return delCompanyReportDetail(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.msgSuccess("刪除成功");
         })
     },
     /** 导出按钮操作 */

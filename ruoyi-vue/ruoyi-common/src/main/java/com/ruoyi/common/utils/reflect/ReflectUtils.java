@@ -16,7 +16,7 @@ import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.DateUtils;
 
 /**
- * 反射工具类. 提供调用getter/setter方法, 访问私有变量, 调用私有方法, 获取泛型类型Class, 被AOP过的真实类等工具函数.
+ * 反射工具类. 提供调用getter/setter方法, 访问私有变量, 调用私有方法, 获取泛型類型Class, 被AOP过的真实类等工具函数.
  * 
  * @author ruoyi
  */
@@ -119,7 +119,7 @@ public class ReflectUtils
     /**
      * 直接调用对象方法, 无视private/protected修饰符.
      * 用于一次性调用的情况，否则应使用getAccessibleMethod()函数获得Method后反复调用.
-     * 同时匹配方法名+参数类型，
+     * 同时匹配方法名+参数類型，
      */
     @SuppressWarnings("unchecked")
     public static <E> E invokeMethod(final Object obj, final String methodName, final Class<?>[] parameterTypes,
@@ -163,7 +163,7 @@ public class ReflectUtils
         }
         try
         {
-            // 类型转换（将参数数据类型转换为目标方法参数类型）
+            // 類型转换（将参数数据類型转换为目标方法参数類型）
             Class<?>[] cs = method.getParameterTypes();
             for (int i = 0; i < cs.length; i++)
             {
@@ -250,7 +250,7 @@ public class ReflectUtils
     /**
      * 循环向上转型, 获取对象的DeclaredMethod,并强制设置为可访问.
      * 如向上转型到Object仍无法找到, 返回null.
-     * 匹配函数名+参数类型。
+     * 匹配函数名+参数類型。
      * 用于方法需要被多次调用的情况. 先使用本函数先取得Method,然后调用Method.invoke(Object obj, Object... args)
      */
     public static Method getAccessibleMethod(final Object obj, final String methodName,
@@ -332,7 +332,7 @@ public class ReflectUtils
     }
 
     /**
-     * 通过反射, 获得Class定义中声明的泛型参数的类型, 注意泛型必须定义在父类处
+     * 通过反射, 获得Class定义中声明的泛型参数的類型, 注意泛型必须定义在父类处
      * 如无法找到, 返回Object.class.
      */
     @SuppressWarnings("unchecked")
@@ -342,7 +342,7 @@ public class ReflectUtils
     }
 
     /**
-     * 通过反射, 获得Class定义中声明的父类的泛型参数的类型.
+     * 通过反射, 获得Class定义中声明的父类的泛型参数的類型.
      * 如无法找到, 返回Object.class.
      */
     public static Class getClassGenricType(final Class clazz, final int index)

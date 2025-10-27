@@ -51,7 +51,7 @@ public class FtpService {
         
         if (!ftpClient.login(ftpProperties.getUser(), ftpProperties.getPassword())) {
             disconnect(ftpClient);
-            throw new IOException("FTP登录失败，用户名或密码错误");
+            throw new IOException("FTP登入失败，用户名或密码错误");
         }
         
         ftpClient.enterLocalPassiveMode();

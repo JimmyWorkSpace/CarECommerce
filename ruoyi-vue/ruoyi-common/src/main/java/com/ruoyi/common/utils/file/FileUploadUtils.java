@@ -50,7 +50,7 @@ public class FileUploadUtils
      * 以默认配置进行文件上传
      *
      * @param file 上传的文件
-     * @return 文件名称
+     * @return 文件名稱
      * @throws Exception
      */
     public static final String upload(MultipartFile file) throws IOException
@@ -70,7 +70,7 @@ public class FileUploadUtils
      *
      * @param baseDir 相对应用的基目录
      * @param file 上传的文件
-     * @return 文件名称
+     * @return 文件名稱
      * @throws IOException
      */
     public static final String upload(String baseDir, MultipartFile file) throws IOException
@@ -90,7 +90,7 @@ public class FileUploadUtils
      *
      * @param baseDir 相对应用的基目录
      * @param file 上传的文件
-     * @param allowedExtension 上传文件类型
+     * @param allowedExtension 上传文件類型
      * @return 返回上传成功的文件名
      * @throws FileSizeLimitExceededException 如果超出最大大小
      * @throws FileNameLengthLimitExceededException 文件名太长
@@ -196,7 +196,7 @@ public class FileUploadUtils
     }
 
     /**
-     * 判断MIME类型是否是允许的MIME类型
+     * 判断MIME類型是否是允许的MIME類型
      *
      * @param extension
      * @param allowedExtension

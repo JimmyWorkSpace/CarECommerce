@@ -16,18 +16,18 @@ public class CarUserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "phoneNumber", nullable = false, unique = true, columnDefinition = "VARCHAR(20) COMMENT '手机号'")
+    @Column(name = "phoneNumber", nullable = false, unique = true, columnDefinition = "VARCHAR(20) COMMENT '手機號'")
     private String phoneNumber;
 
-    @Column(name = "nickName", columnDefinition = "VARCHAR(255) COMMENT '昵称'")
+    @Column(name = "nickName", columnDefinition = "VARCHAR(255) COMMENT '暱稱'")
     private String nickName;
 
-    @Column(name = "delFlag", columnDefinition = "BIT(1) DEFAULT b'0' COMMENT '删除标记 1 是 0 否'")
+    @Column(name = "delFlag", columnDefinition = "BIT(1) DEFAULT b'0' COMMENT '刪除标记 1 是 0 否'")
     private Boolean delFlag;
 
-    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '创建时间'")
+    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '建立時間'")
     private Date createTime;
 
-    @Column(name = "lastLoginTime", columnDefinition = "DATETIME COMMENT '上次登录时间'")
+    @Column(name = "lastLoginTime", columnDefinition = "DATETIME COMMENT '上次登入時間'")
     private Date lastLoginTime;
 }

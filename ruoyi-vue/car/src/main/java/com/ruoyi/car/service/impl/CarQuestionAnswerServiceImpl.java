@@ -49,20 +49,20 @@ public class CarQuestionAnswerServiceImpl implements ICarQuestionAnswerService
         Example example = new Example(CarQuestionAnswerEntity.class);
         Example.Criteria criteria = example.createCriteria();
         
-        // 只查询未删除的数据
+        // 只查询未刪除的数据
         criteria.andEqualTo("delFlag", false);
         
-        // 根据频道ID查询
+        // 根据頻道ID查询
         if (carQuestionAnswer.getChannelId() != null) {
             criteria.andEqualTo("channelId", carQuestionAnswer.getChannelId());
         }
         
-        // 根据问题模糊查询
+        // 根据問題模糊查询
         if (carQuestionAnswer.getQuestion() != null && !carQuestionAnswer.getQuestion().trim().isEmpty()) {
             criteria.andLike("question", "%" + carQuestionAnswer.getQuestion() + "%");
         }
         
-        // 按排序字段和创建时间排序
+        // 按排序字段和建立時間排序
         example.orderBy("showOrder").asc().orderBy("createTime").desc();
         
         return carQuestionAnswerMapper.selectByExample(example);
@@ -97,9 +97,9 @@ public class CarQuestionAnswerServiceImpl implements ICarQuestionAnswerService
     }
 
     /**
-     * 批量删除问答模块（逻辑删除）
+     * 批量刪除问答模块（逻辑刪除）
      * 
-     * @param ids 需要删除的问答模块主键
+     * @param ids 需要刪除的问答模块主键
      * @return 结果
      */
     @Override
@@ -116,7 +116,7 @@ public class CarQuestionAnswerServiceImpl implements ICarQuestionAnswerService
     }
 
     /**
-     * 删除问答模块信息（逻辑删除）
+     * 刪除问答模块信息（逻辑刪除）
      * 
      * @param id 问答模块主键
      * @return 结果

@@ -83,7 +83,7 @@
             <table cellspacing="0" style="width: 100%;">
               <tbody>
                 <tr>
-                  <td class="el-table__cell is-leaf"><div class="cell">服务器名称</div></td>
+                  <td class="el-table__cell is-leaf"><div class="cell">服务器名稱</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="server.sys">{{ server.sys.computerName }}</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell">操作系统</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="server.sys">{{ server.sys.osName }}</div></td>
@@ -109,13 +109,13 @@
             <table cellspacing="0" style="width: 100%;">
               <tbody>
                 <tr>
-                  <td class="el-table__cell is-leaf"><div class="cell">Java名称</div></td>
+                  <td class="el-table__cell is-leaf"><div class="cell">Java名稱</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="server.jvm">{{ server.jvm.name }}</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell">Java版本</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="server.jvm">{{ server.jvm.version }}</div></td>
                 </tr>
                 <tr>
-                  <td class="el-table__cell is-leaf"><div class="cell">启动时间</div></td>
+                  <td class="el-table__cell is-leaf"><div class="cell">启动時間</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="server.jvm">{{ server.jvm.startTime }}</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell">运行时长</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="server.jvm">{{ server.jvm.runTime }}</div></td>
@@ -141,7 +141,7 @@
       <el-col :span="24" class="card-box">
         <el-card>
           <div slot="header">
-            <span>磁盘状态</span>
+            <span>磁盘狀態</span>
           </div>
           <div class="el-table el-table--enable-row-hover el-table--medium">
             <table cellspacing="0" style="width: 100%;">
@@ -149,7 +149,7 @@
                 <tr>
                   <th class="el-table__cell el-table__cell is-leaf"><div class="cell">盘符路径</div></th>
                   <th class="el-table__cell is-leaf"><div class="cell">文件系统</div></th>
-                  <th class="el-table__cell is-leaf"><div class="cell">盘符类型</div></th>
+                  <th class="el-table__cell is-leaf"><div class="cell">盘符類型</div></th>
                   <th class="el-table__cell is-leaf"><div class="cell">总大小</div></th>
                   <th class="el-table__cell is-leaf"><div class="cell">可用大小</div></th>
                   <th class="el-table__cell is-leaf"><div class="cell">已用大小</div></th>

@@ -45,7 +45,7 @@ public class SysMenuController extends BaseController
     }
 
     /**
-     * 根据菜单编号获取详细信息
+     * 根据菜单编號获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:menu:query')")
     @GetMapping(value = "/{menuId}")
@@ -87,7 +87,7 @@ public class SysMenuController extends BaseController
     {
         if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu)))
         {
-            return AjaxResult.error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+            return AjaxResult.error("新增菜单'" + menu.getMenuName() + "'失败，菜单名稱已存在");
         }
         else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath()))
         {
@@ -107,7 +107,7 @@ public class SysMenuController extends BaseController
     {
         if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu)))
         {
-            return AjaxResult.error("修改菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+            return AjaxResult.error("修改菜单'" + menu.getMenuName() + "'失败，菜单名稱已存在");
         }
         else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath()))
         {
@@ -122,7 +122,7 @@ public class SysMenuController extends BaseController
     }
 
     /**
-     * 删除菜单
+     * 刪除菜单
      */
     @PreAuthorize("@ss.hasPermi('system:menu:remove')")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
@@ -131,11 +131,11 @@ public class SysMenuController extends BaseController
     {
         if (menuService.hasChildByMenuId(menuId))
         {
-            return AjaxResult.error("存在子菜单,不允许删除");
+            return AjaxResult.error("存在子菜单,不允许刪除");
         }
         if (menuService.checkMenuExistRole(menuId))
         {
-            return AjaxResult.error("菜单已分配,不允许删除");
+            return AjaxResult.error("菜单已分配,不允许刪除");
         }
         return toAjax(menuService.deleteMenuById(menuId));
     }

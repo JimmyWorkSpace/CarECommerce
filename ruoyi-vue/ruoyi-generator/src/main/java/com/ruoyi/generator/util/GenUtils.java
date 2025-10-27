@@ -40,7 +40,7 @@ public class GenUtils
         column.setCreateBy(table.getCreateBy());
         // 设置java字段名
         column.setJavaField(StringUtils.toCamelCase(columnName));
-        // 设置默认类型
+        // 设置默认類型
         column.setJavaType(GenConstants.TYPE_STRING);
         column.setQueryType(GenConstants.QUERY_EQ);
 
@@ -97,23 +97,23 @@ public class GenUtils
             column.setIsQuery(GenConstants.REQUIRE);
         }
 
-        // 查询字段类型
+        // 查询字段類型
         if (StringUtils.endsWithIgnoreCase(columnName, "name"))
         {
             column.setQueryType(GenConstants.QUERY_LIKE);
         }
-        // 状态字段设置单选框
+        // 狀態字段设置单选框
         if (StringUtils.endsWithIgnoreCase(columnName, "status"))
         {
             column.setHtmlType(GenConstants.HTML_RADIO);
         }
-        // 类型&性别字段设置下拉框
+        // 類型&性别字段设置下拉框
         else if (StringUtils.endsWithIgnoreCase(columnName, "type")
                 || StringUtils.endsWithIgnoreCase(columnName, "sex"))
         {
             column.setHtmlType(GenConstants.HTML_SELECT);
         }
-        // 图片字段设置图片上传控件
+        // 圖片字段设置圖片上传控件
         else if (StringUtils.endsWithIgnoreCase(columnName, "image"))
         {
             column.setHtmlType(GenConstants.HTML_IMAGE_UPLOAD);
@@ -171,7 +171,7 @@ public class GenUtils
     /**
      * 表名转换成Java类名
      * 
-     * @param tableName 表名称
+     * @param tableName 表名稱
      * @return 类名
      */
     public static String convertClassName(String tableName)
@@ -219,10 +219,10 @@ public class GenUtils
     }
 
     /**
-     * 获取数据库类型字段
+     * 获取数据库類型字段
      * 
-     * @param columnType 列类型
-     * @return 截取后的列类型
+     * @param columnType 列類型
+     * @return 截取后的列類型
      */
     public static String getDbType(String columnType)
     {
@@ -239,8 +239,8 @@ public class GenUtils
     /**
      * 获取字段长度
      * 
-     * @param columnType 列类型
-     * @return 截取后的列类型
+     * @param columnType 列類型
+     * @return 截取后的列類型
      */
     public static Integer getColumnLength(String columnType)
     {

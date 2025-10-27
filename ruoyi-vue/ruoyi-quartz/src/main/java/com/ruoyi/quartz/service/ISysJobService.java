@@ -45,7 +45,7 @@ public interface ISysJobService
     public int resumeJob(SysJob job) throws SchedulerException;
 
     /**
-     * 删除任务后，所对应的trigger也将被删除
+     * 刪除任务后，所对应的trigger也将被刪除
      * 
      * @param job 调度信息
      * @return 结果
@@ -53,15 +53,15 @@ public interface ISysJobService
     public int deleteJob(SysJob job) throws SchedulerException;
 
     /**
-     * 批量删除调度信息
+     * 批量刪除调度信息
      * 
-     * @param jobIds 需要删除的任务ID
+     * @param jobIds 需要刪除的任务ID
      * @return 结果
      */
     public void deleteJobByIds(Long[] jobIds) throws SchedulerException;
 
     /**
-     * 任务调度状态修改
+     * 任务调度狀態修改
      * 
      * @param job 调度信息
      * @return 结果

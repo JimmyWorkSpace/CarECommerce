@@ -110,7 +110,7 @@ public class SysJobServiceImpl implements ISysJobService
     }
 
     /**
-     * 删除任务后，所对应的trigger也将被删除
+     * 刪除任务后，所对应的trigger也将被刪除
      * 
      * @param job 调度信息
      */
@@ -129,9 +129,9 @@ public class SysJobServiceImpl implements ISysJobService
     }
 
     /**
-     * 批量删除调度信息
+     * 批量刪除调度信息
      * 
-     * @param jobIds 需要删除的任务ID
+     * @param jobIds 需要刪除的任务ID
      * @return 结果
      */
     @Override
@@ -146,7 +146,7 @@ public class SysJobServiceImpl implements ISysJobService
     }
 
     /**
-     * 任务调度状态修改
+     * 任务调度狀態修改
      * 
      * @param job 调度信息
      */
@@ -204,7 +204,7 @@ public class SysJobServiceImpl implements ISysJobService
     }
 
     /**
-     * 更新任务的时间表达式
+     * 更新任务的時間表达式
      * 
      * @param job 调度信息
      */
@@ -234,7 +234,7 @@ public class SysJobServiceImpl implements ISysJobService
         JobKey jobKey = ScheduleUtils.getJobKey(jobId, jobGroup);
         if (scheduler.checkExists(jobKey))
         {
-            // 防止创建时存在数据问题 先移除，然后在执行创建操作
+            // 防止创建时存在数据問題 先移除，然后在执行创建操作
             scheduler.deleteJob(jobKey);
         }
         ScheduleUtils.createScheduleJob(scheduler, job);

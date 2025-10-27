@@ -8,7 +8,7 @@ package com.ruoyi.framework.web.domain.server;
 public class Sys
 {
     /**
-     * 服务器名称
+     * 服务器名稱
      */
     private String computerName;
 

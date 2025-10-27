@@ -88,7 +88,7 @@ public class TokenService
     }
 
     /**
-     * 删除用户身份信息
+     * 刪除用户身份信息
      */
     public void delLoginUser(String token)
     {
@@ -136,7 +136,7 @@ public class TokenService
     /**
      * 刷新令牌有效期
      *
-     * @param loginUser 登录信息
+     * @param loginUser 登入信息
      */
     public void refreshToken(LoginUser loginUser)
     {
@@ -150,7 +150,7 @@ public class TokenService
     /**
      * 设置用户代理信息
      *
-     * @param loginUser 登录信息
+     * @param loginUser 登入信息
      */
     public void setUserAgent(LoginUser loginUser)
     {

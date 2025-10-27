@@ -7,7 +7,7 @@
 //import java.util.Properties;
 //
 ///**
-// * 定时任务配置（单机部署建议删除此类和qrtz数据库表，默认走内存会最高效）
+// * 定时任务配置（单机部署建议刪除此类和qrtz数据库表，默认走内存会最高效）
 // * 
 // * @author ruoyi
 // */
@@ -47,7 +47,7 @@
 //        factory.setStartupDelay(1);
 //        factory.setApplicationContextSchedulerContextKey("applicationContextKey");
 //        // 可选，QuartzScheduler
-//        // 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了
+//        // 启动时更新己存在的Job，这样就不用每次修改targetObject后刪除qrtz_job_details表对应记录了
 //        factory.setOverwriteExistingJobs(true);
 //        // 设置自动启动，默认为true
 //        factory.setAutoStartup(true);

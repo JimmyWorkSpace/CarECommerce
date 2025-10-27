@@ -11,10 +11,10 @@
       <el-scrollbar class="right-scrollbar">
         <!-- 组件属性 -->
         <el-form v-show="currentTab==='field' && showField" size="small" label-width="90px">
-          <el-form-item v-if="activeData.changeTag" label="组件类型">
+          <el-form-item v-if="activeData.changeTag" label="组件類型">
             <el-select
               v-model="activeData.tagIcon"
-              placeholder="请选择组件类型"
+              placeholder="请选择组件類型"
               :style="{width: '100%'}"
               @change="tagChange"
             >
@@ -37,8 +37,8 @@
           <el-form-item v-if="activeData.componentName!==undefined" label="组件名">
             {{ activeData.componentName }}
           </el-form-item>
-          <el-form-item v-if="activeData.label!==undefined" label="标题">
-            <el-input v-model="activeData.label" placeholder="请输入标题" />
+          <el-form-item v-if="activeData.label!==undefined" label="標題">
+            <el-input v-model="activeData.label" placeholder="请输入標題" />
           </el-form-item>
           <el-form-item v-if="activeData.placeholder!==undefined" label="占位提示">
             <el-input v-model="activeData.placeholder" placeholder="请输入占位提示" />
@@ -114,14 +114,14 @@
             <el-input v-model="activeData.append" placeholder="请输入后缀" />
           </el-form-item>
           <el-form-item v-if="activeData['prefix-icon']!==undefined" label="前图标">
-            <el-input v-model="activeData['prefix-icon']" placeholder="请输入前图标名称">
+            <el-input v-model="activeData['prefix-icon']" placeholder="请输入前图标名稱">
               <el-button slot="append" icon="el-icon-thumb" @click="openIconsDialog('prefix-icon')">
                 选择
               </el-button>
             </el-input>
           </el-form-item>
           <el-form-item v-if="activeData['suffix-icon'] !== undefined" label="后图标">
-            <el-input v-model="activeData['suffix-icon']" placeholder="请输入后图标名称">
+            <el-input v-model="activeData['suffix-icon']" placeholder="请输入后图标名稱">
               <el-button slot="append" icon="el-icon-thumb" @click="openIconsDialog('suffix-icon')">
                 选择
               </el-button>
@@ -187,11 +187,11 @@
           </el-form-item>
           <el-form-item
             v-if="activeData.type !== undefined && 'el-date-picker' === activeData.tag"
-            label="时间类型"
+            label="時間類型"
           >
             <el-select
               v-model="activeData.type"
-              placeholder="请选择时间类型"
+              placeholder="请选择時間類型"
               :style="{ width: '100%' }"
               @change="dateTypeChange"
             >
@@ -206,14 +206,14 @@
           <el-form-item v-if="activeData.name !== undefined" label="文件字段名">
             <el-input v-model="activeData.name" placeholder="请输入上传文件字段名" />
           </el-form-item>
-          <el-form-item v-if="activeData.accept !== undefined" label="文件类型">
+          <el-form-item v-if="activeData.accept !== undefined" label="文件類型">
             <el-select
               v-model="activeData.accept"
-              placeholder="请选择文件类型"
+              placeholder="请选择文件類型"
               :style="{ width: '100%' }"
               clearable
             >
-              <el-option label="图片" value="image/*" />
+              <el-option label="圖片" value="image/*" />
               <el-option label="视频" value="video/*" />
               <el-option label="音频" value="audio/*" />
               <el-option label="excel" value=".xls,.xlsx" />
@@ -234,7 +234,7 @@
           <el-form-item v-if="activeData.action !== undefined" label="上传地址">
             <el-input v-model="activeData.action" placeholder="请输入上传地址" clearable />
           </el-form-item>
-          <el-form-item v-if="activeData['list-type'] !== undefined" label="列表类型">
+          <el-form-item v-if="activeData['list-type'] !== undefined" label="列表類型">
             <el-radio-group v-model="activeData['list-type']" size="small">
               <el-radio-button label="text">
                 text
@@ -257,16 +257,16 @@
           <el-form-item v-if="activeData['range-separator'] !== undefined" label="分隔符">
             <el-input v-model="activeData['range-separator']" placeholder="请输入分隔符" />
           </el-form-item>
-          <el-form-item v-if="activeData['picker-options'] !== undefined" label="时间段">
+          <el-form-item v-if="activeData['picker-options'] !== undefined" label="時間段">
             <el-input
               v-model="activeData['picker-options'].selectableRange"
-              placeholder="请输入时间段"
+              placeholder="请输入時間段"
             />
           </el-form-item>
-          <el-form-item v-if="activeData.format !== undefined" label="时间格式">
+          <el-form-item v-if="activeData.format !== undefined" label="時間格式">
             <el-input
               :value="activeData.format"
-              placeholder="请输入时间格式"
+              placeholder="请输入時間格式"
               @input="setTimeValue($event)"
             />
           </el-form-item>
@@ -309,7 +309,7 @@
 
           <template v-if="['el-cascader'].indexOf(activeData.tag) > -1">
             <el-divider>选项</el-divider>
-            <el-form-item label="数据类型">
+            <el-form-item label="数据類型">
               <el-radio-group v-model="activeData.dataType" size="small">
                 <el-radio-button label="dynamic">
                   动态数据
@@ -626,7 +626,7 @@ export default {
           value: 'year'
         },
         {
-          label: '日期时间(datetime)',
+          label: '日期時間(datetime)',
           value: 'datetime'
         }
       ],
@@ -640,7 +640,7 @@ export default {
           value: 'monthrange'
         },
         {
-          label: '日期时间范围(datetimerange)',
+          label: '日期時間范围(datetimerange)',
           value: 'datetimerange'
         }
       ],
@@ -756,7 +756,7 @@ export default {
             ></i>
             <i on-click={() => this.remove(node, data)}
               class="el-icon-delete"
-              title="删除"
+              title="刪除"
             ></i>
           </span>
         </div>

@@ -85,12 +85,12 @@ public class CarReportServiceImpl extends BaseServiceImpl implements CarReportSe
     public int updateCarReport(CarReportEntity carReport)
     {
         carReport.setUpdatedAt(LocalDateTime.now());
-        // 如果处理人ID为空，设置为当前登录用户（这里需要从SecurityContext获取）
+        // 如果处理人ID为空，设置为当前登入用户（这里需要从SecurityContext获取）
         if (carReport.getProcessorId() == null) {
             // 这里需要根据实际的用户获取方式来实现
             // carReport.setProcessorId(getCurrentUserId());
         }
-        // 如果处理时间为空，设置为当前时间
+        // 如果处理時間为空，设置为当前時間
         if (carReport.getProcessedAt() == null) {
             carReport.setProcessedAt(LocalDateTime.now());
         }
@@ -98,9 +98,9 @@ public class CarReportServiceImpl extends BaseServiceImpl implements CarReportSe
     }
 
     /**
-     * 批量删除車輛檢舉
+     * 批量刪除車輛檢舉
      * 
-     * @param ids 需要删除的車輛檢舉主键
+     * @param ids 需要刪除的車輛檢舉主键
      * @return 结果
      */
     @Override
@@ -114,7 +114,7 @@ public class CarReportServiceImpl extends BaseServiceImpl implements CarReportSe
     }
 
     /**
-     * 删除車輛檢舉信息
+     * 刪除車輛檢舉信息
      * 
      * @param id 車輛檢舉主键
      * @return 结果

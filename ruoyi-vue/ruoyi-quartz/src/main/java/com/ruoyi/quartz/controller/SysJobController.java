@@ -147,7 +147,7 @@ public class SysJobController extends BaseController
     }
 
     /**
-     * 定时任务状态修改
+     * 定时任务狀態修改
      */
     @PreAuthorize("@ss.hasPermi('monitor:job:changeStatus')")
     @Log(title = "定时任务", businessType = BusinessType.UPDATE)
@@ -172,7 +172,7 @@ public class SysJobController extends BaseController
     }
 
     /**
-     * 删除定时任务
+     * 刪除定时任务
      */
     @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
     @Log(title = "定时任务", businessType = BusinessType.DELETE)

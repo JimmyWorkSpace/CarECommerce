@@ -1,7 +1,7 @@
 package com.ruoyi.common.constant;
 
 /**
- * 返回状态码
+ * 返回狀態码
  * 
  * @author ruoyi
  */
@@ -73,7 +73,7 @@ public class HttpStatus
     public static final int CONFLICT = 409;
 
     /**
-     * 不支持的数据，媒体类型
+     * 不支持的数据，媒体類型
      */
     public static final int UNSUPPORTED_TYPE = 415;
 

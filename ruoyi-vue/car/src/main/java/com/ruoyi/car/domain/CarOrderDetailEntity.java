@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 订单详情表实体
+ * 訂單详情表实体
  */
 @Data
 @Entity
@@ -19,21 +19,21 @@ public class CarOrderDetailEntity {
     private Long id;
 
     /**
-     * 订单ID
+     * 訂單ID
      */
-    @Column(name = "orderId", nullable = false, columnDefinition = "BIGINT(20) COMMENT '订单ID'")
+    @Column(name = "orderId", nullable = false, columnDefinition = "BIGINT(20) COMMENT '訂單ID'")
     private Long orderId;
 
     /**
-     * 删除标记 1 是 0 否
+     * 刪除标记 1 是 0 否
      */
-    @Column(name = "delFlag", columnDefinition = "BIT(1) DEFAULT b'0' COMMENT '删除标记 1 是 0 否'")
+    @Column(name = "delFlag", columnDefinition = "BIT(1) DEFAULT b'0' COMMENT '刪除标记 1 是 0 否'")
     private Boolean delFlag;
 
     /**
-     * 创建时间
+     * 建立時間
      */
-    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '创建时间'")
+    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '建立時間'")
     private Date createTime;
 
     /**
@@ -49,9 +49,9 @@ public class CarOrderDetailEntity {
     private Long productId;
 
     /**
-     * 产品名称
+     * 产品名稱
      */
-    @Column(name = "productName", columnDefinition = "VARCHAR(255) COMMENT '产品名称'")
+    @Column(name = "productName", columnDefinition = "VARCHAR(255) COMMENT '产品名稱'")
     private String productName;
 
     /**

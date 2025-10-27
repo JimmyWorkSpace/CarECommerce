@@ -70,10 +70,10 @@ export default {
       open: false,
       // 是否显示cropper
       visible: false,
-      // 弹出层标题
+      // 弹出层標題
       title: "修改头像",
       options: {
-        img: store.getters.avatar, //裁剪图片的地址
+        img: store.getters.avatar, //裁剪圖片的地址
         autoCrop: true, // 是否默认生成截图框
         autoCropWidth: 200, // 默认生成截图框宽度
         autoCropHeight: 200, // 默认生成截图框高度
@@ -102,7 +102,7 @@ export default {
     rotateRight() {
       this.$refs.cropper.rotateRight();
     },
-    // 图片缩放
+    // 圖片缩放
     changeScale(num) {
       num = num || 1;
       this.$refs.cropper.changeScale(num);
@@ -110,7 +110,7 @@ export default {
     // 上传预处理
     beforeUpload(file) {
       if (file.type.indexOf("image/") == -1) {
-        this.$modal.msgError("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+        this.$modal.msgError("文件格式错误，请上传圖片類型,如：JPG，PNG后缀的文件。");
       } else {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -119,7 +119,7 @@ export default {
         };
       }
     },
-    // 上传图片
+    // 上传圖片
     uploadImg() {
       this.$refs.cropper.getCropBlob(data => {
         let formData = new FormData();

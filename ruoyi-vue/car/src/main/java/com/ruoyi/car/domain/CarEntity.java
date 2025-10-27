@@ -28,10 +28,10 @@ public class CarEntity {
   @Column(name = "id_brand", nullable = false, columnDefinition = "INT UNSIGNED COMMENT '品牌ID'")
   private Long idBrand;
 
-  @Column(name = "id_model", nullable = false, columnDefinition = "INT UNSIGNED COMMENT '型号ID'")
+  @Column(name = "id_model", nullable = false, columnDefinition = "INT UNSIGNED COMMENT '型號ID'")
   private Long idModel;
 
-  @Column(name = "custom_model", columnDefinition = "VARCHAR(50) COMMENT '自填型号'")
+  @Column(name = "custom_model", columnDefinition = "VARCHAR(50) COMMENT '自填型號'")
   private String customModel;
 
   @Column(name = "manufacture_year", columnDefinition = "YEAR COMMENT '出厂年份'")
@@ -61,22 +61,22 @@ public class CarEntity {
   @Column(name = "fuel_system", columnDefinition = "VARCHAR(20) COMMENT '燃料系统'")
   private String fuelSystem;
 
-  @Column(name = "vin", columnDefinition = "VARCHAR(50) COMMENT '车身号码'")
+  @Column(name = "vin", columnDefinition = "VARCHAR(50) COMMENT '车身號码'")
   private String vin;
 
-  @Column(name = "engine_number", columnDefinition = "VARCHAR(50) COMMENT '引擎号码'")
+  @Column(name = "engine_number", columnDefinition = "VARCHAR(50) COMMENT '引擎號码'")
   private String engineNumber;
 
   @Column(name = "manufacture_date", columnDefinition = "VARCHAR(20) COMMENT '出厂日期'")
   private String manufactureDate;
 
-  @Column(name = "c_dt", columnDefinition = "TIMESTAMP COMMENT '创建时间'")
+  @Column(name = "c_dt", columnDefinition = "TIMESTAMP COMMENT '建立時間'")
   private Date cDt;
 
-  @Column(name = "u_dt", columnDefinition = "TIMESTAMP COMMENT '更新时间'")
+  @Column(name = "u_dt", columnDefinition = "TIMESTAMP COMMENT '更新時間'")
   private Date uDt;
 
-  @Column(name = "sell_at", columnDefinition = "TIMESTAMP COMMENT '卖出时间'")
+  @Column(name = "sell_at", columnDefinition = "TIMESTAMP COMMENT '卖出時間'")
   private Date sellAt;
 
   @Column(name = "model_year", columnDefinition = "VARCHAR(20) COMMENT '年式'")
@@ -88,7 +88,7 @@ public class CarEntity {
   @Column(name = "registration_date", columnDefinition = "DATE COMMENT '领牌日期'")
   private Date registrationDate;
 
-  @Column(name = "vehicle_type", columnDefinition = "VARCHAR(20) COMMENT '车辆类型'")
+  @Column(name = "vehicle_type", columnDefinition = "VARCHAR(20) COMMENT '车辆類型'")
   private String vehicleType;
 
   @Column(name = "is_procurement_transfer", nullable = false, columnDefinition = "TINYINT(1) COMMENT '是否转入采购'")
