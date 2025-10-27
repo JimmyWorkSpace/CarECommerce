@@ -678,7 +678,7 @@ try {
                 method: 'GET',
                 success: (data) => {
                     // 过滤出 advType=1 的数据，取前2个
-                    const filteredFeatures = data.data.filter(ad => ad.advType === 1).slice(0, 2);
+                    const filteredFeatures = data.data.filter(ad => ad.advType === 2).slice(0, 2);
                     _this.features = filteredFeatures;
                 },
                 error: (error) => {
