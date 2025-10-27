@@ -73,7 +73,7 @@ public class SysPostServiceImpl implements ISysPostService
     }
 
     /**
-     * 校验岗位名称是否唯一
+     * 校验岗位名稱是否唯一
      * 
      * @param post 岗位信息
      * @return 结果
@@ -121,7 +121,7 @@ public class SysPostServiceImpl implements ISysPostService
     }
 
     /**
-     * 删除岗位信息
+     * 刪除岗位信息
      * 
      * @param postId 岗位ID
      * @return 结果
@@ -133,9 +133,9 @@ public class SysPostServiceImpl implements ISysPostService
     }
 
     /**
-     * 批量删除岗位信息
+     * 批量刪除岗位信息
      * 
-     * @param postIds 需要删除的岗位ID
+     * @param postIds 需要刪除的岗位ID
      * @return 结果
      */
     @Override
@@ -146,7 +146,7 @@ public class SysPostServiceImpl implements ISysPostService
             SysPost post = selectPostById(postId);
             if (countUserPostById(postId) > 0)
             {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", post.getPostName()));
+                throw new ServiceException(String.format("%1$s已分配,不能刪除", post.getPostName()));
             }
         }
         return postMapper.deletePostByIds(postIds);

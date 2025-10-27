@@ -42,15 +42,15 @@ public interface SysJobLogMapper
     public int insertJobLog(SysJobLog jobLog);
 
     /**
-     * 批量删除调度日志信息
+     * 批量刪除调度日志信息
      * 
-     * @param logIds 需要删除的数据ID
+     * @param logIds 需要刪除的数据ID
      * @return 结果
      */
     public int deleteJobLogByIds(Long[] logIds);
 
     /**
-     * 删除任务日志
+     * 刪除任务日志
      * 
      * @param jobId 调度日志ID
      * @return 结果

@@ -58,7 +58,7 @@ public class SysPostController extends BaseController
     }
 
     /**
-     * 根据岗位编号获取详细信息
+     * 根据岗位编號获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:post:query')")
     @GetMapping(value = "/{postId}")
@@ -77,7 +77,7 @@ public class SysPostController extends BaseController
     {
         if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post)))
         {
-            return AjaxResult.error("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+            return AjaxResult.error("新增岗位'" + post.getPostName() + "'失败，岗位名稱已存在");
         }
         else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post)))
         {
@@ -97,7 +97,7 @@ public class SysPostController extends BaseController
     {
         if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post)))
         {
-            return AjaxResult.error("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+            return AjaxResult.error("修改岗位'" + post.getPostName() + "'失败，岗位名稱已存在");
         }
         else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post)))
         {
@@ -108,7 +108,7 @@ public class SysPostController extends BaseController
     }
 
     /**
-     * 删除岗位
+     * 刪除岗位
      */
     @PreAuthorize("@ss.hasPermi('system:post:remove')")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)

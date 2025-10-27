@@ -1,7 +1,7 @@
 package com.ruoyi.common.enums;
 
 /**
- * 限流类型
+ * 限流類型
  *
  * @author ruoyi
  */

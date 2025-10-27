@@ -64,9 +64,9 @@ public class TestController extends BaseController
     @ApiOperation("新增用户")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "用户id", dataType = "Integer", dataTypeClass = Integer.class),
-        @ApiImplicitParam(name = "username", value = "用户名称", dataType = "String", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "username", value = "用户名稱", dataType = "String", dataTypeClass = String.class),
         @ApiImplicitParam(name = "password", value = "用户密码", dataType = "String", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "mobile", value = "用户手机", dataType = "String", dataTypeClass = String.class)
+        @ApiImplicitParam(name = "mobile", value = "用户手機", dataType = "String", dataTypeClass = String.class)
     })
     @PostMapping("/save")
     public AjaxResult save(UserEntity user)
@@ -94,7 +94,7 @@ public class TestController extends BaseController
         return AjaxResult.success(users.put(user.getUserId(), user));
     }
 
-    @ApiOperation("删除用户信息")
+    @ApiOperation("刪除用户信息")
     @ApiImplicitParam(name = "userId", value = "用户ID", required = true, dataType = "int", paramType = "path", dataTypeClass = Integer.class)
     @DeleteMapping("/{userId}")
     public AjaxResult delete(@PathVariable Integer userId)
@@ -117,13 +117,13 @@ class UserEntity
     @ApiModelProperty("用户ID")
     private Integer userId;
 
-    @ApiModelProperty("用户名称")
+    @ApiModelProperty("用户名稱")
     private String username;
 
     @ApiModelProperty("用户密码")
     private String password;
 
-    @ApiModelProperty("用户手机")
+    @ApiModelProperty("用户手機")
     private String mobile;
 
     public UserEntity()

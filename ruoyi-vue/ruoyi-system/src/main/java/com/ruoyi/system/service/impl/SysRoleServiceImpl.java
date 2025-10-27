@@ -140,7 +140,7 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 校验角色名称是否唯一
+     * 校验角色名稱是否唯一
      * 
      * @param role 角色信息
      * @return 结果
@@ -248,13 +248,13 @@ public class SysRoleServiceImpl implements ISysRoleService
     {
         // 修改角色信息
         roleMapper.updateRole(role);
-        // 删除角色与菜单关联
+        // 刪除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId(role.getRoleId());
         return insertRoleMenu(role);
     }
 
     /**
-     * 修改角色状态
+     * 修改角色狀態
      * 
      * @param role 角色信息
      * @return 结果
@@ -277,7 +277,7 @@ public class SysRoleServiceImpl implements ISysRoleService
     {
         // 修改角色信息
         roleMapper.updateRole(role);
-        // 删除角色与部门关联
+        // 刪除角色与部门关联
         roleDeptMapper.deleteRoleDeptByRoleId(role.getRoleId());
         // 新增角色和部门信息（数据权限）
         return insertRoleDept(role);
@@ -332,7 +332,7 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 通过角色ID删除角色
+     * 通过角色ID刪除角色
      * 
      * @param roleId 角色ID
      * @return 结果
@@ -341,17 +341,17 @@ public class SysRoleServiceImpl implements ISysRoleService
     @Transactional
     public int deleteRoleById(Long roleId)
     {
-        // 删除角色与菜单关联
+        // 刪除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId(roleId);
-        // 删除角色与部门关联
+        // 刪除角色与部门关联
         roleDeptMapper.deleteRoleDeptByRoleId(roleId);
         return roleMapper.deleteRoleById(roleId);
     }
 
     /**
-     * 批量删除角色信息
+     * 批量刪除角色信息
      * 
-     * @param roleIds 需要删除的角色ID
+     * @param roleIds 需要刪除的角色ID
      * @return 结果
      */
     @Override
@@ -365,12 +365,12 @@ public class SysRoleServiceImpl implements ISysRoleService
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0)
             {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
+                throw new ServiceException(String.format("%1$s已分配,不能刪除", role.getRoleName()));
             }
         }
-        // 删除角色与菜单关联
+        // 刪除角色与菜单关联
         roleMenuMapper.deleteRoleMenu(roleIds);
-        // 删除角色与部门关联
+        // 刪除角色与部门关联
         roleDeptMapper.deleteRoleDept(roleIds);
         return roleMapper.deleteRoleByIds(roleIds);
     }

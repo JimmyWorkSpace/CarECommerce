@@ -29,7 +29,7 @@ public class ImageServiceImpl implements ImageService {
         }
       }
     }catch(Exception ex){
-      log.error("处理图片Url失败", ex);
+      log.error("处理圖片Url失败", ex);
     }
     return imageUrl;
   }
@@ -61,7 +61,7 @@ public class ImageServiceImpl implements ImageService {
 
       return doc.toString();
     }catch(Exception ex){
-      log.error("处理html中的图片元素失败", ex);
+      log.error("处理html中的圖片元素失败", ex);
       return html;
     }
   }

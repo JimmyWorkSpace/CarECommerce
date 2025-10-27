@@ -18,11 +18,11 @@ public class SysRole extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 角色ID */
-    @Excel(name = "角色序号", cellType = ColumnType.NUMERIC)
+    @Excel(name = "角色序號", cellType = ColumnType.NUMERIC)
     private Long roleId;
 
-    /** 角色名称 */
-    @Excel(name = "角色名称")
+    /** 角色名稱 */
+    @Excel(name = "角色名稱")
     private String roleName;
 
     /** 角色权限 */
@@ -43,11 +43,11 @@ public class SysRole extends BaseEntity
     /** 部门树选择项是否关联显示（0：父子不互相关联显示 1：父子互相关联显示 ） */
     private boolean deptCheckStrictly;
 
-    /** 角色状态（0正常 1停用） */
-    @Excel(name = "角色状态", readConverterExp = "0=正常,1=停用")
+    /** 角色狀態（0正常 1停用） */
+    @Excel(name = "角色狀態", readConverterExp = "0=正常,1=停用")
     private String status;
 
-    /** 删除标志（0代表存在 2代表删除） */
+    /** 刪除标志（0代表存在 2代表刪除） */
     private String delFlag;
 
     /** 用户是否存在此角色标识 默认不存在 */
@@ -89,8 +89,8 @@ public class SysRole extends BaseEntity
         return roleId != null && 1L == roleId;
     }
 
-    @NotBlank(message = "角色名称不能为空")
-    @Size(min = 0, max = 30, message = "角色名称长度不能超过30个字符")
+    @NotBlank(message = "角色名稱不能为空")
+    @Size(min = 0, max = 30, message = "角色名稱长度不能超过30个字符")
     public String getRoleName()
     {
         return roleName;

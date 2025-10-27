@@ -90,7 +90,7 @@ public class CarAdvertisementController extends BaseController {
     }
 
     /**
-     * 删除广告
+     * 刪除广告
      */
     @PreAuthorize("@ss.hasPermi('car:advertisement:remove')")
     @Log(title = "广告位", businessType = BusinessType.DELETE)
@@ -104,7 +104,7 @@ public class CarAdvertisementController extends BaseController {
     }
     
     /**
-     * 上传图片
+     * 上传圖片
      */
     @PreAuthorize("@ss.hasPermi('car:advertisement:upload')")
     @PostMapping("/upload")
@@ -114,24 +114,24 @@ public class CarAdvertisementController extends BaseController {
                 return error("请选择要上传的文件");
             }
             
-            // 检查文件类型
+            // 检查文件類型
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null || !isImageFile(originalFilename)) {
-                return error("只能上传图片文件");
+                return error("只能上传圖片文件");
             }
             
             // 上传到FTP服务器
             InputStream inputStream = file.getInputStream();
             String fileName = ftpService.uploadFile(inputStream, originalFilename, "/img/car_sale/advertisement");
             
-            // 返回完整的图片URL
+            // 返回完整的圖片URL
             String imageUrl = imagePrefix + "/img/car_sale/advertisement/" + fileName;
             
             return AjaxResult.success("上传成功", imageUrl);
             
         } catch (Exception e) {
-            logger.error("图片上传失败", e);
-            return error("图片上传失败：" + e.getMessage());
+            logger.error("圖片上传失败", e);
+            return error("圖片上传失败：" + e.getMessage());
         }
     }
     
@@ -146,7 +146,7 @@ public class CarAdvertisementController extends BaseController {
     }
     
     /**
-     * 检查是否为图片文件
+     * 检查是否为圖片文件
      */
     private boolean isImageFile(String fileName) {
         String[] allowedExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"};

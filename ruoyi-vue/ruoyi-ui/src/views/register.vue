@@ -3,7 +3,7 @@
     <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
       <h3 class="title">車勢後台</h3>
       <el-form-item prop="username">
-        <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="账号">
+        <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="帳號">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
@@ -12,7 +12,7 @@
           v-model="registerForm.password"
           type="password"
           auto-complete="off"
-          placeholder="密码"
+          placeholder="密碼"
           @keyup.enter.native="handleRegister"
         >
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
@@ -23,7 +23,7 @@
           v-model="registerForm.confirmPassword"
           type="password"
           auto-complete="off"
-          placeholder="确认密码"
+          placeholder="確認密碼"
           @keyup.enter.native="handleRegister"
         >
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
@@ -33,7 +33,7 @@
         <el-input
           v-model="registerForm.code"
           auto-complete="off"
-          placeholder="验证码"
+          placeholder="驗證碼"
           style="width: 63%"
           @keyup.enter.native="handleRegister"
         >
@@ -51,11 +51,11 @@
           style="width:100%;"
           @click.native.prevent="handleRegister"
         >
-          <span v-if="!loading">注 册</span>
-          <span v-else>注 册 中...</span>
+          <span v-if="!loading">註 冊</span>
+          <span v-else>註 冊 中...</span>
         </el-button>
         <div style="float: right;">
-          <router-link class="link-type" :to="'/login'">使用已有账户登录</router-link>
+          <router-link class="link-type" :to="'/login'">使用已有帳戶登錄</router-link>
         </div>
       </el-form-item>
     </el-form>
@@ -74,7 +74,7 @@ export default {
   data() {
     const equalToPassword = (rule, value, callback) => {
       if (this.registerForm.password !== value) {
-        callback(new Error("两次输入的密码不一致"));
+        callback(new Error("兩次輸入的密碼不一致"));
       } else {
         callback();
       }
@@ -90,18 +90,18 @@ export default {
       },
       registerRules: {
         username: [
-          { required: true, trigger: "blur", message: "请输入您的账号" },
-          { min: 2, max: 20, message: '用户账号长度必须介于 2 和 20 之间', trigger: 'blur' }
+          { required: true, trigger: "blur", message: "請輸入您的帳號" },
+          { min: 2, max: 20, message: '用戶帳號長度必須介於 2 和 20 之間', trigger: 'blur' }
         ],
         password: [
-          { required: true, trigger: "blur", message: "请输入您的密码" },
-          { min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间', trigger: 'blur' }
+          { required: true, trigger: "blur", message: "請輸入您的密碼" },
+          { min: 5, max: 20, message: '用戶密碼長度必須介於 5 和 20 之間', trigger: 'blur' }
         ],
         confirmPassword: [
-          { required: true, trigger: "blur", message: "请再次输入您的密码" },
+          { required: true, trigger: "blur", message: "請再次輸入您的密碼" },
           { required: true, validator: equalToPassword, trigger: "blur" }
         ],
-        code: [{ required: true, trigger: "change", message: "请输入验证码" }]
+        code: [{ required: true, trigger: "change", message: "請輸入驗證碼" }]
       },
       loading: false,
       captchaOnOff: true
@@ -126,7 +126,7 @@ export default {
           this.loading = true;
           register(this.registerForm).then(res => {
             const username = this.registerForm.username;
-            this.$alert("<font color='red'>恭喜你，您的账号 " + username + " 注册成功！</font>", '系统提示', {
+            this.$alert("<font color='red'>恭喜你，您的帳號 " + username + " 註冊成功！</font>", '系統提示', {
               dangerouslyUseHTMLString: true,
               type: 'success'
             }).then(() => {

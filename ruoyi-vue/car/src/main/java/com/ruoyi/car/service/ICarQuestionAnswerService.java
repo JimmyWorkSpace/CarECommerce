@@ -44,15 +44,15 @@ public interface ICarQuestionAnswerService
     public int updateCarQuestionAnswer(CarQuestionAnswerEntity carQuestionAnswer);
 
     /**
-     * 批量删除问答模块
+     * 批量刪除问答模块
      * 
-     * @param ids 需要删除的问答模块主键集合
+     * @param ids 需要刪除的问答模块主键集合
      * @return 结果
      */
     public int deleteCarQuestionAnswerByIds(Long[] ids);
 
     /**
-     * 删除问答模块信息
+     * 刪除问答模块信息
      * 
      * @param id 问答模块主键
      * @return 结果

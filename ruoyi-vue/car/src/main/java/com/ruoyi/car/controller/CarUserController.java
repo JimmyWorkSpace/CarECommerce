@@ -92,7 +92,7 @@ public class CarUserController extends BaseController
     }
 
     /**
-     * 删除用户管理
+     * 刪除用户管理
      */
     @PreAuthorize("@ss.hasPermi('car:user:remove')")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)

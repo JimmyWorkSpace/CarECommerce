@@ -44,7 +44,7 @@ public class VelocityUtils
         VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("tplCategory", genTable.getTplCategory());
         velocityContext.put("tableName", genTable.getTableName());
-        velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
+        velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名稱】");
         velocityContext.put("ClassName", genTable.getClassName());
         velocityContext.put("className", StringUtils.uncapitalize(genTable.getClassName()));
         velocityContext.put("moduleName", genTable.getModuleName());
@@ -157,7 +157,7 @@ public class VelocityUtils
      */
     public static String getFileName(String template, GenTable genTable)
     {
-        // 文件名称
+        // 文件名稱
         String fileName = "";
         // 包路径
         String packageName = genTable.getPackageName();
@@ -165,7 +165,7 @@ public class VelocityUtils
         String moduleName = genTable.getModuleName();
         // 大写类名
         String className = genTable.getClassName();
-        // 业务名称
+        // 业务名稱
         String businessName = genTable.getBusinessName();
 
         String javaPath = PROJECT_PATH + "/" + StringUtils.replace(packageName, ".", "/");
@@ -222,8 +222,8 @@ public class VelocityUtils
     /**
      * 获取包前缀
      *
-     * @param packageName 包名称
-     * @return 包前缀名称
+     * @param packageName 包名稱
+     * @return 包前缀名稱
      */
     public static String getPackagePrefix(String packageName)
     {
@@ -232,7 +232,7 @@ public class VelocityUtils
     }
 
     /**
-     * 根据列类型获取导入包
+     * 根据列類型获取导入包
      * 
      * @param genTable 业务表对象
      * @return 返回需要导入的包列表
@@ -262,7 +262,7 @@ public class VelocityUtils
     }
 
     /**
-     * 根据列类型获取字典组
+     * 根据列類型获取字典组
      * 
      * @param genTable 业务表对象
      * @return 返回字典组
@@ -302,8 +302,8 @@ public class VelocityUtils
     /**
      * 获取权限前缀
      *
-     * @param moduleName 模块名称
-     * @param businessName 业务名称
+     * @param moduleName 模块名稱
+     * @param businessName 业务名稱
      * @return 返回权限前缀
      */
     public static String getPermissionPrefix(String moduleName, String businessName)
@@ -358,10 +358,10 @@ public class VelocityUtils
     }
 
     /**
-     * 获取树名称
+     * 获取树名稱
      *
      * @param paramsObj 生成其他选项
-     * @return 树名称
+     * @return 树名稱
      */
     public static String getTreeName(JSONObject paramsObj)
     {
@@ -376,7 +376,7 @@ public class VelocityUtils
      * 获取需要在哪一列上面显示展开按钮
      *
      * @param genTable 业务表对象
-     * @return 展开按钮列序号
+     * @return 展开按钮列序號
      */
     public static int getExpandColumn(GenTable genTable)
     {

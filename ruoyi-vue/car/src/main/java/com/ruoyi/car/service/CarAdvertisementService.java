@@ -31,7 +31,7 @@ public interface CarAdvertisementService {
     int updateAdvertisement(CarAdvertisementEntity carAdvertisement);
     
     /**
-     * 删除广告
+     * 刪除广告
      */
     int deleteAdvertisement(Long id);
     

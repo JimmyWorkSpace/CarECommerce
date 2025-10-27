@@ -16,10 +16,10 @@ public class CarAdvertisementEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "titleType", columnDefinition = "INT(11) COMMENT '标题类型 0 图片 1 富文本'")
+    @Column(name = "titleType", columnDefinition = "INT(11) COMMENT '標題類型 0 圖片 1 富文本'")
     private Integer titleType;
 
-    @Column(name = "titleHtml", columnDefinition = "LONGTEXT COMMENT '当标题类型为1富文本时，富文本内容'")
+    @Column(name = "titleHtml", columnDefinition = "LONGTEXT COMMENT '当標題類型为1富文本时，富文本内容'")
     private String titleHtml;
 
 

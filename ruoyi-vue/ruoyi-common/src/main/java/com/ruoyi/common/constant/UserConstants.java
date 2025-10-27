@@ -42,13 +42,13 @@ public class UserConstants
     /** 是否選單外鏈（否） */
     public static final String NO_FRAME = "1";
 
-    /** 菜单类型（目录） */
+    /** 菜单類型（目录） */
     public static final String TYPE_DIR = "M";
 
-    /** 菜单类型（菜单） */
+    /** 菜单類型（菜单） */
     public static final String TYPE_MENU = "C";
 
-    /** 菜单类型（按钮） */
+    /** 菜单類型（按钮） */
     public static final String TYPE_BUTTON = "F";
 
     /** Layout组件标识 */

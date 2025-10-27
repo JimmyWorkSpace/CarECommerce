@@ -26,10 +26,10 @@ public class AsyncFactory
     private static final Logger sys_user_logger = LoggerFactory.getLogger("sys-user");
 
     /**
-     * 记录登录信息
+     * 记录登入信息
      * 
      * @param username 用户名
-     * @param status 状态
+     * @param status 狀態
      * @param message 消息
      * @param args 列表
      * @return 任务task
@@ -65,7 +65,7 @@ public class AsyncFactory
                 logininfor.setBrowser(browser);
                 logininfor.setOs(os);
                 logininfor.setMsg(message);
-                // 日志状态
+                // 日志狀態
                 if (StringUtils.equalsAny(status, Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER))
                 {
                     logininfor.setStatus(Constants.SUCCESS);

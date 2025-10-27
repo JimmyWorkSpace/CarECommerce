@@ -42,7 +42,7 @@ public interface ISysPostService
     public List<Long> selectPostListByUserId(Long userId);
 
     /**
-     * 校验岗位名称
+     * 校验岗位名稱
      * 
      * @param post 岗位信息
      * @return 结果
@@ -66,7 +66,7 @@ public interface ISysPostService
     public int countUserPostById(Long postId);
 
     /**
-     * 删除岗位信息
+     * 刪除岗位信息
      * 
      * @param postId 岗位ID
      * @return 结果
@@ -74,9 +74,9 @@ public interface ISysPostService
     public int deletePostById(Long postId);
 
     /**
-     * 批量删除岗位信息
+     * 批量刪除岗位信息
      * 
-     * @param postIds 需要删除的岗位ID
+     * @param postIds 需要刪除的岗位ID
      * @return 结果
      */
     public int deletePostByIds(Long[] postIds);

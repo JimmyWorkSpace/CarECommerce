@@ -66,12 +66,12 @@ public class SysProfileController extends BaseController
         if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
         {
-            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手機號码已存在");
         }
         if (StringUtils.isNotEmpty(user.getEmail())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
         {
-            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账號已存在");
         }
         user.setUserId(sysUser.getUserId());
         user.setPassword(null);
@@ -85,7 +85,7 @@ public class SysProfileController extends BaseController
             tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
-        return AjaxResult.error("修改个人信息异常，请联系管理员");
+        return AjaxResult.error("修改个人信息异常，请聯繫管理员");
     }
 
     /**
@@ -113,7 +113,7 @@ public class SysProfileController extends BaseController
             tokenService.setLoginUser(loginUser);
             return AjaxResult.success();
         }
-        return AjaxResult.error("修改密码异常，请联系管理员");
+        return AjaxResult.error("修改密码异常，请聯繫管理员");
     }
 
     /**
@@ -137,6 +137,6 @@ public class SysProfileController extends BaseController
                 return ajax;
             }
         }
-        return AjaxResult.error("上传图片异常，请联系管理员");
+        return AjaxResult.error("上传圖片异常，请聯繫管理员");
     }
 }

@@ -27,7 +27,7 @@ public class SysDept extends BaseEntity
     /** 祖级列表 */
     private String ancestors;
 
-    /** 部门名称 */
+    /** 部门名稱 */
     private String deptName;
 
     /** 显示顺序 */
@@ -36,19 +36,19 @@ public class SysDept extends BaseEntity
     /** 负责人 */
     private String leader;
 
-    /** 联系电话 */
+    /** 聯繫電話 */
     private String phone;
 
     /** 邮箱 */
     private String email;
 
-    /** 部门状态:0正常,1停用 */
+    /** 部门狀態:0正常,1停用 */
     private String status;
 
-    /** 删除标志（0代表存在 2代表删除） */
+    /** 刪除标志（0代表存在 2代表刪除） */
     private String delFlag;
 
-    /** 父部门名称 */
+    /** 父部门名稱 */
     private String parentName;
     
     /** 子部门 */
@@ -84,8 +84,8 @@ public class SysDept extends BaseEntity
         this.ancestors = ancestors;
     }
 
-    @NotBlank(message = "部门名称不能为空")
-    @Size(min = 0, max = 30, message = "部门名称长度不能超过30个字符")
+    @NotBlank(message = "部门名稱不能为空")
+    @Size(min = 0, max = 30, message = "部门名稱长度不能超过30个字符")
     public String getDeptName()
     {
         return deptName;
@@ -117,7 +117,7 @@ public class SysDept extends BaseEntity
         this.leader = leader;
     }
 
-    @Size(min = 0, max = 11, message = "联系电话长度不能超过11个字符")
+    @Size(min = 0, max = 11, message = "聯繫電話长度不能超过11个字符")
     public String getPhone()
     {
         return phone;

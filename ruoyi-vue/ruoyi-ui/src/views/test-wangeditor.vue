@@ -1,16 +1,16 @@
 <template>
   <div class="test-container">
-    <h2>WangEditor 测试页面</h2>
+    <h2>WangEditor 測試頁面</h2>
     <div class="editor-wrapper">
       <wang-editor 
         v-model="content" 
         :height="400" 
         :min-height="300"
-        placeholder="请输入测试内容..."
+        placeholder="請輸入測試內容..."
       />
     </div>
     <div class="content-display">
-      <h3>编辑器内容：</h3>
+      <h3>編輯器內容：</h3>
       <div v-html="content"></div>
     </div>
   </div>
@@ -26,7 +26,7 @@ export default {
   },
   data() {
     return {
-      content: '<p>这是测试内容</p>'
+      content: '<p>這是測試內容</p>'
     }
   }
 }

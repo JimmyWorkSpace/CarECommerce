@@ -54,9 +54,9 @@ public class SysJobLogServiceImpl implements ISysJobLogService
     }
 
     /**
-     * 批量删除调度日志信息
+     * 批量刪除调度日志信息
      * 
-     * @param logIds 需要删除的数据ID
+     * @param logIds 需要刪除的数据ID
      * @return 结果
      */
     @Override
@@ -66,7 +66,7 @@ public class SysJobLogServiceImpl implements ISysJobLogService
     }
 
     /**
-     * 删除任务日志
+     * 刪除任务日志
      * 
      * @param jobId 调度日志ID
      */

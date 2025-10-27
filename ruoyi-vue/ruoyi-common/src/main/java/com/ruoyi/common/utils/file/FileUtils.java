@@ -103,7 +103,7 @@ public class FileUtils
     }
 
     /**
-     * 删除文件
+     * 刪除文件
      * 
      * @param filePath 文件
      * @return
@@ -112,7 +112,7 @@ public class FileUtils
     {
         boolean flag = false;
         File file = new File(filePath);
-        // 路径为文件且不为空则进行删除
+        // 路径为文件且不为空则进行刪除
         if (file.isFile() && file.exists())
         {
             file.delete();
@@ -122,9 +122,9 @@ public class FileUtils
     }
 
     /**
-     * 文件名称验证
+     * 文件名稱验证
      * 
-     * @param filename 文件名称
+     * @param filename 文件名稱
      * @return true 正常 false 非法
      */
     public static boolean isValidFilename(String filename)
@@ -215,10 +215,10 @@ public class FileUtils
     }
 
     /**
-     * 百分号编码工具方法
+     * 百分號编码工具方法
      *
-     * @param s 需要百分号编码的字符串
-     * @return 百分号编码后的字符串
+     * @param s 需要百分號编码的字符串
+     * @return 百分號编码后的字符串
      */
     public static String percentEncode(String s) throws UnsupportedEncodingException
     {
@@ -256,10 +256,10 @@ public class FileUtils
     }
 
     /**
-     * 获取名称
+     * 获取名稱
      * 
-     * @param fileName 路径名称
-     * @return 没有文件路径的名称
+     * @param fileName 路径名稱
+     * @return 没有文件路径的名稱
      */
     public static String getName(String fileName)
     {

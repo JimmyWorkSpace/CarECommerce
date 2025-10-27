@@ -29,7 +29,7 @@ public interface GenTableMapper
     /**
      * 查询据库列表
      * 
-     * @param tableNames 表名称组
+     * @param tableNames 表名稱组
      * @return 数据库表集合
      */
     public List<GenTable> selectDbTableListByNames(String[] tableNames);
@@ -50,9 +50,9 @@ public interface GenTableMapper
     public GenTable selectGenTableById(Long id);
 
     /**
-     * 查询表名称业务信息
+     * 查询表名稱业务信息
      * 
-     * @param tableName 表名称
+     * @param tableName 表名稱
      * @return 业务信息
      */
     public GenTable selectGenTableByName(String tableName);
@@ -74,9 +74,9 @@ public interface GenTableMapper
     public int updateGenTable(GenTable genTable);
 
     /**
-     * 批量删除业务
+     * 批量刪除业务
      * 
-     * @param ids 需要删除的数据ID
+     * @param ids 需要刪除的数据ID
      * @return 结果
      */
     public int deleteGenTableByIds(Long[] ids);

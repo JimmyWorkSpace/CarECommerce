@@ -13,12 +13,12 @@ public class SysFile
     private String dirName;
 
     /**
-     * 盘符类型
+     * 盘符類型
      */
     private String sysTypeName;
 
     /**
-     * 文件类型
+     * 文件類型
      */
     private String typeName;
 

@@ -6,7 +6,7 @@
         <div class="head-container">
           <el-input
             v-model="deptName"
-            placeholder="请输入部门名称"
+            placeholder="请输入部门名稱"
             clearable
             size="small"
             prefix-icon="el-icon-search"
@@ -28,30 +28,30 @@
       <!--用户数据-->
       <el-col :span="20" :xs="24">
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-          <el-form-item label="用户名称" prop="userName">
+          <el-form-item label="用户名稱" prop="userName">
             <el-input
               v-model="queryParams.userName"
-              placeholder="请输入用户名称"
+              placeholder="请输入用户名稱"
               clearable
               size="small"
               style="width: 240px"
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="手机号码" prop="phonenumber">
+          <el-form-item label="手機號码" prop="phonenumber">
             <el-input
               v-model="queryParams.phonenumber"
-              placeholder="请输入手机号码"
+              placeholder="请输入手機號码"
               clearable
               size="small"
               style="width: 240px"
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="状态" prop="status">
+          <el-form-item label="狀態" prop="status">
             <el-select
               v-model="queryParams.status"
-              placeholder="用户状态"
+              placeholder="用户狀態"
               clearable
               size="small"
               style="width: 240px"
@@ -64,7 +64,7 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="创建时间">
+          <el-form-item label="建立時間">
             <el-date-picker
               v-model="dateRange"
               size="small"
@@ -77,8 +77,8 @@
             ></el-date-picker>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
           </el-form-item>
         </el-form>
 
@@ -113,7 +113,7 @@
               :disabled="multiple"
               @click="handleDelete"
               v-hasPermi="['system:user:remove']"
-            >删除</el-button>
+            >刪除</el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button
@@ -140,12 +140,12 @@
 
         <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="用户编号" align="center" key="userId" prop="userId" v-if="columns[0].visible" />
-          <el-table-column label="用户名称" align="center" key="userName" prop="userName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="用户昵称" align="center" key="nickName" prop="nickName" v-if="columns[2].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="用户编號" align="center" key="userId" prop="userId" v-if="columns[0].visible" />
+          <el-table-column label="用户名稱" align="center" key="userName" prop="userName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="用户暱稱" align="center" key="nickName" prop="nickName" v-if="columns[2].visible" :show-overflow-tooltip="true" />
           <el-table-column label="部门" align="center" key="deptName" prop="dept.deptName" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber" v-if="columns[4].visible" width="120" />
-          <el-table-column label="状态" align="center" key="status" v-if="columns[5].visible">
+          <el-table-column label="手機號码" align="center" key="phonenumber" prop="phonenumber" v-if="columns[4].visible" width="120" />
+          <el-table-column label="狀態" align="center" key="status" v-if="columns[5].visible">
             <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.status"
@@ -155,7 +155,7 @@
               ></el-switch>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" width="160">
+          <el-table-column label="建立時間" align="center" prop="createTime" v-if="columns[6].visible" width="160">
             <template slot-scope="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
@@ -180,7 +180,7 @@
                 icon="el-icon-delete"
                 @click="handleDelete(scope.row)"
                 v-hasPermi="['system:user:remove']"
-              >删除</el-button>
+              >刪除</el-button>
               <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['system:user:resetPwd', 'system:user:edit']">
                 <span class="el-dropdown-link">
                   <i class="el-icon-d-arrow-right el-icon--right"></i>更多
@@ -211,8 +211,8 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="用户昵称" prop="nickName">
-              <el-input v-model="form.nickName" placeholder="请输入用户昵称" maxlength="30" />
+            <el-form-item label="用户暱稱" prop="nickName">
+              <el-input v-model="form.nickName" placeholder="请输入用户暱稱" maxlength="30" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -223,8 +223,8 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="手机号码" prop="phonenumber">
-              <el-input v-model="form.phonenumber" placeholder="请输入手机号码" maxlength="11" />
+            <el-form-item label="手機號码" prop="phonenumber">
+              <el-input v-model="form.phonenumber" placeholder="请输入手機號码" maxlength="11" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -235,8 +235,8 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item v-if="form.userId == undefined" label="用户名称" prop="userName">
-              <el-input v-model="form.userName" placeholder="请输入用户名称" maxlength="30" />
+            <el-form-item v-if="form.userId == undefined" label="用户名稱" prop="userName">
+              <el-input v-model="form.userName" placeholder="请输入用户名稱" maxlength="30" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -259,7 +259,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="状态">
+            <el-form-item label="狀態">
               <el-radio-group v-model="form.status">
                 <el-radio
                   v-for="dict in dict.type.sys_normal_disable"
@@ -371,13 +371,13 @@ export default {
       total: 0,
       // 用户表格数据
       userList: null,
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 部门树选项
       deptOptions: undefined,
       // 是否显示弹出层
       open: false,
-      // 部门名称
+      // 部门名稱
       deptName: undefined,
       // 默认密码
       initPassword: undefined,
@@ -397,7 +397,7 @@ export default {
       upload: {
         // 是否显示弹出层（用户导入）
         open: false,
-        // 弹出层标题（用户导入）
+        // 弹出层標題（用户导入）
         title: "",
         // 是否禁用上传
         isUploading: false,
@@ -419,22 +419,22 @@ export default {
       },
       // 列信息
       columns: [
-        { key: 0, label: `用户编号`, visible: true },
-        { key: 1, label: `用户名称`, visible: true },
-        { key: 2, label: `用户昵称`, visible: true },
+        { key: 0, label: `用户编號`, visible: true },
+        { key: 1, label: `用户名稱`, visible: true },
+        { key: 2, label: `用户暱稱`, visible: true },
         { key: 3, label: `部门`, visible: true },
-        { key: 4, label: `手机号码`, visible: true },
-        { key: 5, label: `状态`, visible: true },
-        { key: 6, label: `创建时间`, visible: true }
+        { key: 4, label: `手機號码`, visible: true },
+        { key: 5, label: `狀態`, visible: true },
+        { key: 6, label: `建立時間`, visible: true }
       ],
       // 表单校验
       rules: {
         userName: [
-          { required: true, message: "用户名称不能为空", trigger: "blur" },
-          { min: 2, max: 20, message: '用户名称长度必须介于 2 和 20 之间', trigger: 'blur' }
+          { required: true, message: "用户名稱不能为空", trigger: "blur" },
+          { min: 2, max: 20, message: '用户名稱长度必须介于 2 和 20 之间', trigger: 'blur' }
         ],
         nickName: [
-          { required: true, message: "用户昵称不能为空", trigger: "blur" }
+          { required: true, message: "用户暱稱不能为空", trigger: "blur" }
         ],
         password: [
           { required: true, message: "用户密码不能为空", trigger: "blur" },
@@ -450,7 +450,7 @@ export default {
         phonenumber: [
           {
             pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
-            message: "请输入正确的手机号码",
+            message: "请输入正确的手機號码",
             trigger: "blur"
           }
         ]
@@ -458,7 +458,7 @@ export default {
     };
   },
   watch: {
-    // 根据名称筛选部门树
+    // 根据名稱筛选部门树
     deptName(val) {
       this.$refs.tree.filter(val);
     }
@@ -497,7 +497,7 @@ export default {
       this.queryParams.deptId = data.id;
       this.handleQuery();
     },
-    // 用户状态修改
+    // 用户狀態修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
       this.$modal.confirm('确认要"' + text + '""' + row.userName + '"用户吗？').then(function() {
@@ -628,14 +628,14 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const userIds = row.userId || this.ids;
-      this.$modal.confirm('是否确认删除用户编号为"' + userIds + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认刪除用户编號为"' + userIds + '"的数据项？').then(function() {
         return delUser(userIds);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("删除成功");
+        this.$modal.msgSuccess("刪除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */

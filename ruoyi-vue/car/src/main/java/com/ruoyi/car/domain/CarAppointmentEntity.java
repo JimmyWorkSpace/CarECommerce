@@ -36,15 +36,15 @@ public class CarAppointmentEntity {
     private String appointmentName;
 
     /**
-     * 预约人电话
+     * 预约人電話
      */
-    @Column(name = "appointmentPhone", nullable = false, columnDefinition = "VARCHAR(20) COMMENT '预约人电话'")
+    @Column(name = "appointmentPhone", nullable = false, columnDefinition = "VARCHAR(20) COMMENT '预约人電話'")
     private String appointmentPhone;
 
     /**
-     * 预约时间
+     * 预约時間
      */
-    @Column(name = "appointmentTime", nullable = false, columnDefinition = "DATETIME COMMENT '预约时间'")
+    @Column(name = "appointmentTime", nullable = false, columnDefinition = "DATETIME COMMENT '预约時間'")
     private Date appointmentTime;
 
     /**
@@ -54,31 +54,31 @@ public class CarAppointmentEntity {
     private String appointmentNote;
 
     /**
-     * 预约状态：1-已预约，2-已看车，3-已取消
+     * 预约狀態：1-已预约，2-已看车，3-已取消
      */
-    @Column(name = "appointmentStatus", nullable = false, columnDefinition = "INT(11) DEFAULT 1 COMMENT '预约状态：1-已预约，2-已看车，3-已取消'")
+    @Column(name = "appointmentStatus", nullable = false, columnDefinition = "INT(11) DEFAULT 1 COMMENT '预约狀態：1-已预约，2-已看车，3-已取消'")
     private Integer appointmentStatus;
 
     /**
-     * 删除标记：0-未删除，1-已删除
+     * 刪除标记：0-未刪除，1-已刪除
      */
-    @Column(name = "delFlag", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0 COMMENT '删除标记：0-未删除，1-已删除'")
+    @Column(name = "delFlag", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0 COMMENT '刪除标记：0-未刪除，1-已刪除'")
     private Boolean delFlag;
 
     /**
-     * 创建时间
+     * 建立時間
      */
-    @Column(name = "createTime", nullable = false, columnDefinition = "DATETIME COMMENT '创建时间'")
+    @Column(name = "createTime", nullable = false, columnDefinition = "DATETIME COMMENT '建立時間'")
     private Date createTime;
 
     /**
-     * 更新时间
+     * 更新時間
      */
-    @Column(name = "updateTime", columnDefinition = "DATETIME COMMENT '更新时间'")
+    @Column(name = "updateTime", columnDefinition = "DATETIME COMMENT '更新時間'")
     private Date updateTime;
 
     /**
-     * 预约状态枚举
+     * 预约狀態枚举
      */
     public enum AppointmentStatus {
         APPOINTED(1, "已预约"),
@@ -107,7 +107,7 @@ public class CarAppointmentEntity {
                     return status;
                 }
             }
-            throw new IllegalArgumentException("未知的预约状态码: " + code);
+            throw new IllegalArgumentException("未知的预约狀態码: " + code);
         }
     }
 }

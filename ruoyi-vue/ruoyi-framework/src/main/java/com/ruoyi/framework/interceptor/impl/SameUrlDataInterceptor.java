@@ -19,7 +19,7 @@ import com.ruoyi.framework.web.service.TokenService;
 
 /**
  * 判断请求url和数据是否和上一次相同，
- * 如果和上次相同，则是重复提交表单。 有效时间为10秒内。
+ * 如果和上次相同，则是重复提交表单。 有效時間为10秒内。
  * 
  * @author ruoyi
  */
@@ -100,7 +100,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
     }
 
     /**
-     * 判断两次间隔时间
+     * 判断两次间隔時間
      */
     private boolean compareTime(Map<String, Object> nowMap, Map<String, Object> preMap, int interval)
     {

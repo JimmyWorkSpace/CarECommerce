@@ -42,10 +42,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 根据条件分页查询字典类型
+     * 根据条件分页查询字典類型
      * 
-     * @param dictType 字典类型信息
-     * @return 字典类型集合信息
+     * @param dictType 字典類型信息
+     * @return 字典類型集合信息
      */
     @Override
     public List<SysDictType> selectDictTypeList(SysDictType dictType)
@@ -54,9 +54,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 根据所有字典类型
+     * 根据所有字典類型
      * 
-     * @return 字典类型集合信息
+     * @return 字典類型集合信息
      */
     @Override
     public List<SysDictType> selectDictTypeAll()
@@ -65,9 +65,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 根据字典类型查询字典数据
+     * 根据字典類型查询字典数据
      * 
-     * @param dictType 字典类型
+     * @param dictType 字典類型
      * @return 字典数据集合信息
      */
     @Override
@@ -88,10 +88,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 根据字典类型ID查询信息
+     * 根据字典類型ID查询信息
      * 
-     * @param dictId 字典类型ID
-     * @return 字典类型
+     * @param dictId 字典類型ID
+     * @return 字典類型
      */
     @Override
     public SysDictType selectDictTypeById(Long dictId)
@@ -100,10 +100,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 根据字典类型查询信息
+     * 根据字典類型查询信息
      * 
-     * @param dictType 字典类型
-     * @return 字典类型
+     * @param dictType 字典類型
+     * @return 字典類型
      */
     @Override
     public SysDictType selectDictTypeByType(String dictType)
@@ -112,9 +112,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 批量删除字典类型信息
+     * 批量刪除字典類型信息
      * 
-     * @param dictIds 需要删除的字典ID
+     * @param dictIds 需要刪除的字典ID
      */
     @Override
     public void deleteDictTypeByIds(Long[] dictIds)
@@ -124,7 +124,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
             SysDictType dictType = selectDictTypeById(dictId);
             if (dictDataMapper.countDictDataByType(dictType.getDictType()) > 0)
             {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
+                throw new ServiceException(String.format("%1$s已分配,不能刪除", dictType.getDictName()));
             }
             dictTypeMapper.deleteDictTypeById(dictId);
             DictUtils.removeDictCache(dictType.getDictType());
@@ -166,9 +166,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 新增保存字典类型信息
+     * 新增保存字典類型信息
      * 
-     * @param dict 字典类型信息
+     * @param dict 字典類型信息
      * @return 结果
      */
     @Override
@@ -183,9 +183,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 修改保存字典类型信息
+     * 修改保存字典類型信息
      * 
-     * @param dict 字典类型信息
+     * @param dict 字典類型信息
      * @return 结果
      */
     @Override
@@ -204,9 +204,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 校验字典类型称是否唯一
+     * 校验字典類型称是否唯一
      * 
-     * @param dict 字典类型
+     * @param dict 字典類型
      * @return 结果
      */
     @Override

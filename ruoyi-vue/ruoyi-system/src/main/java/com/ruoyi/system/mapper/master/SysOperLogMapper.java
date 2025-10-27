@@ -26,9 +26,9 @@ public interface SysOperLogMapper
     public List<SysOperLog> selectOperLogList(SysOperLog operLog);
 
     /**
-     * 批量删除系统操作日志
+     * 批量刪除系统操作日志
      * 
-     * @param operIds 需要删除的操作日志ID
+     * @param operIds 需要刪除的操作日志ID
      * @return 结果
      */
     public int deleteOperLogByIds(Long[] operIds);

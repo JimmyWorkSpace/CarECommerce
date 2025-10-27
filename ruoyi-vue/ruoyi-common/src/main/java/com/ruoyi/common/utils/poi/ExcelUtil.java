@@ -96,12 +96,12 @@ public class ExcelUtil<T>
     public static final int sheetSize = 65536;
 
     /**
-     * 工作表名称
+     * 工作表名稱
      */
     private String sheetName;
 
     /**
-     * 导出类型（EXPORT:导出数据；IMPORT：导入模板）
+     * 导出類型（EXPORT:导出数据；IMPORT：导入模板）
      */
     private Type type;
 
@@ -131,12 +131,12 @@ public class ExcelUtil<T>
     private List<Object[]> fields;
 
     /**
-     * 当前行号
+     * 当前行號
      */
     private int rownum;
 
     /**
-     * 标题
+     * 標題
      */
     private String title;
 
@@ -181,7 +181,7 @@ public class ExcelUtil<T>
     }
 
     /**
-     * 创建excel第一行标题
+     * 创建excel第一行標題
      */
     public void createTitle()
     {
@@ -212,7 +212,7 @@ public class ExcelUtil<T>
      * 对excel表单默认第一个索引名转换成list
      * 
      * @param is 输入流
-     * @param titleNum 标题占用行数
+     * @param titleNum 標題占用行数
      * @return 转换后集合
      */
     public List<T> importExcel(InputStream is, int titleNum) throws Exception
@@ -224,7 +224,7 @@ public class ExcelUtil<T>
      * 对excel表单指定表格索引名转换成list
      * 
      * @param sheetName 表格索引名
-     * @param titleNum 标题占用行数
+     * @param titleNum 標題占用行数
      * @param is 输入流
      * @return 转换后集合
      */
@@ -254,7 +254,7 @@ public class ExcelUtil<T>
 
         if (rows > 0)
         {
-            // 定义一个map用于存放excel列的序号和field.
+            // 定义一个map用于存放excel列的序號和field.
             Map<String, Integer> cellMap = new HashMap<String, Integer>();
             // 获取表头
             Row heard = sheet.getRow(titleNum);
@@ -302,7 +302,7 @@ public class ExcelUtil<T>
                     // 从map中得到对应列的field.
                     Field field = (Field) entry.getValue()[0];
                     Excel attr = (Excel) entry.getValue()[1];
-                    // 取得类型,并根据对象类型设置值.
+                    // 取得類型,并根据对象類型设置值.
                     Class<?> fieldType = field.getType();
                     if (String.class == fieldType)
                     {
@@ -404,7 +404,7 @@ public class ExcelUtil<T>
      * 对list数据源将其里面的数据导入到excel表单
      * 
      * @param list 导出数据集合
-     * @param sheetName 工作表的名称
+     * @param sheetName 工作表的名稱
      * @return 结果
      */
     public AjaxResult exportExcel(List<T> list, String sheetName)
@@ -416,8 +416,8 @@ public class ExcelUtil<T>
      * 对list数据源将其里面的数据导入到excel表单
      * 
      * @param list 导出数据集合
-     * @param sheetName 工作表的名称
-     * @param title 标题
+     * @param sheetName 工作表的名稱
+     * @param title 標題
      * @return 结果
      */
     public AjaxResult exportExcel(List<T> list, String sheetName, String title)
@@ -431,7 +431,7 @@ public class ExcelUtil<T>
      * 
      * @param response 返回数据
      * @param list 导出数据集合
-     * @param sheetName 工作表的名称
+     * @param sheetName 工作表的名稱
      * @return 结果
      */
     public void exportExcel(HttpServletResponse response, List<T> list, String sheetName)
@@ -444,8 +444,8 @@ public class ExcelUtil<T>
      * 
      * @param response 返回数据
      * @param list 导出数据集合
-     * @param sheetName 工作表的名称
-     * @param title 标题
+     * @param sheetName 工作表的名稱
+     * @param title 標題
      * @return 结果
      */
     public void exportExcel(HttpServletResponse response, List<T> list, String sheetName, String title)
@@ -459,7 +459,7 @@ public class ExcelUtil<T>
     /**
      * 对list数据源将其里面的数据导入到excel表单
      * 
-     * @param sheetName 工作表的名称
+     * @param sheetName 工作表的名稱
      * @return 结果
      */
     public AjaxResult importTemplateExcel(String sheetName)
@@ -470,8 +470,8 @@ public class ExcelUtil<T>
     /**
      * 对list数据源将其里面的数据导入到excel表单
      * 
-     * @param sheetName 工作表的名称
-     * @param title 标题
+     * @param sheetName 工作表的名稱
+     * @param title 標題
      * @return 结果
      */
     public AjaxResult importTemplateExcel(String sheetName, String title)
@@ -483,7 +483,7 @@ public class ExcelUtil<T>
     /**
      * 对list数据源将其里面的数据导入到excel表单
      * 
-     * @param sheetName 工作表的名称
+     * @param sheetName 工作表的名稱
      * @return 结果
      */
     public void importTemplateExcel(HttpServletResponse response, String sheetName)
@@ -494,8 +494,8 @@ public class ExcelUtil<T>
     /**
      * 对list数据源将其里面的数据导入到excel表单
      * 
-     * @param sheetName 工作表的名称
-     * @param title 标题
+     * @param sheetName 工作表的名稱
+     * @param title 標題
      * @return 结果
      */
     public void importTemplateExcel(HttpServletResponse response, String sheetName, String title)
@@ -547,7 +547,7 @@ public class ExcelUtil<T>
         catch (Exception e)
         {
             log.error("导出Excel异常{}", e.getMessage());
-            throw new UtilException("导出Excel失败，请联系网站管理员！");
+            throw new UtilException("导出Excel失败，请聯繫网站管理员！");
         }
         finally
         {
@@ -570,7 +570,7 @@ public class ExcelUtil<T>
             // 产生一行
             Row row = sheet.createRow(rownum);
             int column = 0;
-            // 写入各个字段的列头名称
+            // 写入各个字段的列头名稱
             for (Object[] os : fields)
             {
                 Excel excel = (Excel) os[1];
@@ -587,7 +587,7 @@ public class ExcelUtil<T>
     /**
      * 填充excel数据
      * 
-     * @param index 序号
+     * @param index 序號
      * @param row 单元格行
      */
     public void fillExcelData(int index, Row row)
@@ -753,7 +753,7 @@ public class ExcelUtil<T>
     }
 
     /**
-     * 获取图片类型,设置图片插入类型
+     * 获取圖片類型,设置圖片插入類型
      */
     public int getImageType(byte[] value)
     {
@@ -843,7 +843,7 @@ public class ExcelUtil<T>
                 }
                 else
                 {
-                    // 设置列类型
+                    // 设置列類型
                     setCellVo(value, attr, cell);
                 }
                 addStatisticsData(column, Convert.toStr(value), attr);
@@ -860,7 +860,7 @@ public class ExcelUtil<T>
      * 设置 POI XSSFSheet 单元格提示
      * 
      * @param sheet 表单
-     * @param promptTitle 提示标题
+     * @param promptTitle 提示標題
      * @param promptContent 提示内容
      * @param firstRow 开始行
      * @param endRow 结束行
@@ -899,7 +899,7 @@ public class ExcelUtil<T>
         CellRangeAddressList regions = new CellRangeAddressList(firstRow, endRow, firstCol, endCol);
         // 数据有效性对象
         DataValidation dataValidation = helper.createValidation(constraint, regions);
-        // 处理Excel兼容性问题
+        // 处理Excel兼容性問題
         if (dataValidation instanceof XSSFDataValidation)
         {
             dataValidation.setSuppressDropDownArrow(true);
@@ -991,7 +991,7 @@ public class ExcelUtil<T>
      * 解析字典值
      * 
      * @param dictValue 字典值
-     * @param dictType 字典类型
+     * @param dictType 字典類型
      * @param separator 分隔符
      * @return 字典标签
      */
@@ -1004,7 +1004,7 @@ public class ExcelUtil<T>
      * 反向解析值字典值
      * 
      * @param dictLabel 字典标签
-     * @param dictType 字典类型
+     * @param dictType 字典類型
      * @param separator 分隔符
      * @return 字典值
      */
@@ -1093,7 +1093,7 @@ public class ExcelUtil<T>
     /**
      * 获取下载路径
      * 
-     * @param filename 文件名称
+     * @param filename 文件名稱
      */
     public String getAbsoluteFile(String filename)
     {
@@ -1236,11 +1236,11 @@ public class ExcelUtil<T>
      * 创建工作表
      * 
      * @param sheetNo sheet数量
-     * @param index 序号
+     * @param index 序號
      */
     public void createSheet(int sheetNo, int index)
     {
-        // 设置工作表的名称.
+        // 设置工作表的名稱.
         if (sheetNo > 1 && index > 0)
         {
             this.sheet = wb.createSheet();
@@ -1253,7 +1253,7 @@ public class ExcelUtil<T>
      * 获取单元格值
      * 
      * @param row 获取的行
-     * @param column 获取单元格列号
+     * @param column 获取单元格列號
      * @return 单元格值
      */
     public Object getCellValue(Row row, int column)
@@ -1333,11 +1333,11 @@ public class ExcelUtil<T>
     }
 
     /**
-     * 获取Excel2003图片
+     * 获取Excel2003圖片
      *
      * @param sheet 当前sheet对象
      * @param workbook 工作簿对象
-     * @return Map key:图片单元格索引（1_1）String，value:图片流PictureData
+     * @return Map key:圖片单元格索引（1_1）String，value:圖片流PictureData
      */
     public static Map<String, PictureData> getSheetPictures03(HSSFSheet sheet, HSSFWorkbook workbook)
     {
@@ -1366,11 +1366,11 @@ public class ExcelUtil<T>
     }
 
     /**
-     * 获取Excel2007图片
+     * 获取Excel2007圖片
      *
      * @param sheet 当前sheet对象
      * @param workbook 工作簿对象
-     * @return Map key:图片单元格索引（1_1）String，value:图片流PictureData
+     * @return Map key:圖片单元格索引（1_1）String，value:圖片流PictureData
      */
     public static Map<String, PictureData> getSheetPictures07(XSSFSheet sheet, XSSFWorkbook workbook)
     {
@@ -1398,7 +1398,7 @@ public class ExcelUtil<T>
     }
 
     /**
-     * 格式化不同类型的日期对象
+     * 格式化不同類型的日期对象
      * 
      * @param dateFormat 日期格式
      * @param val 被格式化的日期对象

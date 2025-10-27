@@ -49,7 +49,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="刷新时间（秒）">
+              <el-form-item label="刷新時間（秒）">
                 <el-input-number v-model="queryParams.refresh" :min="3" :max="1000"></el-input-number>
               </el-form-item>
             </el-col>
@@ -83,7 +83,7 @@
       <h4>{{ year }}年改制企业{{ pageTitle }}月报</h4>
       <el-table v-if="pageType != 'jyjc'" :data="companyReportDataList" class="table" height="43vh" ref="table" @cell-mouse-enter="cellMouseIn=true" @cell-mouse-leave="cellMouseIn=false">
         <el-table-column type="index" width="50"> </el-table-column>
-        <el-table-column label="公司名称" align="left" width="100" prop="companyName">
+        <el-table-column label="公司名稱" align="left" width="100" prop="companyName">
           <template slot-scope="scope">
             <el-link type="primary" @click="showDlg(scope.row)">{{scope.row.companyName}}</el-link>
           </template>
@@ -92,7 +92,7 @@
       </el-table>
       <el-table v-if="pageType == 'jyjc'" :data="companyReportDataList" class="table" height="43vh" ref="table" @cell-mouse-enter="cellMouseIn=true" @cell-mouse-leave="cellMouseIn=false">
         <el-table-column type="index" width="50"> </el-table-column>
-        <el-table-column label="公司名称" align="left" width="100" prop="companyShortName">
+        <el-table-column label="公司名稱" align="left" width="100" prop="companyShortName">
           <template slot-scope="scope">
             <el-link type="primary" @click="showDlg(scope.row)">{{scope.row.companyShortName}}</el-link>
           </template>
@@ -198,7 +198,7 @@ export default {
       yearMarks: {},
       year: '',
       scrollInterval: null,
-      // 弹出层标题
+      // 弹出层標題
       title: '',
       pageTitle: '',
       heads: [],

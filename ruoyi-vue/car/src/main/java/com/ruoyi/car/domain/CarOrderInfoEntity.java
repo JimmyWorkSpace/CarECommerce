@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 订单主表实体
+ * 訂單主表实体
  */
 @Data
 @Entity
@@ -19,9 +19,9 @@ public class CarOrderInfoEntity {
     private Long id;
 
     /**
-     * 订单号
+     * 訂單號
      */
-    @Column(name = "orderNo", nullable = false, columnDefinition = "VARCHAR(50) COMMENT '订单号'")
+    @Column(name = "orderNo", nullable = false, columnDefinition = "VARCHAR(50) COMMENT '訂單號'")
     private String orderNo;
 
     /**
@@ -31,21 +31,21 @@ public class CarOrderInfoEntity {
     private Long userId;
 
     /**
-     * 总价格
+     * 總價格
      */
-    @Column(name = "totalPrice", columnDefinition = "INT(11) COMMENT '总价格'")
+    @Column(name = "totalPrice", columnDefinition = "INT(11) COMMENT '總價格'")
     private Integer totalPrice;
 
     /**
-     * 删除标记 1 是 0 否
+     * 刪除标记 1 是 0 否
      */
-    @Column(name = "delFlag", columnDefinition = "BIT(1) DEFAULT b'0' COMMENT '删除标记 1 是 0 否'")
+    @Column(name = "delFlag", columnDefinition = "BIT(1) DEFAULT b'0' COMMENT '刪除标记 1 是 0 否'")
     private Boolean delFlag;
 
     /**
-     * 创建时间
+     * 建立時間
      */
-    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '创建时间'")
+    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '建立時間'")
     private Date createTime;
 
     /**
@@ -55,7 +55,7 @@ public class CarOrderInfoEntity {
     private Integer showOrder;
 
     /**
-     * 订单状态：0 未支付 1 支付中 2 已支付 3 已取消 4 支付失败 5 已发货 6 已完成 7 退货中 8 已退货
+     * 訂單狀態：0 未支付 1 支付中 2 已支付 3 已取消 4 支付失败 5 已发货 6 已完成 7 退货中 8 已退货
      */
     @Column(name = "orderStatus", columnDefinition = "INT(11) COMMENT '0 未支付 1 支付中 2 已支付 3 已取消 4 支付失败 5 已发货 6 已完成 7 退货中 8 已退货'")
     private Integer orderStatus;
@@ -73,21 +73,21 @@ public class CarOrderInfoEntity {
     private String receiverName;
 
     /**
-     * 收件人电话
+     * 收件人電話
      */
-    @Column(name = "receiverMobile", columnDefinition = "VARCHAR(50) COMMENT '收件人电话'")
+    @Column(name = "receiverMobile", columnDefinition = "VARCHAR(50) COMMENT '收件人電話'")
     private String receiverMobile;
 
     /**
-     * 物流单号
+     * 物流單號
      */
-    @Column(name = "logicNumber", columnDefinition = "VARCHAR(100) COMMENT '物流单号'")
+    @Column(name = "logicNumber", columnDefinition = "VARCHAR(100) COMMENT '物流單號'")
     private String logicNumber;
 
     /**
-     * 订单类型 1 宅配到府 2 超商取货
+     * 訂單類型 1 宅配到府 2 超商取貨
      */
-    @Column(name = "orderType", columnDefinition = "INT(11) DEFAULT 1 COMMENT '订单类型 1 宅配到府 2 超商取货'")
+    @Column(name = "orderType", columnDefinition = "INT(11) DEFAULT 1 COMMENT '訂單類型 1 宅配到府 2 超商取貨'")
     private Integer orderType;
 
     /**
@@ -121,11 +121,11 @@ public class CarOrderInfoEntity {
     private Integer cvsOutSide;
 
     /**
-     * 订单类型枚举
+     * 訂單類型枚举
      */
     public enum OrderType {
         HOME_DELIVERY(1, "宅配到府"),
-        CONVENIENCE_STORE(2, "超商取货");
+        CONVENIENCE_STORE(2, "超商取貨");
 
         private final Integer code;
         private final String description;
@@ -149,12 +149,12 @@ public class CarOrderInfoEntity {
                     return type;
                 }
             }
-            throw new IllegalArgumentException("未知的订单类型码: " + code);
+            throw new IllegalArgumentException("未知的訂單類型码: " + code);
         }
     }
 
     /**
-     * 订单状态枚举
+     * 訂單狀態枚举
      */
     public enum OrderStatus {
         UNPAID(0, "未支付"),
@@ -189,7 +189,7 @@ public class CarOrderInfoEntity {
                     return status;
                 }
             }
-            throw new IllegalArgumentException("未知的订单状态码: " + code);
+            throw new IllegalArgumentException("未知的訂單狀態码: " + code);
         }
     }
 }

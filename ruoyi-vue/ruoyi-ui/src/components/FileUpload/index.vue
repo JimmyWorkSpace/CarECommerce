@@ -32,7 +32,7 @@
           <span class="el-icon-document"> {{ getFileName(file.name) }} </span>
         </el-link>
         <div class="ele-upload-list__item-content-action">
-          <el-link :underline="false" @click="handleDelete(index)" type="danger">删除</el-link>
+          <el-link :underline="false" @click="handleDelete(index)" type="danger">刪除</el-link>
         </div>
       </li>
     </transition-group>
@@ -57,7 +57,7 @@ export default {
       type: Number,
       default: 5,
     },
-    // 文件类型, 例如['png', 'jpg', 'jpeg']
+    // 文件類型, 例如['png', 'jpg', 'jpeg']
     fileType: {
       type: Array,
       default: () => ["doc", "xls", "ppt", "txt", "pdf"],
@@ -73,7 +73,7 @@ export default {
       number: 0,
       uploadList: [],
       baseUrl: process.env.VUE_APP_BASE_API,
-      uploadFileUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
+      uploadFileUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的圖片服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -113,7 +113,7 @@ export default {
   methods: {
     // 上传前校检格式和大小
     handleBeforeUpload(file) {
-      // 校检文件类型
+      // 校检文件類型
       if (this.fileType) {
         let fileExtension = "";
         if (file.name.lastIndexOf(".") > -1) {
@@ -147,7 +147,7 @@ export default {
     },
     // 上传失败
     handleUploadError(err) {
-      this.$modal.msgError("上传图片失败，请重试");
+      this.$modal.msgError("上传圖片失败，请重试");
       this.$modal.closeLoading()
     },
     // 上传成功回调
@@ -161,12 +161,12 @@ export default {
         this.$modal.closeLoading();
       }
     },
-    // 删除文件
+    // 刪除文件
     handleDelete(index) {
       this.fileList.splice(index, 1);
       this.$emit("input", this.listToString(this.fileList));
     },
-    // 获取文件名称
+    // 获取文件名稱
     getFileName(name) {
       if (name.lastIndexOf("/") > -1) {
         return name.slice(name.lastIndexOf("/") + 1);

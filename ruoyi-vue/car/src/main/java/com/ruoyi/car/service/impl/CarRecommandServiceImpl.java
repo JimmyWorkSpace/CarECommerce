@@ -10,7 +10,7 @@ import com.ruoyi.car.service.ICarRecommandService;
 import tk.mybatis.mapper.entity.Example;
 
 /**
- * 推荐管理Service业务层处理
+ * 推薦管理Service业务层处理
  * 
  * @author ruoyi
  * @date 2024-01-01
@@ -22,10 +22,10 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     private CarRecommandMapper carRecommandMapper;
 
     /**
-     * 查询推荐记录
+     * 查询推薦记录
      * 
-     * @param id 推荐记录主键
-     * @return 推荐记录
+     * @param id 推薦记录主键
+     * @return 推薦记录
      */
     @Override
     public CarRecommandEntity selectCarRecommandById(Long id)
@@ -34,10 +34,10 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
 
     /**
-     * 查询推荐记录列表
+     * 查询推薦记录列表
      * 
-     * @param carRecommand 推荐记录
-     * @return 推荐记录
+     * @param carRecommand 推薦记录
+     * @return 推薦记录
      */
     @Override
     public List<CarRecommandEntity> selectCarRecommandList(CarRecommandEntity carRecommand)
@@ -62,9 +62,9 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
 
     /**
-     * 新增推荐记录
+     * 新增推薦记录
      * 
-     * @param carRecommand 推荐记录
+     * @param carRecommand 推薦记录
      * @return 结果
      */
     @Override
@@ -81,9 +81,9 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
 
     /**
-     * 修改推荐记录
+     * 修改推薦记录
      * 
-     * @param carRecommand 推荐记录
+     * @param carRecommand 推薦记录
      * @return 结果
      */
     @Override
@@ -93,9 +93,9 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
 
     /**
-     * 批量删除推荐记录
+     * 批量刪除推薦记录
      * 
-     * @param ids 需要删除的推荐记录主键
+     * @param ids 需要刪除的推薦记录主键
      * @return 结果
      */
     @Override
@@ -108,9 +108,9 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
 
     /**
-     * 删除推荐记录信息
+     * 刪除推薦记录信息
      * 
-     * @param id 推荐记录主键
+     * @param id 推薦记录主键
      * @return 结果
      */
     @Override
@@ -120,11 +120,11 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
     
     /**
-     * 根据推荐类型和推荐ID查询推荐记录
+     * 根据推薦類型和推薦ID查询推薦记录
      * 
-     * @param recommandType 推荐类型
-     * @param recommandId 推荐ID
-     * @return 推荐记录
+     * @param recommandType 推薦類型
+     * @param recommandId 推薦ID
+     * @return 推薦记录
      */
     @Override
     public CarRecommandEntity selectByRecommandTypeAndId(Integer recommandType, Long recommandId)
@@ -133,10 +133,10 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
     
     /**
-     * 根据推荐类型查询推荐列表
+     * 根据推薦類型查询推薦列表
      * 
-     * @param recommandType 推荐类型
-     * @return 推荐记录集合
+     * @param recommandType 推薦類型
+     * @return 推薦记录集合
      */
     @Override
     public List<CarRecommandEntity> selectByRecommandType(Integer recommandType)
@@ -145,10 +145,10 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
     
     /**
-     * 删除推荐记录
+     * 刪除推薦记录
      * 
-     * @param recommandType 推荐类型
-     * @param recommandId 推荐ID
+     * @param recommandType 推薦類型
+     * @param recommandId 推薦ID
      * @return 结果
      */
     @Override
@@ -158,18 +158,18 @@ public class CarRecommandServiceImpl implements ICarRecommandService
     }
     
     /**
-     * 设置推荐状态
+     * 设置推薦狀態
      * 
-     * @param recommandType 推荐类型
-     * @param recommandId 推荐ID
-     * @param isRecommended 是否推荐
+     * @param recommandType 推薦類型
+     * @param recommandId 推薦ID
+     * @param isRecommended 是否推薦
      * @return 结果
      */
     @Override
     public int setRecommended(Integer recommandType, Long recommandId, Boolean isRecommended)
     {
         if (isRecommended) {
-            // 添加推荐
+            // 添加推薦
             CarRecommandEntity existing = selectByRecommandTypeAndId(recommandType, recommandId);
             if (existing == null) {
                 CarRecommandEntity carRecommand = new CarRecommandEntity();
@@ -182,7 +182,7 @@ public class CarRecommandServiceImpl implements ICarRecommandService
             }
             return 1; // 已存在
         } else {
-            // 取消推荐
+            // 取消推薦
             return deleteByRecommandTypeAndId(recommandType, recommandId);
         }
     }

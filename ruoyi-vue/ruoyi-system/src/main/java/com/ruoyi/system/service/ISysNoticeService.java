@@ -43,7 +43,7 @@ public interface ISysNoticeService
     public int updateNotice(SysNotice notice);
 
     /**
-     * 删除公告信息
+     * 刪除公告信息
      * 
      * @param noticeId 公告ID
      * @return 结果
@@ -51,9 +51,9 @@ public interface ISysNoticeService
     public int deleteNoticeById(Long noticeId);
     
     /**
-     * 批量删除公告信息
+     * 批量刪除公告信息
      * 
-     * @param noticeIds 需要删除的公告ID
+     * @param noticeIds 需要刪除的公告ID
      * @return 结果
      */
     public int deleteNoticeByIds(Long[] noticeIds);

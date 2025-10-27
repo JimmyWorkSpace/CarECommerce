@@ -26,9 +26,9 @@ public class CarRichContentEntity {
     private Long id;
     
     /**
-     * 标题
+     * 標題
      */
-    @Column(name = "title", columnDefinition = "VARCHAR(255) COMMENT '标题'")
+    @Column(name = "title", columnDefinition = "VARCHAR(255) COMMENT '標題'")
     private String title;
     
     /**
@@ -38,9 +38,9 @@ public class CarRichContentEntity {
     private String content;
     
     /**
-     * 类型 1 关于 2 频道
+     * 類型 1 关于 2 頻道
      */
-    @Column(name = "contentType", columnDefinition = "INT(11) COMMENT '类型 1 关于 2 频道'")
+    @Column(name = "contentType", columnDefinition = "INT(11) COMMENT '類型 1 关于 2 頻道'")
     private Integer contentType;
     
     /**
@@ -50,23 +50,23 @@ public class CarRichContentEntity {
     private Integer showOrder;
     
     /**
-     * 删除标记 1 是 0 否
+     * 刪除标记 1 是 0 否
      */
-    @Column(name = "delFlag", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0 COMMENT '删除标记 1 是 0 否'")
+    @Column(name = "delFlag", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0 COMMENT '刪除标记 1 是 0 否'")
     private Boolean delFlag;
     
     /**
-     * 创建时间
+     * 建立時間
      */
-    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '创建时间'")
+    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '建立時間'")
     private LocalDateTime createTime;
     
     /**
-     * 内容类型枚举
+     * 内容類型枚举
      */
     public enum ContentType {
         ABOUT(1, "关于"),
-        CHANNEL(2, "频道");
+        CHANNEL(2, "頻道");
         
         private final Integer code;
         private final String description;
@@ -90,7 +90,7 @@ public class CarRichContentEntity {
                     return type;
                 }
             }
-            throw new IllegalArgumentException("未知的内容类型码: " + code);
+            throw new IllegalArgumentException("未知的内容類型码: " + code);
         }
     }
 }

@@ -56,8 +56,8 @@
         <el-input-number v-model="queryParams.value" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
     <div v-if="pageType=='jyjcyj'">
@@ -72,7 +72,7 @@
 
       </div>
       <el-table v-loading="loading" :data="list" height="32vw" :cell-style="cellStyle">
-        <el-table-column label="公司名称" align="center" width="150" prop="shortName" />
+        <el-table-column label="公司名稱" align="center" width="150" prop="shortName" />
         <el-table-column label="职工队伍结构" align="center">
           <el-table-column label="职工总数" align="center" prop="zgzs" />
           <el-table-column label="同比" align="center" prop="zgzsInc" :formatter="incFormatter" />
@@ -125,7 +125,7 @@
 
       </div>
       <el-table v-loading="loading" :data="list" height="70vh" :cell-style="cellStyle">
-        <el-table-column label="公司名称" align="center" width="150" prop="shortName" />
+        <el-table-column label="公司名稱" align="center" width="150" prop="shortName" />
         <el-table-column v-for="(h, idx) in heads" :key="idx" :label="h.columnTitle" align="center" :prop="h.dictValue" />
       </el-table>
     </div>

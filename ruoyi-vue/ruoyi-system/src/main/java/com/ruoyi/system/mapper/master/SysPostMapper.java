@@ -50,7 +50,7 @@ public interface SysPostMapper
     public List<SysPost> selectPostsByUserName(String userName);
 
     /**
-     * 删除岗位信息
+     * 刪除岗位信息
      * 
      * @param postId 岗位ID
      * @return 结果
@@ -58,9 +58,9 @@ public interface SysPostMapper
     public int deletePostById(Long postId);
 
     /**
-     * 批量删除岗位信息
+     * 批量刪除岗位信息
      * 
-     * @param postIds 需要删除的岗位ID
+     * @param postIds 需要刪除的岗位ID
      * @return 结果
      */
     public int deletePostByIds(Long[] postIds);
@@ -82,9 +82,9 @@ public interface SysPostMapper
     public int insertPost(SysPost post);
 
     /**
-     * 校验岗位名称
+     * 校验岗位名稱
      * 
-     * @param postName 岗位名称
+     * @param postName 岗位名稱
      * @return 结果
      */
     public SysPost checkPostNameUnique(String postName);

@@ -28,7 +28,7 @@ export default {
     return {
       // 显隐数据
       value: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "显示/隐藏",
       // 是否显示弹出层
       open: false,

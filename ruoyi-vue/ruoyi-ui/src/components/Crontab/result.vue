@@ -1,6 +1,6 @@
 <template>
 	<div class="popup-result">
-		<p class="title">最近5次运行时间</p>
+		<p class="title">最近5次运行時間</p>
 		<ul class="popup-result-scroll">
 			<template v-if='isShow'>
 				<li v-for='item in resultList' :key="item">{{item}}</li>
@@ -32,9 +32,9 @@ export default {
 			let ruleArr = this.$options.propsData.ex.split(' ');
 			// 用于记录进入循环的次数
 			let nums = 0;
-			// 用于暂时存符号时间规则结果的数组
+			// 用于暂时存符號時間规则结果的数组
 			let resultArr = [];
-			// 获取当前时间精确至[年、月、日、时、分、秒]
+			// 获取当前時間精确至[年、月、日、时、分、秒]
 			let nTime = new Date();
 			let nYear = nTime.getFullYear();
 			let nMonth = nTime.getMonth() + 1;
@@ -57,7 +57,7 @@ export default {
 			let DDate = this.dateArr[3];
 			let MDate = this.dateArr[4];
 			let YDate = this.dateArr[5];
-			// 获取当前时间在数组中的索引
+			// 获取当前時間在数组中的索引
 			let sIdx = this.getIndex(sDate, nSecond);
 			let mIdx = this.getIndex(mDate, nMin);
 			let hIdx = this.getIndex(hDate, nHour);
@@ -169,7 +169,7 @@ export default {
 								}
 							}
 						} else if (this.dayRule == 'workDay') {
-							// 校验并调整如果是2月30号这种日期传进来时需调整至正常月底
+							// 校验并调整如果是2月30號这种日期传进来时需调整至正常月底
 							if (this.checkDate(YY + '-' + MM + '-' + thisDD + ' 00:00:00') !== true) {
 								while (DD > 0 && this.checkDate(YY + '-' + MM + '-' + thisDD + ' 00:00:00') !== true) {
 									DD--;
@@ -188,7 +188,7 @@ export default {
 									DD -= 3;
 								}
 							} else if (thisWeek == 7) {
-								// 当星期6时只需判断不是1号就可进行操作
+								// 当星期6时只需判断不是1號就可进行操作
 								if (this.dayRuleSup !== 1) {
 									DD--;
 								} else {
@@ -214,7 +214,7 @@ export default {
 							}
 						} else if (this.dayRule == 'assWeek') {
 							// 如果指定了是第几周的星期几
-							// 获取每月1号是属于星期几
+							// 获取每月1號是属于星期几
 							let thisWeek = this.formatDate(new Date(YY + '-' + MM + '-' + DD + ' 00:00:00'), 'week');
 							if (this.dayRuleSup[1] >= thisWeek) {
 								DD = (this.dayRuleSup[0] - 1) * 7 + this.dayRuleSup[1] - thisWeek + 1;
@@ -223,7 +223,7 @@ export default {
 							}
 						} else if (this.dayRule == 'lastWeek') {
 							// 如果指定了每月最后一个星期几
-							// 校验并调整如果是2月30号这种日期传进来时需调整至正常月底
+							// 校验并调整如果是2月30號这种日期传进来时需调整至正常月底
 							if (this.checkDate(YY + '-' + MM + '-' + thisDD + ' 00:00:00') !== true) {
 								while (DD > 0 && this.checkDate(YY + '-' + MM + '-' + thisDD + ' 00:00:00') !== true) {
 									DD--;
@@ -239,7 +239,7 @@ export default {
 								DD -= 7 - (this.dayRuleSup - thisWeek)
 							}
 						}
-						// 判断时间值是否小于10置换成“05”这种格式
+						// 判断時間值是否小于10置换成“05”这种格式
 						DD = DD < 10 ? '0' + DD : DD;
 
 						// 循环“时”数组
@@ -291,7 +291,7 @@ export default {
 								// 循环"秒"数组
 								goSecond: for (let si = sIdx; si <= sDate.length - 1; si++) {
 									let ss = sDate[si] < 10 ? '0' + sDate[si] : sDate[si];
-									// 添加当前时间（时间合法性在日期循环时已经判断）
+									// 添加当前時間（時間合法性在日期循环时已经判断）
 									if (MM !== '00' && DD !== '00') {
 										resultArr.push(YY + '-' + MM + '-' + DD + ' ' + hh + ':' + mm + ':' + ss)
 										nums++;

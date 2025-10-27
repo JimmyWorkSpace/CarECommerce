@@ -52,7 +52,7 @@ export default {
       type: Number,
       default: 5,
     },
-    /* 类型（base64格式、url格式） */
+    /* 類型（base64格式、url格式） */
     type: {
       type: String,
       default: "url",
@@ -60,7 +60,7 @@ export default {
   },
   data() {
     return {
-      uploadUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
+      uploadUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的圖片服务器地址
       headers: {
         Authorization: "Bearer " + getToken()
       },
@@ -73,16 +73,16 @@ export default {
         modules: {
           // 工具栏配置
           toolbar: [
-            ["bold", "italic", "underline", "strike"],       // 加粗 斜体 下划线 删除线
+            ["bold", "italic", "underline", "strike"],       // 加粗 斜体 下划线 刪除线
             ["blockquote", "code-block"],                    // 引用  代码块
             [{ list: "ordered" }, { list: "bullet" }],       // 有序、无序列表
             [{ indent: "-1" }, { indent: "+1" }],            // 缩进
             [{ size: ["small", false, "large", "huge"] }],   // 字体大小
-            [{ header: [1, 2, 3, 4, 5, 6, false] }],         // 标题
+            [{ header: [1, 2, 3, 4, 5, 6, false] }],         // 標題
             [{ color: [] }, { background: [] }],             // 字体颜色、字体背景颜色
             [{ align: [] }],                                 // 对齐方式
             ["clean"],                                       // 清除文本格式
-            ["link", "image", "video"]                       // 链接、图片、视频
+            ["link", "image", "video"]                       // 链接、圖片、视频
           ],
         },
         placeholder: "请输入内容",
@@ -125,7 +125,7 @@ export default {
     init() {
       const editor = this.$refs.editor;
       this.Quill = new Quill(editor, this.options);
-      // 如果设置了上传地址则自定义图片上传事件
+      // 如果设置了上传地址则自定义圖片上传事件
       if (this.type == 'url') {
         let toolbar = this.Quill.getModule("toolbar");
         toolbar.addHandler("image", (value) => {
@@ -175,16 +175,16 @@ export default {
       if (res.code == 200) {
         // 获取光标所在位置
         let length = quill.getSelection().index;
-        // 插入图片  res.url为服务器返回的图片地址
+        // 插入圖片  res.url为服务器返回的圖片地址
         quill.insertEmbed(length, "image", process.env.VUE_APP_BASE_API + res.fileName);
         // 调整光标到最后
         quill.setSelection(length + 1);
       } else {
-        this.$message.error("图片插入失败");
+        this.$message.error("圖片插入失败");
       }
     },
     handleUploadError() {
-      this.$message.error("图片插入失败");
+      this.$message.error("圖片插入失败");
     },
   },
 };
@@ -234,27 +234,27 @@ export default {
 }
 .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before,
 .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"]::before {
-  content: "标题1";
+  content: "標題1";
 }
 .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
 .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
-  content: "标题2";
+  content: "標題2";
 }
 .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
 .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
-  content: "标题3";
+  content: "標題3";
 }
 .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="4"]::before,
 .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="4"]::before {
-  content: "标题4";
+  content: "標題4";
 }
 .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="5"]::before,
 .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="5"]::before {
-  content: "标题5";
+  content: "標題5";
 }
 .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="6"]::before,
 .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="6"]::before {
-  content: "标题6";
+  content: "標題6";
 }
 
 .ql-snow .ql-picker.ql-font .ql-picker-label::before,

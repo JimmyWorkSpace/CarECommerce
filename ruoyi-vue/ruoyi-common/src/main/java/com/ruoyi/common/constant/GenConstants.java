@@ -7,13 +7,13 @@ package com.ruoyi.common.constant;
  */
 public class GenConstants
 {
-    /** 单表（增删改查） */
+    /** 单表（增刪改查） */
     public static final String TPL_CRUD = "crud";
 
-    /** 树表（增删改查） */
+    /** 树表（增刪改查） */
     public static final String TPL_TREE = "tree";
 
-    /** 主子表（增删改查） */
+    /** 主子表（增刪改查） */
     public static final String TPL_SUB = "sub";
 
     /** 树编码字段 */
@@ -22,25 +22,25 @@ public class GenConstants
     /** 树父编码字段 */
     public static final String TREE_PARENT_CODE = "treeParentCode";
 
-    /** 树名称字段 */
+    /** 树名稱字段 */
     public static final String TREE_NAME = "treeName";
 
     /** 上级菜单ID字段 */
     public static final String PARENT_MENU_ID = "parentMenuId";
 
-    /** 上级菜单名称字段 */
+    /** 上级菜单名稱字段 */
     public static final String PARENT_MENU_NAME = "parentMenuName";
 
-    /** 数据库字符串类型 */
+    /** 数据库字符串類型 */
     public static final String[] COLUMNTYPE_STR = { "char", "varchar", "nvarchar", "varchar2" };
 
-    /** 数据库文本类型 */
+    /** 数据库文本類型 */
     public static final String[] COLUMNTYPE_TEXT = { "tinytext", "text", "mediumtext", "longtext" };
 
-    /** 数据库时间类型 */
+    /** 数据库時間類型 */
     public static final String[] COLUMNTYPE_TIME = { "datetime", "time", "date", "timestamp" };
 
-    /** 数据库数字类型 */
+    /** 数据库数字類型 */
     public static final String[] COLUMNTYPE_NUMBER = { "tinyint", "smallint", "mediumint", "int", "number", "integer",
             "bit", "bigint", "float", "double", "decimal" };
 
@@ -79,7 +79,7 @@ public class GenConstants
     /** 日期控件 */
     public static final String HTML_DATETIME = "datetime";
 
-    /** 图片上传控件 */
+    /** 圖片上传控件 */
     public static final String HTML_IMAGE_UPLOAD = "imageUpload";
 
     /** 文件上传控件 */
@@ -88,7 +88,7 @@ public class GenConstants
     /** 富文本控件 */
     public static final String HTML_EDITOR = "editor";
 
-    /** 字符串类型 */
+    /** 字符串類型 */
     public static final String TYPE_STRING = "String";
 
     /** 整型 */
@@ -100,10 +100,10 @@ public class GenConstants
     /** 浮点型 */
     public static final String TYPE_DOUBLE = "Double";
 
-    /** 高精度计算类型 */
+    /** 高精度计算類型 */
     public static final String TYPE_BIGDECIMAL = "BigDecimal";
 
-    /** 时间类型 */
+    /** 時間類型 */
     public static final String TYPE_DATE = "Date";
 
     /** 模糊查询 */

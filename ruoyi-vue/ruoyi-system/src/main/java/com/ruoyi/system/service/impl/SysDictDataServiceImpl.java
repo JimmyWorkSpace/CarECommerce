@@ -32,9 +32,9 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     }
 
     /**
-     * 根据字典类型和字典键值查询字典数据信息
+     * 根据字典類型和字典键值查询字典数据信息
      * 
-     * @param dictType 字典类型
+     * @param dictType 字典類型
      * @param dictValue 字典键值
      * @return 字典标签
      */
@@ -57,9 +57,9 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     }
 
     /**
-     * 批量删除字典数据信息
+     * 批量刪除字典数据信息
      * 
-     * @param dictCodes 需要删除的字典数据ID
+     * @param dictCodes 需要刪除的字典数据ID
      */
     @Override
     public void deleteDictDataByIds(Long[] dictCodes)

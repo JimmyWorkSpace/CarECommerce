@@ -49,15 +49,15 @@ public class CarRichContentServiceImpl implements ICarRichContentService
         Example example = new Example(CarRichContentEntity.class);
         Example.Criteria criteria = example.createCriteria();
         
-        // 未删除条件
+        // 未刪除条件
         criteria.andCondition("(delFlag = 0 or delFlag is null)");
         
-        // 标题模糊查询
+        // 標題模糊查询
         if (carRichContent.getTitle() != null && !carRichContent.getTitle().trim().isEmpty()) {
             criteria.andLike("title", "%" + carRichContent.getTitle() + "%");
         }
         
-        // 内容类型查询
+        // 内容類型查询
         if (carRichContent.getContentType() != null) {
             criteria.andEqualTo("contentType", carRichContent.getContentType());
         }
@@ -95,9 +95,9 @@ public class CarRichContentServiceImpl implements ICarRichContentService
     }
 
     /**
-     * 批量删除富文本内容
+     * 批量刪除富文本内容
      * 
-     * @param ids 需要删除的富文本内容主键
+     * @param ids 需要刪除的富文本内容主键
      * @return 结果
      */
     @Override
@@ -114,7 +114,7 @@ public class CarRichContentServiceImpl implements ICarRichContentService
     }
 
     /**
-     * 删除富文本内容信息
+     * 刪除富文本内容信息
      * 
      * @param id 富文本内容主键
      * @return 结果

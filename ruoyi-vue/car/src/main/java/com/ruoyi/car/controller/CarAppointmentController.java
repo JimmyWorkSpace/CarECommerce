@@ -93,7 +93,7 @@ public class CarAppointmentController extends BaseController
     }
 
     /**
-     * 删除预约看车
+     * 刪除预约看车
      */
     @PreAuthorize("@ss.hasPermi('car:appointment:remove')")
     @Log(title = "预约看车", businessType = BusinessType.DELETE)

@@ -58,7 +58,7 @@ public class CarAppointmentServiceImpl extends BaseServiceImpl  implements CarAp
         Example example = new Example(CarAppointmentEntity.class);
         Example.Criteria criteria = example.createCriteria();
         
-        // 只查询未删除的数据
+        // 只查询未刪除的数据
         criteria.andEqualTo("delFlag", Boolean.FALSE);
         
         // 根据预约人姓名模糊查询
@@ -66,12 +66,12 @@ public class CarAppointmentServiceImpl extends BaseServiceImpl  implements CarAp
             criteria.andLike("appointmentName", "%" + carAppointment.getAppointmentName() + "%");
         }
         
-        // 根据预约人电话模糊查询
+        // 根据预约人電話模糊查询
         if (carAppointment.getAppointmentPhone() != null && !carAppointment.getAppointmentPhone().trim().isEmpty()) {
             criteria.andLike("appointmentPhone", "%" + carAppointment.getAppointmentPhone() + "%");
         }
         
-        // 根据预约状态查询
+        // 根据预约狀態查询
         if (carAppointment.getAppointmentStatus() != null) {
             criteria.andEqualTo("appointmentStatus", carAppointment.getAppointmentStatus());
         }
@@ -86,14 +86,14 @@ public class CarAppointmentServiceImpl extends BaseServiceImpl  implements CarAp
             criteria.andEqualTo("carSaleId", carAppointment.getCarSaleId());
         }
         
-        // 按创建时间倒序排列
+        // 按建立時間倒序排列
         example.orderBy("createTime").desc();
         
         return carAppointmentMapper.selectByExample(example);
     }
 
     /**
-     * 查询预约看车列表（带车辆销售标题）
+     * 查询预约看车列表（带车辆销售標題）
      * 
      * @param carAppointment 预约看车
      * @return 预约看车
@@ -126,7 +126,7 @@ public class CarAppointmentServiceImpl extends BaseServiceImpl  implements CarAp
 //            }
 //        });
 //        
-//        // 设置车辆销售标题
+//        // 设置车辆销售標題
 //        appointmentList.forEach(appointment -> {
 //            appointment.setSaleTitle(saleTitleMap.get(appointment.getCarSaleId()));
 //        });
@@ -175,9 +175,9 @@ public class CarAppointmentServiceImpl extends BaseServiceImpl  implements CarAp
     }
 
     /**
-     * 批量删除预约看车
+     * 批量刪除预约看车
      * 
-     * @param ids 需要删除的预约看车主键
+     * @param ids 需要刪除的预约看车主键
      * @return 结果
      */
     @Override
@@ -195,7 +195,7 @@ public class CarAppointmentServiceImpl extends BaseServiceImpl  implements CarAp
     }
 
     /**
-     * 删除预约看车信息
+     * 刪除预约看车信息
      * 
      * @param id 预约看车主键
      * @return 结果

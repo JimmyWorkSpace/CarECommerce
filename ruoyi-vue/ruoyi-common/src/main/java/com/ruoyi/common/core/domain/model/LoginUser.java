@@ -8,7 +8,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.ruoyi.common.core.domain.entity.SysUser;
 
 /**
- * 登录用户身份权限
+ * 登入用户身份权限
  * 
  * @author ruoyi
  */
@@ -32,27 +32,27 @@ public class LoginUser implements UserDetails
     private String token;
 
     /**
-     * 登录时间
+     * 登入時間
      */
     private Long loginTime;
 
     /**
-     * 过期时间
+     * 过期時間
      */
     private Long expireTime;
 
     /**
-     * 登录IP地址
+     * 登入IP地址
      */
     private String ipaddr;
 
     /**
-     * 登录地点
+     * 登入地点
      */
     private String loginLocation;
 
     /**
-     * 浏览器类型
+     * 浏览器類型
      */
     private String browser;
 

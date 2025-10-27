@@ -14,7 +14,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.StringUtils;
 
 /**
- * 图片处理工具类
+ * 圖片处理工具类
  *
  * @author ruoyi
  */
@@ -31,7 +31,7 @@ public class ImageUtils
         }
         catch (Exception e)
         {
-            log.error("图片加载异常 {}", e);
+            log.error("圖片加载异常 {}", e);
             return null;
         }
         finally
@@ -50,7 +50,7 @@ public class ImageUtils
         }
         catch (Exception e)
         {
-            log.error("获取图片异常 {}", e);
+            log.error("获取圖片异常 {}", e);
         }
         return null;
     }

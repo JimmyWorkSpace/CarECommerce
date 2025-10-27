@@ -92,7 +92,7 @@ public class CarRichContentController extends BaseController
     }
 
     /**
-     * 删除富文本内容
+     * 刪除富文本内容
      */
     @PreAuthorize("@ss.hasPermi('car:richContent:remove')")
     @Log(title = "富文本内容", businessType = BusinessType.DELETE)

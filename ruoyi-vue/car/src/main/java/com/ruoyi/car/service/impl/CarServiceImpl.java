@@ -105,7 +105,7 @@ public class CarServiceImpl implements CarService {
 	@Override
 	public CarBaseInfoDto getBaseInfoByUidId(String uid) {
 		CarBaseInfoDto result = carMapper.selectCarBaseInfoByUid(uid);
-//		将图片地址替换为图片服务器地址，加上前缀
+//		将圖片地址替换为圖片服务器地址，加上前缀
 		result.setSaleDescription(imageService.replaceImagePrefixInHtml(result.getSaleDescription()));
 		return result;
 	}
@@ -147,7 +147,7 @@ public class CarServiceImpl implements CarService {
 				return images.stream().map(img -> imageService.replaceImagePrefix(dir + "/" + img)).collect(Collectors.toList());
 			}
 		} catch (Exception e) {
-			log.error("从ftp获取图片信息失败", e);
+			log.error("从ftp获取圖片信息失败", e);
 		}
 		return new ArrayList<>();
 	}
@@ -170,7 +170,7 @@ public class CarServiceImpl implements CarService {
 				}
 			}
 		} catch (Exception e) {
-			log.error("从ftp获取图片信息失败", e);
+			log.error("从ftp获取圖片信息失败", e);
 		}
 		return new ArrayList<>();
 	}

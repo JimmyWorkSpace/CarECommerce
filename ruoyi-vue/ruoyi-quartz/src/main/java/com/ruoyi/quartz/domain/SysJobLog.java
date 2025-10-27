@@ -16,11 +16,11 @@ public class SysJobLog extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** ID */
-    @Excel(name = "日志序号")
+    @Excel(name = "日志序號")
     private Long jobLogId;
 
-    /** 任务名称 */
-    @Excel(name = "任务名称")
+    /** 任务名稱 */
+    @Excel(name = "任务名稱")
     private String jobName;
 
     /** 任务组名 */
@@ -35,18 +35,18 @@ public class SysJobLog extends BaseEntity
     @Excel(name = "日志信息")
     private String jobMessage;
 
-    /** 执行状态（0正常 1失败） */
-    @Excel(name = "执行状态", readConverterExp = "0=正常,1=失败")
+    /** 执行狀態（0正常 1失败） */
+    @Excel(name = "执行狀態", readConverterExp = "0=正常,1=失败")
     private String status;
 
     /** 异常信息 */
     @Excel(name = "异常信息")
     private String exceptionInfo;
 
-    /** 开始时间 */
+    /** 开始時間 */
     private Date startTime;
 
-    /** 停止时间 */
+    /** 停止時間 */
     private Date stopTime;
 
     public Long getJobLogId()

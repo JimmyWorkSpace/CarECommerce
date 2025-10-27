@@ -11,17 +11,17 @@ import tk.mybatis.mapper.common.Mapper;
 public interface CarRecommandMapper extends Mapper<CarRecommandEntity> {
     
     /**
-     * 根据推荐类型和推荐ID查询推荐记录
+     * 根据推薦類型和推薦ID查询推薦记录
      */
     CarRecommandEntity selectByRecommandTypeAndId(@Param("recommandType") Integer recommandType, @Param("recommandId") Long recommandId);
     
     /**
-     * 根据推荐类型查询推荐列表
+     * 根据推薦類型查询推薦列表
      */
     List<CarRecommandEntity> selectByRecommandType(@Param("recommandType") Integer recommandType);
     
     /**
-     * 删除推荐记录
+     * 刪除推薦记录
      */
     int deleteByRecommandTypeAndId(@Param("recommandType") Integer recommandType, @Param("recommandId") Long recommandId);
 }

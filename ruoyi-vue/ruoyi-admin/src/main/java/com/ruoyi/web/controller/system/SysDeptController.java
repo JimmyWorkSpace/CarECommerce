@@ -68,7 +68,7 @@ public class SysDeptController extends BaseController
     }
 
     /**
-     * 根据部门编号获取详细信息
+     * 根据部门编號获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping(value = "/{deptId}")
@@ -111,7 +111,7 @@ public class SysDeptController extends BaseController
     {
         if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept)))
         {
-            return AjaxResult.error("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
+            return AjaxResult.error("新增部门'" + dept.getDeptName() + "'失败，部门名稱已存在");
         }
         dept.setCreateBy(getUsername());
         return toAjax(deptService.insertDept(dept));
@@ -129,7 +129,7 @@ public class SysDeptController extends BaseController
         deptService.checkDeptDataScope(deptId);
         if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept)))
         {
-            return AjaxResult.error("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
+            return AjaxResult.error("修改部门'" + dept.getDeptName() + "'失败，部门名稱已存在");
         }
         else if (dept.getParentId().equals(deptId))
         {
@@ -144,7 +144,7 @@ public class SysDeptController extends BaseController
     }
 
     /**
-     * 删除部门
+     * 刪除部门
      */
     @PreAuthorize("@ss.hasPermi('system:dept:remove')")
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
@@ -153,11 +153,11 @@ public class SysDeptController extends BaseController
     {
         if (deptService.hasChildByDeptId(deptId))
         {
-            return AjaxResult.error("存在下级部门,不允许删除");
+            return AjaxResult.error("存在下级部门,不允许刪除");
         }
         if (deptService.checkDeptExistUser(deptId))
         {
-            return AjaxResult.error("部门存在用户,不允许删除");
+            return AjaxResult.error("部门存在用户,不允许刪除");
         }
         deptService.checkDeptDataScope(deptId);
         return toAjax(deptService.deleteDeptById(deptId));

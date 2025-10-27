@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 
 import cc.carce.sale.entity.CarSmsLogEntity;
 import cc.carce.sale.mapper.manager.CarSmsLogMapper;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.RandomUtil;
 import lombok.Data;
@@ -46,9 +45,15 @@ public class SmsService {
 
     // 存储验证码的Map，key为手机号，value为验证码和过期时间
     private static final Map<String, SmsCode> SMS_CODE_MAP = new ConcurrentHashMap<>();
+    
+    // 存储发送时间的Map，key为手机号，value为发送时间戳
+    private static final Map<String, Long> SMS_SEND_TIME_MAP = new ConcurrentHashMap<>();
 
     // 验证码有效期（分钟）
     private static final int CODE_EXPIRE_MINUTES = 5;
+    
+    // 发送间隔时间（秒）
+    private static final int SEND_INTERVAL_SECONDS = 25;
 
     // 开发环境固定验证码
     private static final String DEV_FIXED_CODE = "123456";
@@ -86,6 +91,10 @@ public class SmsService {
 
         // 计算过期时间
         long expireTime = System.currentTimeMillis() + CODE_EXPIRE_MINUTES * 60 * 1000;
+        
+        // 记录发送时间
+        long currentTime = System.currentTimeMillis();
+        SMS_SEND_TIME_MAP.put(phoneNumber, currentTime);
 
         // 存储验证码
         SMS_CODE_MAP.put(phoneNumber, new SmsCode(code, expireTime));
@@ -159,20 +168,48 @@ public class SmsService {
     }
 
     /**
-     * 检查手机号是否已发送验证码且未过期
+     * 检查手机号是否可以重新发送验证码
      * 
      * @param phoneNumber 手机号
      * @return 是否可以重新发送
      */
     public boolean canResendCode(String phoneNumber) {
-        SmsCode smsCode = SMS_CODE_MAP.get(phoneNumber);
-        if (smsCode == null) {
-            return true;
+        Long lastSendTime = SMS_SEND_TIME_MAP.get(phoneNumber);
+        if (lastSendTime == null) {
+            return true; // 从未发送过，可以发送
         }
 
-        // 如果距离上次发送不足1分钟，则不能重新发送
-        long oneMinuteAgo = System.currentTimeMillis() - 60 * 1000;
-        return smsCode.getExpireTime() < oneMinuteAgo;
+        // 检查距离上次发送是否已超过25秒
+        long currentTime = System.currentTimeMillis();
+        long timeSinceLastSend = currentTime - lastSendTime;
+        
+        if (timeSinceLastSend < SEND_INTERVAL_SECONDS * 1000) {
+            log.info("手机号 {} 距离上次发送验证码不足 {} 秒，剩余 {} 秒", 
+                    phoneNumber, SEND_INTERVAL_SECONDS, 
+                    (SEND_INTERVAL_SECONDS * 1000 - timeSinceLastSend) / 1000);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * 获取手机号剩余等待时间（秒）
+     * 
+     * @param phoneNumber 手机号
+     * @return 剩余等待时间，如果为0表示可以发送
+     */
+    public int getRemainingWaitTime(String phoneNumber) {
+        Long lastSendTime = SMS_SEND_TIME_MAP.get(phoneNumber);
+        if (lastSendTime == null) {
+            return 0; // 从未发送过，可以发送
+        }
+
+        long currentTime = System.currentTimeMillis();
+        long timeSinceLastSend = currentTime - lastSendTime;
+        long remainingTime = SEND_INTERVAL_SECONDS * 1000 - timeSinceLastSend;
+        
+        return remainingTime > 0 ? (int) (remainingTime / 1000) : 0;
     }
 
     public SmsResponse sendSms(String mobile, String message) {

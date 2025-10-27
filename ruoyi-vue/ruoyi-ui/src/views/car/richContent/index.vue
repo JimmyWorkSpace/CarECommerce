@@ -1,17 +1,17 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="标题" prop="title">
+      <el-form-item label="標題" prop="title">
         <el-input
           v-model="queryParams.title"
-          placeholder="请输入标题"
+          placeholder="请输入標題"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <!-- <el-form-item label="内容类型" prop="contentType">
-        <el-select v-model="queryParams.contentType" placeholder="请选择内容类型" clearable size="small">
+      <!-- <el-form-item label="内容類型" prop="contentType">
+        <el-select v-model="queryParams.contentType" placeholder="请选择内容類型" clearable size="small">
           <el-option
             v-for="dict in contentTypeOptions"
             :key="dict.value"
@@ -21,8 +21,8 @@
         </el-select>
       </el-form-item> -->
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -89,7 +89,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['car:richContent:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -102,13 +102,13 @@
       :row-class-name="tableRowClassName">
       <el-table-column type="selection" width="55" align="center" />
       <!-- <el-table-column label="主键ID" align="center" prop="id" /> -->
-      <el-table-column label="标题" align="center" prop="title" />
-      <!-- <el-table-column label="内容类型" align="center" prop="contentType">
+      <el-table-column label="標題" align="center" prop="title" />
+      <!-- <el-table-column label="内容類型" align="center" prop="contentType">
         <template slot-scope="scope">
           <dict-tag :options="contentTypeOptions" :value="scope.row.contentType"/>
         </template>
       </el-table-column> -->
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="建立時間" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -128,7 +128,7 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['car:richContent:remove']"
-          >删除</el-button>
+          >刪除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -146,8 +146,8 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="标题" prop="title">
-              <el-input v-model="form.title" placeholder="请输入标题" />
+            <el-form-item label="標題" prop="title">
+              <el-input v-model="form.title" placeholder="请输入標題" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -184,14 +184,14 @@ export default {
       total: 0,
       // 富文本内容表格数据
       richContentList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 是否显示弹出层
       open: false,
-      // 内容类型字典
+      // 内容類型字典
       contentTypeOptions: [
         { label: "关于", value: 1 },
-        { label: "频道", value: 2 }
+        { label: "頻道", value: 2 }
       ],
       // 查询参数
       queryParams: {
@@ -205,7 +205,7 @@ export default {
       // 表单校验
       rules: {
         title: [
-          { required: true, message: "标题不能为空", trigger: "blur" }
+          { required: true, message: "標題不能为空", trigger: "blur" }
         ]
       },
       // 排序相关
@@ -260,14 +260,14 @@ export default {
         this.title = "修改富文本内容";
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除富文本内容编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认刪除富文本内容编號为"' + ids + '"的数据项？').then(function() {
         return delRichContent(ids);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("删除成功");
+        this.$modal.msgSuccess("刪除成功");
       }).catch(() => {});
     },
     // 取消按钮

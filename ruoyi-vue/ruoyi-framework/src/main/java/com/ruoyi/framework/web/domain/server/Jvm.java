@@ -77,7 +77,7 @@ public class Jvm
     }
 
     /**
-     * 获取JDK名称
+     * 获取JDK名稱
      */
     public String getName()
     {
@@ -105,7 +105,7 @@ public class Jvm
     }
 
     /**
-     * JDK启动时间
+     * JDK启动時間
      */
     public String getStartTime()
     {
@@ -113,7 +113,7 @@ public class Jvm
     }
 
     /**
-     * JDK运行时间
+     * JDK运行時間
      */
     public String getRunTime()
     {

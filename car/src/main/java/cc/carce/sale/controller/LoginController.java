@@ -3,10 +3,9 @@ package cc.carce.sale.controller;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.springframework.http.ResponseCookie;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -87,11 +86,16 @@ public class LoginController extends BaseController {
             sessionUser.setToken(token);
             session.setAttribute("user", sessionUser);
             
-            Cookie cookie = new Cookie("token", token);
-            cookie.setHttpOnly(true);   // 防止前端JS读取（安全）
-            cookie.setPath("/");        // 整个网站都有效
-            cookie.setMaxAge(60 * 60);  // 1小时有效
-            response.addCookie(cookie);
+            // 使用ResponseCookie支持SameSite和Secure属性
+            ResponseCookie cookie = ResponseCookie.from("token", token)
+                    .httpOnly(true)           // 防止前端JS读取（安全）
+                    .path("/")                // 整个网站都有效
+                    .maxAge(60 * 60)          // 1小时有效
+                    .sameSite("None")         // 允许跨站请求
+                    .secure(true)             // 需要HTTPS（SameSite=None必需）
+                    .build();
+            
+            response.addHeader("Set-Cookie", cookie.toString());
             
             redisTemplate.opsForValue().set("TOKEN:" + token, JSONUtil.toJsonStr(sessionUser), 1, TimeUnit.HOURS);
             log.info("用户登录成功: ID={}, 手机号={}", user.getId(), user.getPhoneNumber());
@@ -158,11 +162,15 @@ public class LoginController extends BaseController {
         session.removeAttribute("user");
         
         // 清除Cookie中的token
-        Cookie tokenCookie = new Cookie("token", null);
-        tokenCookie.setPath("/");
-        tokenCookie.setMaxAge(0);  // 设置为0立即删除
-        tokenCookie.setHttpOnly(true);
-        response.addCookie(tokenCookie);
+        ResponseCookie tokenCookie = ResponseCookie.from("token", "")
+                .path("/")
+                .maxAge(0)              // 设置为0立即删除
+                .httpOnly(true)
+                .sameSite("None")       // 保持与设置时一致
+                .secure(true)           // 保持与设置时一致
+                .build();
+        
+        response.addHeader("Set-Cookie", tokenCookie.toString());
         
         log.info("用户登出成功");
         

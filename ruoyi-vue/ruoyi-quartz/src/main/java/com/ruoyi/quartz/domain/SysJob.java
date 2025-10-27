@@ -23,11 +23,11 @@ public class SysJob extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 任务ID */
-    @Excel(name = "任务序号", cellType = ColumnType.NUMERIC)
+    @Excel(name = "任务序號", cellType = ColumnType.NUMERIC)
     private Long jobId;
 
-    /** 任务名称 */
-    @Excel(name = "任务名称")
+    /** 任务名稱 */
+    @Excel(name = "任务名稱")
     private String jobName;
 
     /** 任务组名 */
@@ -50,8 +50,8 @@ public class SysJob extends BaseEntity
     @Excel(name = "并发执行", readConverterExp = "0=允许,1=禁止")
     private String concurrent;
 
-    /** 任务状态（0正常 1暂停） */
-    @Excel(name = "任务状态", readConverterExp = "0=正常,1=暂停")
+    /** 任务狀態（0正常 1暂停） */
+    @Excel(name = "任务狀態", readConverterExp = "0=正常,1=暂停")
     private String status;
 
     public Long getJobId()
@@ -64,8 +64,8 @@ public class SysJob extends BaseEntity
         this.jobId = jobId;
     }
 
-    @NotBlank(message = "任务名称不能为空")
-    @Size(min = 0, max = 64, message = "任务名称不能超过64个字符")
+    @NotBlank(message = "任务名稱不能为空")
+    @Size(min = 0, max = 64, message = "任务名稱不能超过64个字符")
     public String getJobName()
     {
         return jobName;

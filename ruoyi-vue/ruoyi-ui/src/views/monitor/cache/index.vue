@@ -18,7 +18,7 @@
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="cache.info">{{ cache.info.connected_clients }}</div></td>
                 </tr>
                 <tr>
-                  <td class="el-table__cell is-leaf"><div class="cell">运行时间(天)</div></td>
+                  <td class="el-table__cell is-leaf"><div class="cell">运行時間(天)</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="cache.info">{{ cache.info.uptime_in_days }}</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell">使用内存</div></td>
                   <td class="el-table__cell is-leaf"><div class="cell" v-if="cache.info">{{ cache.info.used_memory_human }}</div></td>

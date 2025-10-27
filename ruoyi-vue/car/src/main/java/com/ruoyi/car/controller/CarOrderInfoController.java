@@ -22,7 +22,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 订单信息Controller
+ * 訂單信息Controller
  * 
  * @author ruoyi
  * @date 2024-01-01
@@ -35,7 +35,7 @@ public class CarOrderInfoController extends BaseController
     private ICarOrderInfoService carOrderInfoService;
 
     /**
-     * 查询订单信息列表
+     * 查询訂單信息列表
      */
     @PreAuthorize("@ss.hasPermi('car:orderInfo:list')")
     @GetMapping("/list")
@@ -47,20 +47,20 @@ public class CarOrderInfoController extends BaseController
     }
 
     /**
-     * 导出订单信息列表
+     * 导出訂單信息列表
      */
     @PreAuthorize("@ss.hasPermi('car:orderInfo:export')")
-    @Log(title = "订单信息", businessType = BusinessType.EXPORT)
+    @Log(title = "訂單信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CarOrderInfoEntity carOrderInfo)
     {
         List<CarOrderInfoEntity> list = carOrderInfoService.selectCarOrderInfoList(carOrderInfo);
         ExcelUtil<CarOrderInfoEntity> util = new ExcelUtil<CarOrderInfoEntity>(CarOrderInfoEntity.class);
-        util.exportExcel(response, list, "订单信息数据");
+        util.exportExcel(response, list, "訂單信息数据");
     }
 
     /**
-     * 获取订单信息详细信息
+     * 获取訂單信息详细信息
      */
     @PreAuthorize("@ss.hasPermi('car:orderInfo:query')")
     @GetMapping(value = "/{id}")
@@ -70,10 +70,10 @@ public class CarOrderInfoController extends BaseController
     }
 
     /**
-     * 新增订单信息
+     * 新增訂單信息
      */
     @PreAuthorize("@ss.hasPermi('car:orderInfo:add')")
-    @Log(title = "订单信息", businessType = BusinessType.INSERT)
+    @Log(title = "訂單信息", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody CarOrderInfoEntity carOrderInfo)
     {
@@ -81,10 +81,10 @@ public class CarOrderInfoController extends BaseController
     }
 
     /**
-     * 修改订单信息
+     * 修改訂單信息
      */
     @PreAuthorize("@ss.hasPermi('car:orderInfo:edit')")
-    @Log(title = "订单信息", businessType = BusinessType.UPDATE)
+    @Log(title = "訂單信息", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody CarOrderInfoEntity carOrderInfo)
     {
@@ -92,10 +92,10 @@ public class CarOrderInfoController extends BaseController
     }
 
     /**
-     * 删除订单信息
+     * 刪除訂單信息
      */
     @PreAuthorize("@ss.hasPermi('car:orderInfo:remove')")
-    @Log(title = "订单信息", businessType = BusinessType.DELETE)
+    @Log(title = "訂單信息", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {

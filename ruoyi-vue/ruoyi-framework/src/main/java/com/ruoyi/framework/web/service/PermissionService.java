@@ -116,7 +116,7 @@ public class PermissionService
     /**
      * 验证用户是否不具备某角色，与 isRole逻辑相反。
      *
-     * @param role 角色名称
+     * @param role 角色名稱
      * @return 用户是否不具备某角色
      */
     public boolean lacksRole(String role)

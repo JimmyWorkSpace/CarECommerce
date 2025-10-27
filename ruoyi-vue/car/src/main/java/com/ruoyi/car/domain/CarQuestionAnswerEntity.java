@@ -26,15 +26,15 @@ public class CarQuestionAnswerEntity {
     private Long id;
     
     /**
-     * 频道ID
+     * 頻道ID
      */
-    @Column(name = "channelId", nullable = false, columnDefinition = "BIGINT(20) COMMENT '频道ID'")
+    @Column(name = "channelId", nullable = false, columnDefinition = "BIGINT(20) COMMENT '頻道ID'")
     private Long channelId;
     
     /**
-     * 问题
+     * 問題
      */
-    @Column(name = "question", columnDefinition = "VARCHAR(2000) COMMENT '问题'")
+    @Column(name = "question", columnDefinition = "VARCHAR(2000) COMMENT '問題'")
     private String question;
     
     /**
@@ -50,14 +50,14 @@ public class CarQuestionAnswerEntity {
     private Integer showOrder;
     
     /**
-     * 删除标记 1 是 0 否
+     * 刪除标记 1 是 0 否
      */
-    @Column(name = "delFlag", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0 COMMENT '删除标记 1 是 0 否'")
+    @Column(name = "delFlag", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0 COMMENT '刪除标记 1 是 0 否'")
     private Boolean delFlag;
     
     /**
-     * 创建时间
+     * 建立時間
      */
-    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '创建时间'")
+    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '建立時間'")
     private LocalDateTime createTime;
 }

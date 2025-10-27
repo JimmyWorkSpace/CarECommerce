@@ -44,15 +44,15 @@ public interface ICarRichContentService
     public int updateCarRichContent(CarRichContentEntity carRichContent);
 
     /**
-     * 批量删除富文本内容
+     * 批量刪除富文本内容
      * 
-     * @param ids 需要删除的富文本内容主键集合
+     * @param ids 需要刪除的富文本内容主键集合
      * @return 结果
      */
     public int deleteCarRichContentByIds(Long[] ids);
 
     /**
-     * 删除富文本内容信息
+     * 刪除富文本内容信息
      * 
      * @param id 富文本内容主键
      * @return 结果

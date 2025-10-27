@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="公告标题" prop="noticeTitle">
+      <el-form-item label="公告標題" prop="noticeTitle">
         <el-input
           v-model="queryParams.noticeTitle"
-          placeholder="请输入公告标题"
+          placeholder="请输入公告標題"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -19,8 +19,8 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="类型" prop="noticeType">
-        <el-select v-model="queryParams.noticeType" placeholder="公告类型" clearable size="small">
+      <el-form-item label="類型" prop="noticeType">
+        <el-select v-model="queryParams.noticeType" placeholder="公告類型" clearable size="small">
           <el-option
             v-for="dict in dict.type.sys_notice_type"
             :key="dict.value"
@@ -30,8 +30,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -66,32 +66,32 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['system:notice:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="noticeList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="序号" align="center" prop="noticeId" width="100" />
+      <el-table-column label="序號" align="center" prop="noticeId" width="100" />
       <el-table-column
-        label="公告标题"
+        label="公告標題"
         align="center"
         prop="noticeTitle"
         :show-overflow-tooltip="true"
       />
-      <el-table-column label="公告类型" align="center" prop="noticeType" width="100">
+      <el-table-column label="公告類型" align="center" prop="noticeType" width="100">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_notice_type" :value="scope.row.noticeType"/>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status" width="100">
+      <el-table-column label="狀態" align="center" prop="status" width="100">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_notice_status" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="创建者" align="center" prop="createBy" width="100" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="100">
+      <el-table-column label="建立時間" align="center" prop="createTime" width="100">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
@@ -111,7 +111,7 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:notice:remove']"
-          >删除</el-button>
+          >刪除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -129,13 +129,13 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="公告标题" prop="noticeTitle">
-              <el-input v-model="form.noticeTitle" placeholder="请输入公告标题" />
+            <el-form-item label="公告標題" prop="noticeTitle">
+              <el-input v-model="form.noticeTitle" placeholder="请输入公告標題" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="公告类型" prop="noticeType">
-              <el-select v-model="form.noticeType" placeholder="请选择公告类型">
+            <el-form-item label="公告類型" prop="noticeType">
+              <el-select v-model="form.noticeType" placeholder="请选择公告類型">
                 <el-option
                   v-for="dict in dict.type.sys_notice_type"
                   :key="dict.value"
@@ -146,7 +146,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="状态">
+            <el-form-item label="狀態">
               <el-radio-group v-model="form.status">
                 <el-radio
                   v-for="dict in dict.type.sys_notice_status"
@@ -193,7 +193,7 @@ export default {
       total: 0,
       // 公告表格数据
       noticeList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 是否显示弹出层
       open: false,
@@ -210,10 +210,10 @@ export default {
       // 表单校验
       rules: {
         noticeTitle: [
-          { required: true, message: "公告标题不能为空", trigger: "blur" }
+          { required: true, message: "公告標題不能为空", trigger: "blur" }
         ],
         noticeType: [
-          { required: true, message: "公告类型不能为空", trigger: "change" }
+          { required: true, message: "公告類型不能为空", trigger: "change" }
         ]
       }
     };
@@ -299,14 +299,14 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const noticeIds = row.noticeId || this.ids
-      this.$modal.confirm('是否确认删除公告编号为"' + noticeIds + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认刪除公告编號为"' + noticeIds + '"的数据项？').then(function() {
         return delNotice(noticeIds);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("删除成功");
+        this.$modal.msgSuccess("刪除成功");
       }).catch(() => {});
     }
   }

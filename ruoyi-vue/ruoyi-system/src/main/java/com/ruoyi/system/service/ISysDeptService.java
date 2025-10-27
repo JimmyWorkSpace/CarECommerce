@@ -52,7 +52,7 @@ public interface ISysDeptService
     public SysDept selectDeptById(Long deptId);
 
     /**
-     * 根据ID查询所有子部门（正常状态）
+     * 根据ID查询所有子部门（正常狀態）
      * 
      * @param deptId 部门ID
      * @return 子部门数
@@ -76,7 +76,7 @@ public interface ISysDeptService
     public boolean checkDeptExistUser(Long deptId);
 
     /**
-     * 校验部门名称是否唯一
+     * 校验部门名稱是否唯一
      * 
      * @param dept 部门信息
      * @return 结果
@@ -107,7 +107,7 @@ public interface ISysDeptService
     public int updateDept(SysDept dept);
 
     /**
-     * 删除部门管理信息
+     * 刪除部门管理信息
      * 
      * @param deptId 部门ID
      * @return 结果

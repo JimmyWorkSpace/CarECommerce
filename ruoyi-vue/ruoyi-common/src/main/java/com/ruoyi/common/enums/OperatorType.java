@@ -18,7 +18,7 @@ public enum OperatorType
     MANAGE,
 
     /**
-     * 手机端用户
+     * 手機端用户
      */
     MOBILE
 }

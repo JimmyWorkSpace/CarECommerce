@@ -12,7 +12,7 @@ import com.ruoyi.system.domain.SysUserRole;
 public interface SysUserRoleMapper
 {
     /**
-     * 通过用户ID删除用户和角色关联
+     * 通过用户ID刪除用户和角色关联
      * 
      * @param userId 用户ID
      * @return 结果
@@ -20,9 +20,9 @@ public interface SysUserRoleMapper
     public int deleteUserRoleByUserId(Long userId);
 
     /**
-     * 批量删除用户和角色关联
+     * 批量刪除用户和角色关联
      * 
-     * @param ids 需要删除的数据ID
+     * @param ids 需要刪除的数据ID
      * @return 结果
      */
     public int deleteUserRole(Long[] ids);
@@ -44,7 +44,7 @@ public interface SysUserRoleMapper
     public int batchUserRole(List<SysUserRole> userRoleList);
 
     /**
-     * 删除用户和角色关联信息
+     * 刪除用户和角色关联信息
      * 
      * @param userRole 用户和角色关联信息
      * @return 结果
@@ -55,7 +55,7 @@ public interface SysUserRoleMapper
      * 批量取消授权用户角色
      * 
      * @param roleId 角色ID
-     * @param userIds 需要删除的用户数据ID
+     * @param userIds 需要刪除的用户数据ID
      * @return 结果
      */
     public int deleteUserRoleInfos(@Param("roleId") Long roleId, @Param("userIds") Long[] userIds);

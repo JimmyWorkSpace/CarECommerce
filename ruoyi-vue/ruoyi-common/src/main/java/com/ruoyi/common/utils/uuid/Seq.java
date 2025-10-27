@@ -9,10 +9,10 @@ import com.ruoyi.common.utils.StringUtils;
  */
 public class Seq
 {
-    // 通用序列类型
+    // 通用序列類型
     public static final String commSeqType = "COMMON";
 
-    // 上传序列类型
+    // 上传序列類型
     public static final String uploadSeqType = "UPLOAD";
 
     // 通用接口序列数
@@ -25,7 +25,7 @@ public class Seq
     private static String machineCode = "A";
 
     /**
-     * 获取通用序列号
+     * 获取通用序列號
      * 
      * @return 序列值
      */
@@ -35,7 +35,7 @@ public class Seq
     }
     
     /**
-     * 默认16位序列号 yyMMddHHmmss + 一位机器标识 + 3长度循环递增字符串
+     * 默认16位序列號 yyMMddHHmmss + 一位机器标识 + 3长度循环递增字符串
      * 
      * @return 序列值
      */
@@ -50,7 +50,7 @@ public class Seq
     }
 
     /**
-     * 通用接口序列号 yyMMddHHmmss + 一位机器标识 + length长度循环递增字符串
+     * 通用接口序列號 yyMMddHHmmss + 一位机器标识 + length长度循环递增字符串
      * 
      * @param atomicInt 序列数
      * @param length 数值长度

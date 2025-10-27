@@ -10,10 +10,10 @@ public interface CarDealerService {
 	CarDealerInfoDto getInfoByUid(String uid);
 	
 	/**
-	 * 查询经销商列表
+	 * 查询經銷商列表
 	 * 
-	 * @param carDealer 经销商信息
-	 * @return 经销商集合
+	 * @param carDealer 經銷商信息
+	 * @return 經銷商集合
 	 */
 	List<CarDealerEntity> selectCarDealerList(CarDealerEntity carDealer);
 }

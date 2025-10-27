@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-      <el-form-item label="角色名称" prop="roleName">
+      <el-form-item label="角色名稱" prop="roleName">
         <el-input
           v-model="queryParams.roleName"
-          placeholder="请输入角色名称"
+          placeholder="请输入角色名稱"
           clearable
           size="small"
           style="width: 240px"
@@ -21,10 +21,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
+      <el-form-item label="狀態" prop="status">
         <el-select
           v-model="queryParams.status"
-          placeholder="角色状态"
+          placeholder="角色狀態"
           clearable
           size="small"
           style="width: 240px"
@@ -37,7 +37,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
+      <el-form-item label="建立時間">
         <el-date-picker
           v-model="dateRange"
           size="small"
@@ -50,8 +50,8 @@
         ></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -86,7 +86,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['system:role:remove']"
-        >删除</el-button>
+        >刪除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -103,11 +103,11 @@
 
     <el-table v-loading="loading" :data="roleList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="角色编号" prop="roleId" width="120" />
-      <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" width="150" />
+      <el-table-column label="角色编號" prop="roleId" width="120" />
+      <el-table-column label="角色名稱" prop="roleName" :show-overflow-tooltip="true" width="150" />
       <el-table-column label="权限字符" prop="roleKey" :show-overflow-tooltip="true" width="150" />
       <el-table-column label="显示顺序" prop="roleSort" width="100" />
-      <el-table-column label="状态" align="center" width="100">
+      <el-table-column label="狀態" align="center" width="100">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -117,7 +117,7 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="建立時間" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
@@ -137,7 +137,7 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:role:remove']"
-          >删除</el-button>
+          >刪除</el-button>
           <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['system:role:edit']">
             <span class="el-dropdown-link">
               <i class="el-icon-d-arrow-right el-icon--right"></i>更多
@@ -164,8 +164,8 @@
     <!-- 添加或修改角色配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="form.roleName" placeholder="请输入角色名称" />
+        <el-form-item label="角色名稱" prop="roleName">
+          <el-input v-model="form.roleName" placeholder="请输入角色名稱" />
         </el-form-item>
         <el-form-item prop="roleKey">
           <span slot="label">
@@ -179,7 +179,7 @@
         <el-form-item label="角色顺序" prop="roleSort">
           <el-input-number v-model="form.roleSort" controls-position="right" :min="0" />
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="狀態">
           <el-radio-group v-model="form.status">
             <el-radio
               v-for="dict in dict.type.sys_normal_disable"
@@ -216,7 +216,7 @@
     <!-- 分配角色数据权限对话框 -->
     <el-dialog :title="title" :visible.sync="openDataScope" width="500px" append-to-body>
       <el-form :model="form" label-width="80px">
-        <el-form-item label="角色名称">
+        <el-form-item label="角色名稱">
           <el-input v-model="form.roleName" :disabled="true" />
         </el-form-item>
         <el-form-item label="权限字符">
@@ -281,7 +281,7 @@ export default {
       total: 0,
       // 角色表格数据
       roleList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: "",
       // 是否显示弹出层
       open: false,
@@ -337,7 +337,7 @@ export default {
       // 表单校验
       rules: {
         roleName: [
-          { required: true, message: "角色名称不能为空", trigger: "blur" }
+          { required: true, message: "角色名稱不能为空", trigger: "blur" }
         ],
         roleKey: [
           { required: true, message: "权限字符不能为空", trigger: "blur" }
@@ -406,7 +406,7 @@ export default {
         return response;
       });
     },
-    // 角色状态修改
+    // 角色狀態修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
       this.$modal.confirm('确认要"' + text + '""' + row.roleName + '"角色吗？').then(function() {
@@ -597,14 +597,14 @@ export default {
         });
       }
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const roleIds = row.roleId || this.ids;
-      this.$modal.confirm('是否确认删除角色编号为"' + roleIds + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认刪除角色编號为"' + roleIds + '"的数据项？').then(function() {
         return delRole(roleIds);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("删除成功");
+        this.$modal.msgSuccess("刪除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */

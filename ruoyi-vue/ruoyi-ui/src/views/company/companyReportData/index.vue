@@ -12,8 +12,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
       </el-form-item>
     </el-form>
 
@@ -25,7 +25,7 @@
         <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate" v-hasPermi="['company:companyReportData:edit']">修改</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete" v-hasPermi="['company:companyReportData:remove']">删除</el-button>
+        <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete" v-hasPermi="['company:companyReportData:remove']">刪除</el-button>
       </el-col>
       <!-- <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" v-hasPermi="['company:companyReportData:export']">导出</el-button>
@@ -38,7 +38,7 @@
 
     <el-table v-loading="loading" :data="companyReportDataList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" prop="id" />
-      <el-table-column label="公司名称" align="left" width="250" prop="companyName" />
+      <el-table-column label="公司名稱" align="left" width="250" prop="companyName" />
       <el-table-column label="年份" align="center" prop="year" width="120" :formatter="yearFormatter" />
       <el-table-column label="职工队伍结构" align="center">
         <el-table-column label="职工总数" align="center" prop="zgzs" />
@@ -66,7 +66,7 @@
       <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['company:companyReportData:edit']">修改</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['company:companyReportData:remove']">删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['company:companyReportData:remove']">刪除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -292,7 +292,7 @@ export default {
       total: 0,
       // 公司月报详细表格数据
       companyReportDataList: [],
-      // 弹出层标题
+      // 弹出层標題
       title: '',
       // 是否显示弹出层
       open: false,
@@ -479,11 +479,11 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
+    /** 刪除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$confirm(
-        '是否确认删除公司月报详细编号为"' + ids + '"的数据项?',
+        '是否确认刪除公司月报详细编號为"' + ids + '"的数据项?',
         '警告',
         {
           confirmButtonText: '确定',
@@ -496,7 +496,7 @@ export default {
         })
         .then(() => {
           this.getList();
-          this.$modal.msgSuccess('删除成功');
+          this.$modal.msgSuccess('刪除成功');
         });
     },
     exportModal() {

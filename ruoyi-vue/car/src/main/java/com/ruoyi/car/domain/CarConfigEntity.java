@@ -23,15 +23,15 @@ public class CarConfigEntity {
     @Column(name = "value", nullable = false, columnDefinition = "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置值'")
     private String value;
 
-    @Column(name = "name", nullable = false, columnDefinition = "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置名称'")
+    @Column(name = "name", nullable = false, columnDefinition = "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置名稱'")
     private String name;
 
     @Column(name = "showOrder", columnDefinition = "INT(11) DEFAULT 0 COMMENT '显示顺序'")
     private Integer showOrder;
 
-    @Column(name = "delFlag", columnDefinition = "INT(11) DEFAULT 0 COMMENT '删除标记 1 是 0 否'")
+    @Column(name = "delFlag", columnDefinition = "INT(11) DEFAULT 0 COMMENT '刪除标记 1 是 0 否'")
     private Integer delFlag;
 
-    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '创建时间'")
+    @Column(name = "createTime", columnDefinition = "DATETIME COMMENT '建立時間'")
     private Date createTime;
 }

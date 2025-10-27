@@ -127,7 +127,7 @@ public class GenController extends BaseController
     }
 
     /**
-     * 删除代码生成
+     * 刪除代码生成
      */
     @PreAuthorize("@ss.hasPermi('tool:gen:remove')")
     @Log(title = "代码生成", businessType = BusinessType.DELETE)

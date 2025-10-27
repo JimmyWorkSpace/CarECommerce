@@ -21,7 +21,7 @@ public class GenTableColumnServiceImpl implements IGenTableColumnService
 	/**
      * 查询业务字段列表
      * 
-     * @param tableId 业务字段编号
+     * @param tableId 业务字段编號
      * @return 业务字段集合
      */
 	@Override
@@ -55,9 +55,9 @@ public class GenTableColumnServiceImpl implements IGenTableColumnService
 	}
 
 	/**
-     * 删除业务字段对象
+     * 刪除业务字段对象
      * 
-     * @param ids 需要删除的数据ID
+     * @param ids 需要刪除的数据ID
      * @return 结果
      */
 	@Override

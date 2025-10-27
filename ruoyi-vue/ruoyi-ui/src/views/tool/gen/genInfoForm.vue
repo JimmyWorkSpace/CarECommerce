@@ -5,9 +5,9 @@
         <el-form-item prop="tplCategory">
           <span slot="label">生成模板</span>
           <el-select v-model="info.tplCategory" @change="tplSelectChange">
-            <el-option label="单表（增删改查）" value="crud" />
-            <el-option label="树表（增删改查）" value="tree" />
-            <el-option label="主子表（增删改查）" value="sub" />
+            <el-option label="单表（增刪改查）" value="crud" />
+            <el-option label="树表（增刪改查）" value="tree" />
+            <el-option label="主子表（增刪改查）" value="sub" />
           </el-select>
         </el-form-item>
       </el-col>
@@ -155,8 +155,8 @@
       <el-col :span="12">
         <el-form-item>
           <span slot="label">
-            树名称字段
-            <el-tooltip content="树节点的显示名称字段名， 如：dept_name" placement="top">
+            树名稱字段
+            <el-tooltip content="树节点的显示名稱字段名， 如：dept_name" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
           </span>

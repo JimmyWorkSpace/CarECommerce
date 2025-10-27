@@ -30,7 +30,7 @@ public interface IGenTableService
     /**
      * 查询据库列表
      * 
-     * @param tableNames 表名称组
+     * @param tableNames 表名稱组
      * @return 数据库表集合
      */
     public List<GenTable> selectDbTableListByNames(String[] tableNames);
@@ -59,9 +59,9 @@ public interface IGenTableService
     public void updateGenTable(GenTable genTable);
 
     /**
-     * 删除业务信息
+     * 刪除业务信息
      * 
-     * @param tableIds 需要删除的表数据ID
+     * @param tableIds 需要刪除的表数据ID
      * @return 结果
      */
     public void deleteGenTableByIds(Long[] tableIds);
@@ -76,7 +76,7 @@ public interface IGenTableService
     /**
      * 预览代码
      * 
-     * @param tableId 表编号
+     * @param tableId 表编號
      * @return 预览数据列表
      */
     public Map<String, String> previewCode(Long tableId);
@@ -84,7 +84,7 @@ public interface IGenTableService
     /**
      * 生成代码（下载方式）
      * 
-     * @param tableName 表名称
+     * @param tableName 表名稱
      * @return 数据
      */
     public byte[] downloadCode(String tableName);
@@ -92,7 +92,7 @@ public interface IGenTableService
     /**
      * 生成代码（自定义路径）
      * 
-     * @param tableName 表名称
+     * @param tableName 表名稱
      * @return 数据
      */
     public void generatorCode(String tableName);
@@ -100,7 +100,7 @@ public interface IGenTableService
     /**
      * 同步数据库
      * 
-     * @param tableName 表名称
+     * @param tableName 表名稱
      */
     public void synchDb(String tableName);
 

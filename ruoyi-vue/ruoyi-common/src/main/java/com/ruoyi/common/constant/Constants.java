@@ -40,7 +40,7 @@ public class Constants
     public static final String FAIL = "1";
 
     /**
-     * 登录成功
+     * 登入成功
      */
     public static final String LOGIN_SUCCESS = "Success";
 
@@ -50,12 +50,12 @@ public class Constants
     public static final String LOGOUT = "Logout";
 
     /**
-     * 注册
+     * 註冊
      */
     public static final String REGISTER = "Register";
 
     /**
-     * 登录失败
+     * 登入失败
      */
     public static final String LOGIN_FAIL = "Error";
 
@@ -65,7 +65,7 @@ public class Constants
     public static final String CAPTCHA_CODE_KEY = "captcha_codes:";
 
     /**
-     * 登录用户 redis key
+     * 登入用户 redis key
      */
     public static final String LOGIN_TOKEN_KEY = "login_tokens:";
 
@@ -105,7 +105,7 @@ public class Constants
     public static final String JWT_USERID = "userid";
 
     /**
-     * 用户名称
+     * 用户名稱
      */
     public static final String JWT_USERNAME = Claims.SUBJECT;
 
@@ -115,7 +115,7 @@ public class Constants
     public static final String JWT_AVATAR = "avatar";
 
     /**
-     * 创建时间
+     * 建立時間
      */
     public static final String JWT_CREATED = "created";
 

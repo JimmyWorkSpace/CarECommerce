@@ -3,6 +3,7 @@ import Vue from 'vue'
 import Cookies from 'js-cookie'
 
 import Element from 'element-ui'
+import locale from 'element-ui/lib/locale/lang/zh-TW' // 繁体中文语言包
 import './assets/styles/element-variables.scss'
 
 import '@/assets/styles/index.scss' // global css
@@ -68,7 +69,7 @@ Vue.component('FileUpload', FileUpload)
 Vue.component('ImageUpload', ImageUpload)
 Vue.component('ImagePreview', ImagePreview)
 
-Vue.use(Element, { size: 'small', zIndex: 3000 });
+Vue.use(Element, { locale, size: 'small', zIndex: 3000 });
 Vue.use(directive)
 Vue.use(plugins)
 Vue.use(VueMeta)
@@ -84,6 +85,7 @@ DictData.install()
  */
 
 Vue.use(Element, {
+  locale,
   size: Cookies.get('size') || 'small' // set element-ui default size
 })
 

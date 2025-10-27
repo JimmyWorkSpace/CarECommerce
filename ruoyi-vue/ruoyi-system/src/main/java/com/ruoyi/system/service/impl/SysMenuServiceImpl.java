@@ -103,7 +103,7 @@ public class SysMenuServiceImpl implements ISysMenuService
     /**
      * 根据用户ID查询菜单
      * 
-     * @param userId 用户名称
+     * @param userId 用户名稱
      * @return 菜单列表
      */
     @Override
@@ -300,7 +300,7 @@ public class SysMenuServiceImpl implements ISysMenuService
     }
 
     /**
-     * 删除菜单管理信息
+     * 刪除菜单管理信息
      * 
      * @param menuId 菜单ID
      * @return 结果
@@ -312,7 +312,7 @@ public class SysMenuServiceImpl implements ISysMenuService
     }
 
     /**
-     * 校验菜单名称是否唯一
+     * 校验菜单名稱是否唯一
      * 
      * @param menu 菜单信息
      * @return 结果
@@ -330,15 +330,15 @@ public class SysMenuServiceImpl implements ISysMenuService
     }
 
     /**
-     * 获取路由名称
+     * 获取路由名稱
      * 
      * @param menu 菜单信息
-     * @return 路由名称
+     * @return 路由名稱
      */
     public String getRouteName(SysMenu menu)
     {
         String routerName = StringUtils.capitalize(menu.getPath());
-        // 非外链并且是一级目录（类型为目录）
+        // 非外链并且是一级目录（類型为目录）
         if (isMenuFrame(menu))
         {
             routerName = StringUtils.EMPTY;
@@ -360,13 +360,13 @@ public class SysMenuServiceImpl implements ISysMenuService
         {
             routerPath = innerLinkReplaceEach(routerPath);
         }
-        // 非外链并且是一级目录（类型为目录）
+        // 非外链并且是一级目录（類型为目录）
         if (0 == menu.getParentId().intValue() && UserConstants.TYPE_DIR.equals(menu.getMenuType())
                 && UserConstants.NO_FRAME.equals(menu.getIsFrame()))
         {
             routerPath = "/" + menu.getPath();
         }
-        // 非外链并且是一级目录（类型为菜单）
+        // 非外链并且是一级目录（類型为菜单）
         else if (isMenuFrame(menu))
         {
             routerPath = "/";

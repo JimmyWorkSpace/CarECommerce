@@ -60,7 +60,7 @@ public interface ISysRoleService
     public SysRole selectRoleById(Long roleId);
 
     /**
-     * 校验角色名称是否唯一
+     * 校验角色名稱是否唯一
      * 
      * @param role 角色信息
      * @return 结果
@@ -114,7 +114,7 @@ public interface ISysRoleService
     public int updateRole(SysRole role);
 
     /**
-     * 修改角色状态
+     * 修改角色狀態
      * 
      * @param role 角色信息
      * @return 结果
@@ -130,7 +130,7 @@ public interface ISysRoleService
     public int authDataScope(SysRole role);
 
     /**
-     * 通过角色ID删除角色
+     * 通过角色ID刪除角色
      * 
      * @param roleId 角色ID
      * @return 结果
@@ -138,9 +138,9 @@ public interface ISysRoleService
     public int deleteRoleById(Long roleId);
 
     /**
-     * 批量删除角色信息
+     * 批量刪除角色信息
      * 
-     * @param roleIds 需要删除的角色ID
+     * @param roleIds 需要刪除的角色ID
      * @return 结果
      */
     public int deleteRoleByIds(Long[] roleIds);
@@ -166,7 +166,7 @@ public interface ISysRoleService
      * 批量选择授权用户角色
      * 
      * @param roleId 角色ID
-     * @param userIds 需要删除的用户数据ID
+     * @param userIds 需要刪除的用户数据ID
      * @return 结果
      */
     public int insertAuthUsers(Long roleId, Long[] userIds);

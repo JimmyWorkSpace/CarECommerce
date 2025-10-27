@@ -40,7 +40,7 @@ public class CarDealerRecommendController extends BaseController {
     private ICarRecommandService carRecommandService;
 
     /**
-     * 查询经销商列表（用于精选卖家管理）
+     * 查询經銷商列表（用于精选卖家管理）
      */
     @PreAuthorize("@ss.hasPermi('car:dealerRecommend:list')")
     @GetMapping("/list")
@@ -49,11 +49,11 @@ public class CarDealerRecommendController extends BaseController {
         startPage();
         List<CarDealerEntity> list = carDealerService.selectCarDealerList(carDealer);
 
-        // 为每个经销商记录添加推荐状态
+        // 为每个經銷商记录添加推薦狀態
         for (CarDealerEntity dealer : list) {
             CarDealerRecommandListDto dto = new CarDealerRecommandListDto();
             BeanUtil.copyProperties(dealer, dto);
-            // 检查是否已推荐
+            // 检查是否已推薦
             boolean isRecommended = carRecommandService.selectByRecommandTypeAndId(0, dealer.getId()) != null;
             dto.setRecommendedValue(isRecommended ? 1L : 0L);
             resultList.add(dto);
@@ -63,7 +63,7 @@ public class CarDealerRecommendController extends BaseController {
     }
 
     /**
-     * 设置经销商推荐状态
+     * 设置經銷商推薦狀態
      */
     @PreAuthorize("@ss.hasPermi('car:dealerRecommend:edit')")
     @Log(title = "精选卖家", businessType = BusinessType.UPDATE)

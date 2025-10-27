@@ -189,7 +189,7 @@ export default {
             allowedFileTypes: ['image/*'],
             maxFileSize: 5 * 1024 * 1024, // 5M
             customInsert: (res, insertFn) => {
-              // 自定义插入图片
+              // 自定义插入圖片
               if (res.code === 200) {
                 const url = process.env.VUE_APP_BASE_API + res.fileName
                 insertFn(url, '', '')
