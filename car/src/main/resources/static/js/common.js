@@ -151,3 +151,162 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '/login';
     }
 });
+
+/**
+ * 加载HTML内容到iframe并自动调整高度
+ * @param {HTMLIFrameElement} iframe - iframe元素对象
+ * @param {string} htmlContent - 要加载的HTML文本内容
+ * @param {Object} options - 可选配置参数
+ * @param {number} options.minHeight - 最小高度（默认200px）
+ * @param {number} options.maxHeight - 最大高度（默认2000px）
+ * @param {number} options.adjustDelay - 调整延迟时间（默认100ms）
+ * @param {boolean} options.removeScrollbars - 是否移除滚动条（默认true）
+ */
+window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
+    // 参数验证
+    if (!iframe || !(iframe instanceof HTMLIFrameElement)) {
+        console.error('loadHtmlToIframe: 第一个参数必须是iframe元素');
+        return;
+    }
+    
+    if (!htmlContent || typeof htmlContent !== 'string') {
+        console.error('loadHtmlToIframe: 第二个参数必须是HTML文本字符串');
+        return;
+    }
+    
+    // 默认配置
+    const config = {
+        minHeight: 200,
+        maxHeight: 2000,
+        adjustDelay: 100,
+        removeScrollbars: true,
+        ...options
+    };
+    
+    // 设置iframe样式
+    iframe.style.border = 'none';
+    iframe.style.width = '100%';
+    iframe.style.minHeight = config.minHeight + 'px';
+    
+    if (config.removeScrollbars) {
+        iframe.style.overflow = 'hidden';
+    }
+    
+    // 创建完整的HTML文档
+    const fullHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    margin: 0;
+                    padding: 10px;
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    word-wrap: break-word;
+                }
+                img {
+                    max-width: 100%;
+                    height: auto;
+                }
+                table {
+                    max-width: 100%;
+                    overflow-x: auto;
+                }
+            </style>
+        </head>
+        <body>
+            ${htmlContent}
+        </body>
+        </html>
+    `;
+    
+    // 加载HTML内容
+    try {
+        // 使用srcdoc属性加载HTML内容
+        iframe.srcdoc = fullHtml;
+        
+        // 监听iframe加载完成事件
+        iframe.onload = function() {
+            // 延迟调整高度，确保内容完全渲染
+            setTimeout(() => {
+                adjustIframeHeight(iframe, config);
+            }, config.adjustDelay);
+        };
+        
+        // 如果iframe已经加载完成，直接调整高度
+        if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+            setTimeout(() => {
+                adjustIframeHeight(iframe, config);
+            }, config.adjustDelay);
+        }
+        
+    } catch (error) {
+        console.error('loadHtmlToIframe: 加载HTML内容失败', error);
+        // 降级方案：使用src属性加载data URL
+        try {
+            const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(fullHtml);
+            iframe.src = dataUrl;
+            
+            iframe.onload = function() {
+                setTimeout(() => {
+                    adjustIframeHeight(iframe, config);
+                }, config.adjustDelay);
+            };
+        } catch (fallbackError) {
+            console.error('loadHtmlToIframe: 降级方案也失败', fallbackError);
+        }
+    }
+};
+
+/**
+ * 调整iframe高度
+ * @param {HTMLIFrameElement} iframe - iframe元素
+ * @param {Object} config - 配置参数
+ */
+function adjustIframeHeight(iframe, config) {
+    try {
+        // 获取iframe内容的高度
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const body = iframeDoc.body;
+        const html = iframeDoc.documentElement;
+        
+        if (!body || !html) {
+            console.warn('adjustIframeHeight: 无法获取iframe内容');
+            return;
+        }
+        
+        // 计算内容高度
+        const contentHeight = Math.max(
+            body.scrollHeight,
+            body.offsetHeight,
+            html.clientHeight,
+            html.scrollHeight,
+            html.offsetHeight
+        );
+        
+        // 添加一些边距
+        const finalHeight = Math.min(
+            Math.max(contentHeight + 20, config.minHeight),
+            config.maxHeight
+        );
+        
+        // 设置iframe高度
+        iframe.style.height = finalHeight + 'px';
+        
+        console.log(`iframe高度已调整为: ${finalHeight}px`);
+        
+        // 如果内容高度超过最大高度，显示滚动条
+        if (contentHeight > config.maxHeight - 20) {
+            iframe.style.overflow = 'auto';
+            console.warn('内容高度超过最大限制，显示滚动条');
+        }
+        
+    } catch (error) {
+        console.error('adjustIframeHeight: 调整高度失败', error);
+        // 设置默认高度
+        iframe.style.height = config.minHeight + 'px';
+    }
+}
