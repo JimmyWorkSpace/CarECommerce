@@ -1,4 +1,10 @@
 <style>
+    /* iframe容器样式 */
+    #richContentIframe {
+        transition: height 0.3s ease;
+    }
+    
+    /* 确保iframe内容样式 */
     .rich-content-text {
         line-height: 1.8;
         color: #333;
@@ -143,6 +149,10 @@
         .content-item {
             padding: 15px;
         }
+        
+        #richContentIframe {
+            margin: 0 -15px;
+        }
     }
 </style>
 
@@ -152,10 +162,31 @@
             <div class="card">
                 <div class="card-body">
                     <#if richContent??>
-                        <!-- 富文本内容 -->
-                        <div class="rich-content-text">
-                            ${richContent.content!''}
-                        </div>
+                        <!-- 富文本内容iframe -->
+                        <iframe id="richContentIframe" 
+                                style="width: 100%; border: none; min-height: 200px;">
+                        </iframe>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const iframe = document.getElementById('richContentIframe');
+                                const htmlContent = `${richContent.content!''}`;
+                                
+                                // 使用loadHtmlToIframe方法加载内容并自动调整高度
+                                if (typeof window.loadHtmlToIframe === 'function') {
+                                    window.loadHtmlToIframe(iframe, htmlContent, {
+                                        minHeight: 200,
+                                        maxHeight: 3000,
+                                        adjustDelay: 150,
+                                        removeScrollbars: true
+                                    });
+                                } else {
+                                    console.error('loadHtmlToIframe方法未找到，请确保common.js已加载');
+                                    // 降级方案：直接设置内容
+                                    iframe.srcdoc = htmlContent;
+                                }
+                            });
+                        </script>
                     <#else>
                         <div class="alert alert-info" role="alert">
                             <h4 class="alert-heading">内容不存在</h4>
