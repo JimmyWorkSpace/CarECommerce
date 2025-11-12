@@ -263,13 +263,6 @@
                         <h3 class="dealer-name">${dealer.name}</h3>
                     </div>
                     </#list>
-                    <!-- 重复内容以实现无缝循环 -->
-                    <#list dealers as dealer>
-                    <div class="dealer-card">
-                        <img src="${dealer.image}" alt="${dealer.name}" class="dealer-image">
-                        <h3 class="dealer-name">${dealer.name}</h3>
-                    </div>
-                    </#list>
                 </div>
             </div>
         </div>
@@ -283,16 +276,6 @@
             </div>
             <div class="marquee-container">
                 <div class="marquee-content cars-marquee">
-                    <#list cars as car>
-                    <a href="/detail/${car.id}" class="car-card-link">
-                        <div class="car-card">
-                            <img src="${car.image}" alt="${car.model}" class="car-image">
-                            <h3 class="car-model">${car.model}</h3>
-                            <p class="car-price">$${car.price}</p>
-                        </div>
-                    </a>
-                    </#list>
-                    <!-- 重复内容以实现无缝循环 -->
                     <#list cars as car>
                     <a href="/detail/${car.id}" class="car-card-link">
                         <div class="car-card">

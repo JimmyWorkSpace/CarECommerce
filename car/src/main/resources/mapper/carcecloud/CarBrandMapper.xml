@@ -13,8 +13,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         FROM car_brand cb
         INNER JOIN cars c ON cb.id = c.id_brand
         INNER JOIN car_sales cs ON c.id = cs.car_id
-        WHERE cs.is_visible = 1
-        AND cs.status = '上架'
+        WHERE cs.is_admin_check = 1
+        and cs.is_publish = 1
         GROUP BY cb.brand, cb.id
         ORDER BY saleCount DESC
     </select>

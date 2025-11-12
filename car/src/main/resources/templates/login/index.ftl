@@ -280,7 +280,7 @@ new Vue({
                 } else {
                     // 如果服务器返回剩余等待时间，显示更友好的提示
                     if (data.remainingTime) {
-                        alert(`請等待 ${data.remainingTime} 秒後再發送驗證碼`);
+                        alert('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼');
                         // 如果服务器返回剩余时间，设置前端倒计时
                         this.countdown = data.remainingTime;
                         this.startCountdown();

@@ -3,9 +3,9 @@ package com.ruoyi.car.domain;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.Data;
 import tk.mybatis.mapper.annotation.KeySql;
@@ -125,6 +125,19 @@ public class CarSalesEntity {
 
     @Column(name = "second_warning_issued_at")
     private Date secondWarningIssuedAt;
+
+    @Column(name = "reg_image")
+    private String regImage;
+
+    @Column(name = "is_admin_check")
+    private Integer isAdminCheck;
+
+    @Column(name = "is_publish")
+    private Integer isPublish;
+    
+    // 查询条件：行照照片是否为空，1-已上传，0-未上传
+    @Transient
+    private Integer hasRegImage;
 //    
 //    @Column(name = "recommended_value")
 //    private Long recommendedValue;

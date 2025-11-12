@@ -147,8 +147,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN car_model cm ON cm.id = c.id_model
         LEFT JOIN car_sale_photos csp ON csp.car_sales_id = cs.id AND csp.is_cover = 1
         WHERE
-        cs.is_visible = 1
-        AND cs.status = '上架'
+        cs.is_admin_check = 1
+        and cs.is_publish = 1
         <if test="brand != null and brand.size() > 0">
             AND cb.brand IN
             <foreach collection="brand" item="brandName" open="(" separator="," close=")">
@@ -213,8 +213,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT DISTINCT c.transmission 
         FROM cars c
         INNER JOIN car_sales cs ON c.id = cs.car_id
-        WHERE cs.is_visible = 1 
-        AND cs.status = '上架'
+        WHERE cs.is_admin_check = 1
+        and cs.is_publish = 1
         AND c.transmission IS NOT NULL 
         AND c.transmission != ''
         ORDER BY c.transmission ASC
@@ -225,8 +225,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT DISTINCT c.drivetrain 
         FROM cars c
         INNER JOIN car_sales cs ON c.id = cs.car_id
-        WHERE cs.is_visible = 1 
-        AND cs.status = '上架'
+        WHERE  cs.is_admin_check = 1
+        and cs.is_publish = 1
         AND c.drivetrain IS NOT NULL 
         AND c.drivetrain != ''
         ORDER BY c.drivetrain ASC
@@ -237,8 +237,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT DISTINCT c.fuel_system 
         FROM cars c
         INNER JOIN car_sales cs ON c.id = cs.car_id
-        WHERE cs.is_visible = 1 
-        AND cs.status = '上架'
+        WHERE  cs.is_admin_check = 1
+        and cs.is_publish = 1
         AND c.fuel_system IS NOT NULL 
         AND c.fuel_system != ''
         ORDER BY c.fuel_system ASC

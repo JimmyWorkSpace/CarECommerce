@@ -127,6 +127,14 @@ public class CarSalesEntity {
     @Column(name = "second_warning_issued_at")
     private Date secondWarningIssuedAt;
     
+    @Column(name = "reg_image")
+    private String regImage;
+
+    @Column(name = "is_admin_check")
+    private Integer isAdminCheck;
+
+    @Column(name = "is_publish")
+    private Integer isPublish;
 //    @Transient
 //    @Column(name = "recommended_value")
 //    private Long recommendedValue;

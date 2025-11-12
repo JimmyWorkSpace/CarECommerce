@@ -147,26 +147,28 @@ public class CarSalesService {
 		recommandExample.createCriteria()
 			.andEqualTo("recommandType", 1)
 			.andEqualTo("delFlag", 0);
-		recommandExample.orderBy("showOrder").asc();
-		
-		List<CarRecommandEntity> recommandList = carRecommandMapper.selectByExample(recommandExample);
-		
-		if (recommandList == null || recommandList.isEmpty()) {
-			return new ArrayList<>();
-		}
-		
-		// 提取推荐ID列表
-		List<Long> recommandIds = new ArrayList<>();
-		for (CarRecommandEntity recommand : recommandList) {
-			recommandIds.add(recommand.getRecommandId());
-		}
-		
-		// 查询对应的车辆销售信息
-		Example salesExample = new Example(CarSalesEntity.class);
-		salesExample.createCriteria()
+			recommandExample.orderBy("showOrder").asc();
+			
+			List<CarRecommandEntity> recommandList = carRecommandMapper.selectByExample(recommandExample);
+			
+			if (recommandList == null || recommandList.isEmpty()) {
+				return new ArrayList<>();
+			}
+			
+			// 提取推荐ID列表
+			List<Long> recommandIds = new ArrayList<>();
+			for (CarRecommandEntity recommand : recommandList) {
+				recommandIds.add(recommand.getRecommandId());
+			}
+			
+			// 查询对应的车辆销售信息
+			Example salesExample = new Example(CarSalesEntity.class);
+			salesExample.createCriteria()
+			.andEqualTo("isAdminCheck", 1)
+			.andEqualTo("isPublish", 1)
 			.andIn("id", recommandIds);
-//			.andEqualTo("status", "上架")
-//			.andEqualTo("isVisible", 1);
+			//			.andEqualTo("status", "上架")
+			//			.andEqualTo("isVisible", 1);
 		
 		List<CarSalesEntity> salesList = carSalesMapper.selectByExample(salesExample);
 		

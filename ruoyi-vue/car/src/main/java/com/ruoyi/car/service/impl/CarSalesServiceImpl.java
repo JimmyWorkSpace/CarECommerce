@@ -11,6 +11,7 @@ import com.ruoyi.car.domain.CarSalesEntity;
 import com.ruoyi.car.dto.CarSalesDto;
 import com.ruoyi.car.mapper.carcecloud.CarSalesMapper;
 import com.ruoyi.car.service.CarSalesService;
+import com.ruoyi.car.service.ImageService;
 import com.ruoyi.framework.service.BaseServiceImpl;
 
 import cn.hutool.core.util.StrUtil;
@@ -23,6 +24,9 @@ public class CarSalesServiceImpl extends BaseServiceImpl implements CarSalesServ
 
 	@Resource
 	private CarSalesMapper carSalesMapper;
+	
+	@Resource
+	private ImageService imageService;
 
 	/**
 	 * 根据id获取uid,  如果uid为空则生成一个
@@ -79,7 +83,16 @@ public class CarSalesServiceImpl extends BaseServiceImpl implements CarSalesServ
 	 */
 	@Override
 	public List<CarSalesDto> selectCarSalesList(CarSalesEntity carSales) {
-		return carSalesMapper.selectCarSalesList(carSales, mgrDbName);
+		List<CarSalesDto> list = carSalesMapper.selectCarSalesList(carSales, mgrDbName);
+		// 处理 regImage 前缀
+		if (list != null) {
+			for (CarSalesDto dto : list) {
+				if (StrUtil.isNotBlank(dto.getRegImage())) {
+					dto.setRegImage(imageService.replaceImagePrefix(dto.getRegImage()));
+				}
+			}
+		}
+		return list;
 	}
 	
 	/**
@@ -95,5 +108,20 @@ public class CarSalesServiceImpl extends BaseServiceImpl implements CarSalesServ
 		}
 		
 		return carSalesMapper.selectCarSalesByIds(ids);
+	}
+	
+	/**
+	 * 更新车辆销售的后台审核结果
+	 * 
+	 * @param id 车辆销售ID
+	 * @param isAdminCheck 后台审核结果 0 待审核 1 通过 2 拒绝
+	 * @return 更新结果
+	 */
+	@Override
+	public int updateAdminCheck(Long id, Integer isAdminCheck) {
+		CarSalesEntity entity = new CarSalesEntity();
+		entity.setId(id);
+		entity.setIsAdminCheck(isAdminCheck);
+		return carSalesMapper.updateByPrimaryKeySelective(entity);
 	}
 }

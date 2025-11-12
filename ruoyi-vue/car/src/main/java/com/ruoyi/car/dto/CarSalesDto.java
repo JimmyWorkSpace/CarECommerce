@@ -2,11 +2,7 @@ package com.ruoyi.car.dto;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-
 import lombok.Data;
-import tk.mybatis.mapper.annotation.KeySql;
 
 @Data
 public class CarSalesDto {
@@ -84,6 +80,12 @@ public class CarSalesDto {
     private Date firstWarningIssuedAt;
 
     private Date secondWarningIssuedAt;
+
+    private String regImage;
+
+    private Integer isAdminCheck;
+
+    private Integer isPublish;
     
     private Long recommendedValue;
 }
