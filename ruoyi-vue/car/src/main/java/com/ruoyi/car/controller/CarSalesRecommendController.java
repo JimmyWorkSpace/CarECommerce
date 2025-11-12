@@ -66,4 +66,16 @@ public class CarSalesRecommendController extends BaseController
         int result = carRecommandService.setRecommended(1, carSales.getId(), isRecommended);
         return toAjax(result);
     }
+    
+    /**
+     * 更新车辆销售的后台审核结果
+     */
+    @PreAuthorize("@ss.hasPermi('car:salesRecommend:edit')")
+    @Log(title = "精选好车", businessType = BusinessType.UPDATE)
+    @PutMapping("/updateAdminCheck")
+    public AjaxResult updateAdminCheck(@RequestBody CarSalesDto carSales)
+    {
+        int result = carSalesService.updateAdminCheck(carSales.getId(), carSales.getIsAdminCheck());
+        return toAjax(result);
+    }
 }

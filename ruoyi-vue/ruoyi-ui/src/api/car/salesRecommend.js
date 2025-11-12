@@ -17,3 +17,12 @@ export function setSalesRecommended(data) {
     data: data
   })
 }
+
+// 更新车辆销售的后台审核结果
+export function updateAdminCheck(data) {
+  return request({
+    url: '/car/salesRecommend/updateAdminCheck',
+    method: 'put',
+    data: data
+  })
+}

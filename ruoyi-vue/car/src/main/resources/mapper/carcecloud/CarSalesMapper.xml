@@ -52,6 +52,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="entity.isVisible != null">
                 AND cs.is_visible = #{entity.isVisible}
             </if>
+            <if test="entity.hasRegImage != null">
+                <choose>
+                    <when test="entity.hasRegImage == 1">
+                        AND cs.reg_image IS NOT NULL AND cs.reg_image != ''
+                    </when>
+                    <otherwise>
+                        AND (cs.reg_image IS NULL OR cs.reg_image = '')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="entity.isAdminCheck != null">
+                AND cs.is_admin_check = #{entity.isAdminCheck}
+            </if>
+            <if test="entity.isPublish != null">
+                AND cs.is_publish = #{entity.isPublish}
+            </if>
         </where>
         ) t
         ORDER BY t.recommendedValue desc, t.c_dt DESC
