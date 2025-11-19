@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="訂單號" prop="orderNo">
         <el-input
           v-model="queryParams.orderNo"
-          placeholder="请输入訂單號"
+          placeholder="請輸入訂單號"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -12,7 +12,7 @@
       </el-form-item>
       
       <el-form-item label="訂單狀態" prop="orderStatus">
-        <el-select v-model="queryParams.orderStatus" placeholder="请选择訂單狀態" clearable size="small">
+        <el-select v-model="queryParams.orderStatus" placeholder="請選擇訂單狀態" clearable size="small">
           <el-option
             v-for="dict in dict.type.order_status"
             :key="dict.value"
@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="訂單類型" prop="orderType">
-        <el-select v-model="queryParams.orderType" placeholder="请选择訂單類型" clearable size="small">
+        <el-select v-model="queryParams.orderType" placeholder="請選擇訂單類型" clearable size="small">
           <el-option
             v-for="dict in dict.type.order_type"
             :key="dict.value"
@@ -34,7 +34,7 @@
       <el-form-item label="收件人" prop="receiverName">
         <el-input
           v-model="queryParams.receiverName"
-          placeholder="请输入收件人"
+          placeholder="請輸入收件人"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -43,7 +43,7 @@
       <el-form-item label="收件人電話" prop="receiverMobile">
         <el-input
           v-model="queryParams.receiverMobile"
-          placeholder="请输入收件人電話"
+          placeholder="請輸入收件人電話"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -86,7 +86,7 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['car:orderInfo:export']"
-        >导出</el-button>
+        >匯出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -121,7 +121,7 @@
             icon="el-icon-view"
             @click="handleDetail(scope.row)"
             v-hasPermi="['car:orderInfo:query']"
-          >详情</el-button>
+          >詳情</el-button>
           <el-button
             size="mini"
             type="text"
@@ -148,30 +148,30 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改訂單信息对话框 -->
+    <!-- 新增或修改訂單資訊對話框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
             <el-form-item label="訂單號" prop="orderNo">
-              <el-input v-model="form.orderNo" placeholder="请输入訂單號" />
+              <el-input v-model="form.orderNo" placeholder="請輸入訂單號" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="用户ID" prop="userId">
-              <el-input v-model="form.userId" placeholder="请输入用户ID" />
+            <el-form-item label="用戶ID" prop="userId">
+              <el-input v-model="form.userId" placeholder="請輸入用戶ID" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="總價格" prop="totalPrice">
-              <el-input v-model="form.totalPrice" placeholder="请输入總價格" />
+              <el-input v-model="form.totalPrice" placeholder="請輸入總價格" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="訂單狀態" prop="orderStatus">
-              <el-select v-model="form.orderStatus" placeholder="请选择訂單狀態">
+              <el-select v-model="form.orderStatus" placeholder="請選擇訂單狀態">
                 <el-option
                   v-for="dict in dict.type.order_status"
                   :key="dict.value"
@@ -185,27 +185,27 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="收件人" prop="receiverName">
-              <el-input v-model="form.receiverName" placeholder="请输入收件人" />
+              <el-input v-model="form.receiverName" placeholder="請輸入收件人" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="收件人電話" prop="receiverMobile">
-              <el-input v-model="form.receiverMobile" placeholder="请输入收件人電話" />
+              <el-input v-model="form.receiverMobile" placeholder="請輸入收件人電話" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-form-item label="收件人地址" prop="receiverAddress">
-          <el-input v-model="form.receiverAddress" type="textarea" placeholder="请输入收件人地址" />
+          <el-input v-model="form.receiverAddress" type="textarea" placeholder="請輸入收件人地址" />
         </el-form-item>
         <el-row>
           <el-col :span="12">
             <el-form-item label="物流單號" prop="logicNumber">
-              <el-input v-model="form.logicNumber" placeholder="请输入物流單號" />
+              <el-input v-model="form.logicNumber" placeholder="請輸入物流單號" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="訂單類型" prop="orderType">
-              <el-select v-model="form.orderType" placeholder="请选择訂單類型">
+              <el-select v-model="form.orderType" placeholder="請選擇訂單類型">
                 <el-option
                   v-for="dict in dict.type.order_type"
                   :key="dict.value"
@@ -219,24 +219,24 @@
         <el-row v-if="form.orderType === 2">
           <el-col :span="12">
             <el-form-item label="超商店舖編號" prop="cvsStoreID">
-              <el-input v-model="form.cvsStoreID" placeholder="请输入超商店舖編號" />
+              <el-input v-model="form.cvsStoreID" placeholder="請輸入超商店舖編號" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="超商店舖名稱" prop="cvsStoreName">
-              <el-input v-model="form.cvsStoreName" placeholder="请输入超商店舖名稱" />
+              <el-input v-model="form.cvsStoreName" placeholder="請輸入超商店舖名稱" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="form.orderType === 2">
           <el-col :span="12">
             <el-form-item label="超商店舖地址" prop="cvsAddress">
-              <el-input v-model="form.cvsAddress" placeholder="请输入超商店舖地址" />
+              <el-input v-model="form.cvsAddress" placeholder="請輸入超商店舖地址" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="超商店舖電話" prop="cvsTelephone">
-              <el-input v-model="form.cvsTelephone" placeholder="请输入超商店舖電話" />
+              <el-input v-model="form.cvsTelephone" placeholder="請輸入超商店舖電話" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -252,23 +252,22 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm">確 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
 
-    <!-- 訂單详情对话框 -->
-    <el-dialog title="訂單详情" :visible.sync="detailOpen" width="1000px" append-to-body>
+    <!-- 訂單詳情對話框 -->
+    <el-dialog title="訂單詳情" :visible.sync="detailOpen" width="1000px" append-to-body>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>訂單基本信息</span>
+              <span>訂單基本資訊</span>
             </div>
             <el-descriptions :column="1" border>
               <el-descriptions-item label="訂單號">{{ orderDetail.orderNo }}</el-descriptions-item>
-              <el-descriptions-item label="用户ID">{{ orderDetail.userId }}</el-descriptions-item>
-              <el-descriptions-item label="總價格">¥{{ orderDetail.totalPrice }}</el-descriptions-item>
+              <el-descriptions-item label="總價格">{{ orderDetail.totalPrice }}</el-descriptions-item>
               <el-descriptions-item label="訂單狀態">
                 <dict-tag :options="dict.type.order_status" :value="orderDetail.orderStatus"/>
               </el-descriptions-item>
@@ -282,13 +281,13 @@
         <el-col :span="12">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>收货信息</span>
+              <span>收貨資訊</span>
             </div>
             <el-descriptions :column="1" border>
               <el-descriptions-item label="收件人">{{ orderDetail.receiverName }}</el-descriptions-item>
               <el-descriptions-item label="收件人電話">{{ orderDetail.receiverMobile }}</el-descriptions-item>
               <el-descriptions-item label="收件人地址" :span="2">{{ orderDetail.receiverAddress }}</el-descriptions-item>
-              <el-descriptions-item label="物流單號">{{ orderDetail.logicNumber || '暂无' }}</el-descriptions-item>
+              <el-descriptions-item label="物流單號">{{ orderDetail.logicNumber || '暫無' }}</el-descriptions-item>
             </el-descriptions>
           </el-card>
         </el-col>
@@ -298,7 +297,7 @@
         <el-col :span="24">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>超商取貨信息</span>
+              <span>超商取貨資訊</span>
             </div>
             <el-descriptions :column="2" border>
               <el-descriptions-item label="超商店舖編號">{{ orderDetail.cvsStoreID }}</el-descriptions-item>
@@ -319,20 +318,19 @@
         <el-col :span="24">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>訂單商品详情</span>
+              <span>訂單商品詳情</span>
             </div>
             <el-table :data="orderDetailList" border>
-              <el-table-column label="产品ID" align="center" prop="productId" />
-              <el-table-column label="产品名稱" align="center" prop="productName" />
-              <el-table-column label="产品数量" align="center" prop="productAmount" />
-              <el-table-column label="单价" align="center" prop="productPrice">
+              <el-table-column label="產品名稱" align="center" prop="productName" />
+              <el-table-column label="產品數量" align="center" prop="productAmount" />
+              <el-table-column label="單價" align="center" prop="productPrice">
                 <template slot-scope="scope">
-                  ¥{{ scope.row.productPrice }}
+                  {{ scope.row.productPrice }}
                 </template>
               </el-table-column>
-              <el-table-column label="总价" align="center" prop="totalPrice">
+              <el-table-column label="總價" align="center" prop="totalPrice">
                 <template slot-scope="scope">
-                  ¥{{ scope.row.totalPrice }}
+                  {{ scope.row.totalPrice }}
                 </template>
               </el-table-column>
             </el-table>
@@ -341,7 +339,7 @@
       </el-row>
       
       <div slot="footer" class="dialog-footer">
-        <el-button @click="detailOpen = false">关 闭</el-button>
+        <el-button @click="detailOpen = false">關 閉</el-button>
       </div>
     </el-dialog>
   </div>
@@ -356,31 +354,31 @@ export default {
   dicts: ['order_status', 'order_type'],
   data() {
     return {
-      // 遮罩层
+      // 遮罩層
       loading: true,
-      // 选中数组
+      // 選中陣列
       ids: [],
-      // 非单个禁用
+      // 非單個禁用
       single: true,
-      // 非多个禁用
+      // 非多個禁用
       multiple: true,
-      // 显示搜索条件
+      // 顯示搜尋條件
       showSearch: true,
-      // 总条数
+      // 總條數
       total: 0,
-      // 訂單信息表格数据
+      // 訂單資訊表格資料
       orderInfoList: [],
-      // 弹出层標題
+      // 彈出層標題
       title: "",
-      // 是否显示弹出层
+      // 是否顯示彈出層
       open: false,
-      // 是否显示详情弹出层
+      // 是否顯示詳情彈出層
       detailOpen: false,
-      // 訂單详情数据
+      // 訂單詳情資料
       orderDetail: {},
-      // 訂單详情列表
+      // 訂單詳情列表
       orderDetailList: [],
-      // 查询参数
+      // 查詢參數
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -391,21 +389,21 @@ export default {
         receiverName: null,
         receiverMobile: null
       },
-      // 表单参数
+      // 表單參數
       form: {},
-      // 表单校验
+      // 表單校驗
       rules: {
         orderNo: [
-          { required: true, message: "訂單號不能为空", trigger: "blur" }
+          { required: true, message: "訂單號不能為空", trigger: "blur" }
         ],
         userId: [
-          { required: true, message: "用户ID不能为空", trigger: "blur" }
+          { required: true, message: "用戶ID不能為空", trigger: "blur" }
         ],
         orderStatus: [
-          { required: true, message: "訂單狀態不能为空", trigger: "change" }
+          { required: true, message: "訂單狀態不能為空", trigger: "change" }
         ],
         orderType: [
-          { required: true, message: "訂單類型不能为空", trigger: "change" }
+          { required: true, message: "訂單類型不能為空", trigger: "change" }
         ]
       }
     };
@@ -414,7 +412,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询訂單信息列表 */
+    /** 查詢訂單資訊列表 */
     getList() {
       this.loading = true;
       listOrderInfo(this.queryParams).then(response => {
@@ -423,12 +421,12 @@ export default {
         this.loading = false;
       });
     },
-    // 取消按钮
+    // 取消按鈕
     cancel() {
       this.open = false;
       this.reset();
     },
-    // 表单重置
+    // 表單重置
     reset() {
       this.form = {
         id: null,
@@ -452,39 +450,39 @@ export default {
       };
       this.resetForm("form");
     },
-    /** 搜索按钮操作 */
+    /** 搜尋按鈕操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置按钮操作 */
+    /** 重置按鈕操作 */
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
+    // 多選框選中資料
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
-    /** 新增按钮操作 */
+    /** 新增按鈕操作 */
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加訂單信息";
+      this.title = "新增訂單資訊";
     },
-    /** 修改按钮操作 */
+    /** 修改按鈕操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
       getOrderInfo(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改訂單信息";
+        this.title = "修改訂單資訊";
       });
     },
-    /** 提交按钮 */
+    /** 提交按鈕 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -504,27 +502,27 @@ export default {
         }
       });
     },
-    /** 刪除按钮操作 */
+    /** 刪除按鈕操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认刪除訂單信息编號为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否確認刪除訂單資訊編號為"' + ids + '"的資料項？').then(function() {
         return delOrderInfo(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("刪除成功");
       }).catch(() => {});
     },
-    /** 导出按钮操作 */
+    /** 匯出按鈕操作 */
     handleExport() {
       this.download('car/orderInfo/export', {
         ...this.queryParams
       }, `orderInfo_${new Date().getTime()}.xlsx`)
     },
-    /** 详情按钮操作 */
+    /** 詳情按鈕操作 */
     handleDetail(row) {
       this.orderDetail = row;
       this.detailOpen = true;
-      // 查询訂單详情列表
+      // 查詢訂單詳情列表
       listOrderDetail({ orderId: row.id }).then(response => {
         this.orderDetailList = response.rows;
       });

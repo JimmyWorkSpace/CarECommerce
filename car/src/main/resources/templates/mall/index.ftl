@@ -76,31 +76,34 @@
              :key="product.id" 
              class="product-card" 
              :data-category="product.category || 'other'">
-            <div class="product-image">
-                <img :src="product.image" :alt="product.name" @error="handleImageError">
-                <div class="product-overlay">
-                    <button class="btn btn-primary add-to-cart-btn" 
-                            @click="addToCart(product)"
-                            :disabled="addingToCart === product.id">
-                        <i v-if="addingToCart !== product.id" class="bi bi-cart-plus"></i>
-                        <span v-else class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        {{ addingToCart === product.id ? '添加中...' : '加入購物車' }}
-                    </button>
+            <a :href="'/product/' + product.id" class="product-card-link">
+                <div class="product-image">
+                    <img :src="product.image" :alt="product.name" @error="handleImageError">
+                    <div class="product-overlay">
+                        <button class="btn btn-primary add-to-cart-btn" 
+                                @click.stop.prevent="addToCart(product, $event)"
+                                :disabled="addingToCart === product.id"
+                                type="button">
+                            <i v-if="addingToCart !== product.id" class="bi bi-cart-plus"></i>
+                            <span v-else class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            {{ addingToCart === product.id ? '添加中...' : '加入購物車' }}
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="product-info">
-                <h5 class="product-name">{{ product.name }}</h5>
-                <p class="product-description">{{ product.description }}</p>
-                <div class="product-meta">
-                    <span v-if="product.brand" class="badge bg-secondary me-2">{{ product.brand }}</span>
-                    <span v-if="product.model" class="badge bg-info me-2">{{ product.model }}</span>
-                    <span v-if="product.source" class="badge bg-warning me-2">{{ product.source }}</span>
+                <div class="product-info">
+                    <h5 class="product-name">{{ product.name }}</h5>
+                    <p class="product-description">{{ product.description }}</p>
+                    <div class="product-meta">
+                        <span v-if="product.brand" class="badge bg-secondary me-2">{{ product.brand }}</span>
+                        <span v-if="product.model" class="badge bg-info me-2">{{ product.model }}</span>
+                        <span v-if="product.source" class="badge bg-warning me-2">{{ product.source }}</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="price-symbol">${CurrencyUnit}</span>
+                        <span class="price-amount">{{ formatPrice(product.marketPrice) }}</span>
+                    </div>
                 </div>
-                <div class="product-price">
-                    <span class="price-symbol">${CurrencyUnit}</span>
-                    <span class="price-amount">{{ formatPrice(product.marketPrice) }}</span>
-                </div>
-            </div>
+            </a>
         </div>
     </div>
     
@@ -199,6 +202,18 @@
     overflow: hidden;
     transition: all 0.3s ease;
     position: relative;
+}
+
+.product-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.product-card-link:hover {
+    text-decoration: none;
+    color: inherit;
 }
 
 .product-card:hover {
@@ -420,6 +435,30 @@ new Vue({
     },
     mounted() {
         this.loadProducts();
+        
+        // 监听登录后待执行的操作
+        const self = this;
+        window.addEventListener('pendingAction', function(event) {
+            if (event.detail && event.detail.action === 'addToCart') {
+                // 登录后自动执行加购操作
+                const pendingCartItem = sessionStorage.getItem('pendingAddToCart');
+                if (pendingCartItem) {
+                    try {
+                        const cartItem = JSON.parse(pendingCartItem);
+                        sessionStorage.removeItem('pendingAddToCart');
+                        // 延迟执行，确保页面已完全加载
+                        setTimeout(() => {
+                            const product = self.products.find(p => p.id === cartItem.productId);
+                            if (product) {
+                                self.addToCart(product);
+                            }
+                        }, 300);
+                    } catch (e) {
+                        console.error('解析待加购商品信息失败:', e);
+                    }
+                }
+            }
+        });
     },
     methods: {
         // 加载商品数据
@@ -498,7 +537,25 @@ new Vue({
         },
         
         // 添加到购物车
-        async addToCart(product) {
+        async addToCart(product, event) {
+            // 阻止事件冒泡和默认行为，防止跳转到详情页
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            // 检查登录状态，如果未登录则显示登录弹窗
+            if (!window.checkLoginAndShowModal('addToCart')) {
+                // 保存商品信息，登录后自动加购
+                sessionStorage.setItem('pendingAddToCart', JSON.stringify({
+                    productId: product.id,
+                    productAmount: 1,
+                    productPrice: product.price,
+                    productName: product.name
+                }));
+                return;
+            }
+            
             try {
                 this.addingToCart = product.id;
                 

@@ -59,6 +59,32 @@ public class CarDealerService {
 	}
 
 	/**
+	 * 根据dealer id获取车商信息
+	 * @param dealerId 车商ID
+	 * @return 车商信息
+	 */
+	public CarDealerInfoDto getInfoByDealerId(Long dealerId) {
+		CarDealerInfoDto result = new CarDealerInfoDto();
+		Example example = new Example(CarDealerEntity.class);
+		example.createCriteria().andEqualTo("id", dealerId);
+		List<CarDealerEntity> carDealerList = carDealerMapper.selectByExample(example);
+		if (CollUtil.isNotEmpty(carDealerList)) {
+			CarDealerEntity cd = carDealerList.get(0);
+			BeanUtil.copyProperties(cd, result);
+			result.setDescription(imageService.replaceImagePrefixInHtml(result.getDescription()));
+			example = new Example(CarDealerPhotoEntity.class);
+			example.createCriteria().andEqualTo("idGarage", cd.getIdGarage()).andEqualTo("dealerId", cd.getId());
+			example.orderBy("photoOrder");
+			List<CarDealerPhotoEntity> photoList = carDealerPhotoMapper.selectByExample(example);
+			if (CollUtil.isNotEmpty(photoList)) {
+				result.setPhotos(photoList.stream().map(p -> imageService.replaceImagePrefix(p.getPhotoUrl()))
+						.collect(Collectors.toList()));
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * 根据uid获取车商信息
 	 * @param uid
 	 * @return

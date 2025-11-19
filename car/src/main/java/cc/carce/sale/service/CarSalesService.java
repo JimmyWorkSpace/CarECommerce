@@ -285,4 +285,18 @@ public class CarSalesService {
         
 		return list;
     }
+    
+    /**
+     * 根据店家ID获取车辆列表
+     * @param idGarage 店家ID
+     * @return 车辆列表
+     */
+    public List<CarListDto> getCarsByGarageId(Long idGarage) {
+        CarSalesSearchForm form = new CarSalesSearchForm();
+        form.setIdGarage(idGarage);
+        form.setPageNum(1);
+        form.setPageSize(100); // 获取足够多的车辆
+        PageInfo<CarListDto> pageInfo = getCarListByPage(form);
+        return pageInfo.getList() != null ? pageInfo.getList() : new ArrayList<>();
+    }
 }

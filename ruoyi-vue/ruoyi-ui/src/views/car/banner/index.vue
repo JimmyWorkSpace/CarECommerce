@@ -96,7 +96,12 @@
           <dict-tag :options="dict.type.sys_yes_no_num" :value="scope.row.isLink"/>
         </template>
       </el-table-column>
-      <el-table-column label="跳轉地址" align="center" prop="linkUrl" :show-overflow-tooltip="true" />
+      <el-table-column label="跳轉地址" align="center" prop="linkUrl" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <span v-if="scope.row.isLink === 1 || scope.row.isLink === '1'">{{ scope.row.linkUrl }}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column label="建立時間" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -148,26 +153,17 @@
             <div slot="tip" class="el-upload__tip">只能上傳jpg/png/gif檔案，且不超過2MB</div>
           </el-upload>
         </el-form-item>
-        <el-form-item label="跳轉地址" prop="linkUrl">
-          <el-input v-model="form.linkUrl" placeholder="請輸入跳轉地址" />
-        </el-form-item>
         <el-form-item label="是否跳轉" prop="isLink">
-          <el-radio-group v-model="form.isLink">
+          <el-radio-group v-model="form.isLink" @change="handleIsLinkChange">
             <el-radio
               v-for="dict in dict.type.sys_yes_no_num"
               :key="parseInt(dict.value)"
-              :label="dict.value"
+              :label="parseInt(dict.value)"
             >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="是否刪除" prop="delFlag">
-          <el-radio-group v-model="form.delFlag">
-            <el-radio
-              v-for="dict in dict.type.sys_yes_no_num"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
+        <el-form-item v-if="form.isLink === 1" label="跳轉地址" prop="linkUrl">
+          <el-input v-model="form.linkUrl" placeholder="請輸入跳轉地址" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -288,6 +284,22 @@ export default {
       const id = row.id || this.ids
       getBanner(id).then(response => {
         this.form = response.data;
+        // 确保 isLink 和 delFlag 是数字类型
+        if (this.form.isLink !== null && this.form.isLink !== undefined) {
+          this.form.isLink = parseInt(this.form.isLink);
+        } else {
+          this.form.isLink = 0;
+        }
+        // delFlag 默认为 0
+        if (this.form.delFlag !== null && this.form.delFlag !== undefined) {
+          this.form.delFlag = parseInt(this.form.delFlag);
+        } else {
+          this.form.delFlag = 0;
+        }
+        // 如果 isLink 为 0，清空 linkUrl
+        if (this.form.isLink === 0) {
+          this.form.linkUrl = '';
+        }
         this.open = true;
         this.title = "修改輪播圖";
       });
@@ -296,6 +308,14 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          // 确保 delFlag 默认为 0
+          if (this.form.delFlag === null || this.form.delFlag === undefined) {
+            this.form.delFlag = 0;
+          }
+          // 如果 isLink 为 0，清空 linkUrl
+          if (this.form.isLink === 0 || this.form.isLink === '0') {
+            this.form.linkUrl = '';
+          }
           if (this.form.id != null) {
             updateBanner(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
@@ -433,6 +453,13 @@ export default {
         return false;
       }
       return true;
+    },
+    /** 是否跳转改变时的处理 */
+    handleIsLinkChange(value) {
+      // 如果选择"否"（值为0），清空跳转地址
+      if (value === 0 || value === '0') {
+        this.form.linkUrl = '';
+      }
     }
   }
 };

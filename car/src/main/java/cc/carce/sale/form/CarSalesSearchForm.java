@@ -22,4 +22,5 @@ public class CarSalesSearchForm extends BasePageForm {
     private List<String> transmission;     // 变速系统列表
     private List<String> drivetrain;       // 驱动方式列表
     private List<String> fuelSystem;       // 燃料系统列表
+    private Long idGarage;                 // 店家ID
 }

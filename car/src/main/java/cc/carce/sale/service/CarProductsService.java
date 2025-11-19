@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import cc.carce.sale.dto.CarProductListDto;
 import cc.carce.sale.entity.CarProductsEntity;
+import cc.carce.sale.entity.PimagesEntity;
 import cc.carce.sale.mapper.carcecloud.CarProductsMapper;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Example;
@@ -23,6 +24,13 @@ public class CarProductsService {
     
     @Value("${carce.prefix}")
     private String imagePrefix;
+    
+    /**
+     * 获取图片前缀
+     */
+    public String getImagePrefix() {
+        return imagePrefix;
+    }
 
     /**
      * 获取已发布的商品列表
@@ -101,18 +109,59 @@ public class CarProductsService {
     }
     
     /**
-     * 根据商品ID获取图片URL
+     * 根据商品ID获取图片URL（列表页使用，只返回第一张图片）
      */
     private String getProductImageUrl(Long productId) {
         try {
-            // 这里可以通过SQL查询获取商品对应的图片
-            // 暂时使用默认图片，实际应该查询products_pimages和pimages表
-            String defaultImage = "/img/product/" + productId + "_90x90.jpg";
-            return imagePrefix + defaultImage;
+            List<PimagesEntity> images = carProductsMapper.selectImagesByProductId(productId);
+            if (images != null && !images.isEmpty()) {
+                // 使用第一张图片，90x90尺寸用于列表页
+                Long imageId = images.get(0).getId();
+                return imagePrefix + "/img/product/" + imageId + "_90x90.jpg";
+            }
+            // 如果没有图片，返回默认图片
+            return imagePrefix + "/img/product/default_90x90.jpg";
         } catch (Exception e) {
             log.error("获取商品图片失败，商品ID: {}", productId, e);
             // 返回默认图片
             return imagePrefix + "/img/product/default_90x90.jpg";
+        }
+    }
+    
+    /**
+     * 根据商品ID获取所有图片URL列表（详情页使用）
+     */
+    public List<String> getProductImageUrls(Long productId) {
+        List<String> imageUrls = new ArrayList<>();
+        try {
+            List<PimagesEntity> images = carProductsMapper.selectImagesByProductId(productId);
+            if (images != null && !images.isEmpty()) {
+                for (PimagesEntity image : images) {
+                    // 详情页使用原图或较大尺寸
+                    String imageUrl = imagePrefix + "/img/product/" + image.getId() + ".jpg";
+                    imageUrls.add(imageUrl);
+                }
+            }
+            // 如果没有图片，添加默认图片
+            if (imageUrls.isEmpty()) {
+                imageUrls.add(imagePrefix + "/img/product/default.jpg");
+            }
+        } catch (Exception e) {
+            log.error("获取商品图片列表失败，商品ID: {}", productId, e);
+            imageUrls.add(imagePrefix + "/img/product/default.jpg");
+        }
+        return imageUrls;
+    }
+    
+    /**
+     * 根据商品ID获取所有图片信息
+     */
+    public List<PimagesEntity> getProductImages(Long productId) {
+        try {
+            return carProductsMapper.selectImagesByProductId(productId);
+        } catch (Exception e) {
+            log.error("获取商品图片信息失败，商品ID: {}", productId, e);
+            return new ArrayList<>();
         }
     }
     
