@@ -67,8 +67,11 @@ import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarShoppingCartService;
 import cc.carce.sale.service.CarUserService;
 import cc.carce.sale.service.SmsService;
+import cc.carce.sale.mapper.carcecloud.CarDealerMapper;
+import cc.carce.sale.dto.CarListDto;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import tk.mybatis.mapper.entity.Example;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -97,6 +100,9 @@ public class CarViewController extends BaseController {
 
 	@Resource
 	private CarDealerService carDealerService;
+	
+	@Resource
+	private CarDealerMapper carDealerMapper;
 	
 	@Resource
 	private CarReportService carReportService;
@@ -502,6 +508,134 @@ public class CarViewController extends BaseController {
         
         
         
+        return "/layout/main";
+    }
+    
+    /**
+     * 跳转到车商详情页面
+     */
+    @GetMapping("/dealer/{dealerId}")
+    public String dealerDetail(Model model, @PathVariable("dealerId") Long dealerId, HttpServletRequest req) {
+        try {
+            // 检查用户登录状态
+            Object user = req.getSession().getAttribute("user");
+            model.addAttribute("user", user);
+            
+            // 获取车商信息
+            CarDealerInfoDto dealerInfo = carDealerService.getInfoByDealerId(dealerId);
+            if (dealerInfo == null || dealerInfo.getDealerName() == null) {
+                model.addAttribute("error", "车商不存在");
+                model.addAttribute("content", "/error/index.ftl");
+                return "/layout/main";
+            }
+            
+            // 获取车商的idGarage - 从dealerInfo中获取，需要查询CarDealerEntity
+            Long idGarage = null;
+            Example dealerExample = new Example(CarDealerEntity.class);
+            dealerExample.createCriteria().andEqualTo("id", dealerId);
+            List<CarDealerEntity> dealerList = carDealerMapper.selectByExample(dealerExample);
+            if (dealerList != null && !dealerList.isEmpty()) {
+                idGarage = dealerList.get(0).getIdGarage();
+            }
+            
+            // 获取该店家的车辆列表
+            List<Map<String, String>> cars = new ArrayList<>();
+            if (idGarage != null) {
+                try {
+                    List<CarListDto> carList = carSalesService.getCarsByGarageId(idGarage);
+                    String[] carImages = {
+                        "/img/car/car4.jpg", "/img/car/car6.jpg", "/img/car/car8.jpg", 
+                        "/img/car/car9.jpg", "/img/car/car10.jpg", "/img/car/car11.jpg"
+                    };
+                    
+                    for (int i = 0; i < carList.size(); i++) {
+                        CarListDto carDto = carList.get(i);
+                        Map<String, String> car = new HashMap<>();
+                        
+                        // 构建车型信息
+                        String carModel = carDto.getSaleTitle() != null ? carDto.getSaleTitle() : 
+                            (carDto.getManufactureYear() != null ? carDto.getManufactureYear() + "年 " : "") +
+                            (carDto.getBrand() != null ? carDto.getBrand() + " " : "") +
+                            (carDto.getModel() != null ? carDto.getModel() : "精選車輛");
+                        car.put("model", carModel);
+                        
+                        // 格式化价格
+                        String price = "面議";
+                        if (carDto.getSalePrice() != null && carDto.getSalePrice() > 0) {
+                            price = String.format("%,d", carDto.getSalePrice());
+                        }
+                        car.put("price", price);
+                        
+                        // 设置图片
+                        String image = carDto.getCoverImage() != null && !carDto.getCoverImage().isEmpty() ? 
+                            carDto.getCoverImage() : carImages[i % carImages.length];
+                        car.put("image", image);
+                        
+                        // 添加车辆ID用于链接
+                        car.put("id", carDto.getId().toString());
+                        car.put("uid", carDto.getUid() != null ? carDto.getUid() : "");
+                        
+                        cars.add(car);
+                    }
+                } catch (Exception e) {
+                    log.error("获取店家车辆列表失败", e);
+                }
+            }
+            
+            model.addAttribute("dealerInfo", dealerInfo);
+            model.addAttribute("dealerInfoJson", JSONUtil.toJsonPrettyStr(dealerInfo));
+            model.addAttribute("dealerId", dealerId);
+            model.addAttribute("cars", cars);
+            model.addAttribute("carsJson", JSONUtil.toJsonPrettyStr(cars));
+            
+            // 设置页面标题和描述
+            String title = dealerInfo.getDealerName() + " - 車商詳情";
+            model.addAttribute("title", title);
+            model.addAttribute("ogTitle", title);
+            String ogDescription = "專業的二手車商，提供優質二手車服務";
+            if (dealerInfo.getDescription() != null && !dealerInfo.getDescription().isEmpty()) {
+                String plainText = dealerInfo.getDescription().replaceAll("<[^>]*>", "");
+                if (plainText.length() > 150) {
+                    ogDescription = plainText.substring(0, 150);
+                } else {
+                    ogDescription = plainText;
+                }
+            }
+            model.addAttribute("ogDescription", ogDescription);
+            model.addAttribute("ogImage", dealerInfo.getPhotos() != null && !dealerInfo.getPhotos().isEmpty() ? 
+                dealerInfo.getPhotos().get(0) : "/img/car/car4.jpg");
+            
+            model.addAttribute("content", "/dealer/detail.ftl");
+            
+        } catch (Exception e) {
+            log.error("获取车商详情失败，ID: {}", dealerId, e);
+            model.addAttribute("error", "獲取數據失敗：" + e.getMessage());
+            model.addAttribute("content", "/error/index.ftl");
+        }
+        
+        return "/layout/main";
+    }
+    
+    /**
+     * 车商介绍内容iframe
+     */
+    @GetMapping("/dealer/{dealerId}/content")
+    public String dealerContentIframe(@PathVariable("dealerId") Long dealerId, Model model) {
+        try {
+            // 获取车商信息
+            CarDealerInfoDto dealerInfo = carDealerService.getInfoByDealerId(dealerId);
+            if (dealerInfo == null || dealerInfo.getDealerName() == null) {
+                model.addAttribute("error", "车商不存在");
+                return "error/index";
+            }
+            
+            model.addAttribute("dealerInfo", dealerInfo);
+            model.addAttribute("content", "/dealer/content-iframe.ftl");
+            
+        } catch (Exception e) {
+            log.error("获取车商介绍内容iframe失败，ID: {}", dealerId, e);
+            model.addAttribute("error", "获取数据失败");
+        }
         return "/layout/main";
     }
     

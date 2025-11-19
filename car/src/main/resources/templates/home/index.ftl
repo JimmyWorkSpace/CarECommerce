@@ -258,10 +258,12 @@
             <div class="marquee-container">
                 <div class="marquee-content dealers-marquee">
                     <#list dealers as dealer>
-                    <div class="dealer-card">
-                        <img src="${dealer.image}" alt="${dealer.name}" class="dealer-image">
-                        <h3 class="dealer-name">${dealer.name}</h3>
-                    </div>
+                    <a href="/dealer/${dealer.id}" class="dealer-card-link">
+                        <div class="dealer-card">
+                            <img src="${dealer.image}" alt="${dealer.name}" class="dealer-image">
+                            <h3 class="dealer-name">${dealer.name}</h3>
+                        </div>
+                    </a>
                     </#list>
                 </div>
             </div>

@@ -185,6 +185,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 #{fuel}
             </foreach>
         </if>
+        <if test="idGarage != null">
+            AND cs.id_garage = #{idGarage}
+        </if>
         <if test="keyword != null and keyword != ''">
             AND (cs.sale_title LIKE CONCAT('%', #{keyword}, '%') 
                  OR cs.sale_description LIKE CONCAT('%', #{keyword}, '%')
