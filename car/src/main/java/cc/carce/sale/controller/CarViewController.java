@@ -47,6 +47,7 @@ import cc.carce.sale.entity.CarUserEntity;
 import cc.carce.sale.entity.dto.CarConfigContent;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.entity.CarDealerEntity;
+import cc.carce.sale.entity.CarProductsEntity;
 import cc.carce.sale.form.PaymentRequestForm;
 import cc.carce.sale.form.CarReportForm;
 import cc.carce.sale.entity.CarAdvertisementEntity;
@@ -67,6 +68,7 @@ import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarShoppingCartService;
 import cc.carce.sale.service.CarUserService;
 import cc.carce.sale.service.SmsService;
+import cc.carce.sale.service.CarProductsService;
 import cc.carce.sale.mapper.carcecloud.CarDealerMapper;
 import cc.carce.sale.dto.CarListDto;
 import cn.hutool.json.JSONObject;
@@ -148,6 +150,9 @@ public class CarViewController extends BaseController {
     
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+    
+    @Resource
+    private CarProductsService carProductsService;
     
     /**
      * 首页
@@ -609,6 +614,64 @@ public class CarViewController extends BaseController {
             
         } catch (Exception e) {
             log.error("获取车商详情失败，ID: {}", dealerId, e);
+            model.addAttribute("error", "獲取數據失敗：" + e.getMessage());
+            model.addAttribute("content", "/error/index.ftl");
+        }
+        
+        return "/layout/main";
+    }
+    
+    /**
+     * 跳转到商品详情页面
+     */
+    @GetMapping("/product/{productId}")
+    public String productDetail(Model model, @PathVariable("productId") Long productId, HttpServletRequest req) {
+        try {
+            // 检查用户登录状态
+            Object user = req.getSession().getAttribute("user");
+            model.addAttribute("user", user);
+            
+            // 获取商品基本信息
+            CarProductsEntity product = carProductsService.getProductById(productId);
+            if (product == null) {
+                model.addAttribute("error", "商品不存在");
+                model.addAttribute("content", "/error/index.ftl");
+                return "/layout/main";
+            }
+            
+            // 检查商品是否已发布
+            if (!product.getIsPublic()) {
+                model.addAttribute("error", "商品未发布");
+                model.addAttribute("content", "/error/index.ftl");
+                return "/layout/main";
+            }
+            
+            model.addAttribute("product", product);
+            model.addAttribute("productJson", JSONUtil.toJsonPrettyStr(product));
+            
+            // 获取商品图片列表
+            List<String> images = carProductsService.getProductImageUrls(productId);
+            model.addAttribute("images", images);
+            model.addAttribute("imagesJson", JSONUtil.toJsonPrettyStr(images));
+            
+            // 设置页面标题和描述
+            String title = product.getName() + " - " + product.getBrand() + " " + product.getModel();
+            String ogTitle = product.getName() + " - " + product.getBrand();
+            String ogDescription = product.getAlias() != null ? product.getAlias() : 
+                (product.getBrand() + " " + product.getModel() + " 高品質汽車配件");
+            
+            model.addAttribute("title", title);
+            model.addAttribute("ogTitle", ogTitle);
+            model.addAttribute("ogDescription", ogDescription);
+            model.addAttribute("ogImage", images != null && !images.isEmpty() ? images.get(0) : carProductsService.getImagePrefix() + "/img/product/default.jpg");
+            model.addAttribute("ogUrl", webUrl + "/product/" + productId);
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
+            model.addAttribute("imagePrefix", carProductsService.getImagePrefix());
+            
+            model.addAttribute("content", "/product/detail.ftl");
+            
+        } catch (Exception e) {
+            log.error("获取商品详情失败，商品ID: {}", productId, e);
             model.addAttribute("error", "獲取數據失敗：" + e.getMessage());
             model.addAttribute("content", "/error/index.ftl");
         }
