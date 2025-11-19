@@ -152,6 +152,55 @@
         </div>
         </#if>
         
+        <!-- 通用登录弹窗 -->
+        <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%); color: white; border-radius: 15px 15px 0 0;">
+                        <h5 class="modal-title text-start" id="loginModalLabel">
+                            <i class="bi bi-person-circle me-2"></i>用戶登錄
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div id="loginError" class="alert alert-danger" role="alert" style="display: none;">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <span id="loginErrorText"></span>
+                        </div>
+                        
+                        <form id="loginModalForm">
+                            <div class="mb-3">
+                                <label for="loginPhoneNumber" class="form-label">
+                                    <i class="bi bi-phone me-2"></i>手機號碼
+                                </label>
+                                <input type="tel" class="form-control" id="loginPhoneNumber" 
+                                       placeholder="請輸入手機號碼" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="loginSmsCode" class="form-label">
+                                    <i class="bi bi-shield-check me-2"></i>短信驗證碼
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="loginSmsCode" 
+                                           placeholder="請輸入驗證碼" required maxlength="6">
+                                    <button type="button" class="btn btn-outline-primary" id="loginSendSmsBtn">
+                                        <span id="loginSmsBtnText">發送驗證碼</span>
+                                    </button>
+                                </div>
+                                <div class="form-text">驗證碼將發送到您的手機，有效期5分鐘</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="loginSubmitBtn">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>登錄
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         
         <script>
@@ -352,8 +401,335 @@
             window.refreshCartCount = function() {
                 window.cartManager.refreshCartCount();
             };
+            
+            // 通用登录管理器
+            window.loginManager = {
+                loginPhoneNumber: '',
+                loginSmsCode: '',
+                loginCountdown: 0,
+                loginCountdownTimer: null,
+                loginSubmitting: false,
+                pendingAction: null,
+                
+                // 检查用户是否已登录
+                isLoggedIn: function() {
+                    // 通过检查页面元素判断是否登录
+                    // 如果存在退出登录按钮或用户状态显示，说明已登录
+                    const logoutBtn = document.getElementById('logoutBtn');
+                    const userStatus = document.querySelector('.user-status');
+                    return !!(logoutBtn || userStatus);
+                },
+                
+                // 显示登录弹窗
+                showLoginModal: function(pendingAction) {
+                    this.pendingAction = pendingAction || null;
+                    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    loginModal.show();
+                },
+                
+                // 初始化登录弹窗
+                init: function() {
+                    const self = this;
+                    
+                    // 手机号输入限制
+                    const phoneInput = document.getElementById('loginPhoneNumber');
+                    if (phoneInput) {
+                        phoneInput.addEventListener('input', function(e) {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length > 11) {
+                                value = value.substring(0, 11);
+                            }
+                            self.loginPhoneNumber = value;
+                            e.target.value = value;
+                        });
+                    }
+                    
+                    // 验证码输入限制
+                    const codeInput = document.getElementById('loginSmsCode');
+                    if (codeInput) {
+                        codeInput.addEventListener('input', function(e) {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length > 6) {
+                                value = value.substring(0, 6);
+                            }
+                            self.loginSmsCode = value;
+                            e.target.value = value;
+                        });
+                    }
+                    
+                    // 发送验证码按钮
+                    const sendSmsBtn = document.getElementById('loginSendSmsBtn');
+                    if (sendSmsBtn) {
+                        sendSmsBtn.addEventListener('click', function() {
+                            self.sendLoginSms();
+                        });
+                    }
+                    
+                    // 提交登录按钮
+                    const submitBtn = document.getElementById('loginSubmitBtn');
+                    if (submitBtn) {
+                        submitBtn.addEventListener('click', function() {
+                            self.submitLoginModal();
+                        });
+                    }
+                    
+                    // 监听弹窗关闭事件，清空表单
+                    const loginModalElement = document.getElementById('loginModal');
+                    if (loginModalElement) {
+                        loginModalElement.addEventListener('hidden.bs.modal', function() {
+                            self.resetLoginForm();
+                        });
+                    }
+                },
+                
+                // 发送登录验证码
+                sendLoginSms: async function() {
+                    const phone = this.loginPhoneNumber.trim();
+                    
+                    if (!phone) {
+                        this.showLoginError('請輸入手機號碼');
+                        return;
+                    }
+                    
+                    try {
+                        const res = await axios.post('/api/sms/send', { phoneNumber: phone });
+                        const data = res.data;
+                        if (data.success) {
+                            this.startLoginCountdown();
+                            this.hideLoginError();
+                            alert('驗證碼已發送，請查看控制台輸出');
+                        } else {
+                            if (data.remainingTime) {
+                                this.showLoginError('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼');
+                                this.loginCountdown = data.remainingTime;
+                                this.startLoginCountdown();
+                            } else {
+                                this.showLoginError(data.message || '發送失敗，請稍後重試');
+                            }
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        this.showLoginError('發送失敗，請稍後重試');
+                    }
+                },
+                
+                // 开始倒计时
+                startLoginCountdown: function() {
+                    this.loginCountdown = 30;
+                    const sendSmsBtn = document.getElementById('loginSendSmsBtn');
+                    const btnText = document.getElementById('loginSmsBtnText');
+                    
+                    if (this.loginCountdownTimer) {
+                        clearInterval(this.loginCountdownTimer);
+                    }
+                    
+                    this.loginCountdownTimer = setInterval(() => {
+                        this.loginCountdown--;
+                        if (btnText) {
+                            btnText.textContent = this.loginCountdown > 0 ? this.loginCountdown + '秒後重發' : '發送驗證碼';
+                        }
+                        if (sendSmsBtn) {
+                            sendSmsBtn.disabled = this.loginCountdown > 0;
+                        }
+                        
+                        if (this.loginCountdown <= 0) {
+                            clearInterval(this.loginCountdownTimer);
+                            this.loginCountdownTimer = null;
+                            this.loginCountdown = 0;
+                        }
+                    }, 1000);
+                },
+                
+                // 显示登录错误
+                showLoginError: function(message) {
+                    const errorDiv = document.getElementById('loginError');
+                    const errorText = document.getElementById('loginErrorText');
+                    if (errorDiv && errorText) {
+                        errorText.textContent = message;
+                        errorDiv.style.display = 'block';
+                    }
+                },
+                
+                // 隐藏登录错误
+                hideLoginError: function() {
+                    const errorDiv = document.getElementById('loginError');
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                    }
+                },
+                
+                // 提交登录
+                submitLoginModal: async function() {
+                    const phone = this.loginPhoneNumber.trim();
+                    const code = this.loginSmsCode.trim();
+                    
+                    if (!phone) {
+                        this.showLoginError('請輸入手機號碼');
+                        return;
+                    }
+                    
+                    if (!code || !/^\d{6}$/.test(code)) {
+                        this.showLoginError('請輸入6位數字驗證碼');
+                        return;
+                    }
+                    
+                    this.loginSubmitting = true;
+                    this.hideLoginError();
+                    
+                    const submitBtn = document.getElementById('loginSubmitBtn');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>登錄中...';
+                    }
+                    
+                    // 保存待执行的操作
+                    if (this.pendingAction) {
+                        sessionStorage.setItem('pendingAction', this.pendingAction);
+                    }
+                    
+                    // 创建隐藏的表单并提交（因为后端返回重定向，axios无法处理）
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/login';
+                    form.style.display = 'none';
+                    
+                    const phoneInput = document.createElement('input');
+                    phoneInput.type = 'hidden';
+                    phoneInput.name = 'phoneNumber';
+                    phoneInput.value = phone;
+                    form.appendChild(phoneInput);
+                    
+                    const codeInput = document.createElement('input');
+                    codeInput.type = 'hidden';
+                    codeInput.name = 'smsCode';
+                    codeInput.value = code;
+                    form.appendChild(codeInput);
+                    
+                    // 添加当前页面URL作为返回地址
+                    const returnUrlInput = document.createElement('input');
+                    returnUrlInput.type = 'hidden';
+                    returnUrlInput.name = 'returnUrl';
+                    returnUrlInput.value = window.location.pathname + window.location.search;
+                    form.appendChild(returnUrlInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                },
+                
+                // 重置登录表单
+                resetLoginForm: function() {
+                    this.loginPhoneNumber = '';
+                    this.loginSmsCode = '';
+                    this.loginSubmitting = false;
+                    this.hideLoginError();
+                    
+                    const phoneInput = document.getElementById('loginPhoneNumber');
+                    const codeInput = document.getElementById('loginSmsCode');
+                    const submitBtn = document.getElementById('loginSubmitBtn');
+                    const sendSmsBtn = document.getElementById('loginSendSmsBtn');
+                    const btnText = document.getElementById('loginSmsBtnText');
+                    
+                    if (phoneInput) phoneInput.value = '';
+                    if (codeInput) codeInput.value = '';
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>登錄';
+                    }
+                    if (sendSmsBtn) sendSmsBtn.disabled = false;
+                    if (btnText) btnText.textContent = '發送驗證碼';
+                    
+                    if (this.loginCountdownTimer) {
+                        clearInterval(this.loginCountdownTimer);
+                        this.loginCountdownTimer = null;
+                    }
+                    this.loginCountdown = 0;
+                }
+            };
+            
+            // 检查登录状态，如果未登录则显示登录弹窗
+            window.checkLoginAndShowModal = function(pendingAction) {
+                if (!window.loginManager.isLoggedIn()) {
+                    window.loginManager.showLoginModal(pendingAction);
+                    return false;
+                }
+                return true;
+            };
+            
+            // 页面加载完成后初始化登录管理器
+            document.addEventListener('DOMContentLoaded', function() {
+                window.loginManager.init();
+                
+                // 检查是否有待执行的操作（登录后返回）
+                const pendingAction = sessionStorage.getItem('pendingAction');
+                if (pendingAction) {
+                    sessionStorage.removeItem('pendingAction');
+                    // 延迟执行，确保页面已完全加载
+                    setTimeout(() => {
+                        // 触发自定义事件，让页面自己处理待执行的操作
+                        window.dispatchEvent(new CustomEvent('pendingAction', { detail: { action: pendingAction } }));
+                    }, 500);
+                }
+            });
         </script>
         
+        <style>
+        /* 登录弹窗样式 */
+        #loginModal .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        #loginModal .modal-header {
+            border-radius: 15px 15px 0 0;
+            border: none;
+        }
+
+        #loginModal .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        #loginModal .form-control:focus {
+            border-color: #5ACFC9;
+            box-shadow: 0 0 0 0.2rem rgba(90, 207, 201, 0.25);
+        }
+
+        #loginModal .btn-primary {
+            background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        #loginModal .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
+        }
+
+        #loginModal .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #loginModal .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        #loginModal .input-group .btn {
+            border-radius: 0 10px 10px 0;
+        }
+
+        #loginModal .input-group .form-control {
+            border-radius: 10px 0 0 10px;
+        }
+        </style>
 
 </body>
 </html>

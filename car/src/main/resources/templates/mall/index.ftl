@@ -435,6 +435,30 @@ new Vue({
     },
     mounted() {
         this.loadProducts();
+        
+        // 监听登录后待执行的操作
+        const self = this;
+        window.addEventListener('pendingAction', function(event) {
+            if (event.detail && event.detail.action === 'addToCart') {
+                // 登录后自动执行加购操作
+                const pendingCartItem = sessionStorage.getItem('pendingAddToCart');
+                if (pendingCartItem) {
+                    try {
+                        const cartItem = JSON.parse(pendingCartItem);
+                        sessionStorage.removeItem('pendingAddToCart');
+                        // 延迟执行，确保页面已完全加载
+                        setTimeout(() => {
+                            const product = self.products.find(p => p.id === cartItem.productId);
+                            if (product) {
+                                self.addToCart(product);
+                            }
+                        }, 300);
+                    } catch (e) {
+                        console.error('解析待加购商品信息失败:', e);
+                    }
+                }
+            }
+        });
     },
     methods: {
         // 加载商品数据
@@ -518,6 +542,18 @@ new Vue({
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
+            }
+            
+            // 检查登录状态，如果未登录则显示登录弹窗
+            if (!window.checkLoginAndShowModal('addToCart')) {
+                // 保存商品信息，登录后自动加购
+                sessionStorage.setItem('pendingAddToCart', JSON.stringify({
+                    productId: product.id,
+                    productAmount: 1,
+                    productPrice: product.price,
+                    productName: product.name
+                }));
+                return;
             }
             
             try {
