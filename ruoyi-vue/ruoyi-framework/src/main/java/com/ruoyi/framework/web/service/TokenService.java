@@ -118,33 +118,29 @@ public class TokenService
     }
 
     /**
-     * 验证令牌有效期，相差不足20分钟，自动刷新缓存
+     * 验证令牌有效期，永不过期，无需刷新
      *
      * @param loginUser
      * @return 令牌
      */
     public void verifyToken(LoginUser loginUser)
     {
-        long expireTime = loginUser.getExpireTime();
-        long currentTime = System.currentTimeMillis();
-        if (expireTime - currentTime <= MILLIS_MINUTE_TEN)
-        {
-            refreshToken(loginUser);
-        }
+        // 永不过期，无需验证和刷新
     }
 
     /**
-     * 刷新令牌有效期
+     * 刷新令牌有效期（永不过期）
      *
      * @param loginUser 登入信息
      */
     public void refreshToken(LoginUser loginUser)
     {
         loginUser.setLoginTime(System.currentTimeMillis());
-        loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
-        // 根据uuid将loginUser缓存
+        // 设置过期时间为Long.MAX_VALUE，表示永不过期
+        loginUser.setExpireTime(Long.MAX_VALUE);
+        // 根据uuid将loginUser缓存，不设置过期时间，实现永不过期
         String userKey = getTokenKey(loginUser.getToken());
-        redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
+        redisCache.setCacheObject(userKey, loginUser);
     }
 
     /**

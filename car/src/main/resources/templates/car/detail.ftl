@@ -172,8 +172,8 @@
                     </div>
                 </div>
                 
-                <!-- 右侧广告块区域 (1/3) -->
-                <div class="col-md-4">
+                <!-- 右侧广告块区域 (1/3) - 桌面端显示 -->
+                <div class="col-md-4 d-none d-md-block">
                     <div class="ad-section">
                         <div class="row">
                             <div class="col-12 mb-3" 
@@ -432,10 +432,153 @@
         </div>
     </div>
     
+    <!-- 电话联络弹窗 -->
+    <div class="modal fade" id="phoneContactModal" tabindex="-1" aria-labelledby="phoneContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%); color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="modal-title text-start" id="phoneContactModalLabel">
+                        <i class="bi bi-telephone me-2"></i>聯絡電話
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="phone-number-display mb-3 text-center">
+                        <div style="font-size: 1.1rem; color: #666; margin-bottom: 0.5rem;">聯絡電話</div>
+                        <div>
+                            <i class="bi bi-telephone-fill me-2" style="font-size: 1.5rem; color: #5ACFC9;"></i>
+                            <span id="phoneContactNumber" style="font-size: 1.5rem; font-weight: 600; color: #333;"></span>
+                        </div>
+                    </div>
+                    <div class="phone-warning-text" style="color: #666; line-height: 1.6; font-size: 0.95rem;">
+                        聯絡完店家若確認看車，務必填「預約看車」表單，讓平台一起把關，避免受騙上當。
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @click="confirmPhoneContact" style="width: 100%;">
+                        <i class="bi bi-check-circle me-2"></i>確定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 登录弹窗 -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%); color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="modal-title text-start" id="loginModalLabel">
+                        <i class="bi bi-person-circle me-2"></i>用戶登錄
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="loginError" class="alert alert-danger" role="alert" style="display: none;">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <span id="loginErrorText"></span>
+                    </div>
+                    
+                    <form id="loginModalForm">
+                        <div class="mb-3">
+                            <label for="loginPhoneNumber" class="form-label">
+                                <i class="bi bi-phone me-2"></i>手機號碼
+                            </label>
+                            <input type="tel" class="form-control" id="loginPhoneNumber" 
+                                   placeholder="請輸入手機號碼" required v-model.trim="loginPhoneNumber" @input="onLoginPhoneInput">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="loginSmsCode" class="form-label">
+                                <i class="bi bi-shield-check me-2"></i>短信驗證碼
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="loginSmsCode" 
+                                       placeholder="請輸入驗證碼" required maxlength="6" v-model.trim="loginSmsCode" @input="onLoginCodeInput">
+                                <button type="button" class="btn btn-outline-primary" id="loginSendSmsBtn" 
+                                        :disabled="loginCountdown>0" @click="sendLoginSms">
+                                    <span v-text="loginCountdown>0 ? loginCountdown + '秒後重發' : '發送驗證碼'"></span>
+                                </button>
+                            </div>
+                            <div class="form-text">驗證碼將發送到您的手機，有效期5分鐘</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" @click="submitLoginModal" :disabled="loginSubmitting">
+                        <span v-if="loginSubmitting">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            登錄中...
+                        </span>
+                        <span v-else>
+                            <i class="bi bi-box-arrow-in-right me-2"></i>登錄
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- SEO描述 -->
     <section class="seo-description" style="display:none">
         <p><#if carInfo.saleDescription??>${carInfo.saleDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if><#if carInfo.saleDescription?? && ogDescription??>,</#if><#if ogDescription??>${ogDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if></p>
     </section>
+    
+    <!-- 移动端广告位（在footer上方显示） -->
+    <!-- 小屏幕广告位（手机竖屏，宽度 < 576px） -->
+    <div class="mobile-ads-section d-block d-sm-none">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 mb-3" 
+                     v-for="(ad, index) in mobileAdvertisementsSmall" :key="ad.id">
+                    <div class="ad-card" :data-ad-id="ad.id">
+                        <!-- 連結類型广告 -->
+                        <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
+                            <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
+                                 @error="handleImageError($event, ad.title)">
+                            <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                            <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                        </a>
+                        <!-- 內容類型广告 -->
+                        <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                            <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
+                                 @error="handleImageError($event, ad.title)">
+                            <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                            <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 中等屏幕广告位（手机横屏/小平板，576px <= 宽度 < 768px） -->
+    <div class="mobile-ads-section d-none d-sm-block d-md-none">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 mb-3" 
+                     v-for="(ad, index) in mobileAdvertisementsMedium" :key="ad.id">
+                    <div class="ad-card" :data-ad-id="ad.id">
+                        <!-- 連結類型广告 -->
+                        <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
+                            <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
+                                 @error="handleImageError($event, ad.title)">
+                            <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                            <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                        </a>
+                        <!-- 內容類型广告 -->
+                        <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                            <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
+                                 @error="handleImageError($event, ad.title)">
+                            <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                            <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="application/ld+json">
 {
@@ -503,7 +646,16 @@ try {
         autoPlayTimer: null,
         autoPlayInterval: 5000,
         features: [],
-        advertisements: []
+        advertisements: [],
+        mobileAdvertisementsSmall: [], // 小屏幕移动端广告数据（< 576px）
+        mobileAdvertisementsMedium: [], // 中等屏幕移动端广告数据（576px - 768px）
+        // 登录弹窗相关数据
+        loginPhoneNumber: '',
+        loginSmsCode: '',
+        loginCountdown: 0,
+        loginCountdownTimer: null,
+        loginSubmitting: false,
+        pendingAction: null // 登录后要执行的操作: 'appointment' 或 'report'
     },
     mounted() {
         console.log('车辆详情页Vue实例已挂载');
@@ -515,6 +667,28 @@ try {
         this.startAutoPlay();
         this.getFeatures();
         this.getAdvertisements();
+        
+        // 检查是否有待执行的操作（登录后返回）
+        const pendingAction = sessionStorage.getItem('pendingAction');
+        if (pendingAction) {
+            sessionStorage.removeItem('pendingAction');
+            // 延迟执行，确保页面已完全加载
+            setTimeout(() => {
+                if (pendingAction === 'appointment') {
+                    this.openAppointmentModal();
+                } else if (pendingAction === 'report') {
+                    this.openReportModal();
+                }
+            }, 500);
+        }
+        
+        // 监听登录弹窗关闭事件，清空表单
+        const loginModalElement = document.getElementById('loginModal');
+        if (loginModalElement) {
+            loginModalElement.addEventListener('hidden.bs.modal', () => {
+                this.resetLoginForm();
+            });
+        }
         
         // 测试Vue实例是否正常工作
         setTimeout(() => {
@@ -648,19 +822,38 @@ try {
         // 打开电话联系
         openPhoneContact() {
             if (!this.dealerInfo.companyMobile) {
-                alert('店家未提供联系电话');
+                alert('店家未提供聯絡電話');
                 return;
+            }
+            
+            // 设置电话号码到弹窗
+            const phoneNumberElement = document.getElementById('phoneContactNumber');
+            if (phoneNumberElement) {
+                phoneNumberElement.textContent = this.dealerInfo.companyMobile;
+            }
+            
+            // 显示电话联络弹窗
+            const phoneModal = new bootstrap.Modal(document.getElementById('phoneContactModal'));
+            phoneModal.show();
+        },
+        
+        // 确认电话联系
+        confirmPhoneContact() {
+            // 关闭弹窗
+            const phoneModalElement = document.getElementById('phoneContactModal');
+            if (phoneModalElement) {
+                const phoneModal = bootstrap.Modal.getInstance(phoneModalElement);
+                if (phoneModal) {
+                    phoneModal.hide();
+                }
             }
             
             // 检测设备类型
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            if (isMobile) {
+            if (isMobile && this.dealerInfo.companyMobile) {
                 // 移动设备：直接拨号
                 window.location.href = 'tel:' + this.dealerInfo.companyMobile;
-            } else {
-                // PC设备：显示电话号码
-                alert('联系电话：' + this.dealerInfo.companyMobile);
             }
         },
         
@@ -694,9 +887,14 @@ try {
                 url: '/api/advertisement/list',
                 method: 'GET',
                 success: (data) => {
-                    // 过滤出 advType=0 的数据，取前2个
-                    const filteredAds = data.data.filter(ad => ad.advType === 0).slice(0, 2);
-                    _this.advertisements = filteredAds;
+                    // 过滤出 advType=0 的数据
+                    const filteredAds = data.data.filter(ad => ad.advType === 0);
+                    // 桌面端广告：取前2个
+                    _this.advertisements = filteredAds.slice(0, 2);
+                    // 小屏幕移动端广告：取前2个（< 576px）
+                    _this.mobileAdvertisementsSmall = filteredAds.slice(0, 2);
+                    // 中等屏幕移动端广告：取前2个（576px - 768px）
+                    _this.mobileAdvertisementsMedium = filteredAds.slice(0, 2);
                 },
                 error: (error) => {
                     console.log('获取广告数据失败:', error);
@@ -739,16 +937,26 @@ try {
         
         // 打开檢舉弹窗
         openReportModal() {
-            // 检查用户是否已登录
-            <#if user??>
-                // 已登录，打开檢舉弹窗
-                const modal = new bootstrap.Modal(document.getElementById('reportModal'));
-                modal.show();
-            <#else>
-                // 未登录，提示用户先登录
-                alert('請先登入後再進行檢舉');
+            // 检查用户是否已登录（通过检查预约弹窗中的用户显示元素）
+            const userNameDisplay = document.getElementById('appointmentNameDisplay');
+            if (!userNameDisplay) {
+                console.error('找不到用户名称显示元素');
                 return;
-            </#if>
+            }
+            
+            const isLoggedIn = !userNameDisplay.querySelector('.text-danger');
+            
+            if (!isLoggedIn) {
+                // 未登录，打开登录弹窗
+                this.pendingAction = 'report';
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
+                return;
+            }
+            
+            // 已登录，打开檢舉弹窗
+            const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+            modal.show();
         },
         
         // 提交檢舉
@@ -837,12 +1045,10 @@ try {
             const isLoggedIn = !userNameDisplay.querySelector('.text-danger');
             
             if (!isLoggedIn) {
-                // 未登录，显示提示并跳转到登录页
-                if (confirm('您尚未登录，是否跳转到登录页面？')) {
-                    // 获取当前页面URL作为返回地址
-                    const currentUrl = window.location.pathname + window.location.search;
-                    window.location.href = '/login?returnUrl=' + encodeURIComponent(currentUrl);
-                }
+                // 未登录，打开登录弹窗
+                this.pendingAction = 'appointment';
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
                 return;
             }
             
@@ -947,6 +1153,148 @@ try {
                 console.error('提交预约失败:', error);
                 alert('预约失败，请稍后重试');
             }
+        },
+        
+        // 登录弹窗相关方法
+        onLoginPhoneInput(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            this.loginPhoneNumber = value;
+        },
+        
+        onLoginCodeInput(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            this.loginSmsCode = value;
+        },
+        
+        startLoginCountdown() {
+            this.loginCountdown = 30;
+            if (this.loginCountdownTimer) {
+                clearInterval(this.loginCountdownTimer);
+            }
+            this.loginCountdownTimer = setInterval(() => {
+                this.loginCountdown--;
+                if (this.loginCountdown <= 0) {
+                    clearInterval(this.loginCountdownTimer);
+                    this.loginCountdownTimer = null;
+                    this.loginCountdown = 0;
+                }
+            }, 1000);
+        },
+        
+        async sendLoginSms() {
+            const phone = this.loginPhoneNumber.trim();
+            
+            if (!phone) {
+                this.showLoginError('請輸入手機號碼');
+                return;
+            }
+            
+            try {
+                const res = await axios.post('/api/sms/send', { phoneNumber: phone });
+                const data = res.data;
+                if (data.success) {
+                    this.startLoginCountdown();
+                    this.hideLoginError();
+                    alert('驗證碼已發送，請查看控制台輸出');
+                } else {
+                    if (data.remainingTime) {
+                        this.showLoginError('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼');
+                        this.loginCountdown = data.remainingTime;
+                        this.startLoginCountdown();
+                    } else {
+                        this.showLoginError(data.message || '發送失敗，請稍後重試');
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                this.showLoginError('發送失敗，請稍後重試');
+            }
+        },
+        
+        showLoginError(message) {
+            const errorDiv = document.getElementById('loginError');
+            const errorText = document.getElementById('loginErrorText');
+            if (errorDiv && errorText) {
+                errorText.textContent = message;
+                errorDiv.style.display = 'block';
+            }
+        },
+        
+        hideLoginError() {
+            const errorDiv = document.getElementById('loginError');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+        },
+        
+        async submitLoginModal() {
+            const phone = this.loginPhoneNumber.trim();
+            const code = this.loginSmsCode.trim();
+            
+            if (!phone) {
+                this.showLoginError('請輸入手機號碼');
+                return;
+            }
+            
+            if (!code || !/^\d{6}$/.test(code)) {
+                this.showLoginError('請輸入6位數字驗證碼');
+                return;
+            }
+            
+            this.loginSubmitting = true;
+            this.hideLoginError();
+            
+            // 保存待执行的操作
+            if (this.pendingAction) {
+                sessionStorage.setItem('pendingAction', this.pendingAction);
+            }
+            
+            // 创建隐藏的表单并提交（因为后端返回重定向，axios无法处理）
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/login';
+            form.style.display = 'none';
+            
+            const phoneInput = document.createElement('input');
+            phoneInput.type = 'hidden';
+            phoneInput.name = 'phoneNumber';
+            phoneInput.value = phone;
+            form.appendChild(phoneInput);
+            
+            const codeInput = document.createElement('input');
+            codeInput.type = 'hidden';
+            codeInput.name = 'smsCode';
+            codeInput.value = code;
+            form.appendChild(codeInput);
+            
+            // 添加当前页面URL作为返回地址
+            const returnUrlInput = document.createElement('input');
+            returnUrlInput.type = 'hidden';
+            returnUrlInput.name = 'returnUrl';
+            returnUrlInput.value = window.location.pathname + window.location.search;
+            form.appendChild(returnUrlInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        },
+        
+        // 重置登录表单
+        resetLoginForm() {
+            this.loginPhoneNumber = '';
+            this.loginSmsCode = '';
+            this.loginSubmitting = false;
+            this.hideLoginError();
+            if (this.loginCountdownTimer) {
+                clearInterval(this.loginCountdownTimer);
+                this.loginCountdownTimer = null;
+            }
+            this.loginCountdown = 0;
         }
     }
 });
@@ -1115,9 +1463,218 @@ try {
     }
 }
 
+/* 电话联络弹窗样式 */
+#phoneContactModal .modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+#phoneContactModal .modal-header {
+    border-radius: 15px 15px 0 0;
+    border: none;
+}
+
+#phoneContactModal .phone-number-display {
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+}
+
+#phoneContactModal .phone-warning-text {
+    padding: 1rem;
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 5px;
+    text-align: left;
+}
+
+#phoneContactModal .btn-primary {
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+#phoneContactModal .btn-primary:hover {
+    background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
+}
+
+/* 登录弹窗样式 */
+#loginModal .modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+#loginModal .modal-header {
+    border-radius: 15px 15px 0 0;
+    border: none;
+}
+
+#loginModal .form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+#loginModal .form-control:focus {
+    border-color: #5ACFC9;
+    box-shadow: 0 0 0 0.2rem rgba(90, 207, 201, 0.25);
+}
+
+#loginModal .btn-primary {
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+#loginModal .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
+}
+
+#loginModal .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#loginModal .alert {
+    border-radius: 10px;
+    border: none;
+}
+
+#loginModal .input-group .btn {
+    border-radius: 0 10px 10px 0;
+}
+
+#loginModal .input-group .form-control {
+    border-radius: 10px 0 0 10px;
+}
+
 /* 功能块和广告块样式 */
 .features-ads-section {
     padding: 20px 0;
+}
+
+/* 移动端广告位样式 */
+.mobile-ads-section {
+    padding: 20px 0;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.mobile-ads-section .ad-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    height: auto;
+    min-height: 200px;
+    position: relative;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.mobile-ads-section .ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.mobile-ads-section .ad-image {
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    object-fit: cover;
+}
+
+.mobile-ads-section .ad-title-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-ads-section .ad-card:hover .ad-title-overlay {
+    opacity: 1;
+}
+
+.mobile-ads-section .ad-title-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 20px 15px 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.mobile-ads-section .ad-card:hover .ad-title-bottom {
+    transform: translateY(-5px);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+}
+
+.mobile-ads-section .ad-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+}
+
+.mobile-ads-section .ad-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.mobile-ads-section .ad-content-link {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* 响应式：确保移动端广告位在footer上方 */
+@media (max-width: 767.98px) {
+    .mobile-ads-section {
+        padding: 15px 0;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .mobile-ads-section .ad-card {
+        margin-bottom: 1rem;
+    }
 }
 
 .feature-card {

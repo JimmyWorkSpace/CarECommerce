@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="銷售標題" prop="saleTitle">
+      <el-form-item label="車型" prop="saleTitle">
         <el-input
           v-model="queryParams.saleTitle"
-          placeholder="請輸入銷售標題"
+          placeholder="請輸入車型"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -17,12 +17,12 @@
           <el-option label="下架" value="下架" />
         </el-select>
       </el-form-item> -->
-      <el-form-item label="行照照片" prop="hasRegImage">
+      <!-- <el-form-item label="行照照片" prop="hasRegImage">
         <el-select v-model="queryParams.hasRegImage" placeholder="請選擇" clearable size="small">
           <el-option label="已上傳" :value="1" />
           <el-option label="未上傳" :value="0" />
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="驗證結果" prop="isAdminCheck">
         <el-select v-model="queryParams.isAdminCheck" placeholder="請選擇" clearable size="small">
           <el-option label="待審核" :value="0" />
@@ -193,7 +193,7 @@ export default {
         salesperson: null,
         status: null,
         isVisible: 1,
-        hasRegImage: null,
+        // hasRegImage: null,
         isAdminCheck: null,
         isPublish: null
       }
