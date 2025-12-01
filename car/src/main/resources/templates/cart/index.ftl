@@ -62,13 +62,13 @@
                             </div>
                             <div class="col-md-3">
                                 <h5 class="cart-item-name">{{ item.productName }}</h5>
-                                <p class="cart-item-details">
-                                    <span class="badge bg-secondary me-2">{{ item.brand }} {{ item.model }}</span>
-                                    <span class="badge bg-info me-2">{{ item.tag }}</span>
-                                    <span class="badge bg-warning me-2">{{ item.source }}</span>
-                                    <span class="badge bg-success me-2">市价: ${CurrencyUnit} {{ formatPrice(item.marketPrice) }}</span>
-                                </p>
-                                <p class="cart-item-price">售价: ${CurrencyUnit} {{ formatPrice(item.productPrice) }}</p>
+                                <div class="cart-item-tags" v-if="item.tag">
+                                    <span v-for="(tag, index) in getProductTags(item.tag)" 
+                                          :key="tag" 
+                                          :class="'badge me-1 mb-1 ' + getTagColorClass(index)">
+                                        {{ tag }}
+                                    </span>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="quantity-controls">
@@ -197,14 +197,20 @@
     margin-bottom: 0.5rem;
     color: #333;
     font-weight: 600;
+    text-align: left;
 }
 
-.cart-item-details {
+.cart-item-tags {
     margin-bottom: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: flex-start;
 }
 
-.cart-item-details .badge {
+.cart-item-tags .badge {
     font-size: 0.75rem;
+    padding: 5px 10px;
 }
 
 .cart-item-price {
@@ -693,8 +699,32 @@ new Vue({
         
         // 获取商品图片
         getProductImage(item) {
-            // 直接使用DTO中的商品图片路径
-            return item.productImage || '/img/product/default_90x90.jpg';
+            // 直接使用DTO中的商品图片路径（后端已经处理了前缀）
+            if (item.productImage) {
+                return item.productImage;
+            }
+            // 如果没有图片，返回默认图片
+            return '/img/product/default_90x90.jpg';
+        },
+        
+        // 解析商品标签（按逗号分隔）
+        getProductTags(tags) {
+            if (!tags) return [];
+            return tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        },
+        
+        // 根据索引获取标签颜色类
+        getTagColorClass(index) {
+            const colors = [
+                'bg-primary',
+                'bg-success',
+                'bg-info',
+                'bg-warning',
+                'bg-danger',
+                'bg-secondary',
+                'bg-dark'
+            ];
+            return colors[index % colors.length];
         }
     }
 });
