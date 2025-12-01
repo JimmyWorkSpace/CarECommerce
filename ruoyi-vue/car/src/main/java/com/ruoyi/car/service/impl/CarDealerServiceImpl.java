@@ -102,27 +102,32 @@ public class CarDealerServiceImpl extends BaseServiceImpl implements CarDealerSe
 	}
 	
 	/**
-	 * 查询經銷商列表
+	 * 查询經銷商列表（用于精选卖家管理）
+	 * 过滤条件：
+	 * 1. car_dealers表的id_garage相同的只取第一条（id最小的）
+	 * 2. id_garage需要存在于car_sales表
+	 * 3. car_sales表的is_admin_check为1
 	 * 
 	 * @param carDealer 經銷商信息
 	 * @return 經銷商集合
 	 */
 	@Override
 	public List<CarDealerEntity> selectCarDealerList(CarDealerEntity carDealer) {
-		Example example = new Example(CarDealerEntity.class);
-		Example.Criteria criteria = example.createCriteria();
+		String dealerName = carDealer.getDealerName() != null ? carDealer.getDealerName().trim() : null;
+		String contactPerson = carDealer.getContactPerson() != null ? carDealer.getContactPerson().trim() : null;
+		String companyPhone = carDealer.getCompanyPhone() != null ? carDealer.getCompanyPhone().trim() : null;
 		
-		if (carDealer.getDealerName() != null && !carDealer.getDealerName().trim().isEmpty()) {
-			criteria.andLike("dealerName", "%" + carDealer.getDealerName() + "%");
+		// 如果查詢條件都為空，傳入null
+		if (dealerName != null && dealerName.isEmpty()) {
+			dealerName = null;
 		}
-		if (carDealer.getContactPerson() != null && !carDealer.getContactPerson().trim().isEmpty()) {
-			criteria.andLike("contactPerson", "%" + carDealer.getContactPerson() + "%");
+		if (contactPerson != null && contactPerson.isEmpty()) {
+			contactPerson = null;
 		}
-		if (carDealer.getCompanyPhone() != null && !carDealer.getCompanyPhone().trim().isEmpty()) {
-			criteria.andLike("companyPhone", "%" + carDealer.getCompanyPhone() + "%");
+		if (companyPhone != null && companyPhone.isEmpty()) {
+			companyPhone = null;
 		}
 		
-		example.orderBy("cDt").desc();
-		return carDealerMapper.selectByExample(example);
+		return carDealerMapper.selectCarDealerListForRecommend(dealerName, contactPerson, companyPhone);
 	}
 }

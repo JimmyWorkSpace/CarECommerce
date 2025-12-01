@@ -1194,7 +1194,7 @@ try {
             const phone = this.loginPhoneNumber.trim();
             
             if (!phone) {
-                this.showLoginError('請輸入手機號碼');
+                this.showToast('請輸入手機號碼', 'warning');
                 return;
             }
             
@@ -1207,16 +1207,16 @@ try {
                     this.showToast('驗證碼已發送，請查看手機簡訊，也留意垃圾簡訊內容', 'success');
                 } else {
                     if (data.remainingTime) {
-                        this.showLoginError('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼');
+                        this.showToast('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼', 'warning');
                         this.loginCountdown = data.remainingTime;
                         this.startLoginCountdown();
                     } else {
-                        this.showLoginError(data.message || '發送失敗，請稍後重試');
+                        this.showToast(data.message || '發送失敗，請稍後重試', 'danger');
                     }
                 }
             } catch (err) {
                 console.error(err);
-                this.showLoginError('發送失敗，請稍後重試');
+                this.showToast('發送失敗，請稍後重試', 'danger');
             }
         },
         
@@ -1298,12 +1298,12 @@ try {
             const code = this.loginSmsCode.trim();
             
             if (!phone) {
-                this.showLoginError('請輸入手機號碼');
+                this.showToast('請輸入手機號碼', 'warning');
                 return;
             }
             
             if (!code || !/^\d{6}$/.test(code)) {
-                this.showLoginError('請輸入6位數字驗證碼');
+                this.showToast('請輸入6位數字驗證碼', 'warning');
                 return;
             }
             

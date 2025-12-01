@@ -27,7 +27,6 @@ import cc.carce.sale.mapper.manager.CarRecommandMapper;
 import cc.carce.sale.util.ImageUrlUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Example;
 
 @Service
 @Slf4j
@@ -223,10 +222,44 @@ public class CarSalesService {
 		
 		List<CarDealerEntity> dealerList = carDealerMapper.selectByExample(dealerExample);
 		
+		if (dealerList == null || dealerList.isEmpty()) {
+			return new ArrayList<>();
+		}
+		
+		// 提取所有店家的idGarage列表
+		List<Long> garageIds = dealerList.stream()
+			.map(CarDealerEntity::getIdGarage)
+			.filter(java.util.Objects::nonNull)
+			.distinct()
+			.collect(java.util.stream.Collectors.toList());
+		
+		if (garageIds.isEmpty()) {
+			return new ArrayList<>();
+		}
+		
+		// 查询car_sales表中id_garage存在且is_admin_check=1的记录
+		Example salesExample = new Example(CarSalesEntity.class);
+		salesExample.createCriteria()
+			.andIn("idGarage", garageIds)
+			.andEqualTo("isAdminCheck", 1);
+		
+		List<CarSalesEntity> salesList = carSalesMapper.selectByExample(salesExample);
+		
+		// 提取符合条件的idGarage集合
+		java.util.Set<Long> validGarageIds = salesList.stream()
+			.map(CarSalesEntity::getIdGarage)
+			.filter(java.util.Objects::nonNull)
+			.collect(java.util.stream.Collectors.toSet());
+		
+		// 过滤店家列表，只保留idGarage在car_sales中存在且is_admin_check=1的店家
+		List<CarDealerEntity> filteredDealerList = dealerList.stream()
+			.filter(dealer -> dealer.getIdGarage() != null && validGarageIds.contains(dealer.getIdGarage()))
+			.collect(java.util.stream.Collectors.toList());
+		
 		// 按照推荐顺序排序
 		List<CarDealerEntity> orderedDealerList = new ArrayList<>();
 		for (CarRecommandEntity recommand : recommandList) {
-			for (CarDealerEntity dealer : dealerList) {
+			for (CarDealerEntity dealer : filteredDealerList) {
 				if (dealer.getId().equals(recommand.getRecommandId())) {
 					orderedDealerList.add(dealer);
 					break;

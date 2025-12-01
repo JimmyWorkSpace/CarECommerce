@@ -10,9 +10,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import cc.carce.sale.entity.CarSmsLogEntity;
 import cc.carce.sale.mapper.manager.CarSmsLogMapper;
@@ -37,8 +35,6 @@ public class SmsService {
     @Value("${sms.password}")
     private String password;
 
-    @Autowired
-    private Environment environment;
 
     @Autowired
     private CarSmsLogMapper carSmsLogMapper;
@@ -55,11 +51,6 @@ public class SmsService {
     // 发送间隔时间（秒）
     private static final int SEND_INTERVAL_SECONDS = 25;
 
-    // 开发环境固定验证码
-    private static final String DEV_FIXED_CODE = "123456";
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
     /**
      * 发送短信验证码
      * 
@@ -67,27 +58,8 @@ public class SmsService {
      * @return 验证码
      */
     public String sendSmsCode(String phoneNumber) {
-        String code;
-
-        // 检查当前环境，如果是dev或test环境，使用固定验证码
-        String[] activeProfiles = environment.getActiveProfiles();
-        boolean isDevOrTest = false;
-
-        for (String profile : activeProfiles) {
-            if ("dev".equals(profile) || "test".equals(profile)) {
-                isDevOrTest = true;
-                break;
-            }
-        }
-
-        if (isDevOrTest) {
-            // 开发环境使用固定验证码
-            code = DEV_FIXED_CODE;
-            log.info("=== 开发环境：使用固定验证码 {} ===", code);
-        } else {
-            // 生产环境生成随机验证码
-            code = RandomUtil.randomNumbers(6);
-        }
+        // 生成随机验证码
+        String code = RandomUtil.randomNumbers(6);
 
         // 计算过期时间
         long expireTime = System.currentTimeMillis() + CODE_EXPIRE_MINUTES * 60 * 1000;
@@ -103,26 +75,15 @@ public class SmsService {
         String message = String.format("您的验证码是：%s，%d分钟内有效，请勿泄露给他人。", code, CODE_EXPIRE_MINUTES);
 
         try {
-            if (isDevOrTest) {
-                // 开发环境只打印到控制台，不实际发送短信
-                log.info("=== 短信验证码发送模拟 ===");
-                log.info("手机号: {}", phoneNumber);
-                log.info("验证码: {}", code);
-                log.info("有效期: {} 分钟", CODE_EXPIRE_MINUTES);
-                log.info("环境: 开发环境 (固定验证码)");
-                log.info("短信内容: {}", message);
-                log.info("========================");
-            } else {
-                // 生产环境实际发送短信
-                SmsResponse result = sendSms(phoneNumber, message);
-                log.info("=== 短信验证码发送结果 ===");
-                log.info("手机号: {}", phoneNumber);
-                log.info("验证码: {}", code);
-                log.info("有效期: {} 分钟", CODE_EXPIRE_MINUTES);
-                log.info("短信内容: {}", message);
-                log.info("发送结果: {}", result);
-                log.info("========================");
-            }
+            // 所有环境都实际发送短信
+            SmsResponse result = sendSms(phoneNumber, message);
+            log.info("=== 短信验证码发送结果 ===");
+            log.info("手机号: {}", phoneNumber);
+            log.info("验证码: {}", code);
+            log.info("有效期: {} 分钟", CODE_EXPIRE_MINUTES);
+            log.info("短信内容: {}", message);
+            log.info("发送结果: {}", result);
+            log.info("========================");
         } catch (Exception e) {
             log.error("发送短信验证码失败，手机号: {}, 错误: {}", phoneNumber, e.getMessage(), e);
             // 发送失败时从缓存中移除验证码
