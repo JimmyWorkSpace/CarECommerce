@@ -20,4 +20,6 @@ public class CarProductListDto {
     private String image;
     private String category;
     private String description;
+    private Long categoryId;  // 分类ID
+    private String productTags;  // 商品标签
 }

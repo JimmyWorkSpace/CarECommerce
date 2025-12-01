@@ -21,7 +21,7 @@ import cc.carce.sale.dto.ECPayReturnResultDto;
 import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
-import cc.carce.sale.entity.CarProductsEntity;
+import cc.carce.sale.entity.CarProductEntity;
 import cc.carce.sale.form.CartItem;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
@@ -54,7 +54,7 @@ public class ECPayService {
     private CarOrderDetailService carOrderDetailService;
     
     @Resource
-    private CarProductsService carProductsService;
+    private CarProductService carProductService;
     
     @Resource
     private CarShoppingCartService carShoppingCartService;
@@ -332,15 +332,15 @@ public class ECPayService {
                         Long productId = cartItem.getProductId();
                         Integer productAmount = cartItem.getProductAmount();
                         
-                        // 从products表查询market_price
-                        CarProductsEntity product = carProductsService.getProductById(productId);
+                        // 从car_product表查询salePrice
+                        CarProductEntity product = carProductService.getProductById(productId);
                         if (product == null) {
                             log.error("商品不存在，商品ID：{}", productId);
                             return R.fail("商品不存在，商品ID：" + productId, null);
                         }
                         
-                        // 使用market_price作为商品价格
-                        int productPrice = product.getMarketPrice().intValue();
+                        // 使用salePrice作为商品价格
+                        int productPrice = product.getSalePrice() != null ? product.getSalePrice().intValue() : 0;
                         int itemTotal = productPrice * productAmount;
                         totalAmount += itemTotal;
                         

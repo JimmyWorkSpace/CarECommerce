@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cc.carce.sale.dto.CarShoppingCartDto;
-import cc.carce.sale.entity.CarProductsEntity;
+import cc.carce.sale.entity.CarProductEntity;
+import cc.carce.sale.entity.CarProductImageEntity;
 import cc.carce.sale.entity.CarShoppingCartEntity;
 import cc.carce.sale.mapper.manager.CarShoppingCartMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class CarShoppingCartService {
 	private CarShoppingCartMapper carShoppingCartMapper;
 	
 	@Resource
-	private CarProductsService carProductsService;
+	private CarProductService carProductService;
 	
 	@Value("${carce.prefix}")
 	private String imagePrefix;
@@ -180,17 +181,22 @@ public class CarShoppingCartService {
 		dto.setCreateTime(entity.getCreateTime());
 		
 		// 查询商品详细信息
-		CarProductsEntity product = carProductsService.getProductById(entity.getProductId());
+		CarProductEntity product = carProductService.getProductById(entity.getProductId());
 		if (product != null) {
-			dto.setSource(product.getSource());
-			dto.setAlias(product.getAlias());
-			dto.setModel(product.getModel());
-			dto.setMarketPrice(product.getMarketPrice());
-			dto.setProductPrice(product.getMarketPrice());
-			dto.setBrand(product.getBrand());
-			dto.setTag(product.getTag());
+			dto.setSource(null); // 新表没有source字段
+			dto.setAlias(product.getProductDespShort());
+			dto.setModel(null); // 新表没有model字段
+			dto.setMarketPrice(product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L);
+			dto.setProductPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
+			dto.setBrand(null); // 新表没有brand字段
+			dto.setTag(product.getProductTags());
 			// 设置商品图片路径
-			dto.setProductImage(imagePrefix + "/img/product/" + product.getId() + "_90x90.jpg");
+			java.util.List<cc.carce.sale.entity.CarProductImageEntity> images = carProductService.getProductImages(entity.getProductId());
+			if (images != null && !images.isEmpty()) {
+				dto.setProductImage(images.get(0).getImageUrl());
+			} else {
+				dto.setProductImage(imagePrefix + "/img/product/default_90x90.jpg");
+			}
 		} else {
 			// 如果商品不存在，设置默认值
 			dto.setSource("未知");

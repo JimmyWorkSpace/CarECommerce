@@ -73,5 +73,9 @@ public class CarProductEntity
     /** 商品屬性列表（臨時字段） */
     @Transient
     private List<CarProductAttrEntity> attrs;
+
+    /** 分類名稱（臨時字段） */
+    @Transient
+    private String categoryName;
 }
 

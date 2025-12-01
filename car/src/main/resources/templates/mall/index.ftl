@@ -2,49 +2,40 @@
 <div class="mall-container" id="app">
     <!-- 商品分類過濾 -->
     <div class="filter-section">
-        <div class="filter-buttons">
-            <button class="filter-btn" 
-                    :class="{ active: selectedCategory === 'all' }"
-                    @click="filterByCategory('all')">
-                <i class="bi bi-grid-3x3-gap"></i>
-                全部商品
-            </button>
-            <button class="filter-btn" 
-                    :class="{ active: selectedCategory === 'engine' }"
-                    @click="filterByCategory('engine')">
-                <i class="bi bi-gear"></i>
-                發動機配件
-            </button>
-            <button class="filter-btn" 
-                    :class="{ active: selectedCategory === 'brake' }"
-                    @click="filterByCategory('brake')">
-                <i class="bi bi-disc"></i>
-                制動系統
-            </button>
-            <button class="filter-btn" 
-                    :class="{ active: selectedCategory === 'suspension' }"
-                    @click="filterByCategory('suspension')">
-                <i class="bi bi-arrow-up-down"></i>
-                懸挂系統
-            </button>
-            <button class="filter-btn" 
-                    :class="{ active: selectedCategory === 'electrical' }"
-                    @click="filterByCategory('electrical')">
-                <i class="bi bi-lightning"></i>
-                電氣系統
-            </button>
-            <button class="filter-btn" 
-                    :class="{ active: selectedCategory === 'exterior' }"
-                    @click="filterByCategory('exterior')">
-                <i class="bi bi-car-front"></i>
-                外觀配件
-            </button>
-            <button class="filter-btn" 
-                    :class="{ active: selectedCategory === 'tools' }"
-                    @click="filterByCategory('tools')">
-                <i class="bi bi-tools"></i>
-                工具設備
-            </button>
+        <!-- 一級分類 -->
+        <div class="category-level-first">
+            <div class="category-buttons">
+                <button class="category-btn" 
+                        :class="{ active: !selectedFirstCategory }"
+                        @click="selectFirstCategory(null)">
+                    全部
+                </button>
+                <button v-for="category in firstLevelCategories" 
+                        :key="category.id"
+                        class="category-btn" 
+                        :class="{ active: selectedFirstCategory == category.id }"
+                        @click="selectFirstCategory(category.id)">
+                    {{ category.name }}
+                </button>
+            </div>
+        </div>
+        
+        <!-- 二級分類 -->
+        <div class="category-level-second" v-if="selectedFirstCategory && secondLevelCategories.length > 0">
+            <div class="category-buttons">
+                <button class="category-btn category-btn-second" 
+                        :class="{ active: !selectedSecondCategory }"
+                        @click="selectSecondCategory(null)">
+                    全部
+                </button>
+                <button v-for="category in secondLevelCategories" 
+                        :key="category.id"
+                        class="category-btn category-btn-second" 
+                        :class="{ active: selectedSecondCategory == category.id }"
+                        @click="selectSecondCategory(category.id)">
+                    {{ category.name }}
+                </button>
+            </div>
         </div>
     </div>
     
@@ -98,6 +89,11 @@
                         <span v-if="product.model" class="badge bg-info me-2">{{ product.model }}</span>
                         <span v-if="product.source" class="badge bg-warning me-2">{{ product.source }}</span>
                     </div>
+                    <div class="product-tags" v-if="product.productTags">
+                        <span v-for="tag in getProductTags(product.productTags)" :key="tag" class="badge bg-primary me-1 mb-1">
+                            {{ tag }}
+                        </span>
+                    </div>
                     <div class="product-price">
                         <span class="price-symbol">${CurrencyUnit}</span>
                         <span class="price-amount">{{ formatPrice(product.marketPrice) }}</span>
@@ -148,44 +144,64 @@
     margin-bottom: 30px;
 }
 
-.filter-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
+.category-level-first {
+    margin-bottom: 20px;
 }
 
-.filter-btn {
+.category-level-second {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #e9ecef;
+}
+
+.category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.category-btn {
     background: white;
     border: 2px solid #e9ecef;
-    border-radius: 25px;
-    padding: 12px 20px;
-    font-weight: 600;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-weight: 500;
     color: #666;
     transition: all 0.3s ease;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 0.85rem;
 }
 
-.filter-btn:hover {
+.category-btn:hover {
     border-color: #5ACFC9;
     color: #5ACFC9;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(90, 207, 201, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(90, 207, 201, 0.2);
 }
 
-.filter-btn.active {
+.category-btn.active {
     background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
     border-color: #5ACFC9;
     color: white;
-    box-shadow: 0 4px 12px rgba(90, 207, 201, 0.3);
+    box-shadow: 0 2px 8px rgba(90, 207, 201, 0.3);
 }
 
-.filter-btn i {
-    font-size: 1.1rem;
+.category-btn-second {
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    background: #f8f9fa;
+    border-radius: 18px;
+}
+
+.category-btn-second:hover {
+    background: white;
+}
+
+.category-btn-second.active {
+    background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
 }
 
 .products-grid {
@@ -307,6 +323,18 @@
     font-size: 0.75rem;
 }
 
+.product-tags {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.product-tags .badge {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+}
+
 .product-price {
     display: flex;
     align-items: baseline;
@@ -378,13 +406,18 @@
         padding: 15px;
     }
     
-    .filter-buttons {
-        gap: 10px;
+    .category-buttons {
+        gap: 6px;
     }
     
-    .filter-btn {
-        padding: 10px 15px;
-        font-size: 0.9rem;
+    .category-btn {
+        padding: 5px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .category-btn-second {
+        padding: 4px 10px;
+        font-size: 0.75rem;
     }
     
     .products-grid {
@@ -419,7 +452,13 @@ new Vue({
         addingToCart: null,
         currentPage: 1,
         pageSize: 12,
-        totalPages: 1
+        totalPages: 1,
+        // 分类相关
+        categoryTree: [],
+        firstLevelCategories: [],
+        secondLevelCategories: [],
+        selectedFirstCategory: '',
+        selectedSecondCategory: ''
     },
     computed: {
         visiblePages() {
@@ -434,6 +473,7 @@ new Vue({
         }
     },
     mounted() {
+        this.loadCategoryTree();
         this.loadProducts();
         
         // 监听登录后待执行的操作
@@ -461,6 +501,50 @@ new Vue({
         });
     },
     methods: {
+        // 加载分类树
+        async loadCategoryTree() {
+            try {
+                const response = await axios.get('/api/products/categories/tree');
+                if (response.data.success) {
+                    this.categoryTree = response.data.data || [];
+                    this.firstLevelCategories = this.categoryTree;
+                } else {
+                    console.error('加载分类树失败:', response.data.message);
+                }
+            } catch (error) {
+                console.error('加载分类树失败:', error);
+            }
+        },
+        
+        // 选择一级分类
+        selectFirstCategory(categoryId) {
+            this.selectedFirstCategory = categoryId;
+            this.selectedSecondCategory = '';
+            this.currentPage = 1;
+            
+            if (categoryId) {
+                // 找到选中的一级分类，获取其二级分类
+                const selectedCategory = this.firstLevelCategories.find(c => c.id == categoryId);
+                if (selectedCategory && selectedCategory.children) {
+                    this.secondLevelCategories = selectedCategory.children;
+                } else {
+                    this.secondLevelCategories = [];
+                }
+            } else {
+                this.secondLevelCategories = [];
+            }
+            
+            // 执行筛选
+            this.filterByCategory();
+        },
+        
+        // 选择二级分类
+        selectSecondCategory(categoryId) {
+            this.selectedSecondCategory = categoryId;
+            this.currentPage = 1;
+            this.filterByCategory();
+        },
+        
         // 加载商品数据
         async loadProducts() {
             try {
@@ -487,24 +571,45 @@ new Vue({
         },
         
         // 按分类过滤商品
-        async filterByCategory(category) {
+        async filterByCategory() {
             try {
-                this.selectedCategory = category;
+                this.loading = true;
                 this.currentPage = 1;
                 
-                if (category === 'all') {
-                    this.filteredProducts = [...this.products];
-                } else {
+                let categoryId = null;
+                if (this.selectedSecondCategory) {
+                    // 如果选择了二级分类，使用二级分类ID
+                    categoryId = this.selectedSecondCategory;
+                } else if (this.selectedFirstCategory) {
+                    // 如果只选择了一级分类，使用一级分类ID（后端会返回该一级分类及其所有二级分类的商品）
+                    categoryId = this.selectedFirstCategory;
+                }
+                
+                if (categoryId) {
                     // 调用API获取分类商品
-                    const response = await axios.get(`/api/products/category?category=` + category);
+                    const response = await axios.get('/api/products/category?categoryId=' + categoryId);
                     if (response.data.success) {
                         this.filteredProducts = response.data.data || [];
                     } else {
                         // 如果API调用失败，使用本地过滤
-                        this.filteredProducts = this.products.filter(product => 
-                            product.category === category
-                        );
+                        this.filteredProducts = this.products.filter(product => {
+                            if (this.selectedSecondCategory) {
+                                return product.categoryId == this.selectedSecondCategory;
+                            } else if (this.selectedFirstCategory) {
+                                // 一级分类：需要匹配一级分类或其子分类
+                                const productCategory = this.findCategoryById(product.categoryId);
+                                if (productCategory) {
+                                    return productCategory.id == this.selectedFirstCategory || 
+                                           productCategory.parentId == this.selectedFirstCategory;
+                                }
+                                return false;
+                            }
+                            return true;
+                        });
                     }
+                } else {
+                    // 没有选择分类，显示全部
+                    this.filteredProducts = [...this.products];
                 }
                 
                 this.calculatePagination();
@@ -512,15 +617,52 @@ new Vue({
             } catch (error) {
                 console.error('过滤商品失败:', error);
                 // 使用本地过滤作为备选方案
-                if (category === 'all') {
+                if (!this.selectedFirstCategory && !this.selectedSecondCategory) {
                     this.filteredProducts = [...this.products];
                 } else {
-                    this.filteredProducts = this.products.filter(product => 
-                        product.category === category
-                    );
+                    this.filteredProducts = this.products.filter(product => {
+                        if (this.selectedSecondCategory) {
+                            return product.categoryId == this.selectedSecondCategory;
+                        } else if (this.selectedFirstCategory) {
+                            // 一级分类：需要匹配一级分类或其子分类
+                            const productCategory = this.findCategoryById(product.categoryId);
+                            if (productCategory) {
+                                return productCategory.id == this.selectedFirstCategory || 
+                                       productCategory.parentId == this.selectedFirstCategory;
+                            }
+                            return false;
+                        }
+                        return true;
+                    });
                 }
                 this.calculatePagination();
+            } finally {
+                this.loading = false;
             }
+        },
+        
+        // 根据ID查找分类（返回分类对象和其父分类ID）
+        findCategoryById(categoryId) {
+            if (!categoryId) return null;
+            for (let firstLevel of this.firstLevelCategories) {
+                if (firstLevel.id == categoryId) {
+                    return { id: firstLevel.id, parentId: null };
+                }
+                if (firstLevel.children) {
+                    for (let secondLevel of firstLevel.children) {
+                        if (secondLevel.id == categoryId) {
+                            return { id: secondLevel.id, parentId: firstLevel.id };
+                        }
+                    }
+                }
+            }
+            return null;
+        },
+        
+        // 解析商品标签（按逗号分隔）
+        getProductTags(tags) {
+            if (!tags) return [];
+            return tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
         },
         
         // 计算分页

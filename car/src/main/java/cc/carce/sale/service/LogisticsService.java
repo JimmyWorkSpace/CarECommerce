@@ -1088,7 +1088,7 @@ public class LogisticsService {
         carStoreInfoMapper.batchInsert(list);
     }
 
-    @PostConstruct
+    // @PostConstruct
     public void test() {
         // createLogisticsByOrderNo("202510181403399891");
         // queryLogisticsByOrderNo("202510181403399891");

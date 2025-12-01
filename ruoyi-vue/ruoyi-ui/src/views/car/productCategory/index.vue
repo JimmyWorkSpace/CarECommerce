@@ -65,6 +65,7 @@
             v-hasPermi="['car:productCategory:edit']"
           >修改</el-button>
           <el-button
+            v-if="!scope.row.parentId || scope.row.parentId === 0"
             size="mini"
             type="text"
             icon="el-icon-plus"
@@ -93,6 +94,8 @@
                 :options="categoryOptions"
                 :normalizer="normalizer"
                 :show-count="true"
+                :disable-branch-nodes="true"
+                :disabled="isFirstLevelCategory"
                 placeholder="選擇上級分類"
               />
             </el-form-item>
@@ -118,7 +121,7 @@
 </template>
 
 <script>
-import { listProductCategory, getProductCategory, delProductCategory, addProductCategory, updateProductCategory, treeselect } from "@/api/car/productCategory";
+import { listProductCategory, getProductCategory, delProductCategory, addProductCategory, updateProductCategory, treeselect, treeselectFirstLevel } from "@/api/car/productCategory";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
@@ -163,6 +166,16 @@ export default {
   created() {
     this.getList();
   },
+  computed: {
+    /** 判断当前编辑的是否为一级类目 */
+    isFirstLevelCategory() {
+      // 如果是修改操作，且当前分类的parentId为0或null，则是一级类目
+      if (this.form.id != undefined && (!this.form.parentId || this.form.parentId === 0)) {
+        return true;
+      }
+      return false;
+    }
+  },
   methods: {
     /** 查詢商品目錄分類列表 */
     getList() {
@@ -177,18 +190,28 @@ export default {
       if (node.children && !node.children.length) {
         delete node.children;
       }
+      // 支持两种数据结构：TreeSelect（有label）和Entity（有categoryName）
+      const label = node.label || node.categoryName || '';
       return {
         id: node.id,
-        label: node.categoryName,
+        label: label,
         children: node.children
       };
     },
     /** 查詢商品目錄分類下拉樹結構 */
     getTreeselect() {
-      treeselect().then(response => {
+      // 使用新接口，只返回一级分类（不包含二级分类）
+      treeselectFirstLevel().then(response => {
         this.categoryOptions = [];
-        const category = { id: 0, categoryName: '主類目', children: [] };
-        category.children = this.handleTree(response.data, "id", "parentId");
+        const category = { id: 0, label: '主類目', children: [] };
+        // 后端已经返回只包含一级分类的列表
+        const firstLevelCategories = response.data || [];
+        // 将一级分类转换为treeselect组件需要的格式
+        category.children = firstLevelCategories.map(item => ({
+          id: item.id,
+          label: item.label || item.categoryName || '',
+          children: [] // 不显示二级分类
+        }));
         this.categoryOptions.push(category);
       });
     },
@@ -221,9 +244,17 @@ export default {
     handleAdd(row) {
       this.reset();
       this.getTreeselect();
+      // 如果是从工具栏点击新增按钮（row为null），默认上级为主目录
+      // 如果是从列表行点击新增按钮，设置父级为当前行
       if (row != null && row.id) {
+        // 检查层级限制：如果当前行是二级目录，不能再添加子分类
+        if (row.parentId && row.parentId !== 0) {
+          this.$modal.msgWarning("最多只能维护两层分类，无法继续添加子分类");
+          return;
+        }
         this.form.parentId = row.id;
       } else {
+        // 工具栏新增按钮，默认上级为主目录
         this.form.parentId = 0;
       }
       this.open = true;
@@ -254,21 +285,71 @@ export default {
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          // 层级限制验证：如果选择的父分类不是主目录，检查父分类是否已经是二级分类
+          if (this.form.parentId && this.form.parentId !== 0) {
+            // 从下拉选项树中查找父分类信息
+            const parentCategory = this.findCategoryInOptions(this.form.parentId);
+            if (parentCategory && parentCategory.parentId && parentCategory.parentId !== 0) {
+              this.$modal.msgWarning("最多只能维护两层分类，无法继续添加子分类");
+              return;
+            }
+            // 如果父分类在二级分类列表中（有children但children不为空），说明它已经有子分类，不能再添加
+            // 这个检查由后端完成，前端只做基本验证
+          }
+          
           if (this.form.id != undefined) {
+            // 修改时也要检查层级限制
+            if (this.form.parentId && this.form.parentId !== 0) {
+              const parentCategory = this.findCategoryInOptions(this.form.parentId);
+              if (parentCategory && parentCategory.parentId && parentCategory.parentId !== 0) {
+                this.$modal.msgWarning("最多只能维护两层分类，无法继续添加子分类");
+                return;
+              }
+            }
             updateProductCategory(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
+            }).catch(error => {
+              // 后端验证失败时的错误处理
+              if (error && error.msg) {
+                this.$modal.msgError(error.msg);
+              }
             });
           } else {
             addProductCategory(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
+            }).catch(error => {
+              // 后端验证失败时的错误处理
+              if (error && error.msg) {
+                this.$modal.msgError(error.msg);
+              }
             });
           }
         }
       });
+    },
+    /** 在下拉选项树中根据ID查找分类 */
+    findCategoryInOptions(id) {
+      const findInTree = (list) => {
+        for (let item of list) {
+          if (item.id === id) {
+            return item;
+          }
+          if (item.children && item.children.length > 0) {
+            const found = findInTree(item.children);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      // 从categoryOptions中查找（包含主类目）
+      if (this.categoryOptions && this.categoryOptions.length > 0) {
+        return findInTree(this.categoryOptions);
+      }
+      return null;
     },
     /** 刪除按鈕操作 */
     handleDelete(row) {

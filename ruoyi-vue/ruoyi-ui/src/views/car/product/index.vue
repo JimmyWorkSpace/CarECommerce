@@ -18,6 +18,8 @@
           :show-count="true"
           placeholder="請選擇分類"
           clearable
+          style="width: 200px"
+          class="treeselect-small"
         />
       </el-form-item>
       <el-form-item label="上架狀態" prop="onSale">
@@ -81,7 +83,7 @@
     <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="商品標題" align="center" prop="productTitle" :show-overflow-tooltip="true" />
-      <el-table-column label="分類" align="center" prop="categoryId" width="120" />
+      <el-table-column label="分類" align="center" prop="categoryName" width="120" />
       <el-table-column label="供價" align="center" prop="supplyPrice" width="100" />
       <el-table-column label="售價" align="center" prop="salePrice" width="100" />
       <el-table-column label="數量" align="center" prop="amount" width="80" />
@@ -316,8 +318,19 @@ export default {
     getCategoryTree() {
       treeselect().then(response => {
         this.categoryOptions = [];
-        const category = { id: 0, categoryName: '主類目', children: [] };
-        category.children = this.handleTree(response.data, "id", "parentId");
+        const category = { id: 0, label: '主類目', children: [] };
+        // 后端返回的是TreeSelect结构，已经包含label和children字段
+        const allCategories = response.data || [];
+        // 递归转换TreeSelect结构为treeselect组件需要的格式
+        const convertTree = (items) => {
+          if (!items || items.length === 0) return [];
+          return items.map(item => ({
+            id: item.id,
+            label: item.label || item.categoryName || '',
+            children: item.children ? convertTree(item.children) : []
+          }));
+        };
+        category.children = convertTree(allCategories);
         this.categoryOptions.push(category);
       });
     },
@@ -326,9 +339,11 @@ export default {
       if (node.children && !node.children.length) {
         delete node.children;
       }
+      // 支持两种数据结构：TreeSelect（有label）和Entity（有categoryName）
+      const label = node.label || node.categoryName || '';
       return {
         id: node.id,
-        label: node.categoryName,
+        label: label,
         children: node.children
       };
     },
@@ -512,4 +527,16 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.treeselect-small ::v-deep .vue-treeselect__control {
+  height: 32px;
+  line-height: 32px;
+}
+
+.treeselect-small ::v-deep .vue-treeselect__placeholder,
+.treeselect-small ::v-deep .vue-treeselect__single-value {
+  line-height: 32px;
+}
+</style>
 

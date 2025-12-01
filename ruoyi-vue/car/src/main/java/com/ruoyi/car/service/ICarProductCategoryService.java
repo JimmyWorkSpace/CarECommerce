@@ -45,6 +45,14 @@ public interface ICarProductCategoryService
     public List<TreeSelect> buildCategoryTreeSelect(List<CarProductCategoryEntity> categories);
 
     /**
+     * 構建前端所需要下拉樹結構（只返回一级分类，用于选择上级分类）
+     * 
+     * @param categories 分類列表
+     * @return 下拉樹結構列表（只包含一级分类）
+     */
+    public List<TreeSelect> buildFirstLevelCategoryTreeSelect(List<CarProductCategoryEntity> categories);
+
+    /**
      * 新增商品目錄分類
      * 
      * @param carProductCategory 商品目錄分類

@@ -17,9 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.car.mapper.master.CarProductMapper;
 import com.ruoyi.car.mapper.master.CarProductImageMapper;
 import com.ruoyi.car.mapper.master.CarProductAttrMapper;
+import com.ruoyi.car.mapper.master.CarProductCategoryMapper;
 import com.ruoyi.car.domain.CarProductEntity;
 import com.ruoyi.car.domain.CarProductImageEntity;
 import com.ruoyi.car.domain.CarProductAttrEntity;
+import com.ruoyi.car.domain.CarProductCategoryEntity;
 import com.ruoyi.car.service.ICarProductService;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.service.FtpService;
@@ -44,6 +46,9 @@ public class CarProductServiceImpl implements ICarProductService
 
     @Resource
     private CarProductAttrMapper carProductAttrMapper;
+
+    @Resource
+    private CarProductCategoryMapper carProductCategoryMapper;
 
     @Resource
     private FtpService ftpService;
@@ -88,7 +93,34 @@ public class CarProductServiceImpl implements ICarProductService
             criteria.andLike("productTitle", "%" + carProduct.getProductTitle() + "%");
         }
         if (StringUtils.isNotNull(carProduct.getCategoryId())) {
-            criteria.andEqualTo("categoryId", carProduct.getCategoryId());
+            Long categoryId = carProduct.getCategoryId();
+            // 如果选择的是主目录（0）或一级目录，需要查询其下所有二级目录的商品
+            if (categoryId == 0) {
+                // 主目录：查询所有一级目录下的所有二级目录的商品
+                List<Long> secondLevelCategoryIds = getSecondLevelCategoryIds(null);
+                if (secondLevelCategoryIds != null && !secondLevelCategoryIds.isEmpty()) {
+                    criteria.andIn("categoryId", secondLevelCategoryIds);
+                } else {
+                    // 如果没有二级目录，返回空结果
+                    criteria.andEqualTo("id", -1L); // 使用不存在的ID来返回空结果
+                }
+            } else {
+                // 检查是否是一级目录
+                CarProductCategoryEntity category = carProductCategoryMapper.selectByPrimaryKey(categoryId);
+                if (category != null && (category.getParentId() == null || category.getParentId() == 0)) {
+                    // 一级目录：查询该一级目录下所有二级目录的商品
+                    List<Long> secondLevelCategoryIds = getSecondLevelCategoryIds(categoryId);
+                    if (secondLevelCategoryIds != null && !secondLevelCategoryIds.isEmpty()) {
+                        criteria.andIn("categoryId", secondLevelCategoryIds);
+                    } else {
+                        // 如果没有二级目录，返回空结果
+                        criteria.andEqualTo("id", -1L); // 使用不存在的ID来返回空结果
+                    }
+                } else {
+                    // 二级目录：直接查询该分类的商品
+                    criteria.andEqualTo("categoryId", categoryId);
+                }
+            }
         }
         if (StringUtils.isNotNull(carProduct.getOnSale())) {
             criteria.andEqualTo("onSale", carProduct.getOnSale());
@@ -97,7 +129,71 @@ public class CarProductServiceImpl implements ICarProductService
         // 按ID倒序
         example.orderBy("id").desc();
         
-        return carProductMapper.selectByExample(example);
+        List<CarProductEntity> list = carProductMapper.selectByExample(example);
+        
+        // 設置分類名稱
+        for (CarProductEntity product : list) {
+            if (product.getCategoryId() != null) {
+                CarProductCategoryEntity category = carProductCategoryMapper.selectByPrimaryKey(product.getCategoryId());
+                if (category != null) {
+                    product.setCategoryName(category.getCategoryName());
+                }
+            }
+        }
+        
+        return list;
+    }
+
+    /**
+     * 获取二级分类ID列表
+     * 
+     * @param firstLevelCategoryId 一级分类ID，如果为null则查询所有一级分类下的二级分类
+     * @return 二级分类ID列表
+     */
+    private List<Long> getSecondLevelCategoryIds(Long firstLevelCategoryId) {
+        Example example = new Example(CarProductCategoryEntity.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andNotEqualTo("delFlag", 1);
+        
+        if (firstLevelCategoryId != null) {
+            // 查询指定一级分类下的二级分类
+            criteria.andEqualTo("parentId", firstLevelCategoryId);
+        } else {
+            // 查询所有一级分类下的二级分类
+            // 先查询所有一级分类（parentId为null或0的）
+            Example firstLevelExample = new Example(CarProductCategoryEntity.class);
+            Example.Criteria firstLevelCriteria = firstLevelExample.createCriteria();
+            firstLevelCriteria.andNotEqualTo("delFlag", 1);
+            // 查询parentId为null或0的分类
+            firstLevelCriteria.andCondition("(parentId IS NULL OR parentId = 0)");
+            List<CarProductCategoryEntity> firstLevelCategories = carProductCategoryMapper.selectByExample(firstLevelExample);
+            
+            if (firstLevelCategories == null || firstLevelCategories.isEmpty()) {
+                return new ArrayList<>();
+            }
+            
+            // 获取所有一级分类的ID
+            List<Long> firstLevelIds = new ArrayList<>();
+            for (CarProductCategoryEntity category : firstLevelCategories) {
+                firstLevelIds.add(category.getId());
+            }
+            
+            if (firstLevelIds.isEmpty()) {
+                return new ArrayList<>();
+            }
+            
+            // 查询这些一级分类下的所有二级分类
+            criteria.andIn("parentId", firstLevelIds);
+        }
+        
+        List<CarProductCategoryEntity> secondLevelCategories = carProductCategoryMapper.selectByExample(example);
+        List<Long> secondLevelIds = new ArrayList<>();
+        if (secondLevelCategories != null) {
+            for (CarProductCategoryEntity category : secondLevelCategories) {
+                secondLevelIds.add(category.getId());
+            }
+        }
+        return secondLevelIds;
     }
 
     /**

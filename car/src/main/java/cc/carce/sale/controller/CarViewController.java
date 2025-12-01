@@ -47,7 +47,9 @@ import cc.carce.sale.entity.CarUserEntity;
 import cc.carce.sale.entity.dto.CarConfigContent;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.entity.CarDealerEntity;
-import cc.carce.sale.entity.CarProductsEntity;
+import cc.carce.sale.entity.CarProductEntity;
+import cc.carce.sale.entity.CarProductImageEntity;
+import cc.carce.sale.entity.CarProductAttrEntity;
 import cc.carce.sale.form.PaymentRequestForm;
 import cc.carce.sale.form.CarReportForm;
 import cc.carce.sale.entity.CarAdvertisementEntity;
@@ -68,7 +70,7 @@ import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarShoppingCartService;
 import cc.carce.sale.service.CarUserService;
 import cc.carce.sale.service.SmsService;
-import cc.carce.sale.service.CarProductsService;
+import cc.carce.sale.service.CarProductService;
 import cc.carce.sale.mapper.carcecloud.CarDealerMapper;
 import cc.carce.sale.dto.CarListDto;
 import cn.hutool.json.JSONObject;
@@ -93,6 +95,9 @@ public class CarViewController extends BaseController {
     private static final String CurrencyUnit = "$";
 	@Value("${carce.webUrl}")
 	private String webUrl;
+	
+	@Value("${carce.prefix:}")
+	private String imagePrefix;
 
 	@Resource
 	private CarService carService;
@@ -152,7 +157,7 @@ public class CarViewController extends BaseController {
     private RedisTemplate<String, String> redisTemplate;
     
     @Resource
-    private CarProductsService carProductsService;
+    private CarProductService carProductService;
     
     /**
      * 首页
@@ -632,41 +637,75 @@ public class CarViewController extends BaseController {
             model.addAttribute("user", user);
             
             // 获取商品基本信息
-            CarProductsEntity product = carProductsService.getProductById(productId);
+            CarProductEntity product = carProductService.getProductById(productId);
             if (product == null) {
                 model.addAttribute("error", "商品不存在");
                 model.addAttribute("content", "/error/index.ftl");
                 return "/layout/main";
             }
             
-            // 检查商品是否已发布
-            if (!product.getIsPublic()) {
-                model.addAttribute("error", "商品未发布");
+            // 检查商品是否已上架
+            if (product.getOnSale() == null || product.getOnSale() != 1) {
+                model.addAttribute("error", "商品未上架");
                 model.addAttribute("content", "/error/index.ftl");
                 return "/layout/main";
             }
             
-            model.addAttribute("product", product);
-            model.addAttribute("productJson", JSONUtil.toJsonPrettyStr(product));
+            // 创建商品DTO，映射字段名以匹配前端模板
+            Map<String, Object> productDto = new HashMap<>();
+            productDto.put("id", product.getId());
+            productDto.put("name", product.getProductTitle()); // 商品名称
+            productDto.put("alias", product.getProductDespShort()); // 商品别名/简短描述
+            productDto.put("price", product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L); // 售价
+            productDto.put("marketPrice", product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L); // 市价
+            productDto.put("memo", product.getProductDesp()); // 商品详细描述
+            productDto.put("tag", product.getProductTags()); // 商品标签
+            productDto.put("amount", product.getAmount()); // 库存数量
+            productDto.put("categoryId", product.getCategoryId()); // 分类ID
+            productDto.put("onSale", product.getOnSale()); // 是否上架
+            
+            model.addAttribute("product", productDto);
+            model.addAttribute("productJson", JSONUtil.toJsonPrettyStr(productDto));
             
             // 获取商品图片列表
-            List<String> images = carProductsService.getProductImageUrls(productId);
+            List<CarProductImageEntity> imageEntities = carProductService.getProductImages(productId);
+            List<String> images = new ArrayList<>();
+            for (CarProductImageEntity img : imageEntities) {
+                String imageUrl = img.getImageUrl();
+                // 如果imageUrl不是完整URL，加上前缀
+                if (imageUrl != null && !imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+                    if (imageUrl.startsWith("/")) {
+                        imageUrl = imagePrefix + imageUrl;
+                    } else {
+                        imageUrl = imagePrefix + "/" + imageUrl;
+                    }
+                }
+                images.add(imageUrl);
+            }
+            if (images.isEmpty()) {
+                images.add(imagePrefix + "/img/product/default.jpg");
+            }
             model.addAttribute("images", images);
             model.addAttribute("imagesJson", JSONUtil.toJsonPrettyStr(images));
             
+            // 获取商品属性列表
+            List<CarProductAttrEntity> productAttrs = carProductService.getProductAttrs(productId);
+            model.addAttribute("productAttrs", productAttrs);
+            model.addAttribute("productAttrsJson", JSONUtil.toJsonPrettyStr(productAttrs));
+            
             // 设置页面标题和描述
-            String title = product.getName() + " - " + product.getBrand() + " " + product.getModel();
-            String ogTitle = product.getName() + " - " + product.getBrand();
-            String ogDescription = product.getAlias() != null ? product.getAlias() : 
-                (product.getBrand() + " " + product.getModel() + " 高品質汽車配件");
+            String title = product.getProductTitle();
+            String ogTitle = product.getProductTitle();
+            String ogDescription = product.getProductDespShort() != null ? product.getProductDespShort() : 
+                (product.getProductTitle() + " 高品質汽車配件");
             
             model.addAttribute("title", title);
             model.addAttribute("ogTitle", ogTitle);
             model.addAttribute("ogDescription", ogDescription);
-            model.addAttribute("ogImage", images != null && !images.isEmpty() ? images.get(0) : carProductsService.getImagePrefix() + "/img/product/default.jpg");
+            model.addAttribute("ogImage", images != null && !images.isEmpty() ? images.get(0) : imagePrefix + "/img/product/default.jpg");
             model.addAttribute("ogUrl", webUrl + "/product/" + productId);
             model.addAttribute("CurrencyUnit", CurrencyUnit);
-            model.addAttribute("imagePrefix", carProductsService.getImagePrefix());
+            model.addAttribute("imagePrefix", imagePrefix);
             
             model.addAttribute("content", "/product/detail.ftl");
             

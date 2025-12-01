@@ -21,25 +21,27 @@
         <div class="col-md-6">
             <div class="swiper-wrapper-container" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
                 <div class="swiper-container">
-                    <div v-for="(image, index) in images" 
-                         :key="index"
-                         class="swiper-slide"
-                         :class="{ active: currentImageIndex === index }">
-                        <div class="image-container">
-                            <img class="swiper_image" 
-                                 :src="image" 
-                                 :alt="product.name || '商品圖片'"
-                                 @click="openLightbox(index)"
-                                 @error="handleImageError">
+                    <div class="swiper-wrapper">
+                        <div v-for="(image, index) in images" 
+                             :key="index"
+                             class="swiper-slide"
+                             :class="{ active: currentImageIndex === index }">
+                            <div class="image-container">
+                                <img class="swiper_image" 
+                                     :src="image" 
+                                     :alt="product.name || '商品圖片'"
+                                     @click="openLightbox(index)"
+                                     @error="handleImageError">
+                            </div>
                         </div>
-                    </div>
-                    <!-- 如果没有图片，显示默认图片 -->
-                    <div v-if="!images || images.length === 0" class="swiper-slide active">
-                        <div class="image-container">
-                            <img class="swiper_image" 
-                                 :src="imagePrefix + '/img/product/default.jpg'" 
-                                 alt="商品圖片"
-                                 @error="handleImageError">
+                        <!-- 如果没有图片，显示默认图片 -->
+                        <div v-if="!images || images.length === 0" class="swiper-slide active">
+                            <div class="image-container">
+                                <img class="swiper_image" 
+                                     :src="imagePrefix + '/img/product/default.jpg'" 
+                                     alt="商品圖片"
+                                     @error="handleImageError">
+                            </div>
                         </div>
                     </div>
                     <!-- 輪播圖导航按钮 -->
@@ -72,17 +74,17 @@
             <h2 class="product-title" style="text-align: left">
                 {{ product.name || '商品名稱' }}
             </h2>
-            <#--  <div class="product-subtitle mb-3">
-                <span v-if="product.brand" class="badge bg-secondary me-2">{{ product.brand }}</span>
-                <span v-if="product.model" class="badge bg-info me-2">{{ product.model }}</span>
-                <span v-if="product.tag" class="badge bg-warning me-2">{{ product.tag }}</span>
-            </div>  -->
+            <!-- 类别 -->
+            <div v-if="product.tag" class="product-category mb-3">
+                <span class="badge bg-warning">{{ product.tag }}</span>
+            </div>
             
-            <div class="price-section mb-4">
+            <!-- 价格 -->
+            <div class="price-section mb-3">
                 <div class="current-price mb-2">
                     <span class="price-label text-muted">售價：</span>
                     <span class="price-symbol">${CurrencyUnit}</span>
-                    <span class="price-amount h3">{{ formatPrice(product.price) }}</span>
+                    <span class="price-amount h4">{{ formatPrice(product.price) }}</span>
                 </div>
                 <div class="market-price" v-if="product.marketPrice && product.marketPrice > product.price">
                     <span class="price-label text-muted">市價：</span>
@@ -92,36 +94,30 @@
                 </div>
             </div>
             
-            <div class="product-info-section mb-4">
-                <#--  <div class="info-row" v-if="product.alias">
-                    <div class="info-label">
-                        <i class="bi bi-tag"></i> 商品別名
-                    </div>
-                    <div class="info-value">{{ product.alias }}</div>
-                </div>  -->
-                <#--  <div class="info-row" v-if="product.source">
-                    <div class="info-label">
-                        <i class="bi bi-box-seam"></i> 商品來源
-                    </div>
-                    <div class="info-value">{{ product.source }}</div>
-                </div>  -->
-                <div class="info-row" v-if="product.brand">
-                    <div class="info-label">
-                        <i class="bi bi-award"></i> 品牌
-                    </div>
-                    <div class="info-value">{{ product.brand }}</div>
+            <!-- 简要描述 -->
+            <div v-if="product.alias" class="product-short-description mb-3">
+                <p class="text-muted mb-0" style="font-size: 14px; line-height: 1.8;">{{ product.alias }}</p>
+            </div>
+            
+            <!-- 商品信息 -->
+            <div class="product-info-section mb-3">
+                <div class="info-item" v-if="product.brand">
+                    <span class="info-label">
+                        <i class="bi bi-award me-1"></i>品牌：
+                    </span>
+                    <span class="info-value">{{ product.brand }}</span>
                 </div>
-                <div class="info-row" v-if="product.model">
-                    <div class="info-label">
-                        <i class="bi bi-gear"></i> 型號
-                    </div>
-                    <div class="info-value">{{ product.model }}</div>
+                <div class="info-item" v-if="product.model">
+                    <span class="info-label">
+                        <i class="bi bi-gear me-1"></i>型號：
+                    </span>
+                    <span class="info-value">{{ product.model }}</span>
                 </div>
-                <div class="info-row" v-if="product.tag">
-                    <div class="info-label">
-                        <i class="bi bi-grid"></i> 類別
-                    </div>
-                    <div class="info-value">{{ product.tag }}</div>
+                <div class="info-item" v-if="product.amount !== null && product.amount !== undefined">
+                    <span class="info-label">
+                        <i class="bi bi-box me-1"></i>庫存：
+                    </span>
+                    <span class="info-value">{{ product.amount }} 件</span>
                 </div>
             </div>
             
@@ -173,37 +169,14 @@
                 <div class="specs-table">
                     <table class="table table-bordered">
                         <tbody>
-                            <tr v-if="product.name">
-                                <td class="spec-name">商品名稱</td>
-                                <td class="spec-value">{{ product.name }}</td>
+                            <!-- 显示商品属性 -->
+                            <tr v-for="attr in productAttrs" :key="attr.id" v-if="attr.attrName && attr.attrValue">
+                                <td class="spec-name">{{ attr.attrName }}</td>
+                                <td class="spec-value">{{ attr.attrValue }}</td>
                             </tr>
-                            <tr v-if="product.alias">
-                                <td class="spec-name">商品別名</td>
-                                <td class="spec-value">{{ product.alias }}</td>
-                            </tr>
-                            <tr v-if="product.brand">
-                                <td class="spec-name">品牌</td>
-                                <td class="spec-value">{{ product.brand }}</td>
-                            </tr>
-                            <tr v-if="product.model">
-                                <td class="spec-name">型號</td>
-                                <td class="spec-value">{{ product.model }}</td>
-                            </tr>
-                            <tr v-if="product.tag">
-                                <td class="spec-name">類別</td>
-                                <td class="spec-value">{{ product.tag }}</td>
-                            </tr>
-                            <tr v-if="product.source">
-                                <td class="spec-name">來源</td>
-                                <td class="spec-value">{{ product.source }}</td>
-                            </tr>
-                            <tr v-if="product.price">
-                                <td class="spec-name">售價</td>
-                                <td class="spec-value">${CurrencyUnit}{{ formatPrice(product.price) }}</td>
-                            </tr>
-                            <tr v-if="product.marketPrice">
-                                <td class="spec-name">市價</td>
-                                <td class="spec-value">${CurrencyUnit}{{ formatPrice(product.marketPrice) }}</td>
+                            <!-- 如果没有属性，显示提示 -->
+                            <tr v-if="!productAttrs || productAttrs.length === 0">
+                                <td colspan="2" class="text-center text-muted">暫無規格信息</td>
                             </tr>
                         </tbody>
                     </table>
@@ -229,6 +202,7 @@
 <script>
 const productData = ${productJson};
 const imagesData = ${imagesJson};
+const productAttrsData = ${productAttrsJson![]};
 const CurrencyUnit = '${CurrencyUnit}';
 const imagePrefix = '${imagePrefix}';
 
@@ -237,11 +211,11 @@ new Vue({
     data: {
         product: productData || {},
         images: imagesData || [],
+        productAttrs: productAttrsData || [],
         currentImageIndex: 0,
         visibleLightbox: false,
         lightboxIndex: 0,
         autoPlayTimer: null,
-        slickInstance: null,
         activeTab: { code: 'product_detail', title: '商品詳情' },
         tabs: [
             { code: 'product_detail', title: '商品詳情' },
@@ -249,11 +223,13 @@ new Vue({
         ],
         addingToCart: false,
         message: '',
-        error: ''
+        error: '',
+        autoPlayTimer: null,
+        autoPlayInterval: 5000
     },
     mounted() {
-        this.initSwiper();
         this.setupContentFrame();
+        this.startAutoPlay();
         
         // 监听登录后待执行的操作
         const self = this;
@@ -281,68 +257,19 @@ new Vue({
     },
     beforeDestroy() {
         this.stopAutoPlay();
-        if (this.slickInstance) {
-            $(this.$el).find('.swiper-container').slick('unslick');
-        }
     },
     methods: {
-        initSwiper() {
-            let _this = this;
-            this.$nextTick(() => {
-                const swiperContainer = $(this.$el).find('.swiper-container');
-                if (swiperContainer.length) {
-                    if (this.images && this.images.length > 0) {
-                        swiperContainer.slick({
-                            infinite: true,
-                            speed: 300,
-                            slidesToShow: 1,
-                            slidesToScroll: 1,
-                            autoplay: this.images.length > 1,
-                            autoplaySpeed: 3000,
-                            arrows: this.images.length > 1,
-                            dots: this.images.length > 1,
-                            prevArrow: '<div class="swiper-button-prev"></div>',
-                            nextArrow: '<div class="swiper-button-next"></div>',
-                            fade: true,
-                            cssEase: 'linear'
-                        }).on('afterChange', function(event, slick, currentSlide) {
-                            _this.currentImageIndex = currentSlide;
-                        });
-                    } else {
-                        swiperContainer.slick({
-                            infinite: false,
-                            speed: 300,
-                            slidesToShow: 1,
-                            slidesToScroll: 1,
-                            autoplay: false,
-                            arrows: false,
-                            dots: false,
-                            fade: false
-                        });
-                    }
-                    this.slickInstance = swiperContainer;
-                }
-            });
-        },
         changeImage(index) {
-            if (this.slickInstance) {
-                this.slickInstance.slick('slickGoTo', index);
-            } else {
-                this.currentImageIndex = index;
-            }
+            this.currentImageIndex = index;
         },
         prevImage() {
-            if (this.slickInstance) {
-                this.slickInstance.slick('slickPrev');
-            } else if (this.images && this.images.length > 0) {
-                this.currentImageIndex = (this.currentImageIndex - 1 + this.images.length) % this.images.length;
+            if (this.images && this.images.length > 0) {
+                this.currentImageIndex = this.currentImageIndex > 0 ? this.currentImageIndex - 1 : this.images.length - 1;
             }
         },
         nextImage() {
-            if (this.slickInstance) {
-                this.slickInstance.slick('slickNext');
-            } else if (this.images && this.images.length > 0) {
-                this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
+            if (this.images && this.images.length > 0) {
+                this.currentImageIndex = this.currentImageIndex < this.images.length - 1 ? this.currentImageIndex + 1 : 0;
             }
         },
         openLightbox(index) {
@@ -366,12 +293,10 @@ new Vue({
         },
         getThumbnailUrl(url) {
             if (!url) return '';
-            // 如果URL包含图片处理参数，直接返回
-            if (url.includes('?') || url.includes('imageView')) {
-                return url;
-            }
-            // 将原图URL转换为缩略图URL（假设原图是 .jpg，缩略图是 _90x90.jpg）
-            return url.replace('.jpg', '_90x90.jpg');
+            // 如果URL已经是完整URL，直接使用原图作为缩略图
+            // 或者可以根据实际需求生成缩略图URL
+            // 这里暂时直接返回原图URL，因为数据库中的imageUrl可能已经是完整路径
+            return url;
         },
         handleImageError(event) {
             // 防止无限重试：立即移除错误监听器并隐藏图片
@@ -580,14 +505,13 @@ new Vue({
             window.location.href = '/mall';
         },
         startAutoPlay() {
-            if (this.slickInstance && this.images && this.images.length > 1) {
-                this.slickInstance.slick('slickPlay');
+            if (this.images && this.images.length > 1) {
+                this.autoPlayTimer = setInterval(() => {
+                    this.nextImage();
+                }, this.autoPlayInterval);
             }
         },
         stopAutoPlay() {
-            if (this.slickInstance) {
-                this.slickInstance.slick('slickPause');
-            }
             if (this.autoPlayTimer) {
                 clearInterval(this.autoPlayTimer);
                 this.autoPlayTimer = null;
@@ -655,21 +579,36 @@ new Vue({
     gap: 8px;
 }
 
+/* 商品类别样式 */
+.product-category {
+    text-align: left;
+}
+
+.product-category .badge {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    font-weight: 500;
+}
+
+/* 价格区域样式 - 去掉块样式 */
 .price-section {
-    padding: 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: left;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .current-price {
     display: flex;
     align-items: baseline;
     gap: 5px;
+    margin-bottom: 8px;
 }
 
 .price-label {
     font-size: 1rem;
+    color: #666;
 }
 
 .price-symbol {
@@ -681,6 +620,7 @@ new Vue({
 .price-amount {
     font-weight: 700;
     color: #FA9F42;
+    font-size: 1.8rem;
 }
 
 .market-price {
@@ -699,52 +639,42 @@ new Vue({
     font-weight: 600;
 }
 
+/* 简要描述样式 */
+.product-short-description {
+    text-align: left;
+}
+
+/* 商品信息区域样式 - 去掉块样式 */
 .product-info-section {
-    padding: 15px 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: left;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
 }
 
-.info-row {
+.info-item {
     display: flex;
-    align-items: flex-start;
-    padding: 12px 0;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.info-row:last-child {
-    border-bottom: none;
-}
-
-.info-row:hover {
-    background-color: rgba(90, 207, 201, 0.05);
-    margin: 0 -10px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 6px;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 0.95rem;
 }
 
 .info-label {
-    flex: 0 0 120px;
-    font-size: 0.95rem;
     font-weight: 600;
     color: #5ACFC9;
-    display: flex;
+    margin-right: 8px;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
 }
 
 .info-label i {
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .info-value {
-    flex: 1;
-    font-size: 1rem;
-    font-weight: 500;
     color: #333;
-    line-height: 1.6;
+    font-weight: 400;
 }
 
 .action-buttons {
@@ -828,6 +758,10 @@ new Vue({
     margin-bottom: 0;
 }
 
+.specs-table .table td {
+    padding: 12px 15px;
+}
+
 .specs-table .spec-name {
     width: 200px;
     font-weight: 600;
@@ -837,6 +771,7 @@ new Vue({
 
 .specs-table .spec-value {
     color: #333;
+    background-color: #ffffff;
 }
 
 /* 使用car-detail.css中的轮播图样式 */
@@ -844,6 +779,7 @@ new Vue({
     position: relative;
     width: 100%;
     overflow: hidden;
+    margin-bottom: 15px;
 }
 
 .product-detail .swiper-container {
@@ -852,15 +788,30 @@ new Vue({
     overflow: hidden;
 }
 
+.product-detail .swiper-wrapper {
+    display: flex;
+    transition: transform 0.3s ease;
+}
+
+.product-detail .swiper-slide {
+    min-width: 100%;
+    flex-shrink: 0;
+    display: none;
+}
+
+.product-detail .swiper-slide.active {
+    display: block;
+}
+
 .product-detail .swiper-slide .image-container {
     position: relative;
     width: 100%;
-    padding-bottom: 66.67%; /* 3:2 宽高比 */
+    padding-bottom: 66.67%; /* 3:2 宽高比 (2/3 * 100%) */
     overflow: hidden;
     background-color: #f8f9fa;
 }
 
-.product-detail .swiper-slide .swiper_image {
+.product-detail .swiper-slide img {
     position: absolute;
     top: 0;
     left: 0;
@@ -918,6 +869,7 @@ new Vue({
     margin-top: 15px;
     overflow-x: auto;
     padding: 5px 0;
+    max-width: 100%;
 }
 
 .thumbnail {
@@ -939,44 +891,6 @@ new Vue({
     border-color: #FA9F42;
 }
 
-/* Slick dots样式 */
-.product-detail .slick-dots {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 8px;
-    z-index: 10;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.product-detail .slick-dots li {
-    width: 12px;
-    height: 12px;
-}
-
-.product-detail .slick-dots li button {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    font-size: 0;
-    padding: 0;
-}
-
-.product-detail .slick-dots li.slick-active button {
-    background: #FA9F42;
-}
-
-.product-detail .slick-dots li button:hover {
-    background: rgba(255, 255, 255, 0.8);
-}
 
 .lightbox {
     position: fixed;
