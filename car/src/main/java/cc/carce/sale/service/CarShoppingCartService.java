@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import cc.carce.sale.dto.CarShoppingCartDto;
 import cc.carce.sale.entity.CarProductEntity;
-import cc.carce.sale.entity.CarProductImageEntity;
 import cc.carce.sale.entity.CarShoppingCartEntity;
 import cc.carce.sale.mapper.manager.CarShoppingCartMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -193,7 +192,21 @@ public class CarShoppingCartService {
 			// 设置商品图片路径
 			java.util.List<cc.carce.sale.entity.CarProductImageEntity> images = carProductService.getProductImages(entity.getProductId());
 			if (images != null && !images.isEmpty()) {
-				dto.setProductImage(images.get(0).getImageUrl());
+				String imageUrl = images.get(0).getImageUrl();
+				// 如果imageUrl已经是完整URL（以http://或https://开头），则不需要加前缀
+				// 否则加上前缀
+				if (imageUrl != null && (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"))) {
+					dto.setProductImage(imageUrl);
+				} else {
+					// 如果imageUrl以/开头，直接拼接前缀，否则加上/分隔符
+					if (imageUrl != null && imageUrl.startsWith("/")) {
+						dto.setProductImage(imagePrefix + imageUrl);
+					} else if (imageUrl != null) {
+						dto.setProductImage(imagePrefix + "/" + imageUrl);
+					} else {
+						dto.setProductImage(imagePrefix + "/img/product/default_90x90.jpg");
+					}
+				}
 			} else {
 				dto.setProductImage(imagePrefix + "/img/product/default_90x90.jpg");
 			}
