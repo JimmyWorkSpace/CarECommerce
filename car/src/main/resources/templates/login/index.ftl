@@ -24,6 +24,9 @@
                             <label for="phoneNumber" class="form-label">
                                 <i class="bi bi-phone me-2"></i>手機號碼
                             </label>
+                            <div class="mb-2" style="font-size: 0.95rem; color: #5ACFC9; font-weight: 500;">
+                                <i class="bi bi-info-circle me-1"></i>未註冊用戶將以此手機號註冊
+                            </div>
                             <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
                                    placeholder="請輸入手機號碼" required <#noparse>v-model.trim="phoneNumber" @input="onPhoneInput"</#noparse>>
                         </div>
@@ -267,7 +270,7 @@ new Vue({
             
             // 验证手机号格式
             if (!this.isValidPhone(phone)) {
-                alert('請輸入手機號碼');
+                this.showToast('請輸入手機號碼', 'warning');
                 return;
             }
             
@@ -276,33 +279,89 @@ new Vue({
                 const data = res.data;
                 if (data.success) {
                     this.startCountdown();
-                    alert('驗證碼已發送，請查看控制台輸出');
+                    this.showToast('驗證碼已發送，請查看手機簡訊，也留意垃圾簡訊內容', 'success');
                 } else {
                     // 如果服务器返回剩余等待时间，显示更友好的提示
                     if (data.remainingTime) {
-                        alert('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼');
+                        this.showToast('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼', 'warning');
                         // 如果服务器返回剩余时间，设置前端倒计时
                         this.countdown = data.remainingTime;
                         this.startCountdown();
                     } else {
-                        alert(data.message || '發送失敗，請稍後重試');
+                        this.showToast(data.message || '發送失敗，請稍後重試', 'danger');
                     }
                 }
             } catch (err) {
                 console.error(err);
-                alert('發送失敗，請稍後重試');
+                this.showToast('發送失敗，請稍後重試', 'danger');
             }
         },
         handleSubmit() {
             const phone = this.phoneNumber.trim();
             const code = this.smsCode.trim();
             if (!this.isValidCode(code)) {
-                alert('請輸入6位數字驗證碼');
+                this.showToast('請輸入6位數字驗證碼', 'warning');
                 return;
             }
             // 手动提交表单，保留原有後端處理
             const form = document.getElementById('loginForm');
             form.submit();
+        },
+        showToast(message, type) {
+            type = type || 'info';
+            // 创建toast容器（如果不存在）
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // 创建toast元素
+            const toastId = 'toast-' + Date.now();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            // 根据类型设置样式
+            const bgClass = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
+            const textClass = type === 'warning' ? 'text-dark' : 'text-white';
+            
+            // 根据类型设置图标
+            let iconClass = 'info-circle';
+            if (type === 'success') {
+                iconClass = 'check-circle';
+            } else if (type === 'danger' || type === 'warning') {
+                iconClass = 'exclamation-triangle';
+            }
+            
+            toast.innerHTML = '<div class="toast-header ' + bgClass + ' ' + textClass + '">' +
+                '<i class="bi bi-' + iconClass + ' me-2"></i>' +
+                '<strong class="me-auto">提示</strong>' +
+                '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                '</div>' +
+                '<div class="toast-body">' +
+                message +
+                '</div>';
+            
+            toastContainer.appendChild(toast);
+            
+            // 初始化并显示toast
+            const bsToast = new bootstrap.Toast(toast, {
+                autohide: true,
+                delay: 3000
+            });
+            bsToast.show();
+            
+            // toast关闭后移除元素
+            toast.addEventListener('hidden.bs.toast', function() {
+                toast.remove();
+            });
         }
     }
 });

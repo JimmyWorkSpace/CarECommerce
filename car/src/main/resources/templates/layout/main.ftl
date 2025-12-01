@@ -173,6 +173,9 @@
                                 <label for="loginPhoneNumber" class="form-label">
                                     <i class="bi bi-phone me-2"></i>手機號碼
                                 </label>
+                                <div class="mb-2" style="font-size: 0.95rem; color: #5ACFC9; font-weight: 500;">
+                                    <i class="bi bi-info-circle me-1"></i>未註冊用戶將以此手機號註冊
+                                </div>
                                 <input type="tel" class="form-control" id="loginPhoneNumber" 
                                        placeholder="請輸入手機號碼" required>
                             </div>
@@ -497,7 +500,7 @@
                         if (data.success) {
                             this.startLoginCountdown();
                             this.hideLoginError();
-                            alert('驗證碼已發送，請查看控制台輸出');
+                            this.showToast('驗證碼已發送，請查看手機簡訊，也留意垃圾簡訊內容', 'success');
                         } else {
                             if (data.remainingTime) {
                                 this.showLoginError('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼');
@@ -511,6 +514,64 @@
                         console.error(err);
                         this.showLoginError('發送失敗，請稍後重試');
                     }
+                },
+                
+                // 显示Toast提示
+                showToast: function(message, type) {
+                    type = type || 'info';
+                    // 创建toast容器（如果不存在）
+                    let toastContainer = document.getElementById('toastContainer');
+                    if (!toastContainer) {
+                        toastContainer = document.createElement('div');
+                        toastContainer.id = 'toastContainer';
+                        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                        toastContainer.style.zIndex = '9999';
+                        document.body.appendChild(toastContainer);
+                    }
+                    
+                    // 创建toast元素
+                    const toastId = 'toast-' + Date.now();
+                    const toast = document.createElement('div');
+                    toast.id = toastId;
+                    toast.className = 'toast';
+                    toast.setAttribute('role', 'alert');
+                    toast.setAttribute('aria-live', 'assertive');
+                    toast.setAttribute('aria-atomic', 'true');
+                    
+                    // 根据类型设置样式
+                    const bgClass = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
+                    const textClass = type === 'warning' ? 'text-dark' : 'text-white';
+                    
+                    // 根据类型设置图标
+                    let iconClass = 'info-circle';
+                    if (type === 'success') {
+                        iconClass = 'check-circle';
+                    } else if (type === 'danger' || type === 'warning') {
+                        iconClass = 'exclamation-triangle';
+                    }
+                    
+                    toast.innerHTML = '<div class="toast-header ' + bgClass + ' ' + textClass + '">' +
+                        '<i class="bi bi-' + iconClass + ' me-2"></i>' +
+                        '<strong class="me-auto">提示</strong>' +
+                        '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                        '</div>' +
+                        '<div class="toast-body">' +
+                        message +
+                        '</div>';
+                    
+                    toastContainer.appendChild(toast);
+                    
+                    // 初始化并显示toast
+                    const bsToast = new bootstrap.Toast(toast, {
+                        autohide: true,
+                        delay: 3000
+                    });
+                    bsToast.show();
+                    
+                    // toast关闭后移除元素
+                    toast.addEventListener('hidden.bs.toast', function() {
+                        toast.remove();
+                    });
                 },
                 
                 // 开始倒计时

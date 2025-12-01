@@ -116,6 +116,7 @@ public class CarProductCategoryServiceImpl implements ICarProductCategoryService
 
     /**
      * 構建前端所需要下拉樹結構
+     * 限制最多显示两层（只显示一级分类，不显示二级分类的子分类）
      * 
      * @param categories 分類列表
      * @return 下拉樹結構列表
@@ -128,11 +129,42 @@ public class CarProductCategoryServiceImpl implements ICarProductCategoryService
             TreeSelect treeSelect = new TreeSelect();
             treeSelect.setId(category.getId());
             treeSelect.setLabel(category.getCategoryName());
+            // 只显示一级分类，不显示二级分类的子分类（限制最多两层）
+            // 如果是一级分类，显示其直接子分类；如果是二级分类，不显示子分类
             if (category.getChildren() != null && !category.getChildren().isEmpty()) {
-                treeSelect.setChildren(buildCategoryTreeSelect(category.getChildren()));
+                // 一级分类显示子分类，但子分类不再显示子分类
+                treeSelect.setChildren(category.getChildren().stream().map(child -> {
+                    TreeSelect childTreeSelect = new TreeSelect();
+                    childTreeSelect.setId(child.getId());
+                    childTreeSelect.setLabel(child.getCategoryName());
+                    // 二级分类不显示子分类
+                    return childTreeSelect;
+                }).collect(Collectors.toList()));
             }
             return treeSelect;
         }).collect(Collectors.toList());
+    }
+    
+    /**
+     * 構建前端所需要下拉樹結構（只返回一级分类，用于选择上级分类）
+     * 
+     * @param categories 分類列表
+     * @return 下拉樹結構列表（只包含一级分类）
+     */
+    @Override
+    public List<TreeSelect> buildFirstLevelCategoryTreeSelect(List<CarProductCategoryEntity> categories)
+    {
+        // 只返回一级分类（parentId为0或null的分类）
+        return categories.stream()
+            .filter(category -> category.getParentId() == null || category.getParentId() == 0)
+            .map(category -> {
+                TreeSelect treeSelect = new TreeSelect();
+                treeSelect.setId(category.getId());
+                treeSelect.setLabel(category.getCategoryName());
+                // 不包含children，只显示一级分类
+                return treeSelect;
+            })
+            .collect(Collectors.toList());
     }
 
     /**
@@ -147,6 +179,13 @@ public class CarProductCategoryServiceImpl implements ICarProductCategoryService
     {
         if (carProductCategory.getParentId() == null) {
             carProductCategory.setParentId(0L);
+        }
+        // 层级限制：最多维护两层
+        if (carProductCategory.getParentId() != null && carProductCategory.getParentId() != 0) {
+            CarProductCategoryEntity parent = carProductCategoryMapper.selectByPrimaryKey(carProductCategory.getParentId());
+            if (parent != null && parent.getParentId() != null && parent.getParentId() != 0) {
+                throw new RuntimeException("最多只能维护两层分类，无法继续添加子分类");
+            }
         }
         if (carProductCategory.getDelFlag() == null) {
             carProductCategory.setDelFlag(0);
@@ -167,7 +206,43 @@ public class CarProductCategoryServiceImpl implements ICarProductCategoryService
     @Transactional
     public int updateCarProductCategory(CarProductCategoryEntity carProductCategory)
     {
+        // 层级限制：最多维护两层
+        if (carProductCategory.getParentId() != null && carProductCategory.getParentId() != 0) {
+            CarProductCategoryEntity parent = carProductCategoryMapper.selectByPrimaryKey(carProductCategory.getParentId());
+            if (parent != null && parent.getParentId() != null && parent.getParentId() != 0) {
+                throw new RuntimeException("最多只能维护两层分类，无法继续添加子分类");
+            }
+            // 防止将分类设置为自己的子分类
+            if (carProductCategory.getId() != null && carProductCategory.getId().equals(carProductCategory.getParentId())) {
+                throw new RuntimeException("不能将分类设置为自己的子分类");
+            }
+            // 防止循环引用：检查父分类是否是当前分类的子分类
+            if (isDescendant(carProductCategory.getId(), carProductCategory.getParentId())) {
+                throw new RuntimeException("不能将分类设置为自己的子分类");
+            }
+        }
         return carProductCategoryMapper.updateByPrimaryKeySelective(carProductCategory);
+    }
+    
+    /**
+     * 检查targetId是否是sourceId的后代节点
+     * 
+     * @param sourceId 源节点ID
+     * @param targetId 目标节点ID
+     * @return 是否是后代节点
+     */
+    private boolean isDescendant(Long sourceId, Long targetId) {
+        if (sourceId == null || targetId == null) {
+            return false;
+        }
+        CarProductCategoryEntity target = carProductCategoryMapper.selectByPrimaryKey(targetId);
+        if (target == null || target.getParentId() == null || target.getParentId() == 0) {
+            return false;
+        }
+        if (target.getParentId().equals(sourceId)) {
+            return true;
+        }
+        return isDescendant(sourceId, target.getParentId());
     }
 
     /**

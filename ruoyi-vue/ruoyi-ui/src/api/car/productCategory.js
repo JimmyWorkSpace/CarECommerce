@@ -25,6 +25,14 @@ export function treeselect() {
   })
 }
 
+// 查詢商品目錄分類下拉樹結構（只返回一级分类，用于选择上级分类）
+export function treeselectFirstLevel() {
+  return request({
+    url: '/car/productCategory/treeselect/firstlevel',
+    method: 'get'
+  })
+}
+
 // 根據角色ID查詢商品目錄分類樹結構
 export function roleCategoryTreeselect(roleId) {
   return request({

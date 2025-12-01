@@ -82,6 +82,17 @@ public class CarProductCategoryController extends BaseController
     }
 
     /**
+     * 獲取商品目錄分類下拉樹列表（只返回一级分类，用于选择上级分类）
+     */
+    @GetMapping("/treeselect/firstlevel")
+    public AjaxResult treeselectFirstLevel(CarProductCategoryEntity carProductCategory)
+    {
+        List<CarProductCategoryEntity> categories = carProductCategoryService.selectCarProductCategoryList(carProductCategory);
+        List<TreeSelect> categoryTrees = carProductCategoryService.buildFirstLevelCategoryTreeSelect(categories);
+        return AjaxResult.success(categoryTrees);
+    }
+
+    /**
      * 加載對應角色商品目錄分類列表樹
      */
     @GetMapping(value = "/roleCategoryTreeselect/{roleId}")
