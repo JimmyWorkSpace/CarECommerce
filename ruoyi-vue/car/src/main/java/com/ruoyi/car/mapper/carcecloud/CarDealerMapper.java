@@ -33,8 +33,11 @@ public interface CarDealerMapper extends Mapper<CarDealerEntity> {
 			"    FROM car_dealers " +
 			"    GROUP BY id_garage" +
 			") grouped ON cd.id_garage = grouped.id_garage AND cd.id = grouped.min_id " +
-			"INNER JOIN car_sales cs ON cd.id_garage = cs.id_garage " +
-			"WHERE cs.is_admin_check = 1 " +
+			"WHERE EXISTS (" +
+			"    SELECT 1 FROM car_sales cs " +
+			"    WHERE cs.id_garage = cd.id_garage " +
+			"    AND cs.is_admin_check = 1" +
+			") " +
 			"<if test='dealerName != null and dealerName != \"\"'>" +
 			"    AND cd.dealer_name LIKE CONCAT('%', #{dealerName}, '%') " +
 			"</if>" +
