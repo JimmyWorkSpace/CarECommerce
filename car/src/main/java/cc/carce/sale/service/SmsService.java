@@ -70,27 +70,26 @@ public class SmsService {
 
         // 存储验证码
         SMS_CODE_MAP.put(phoneNumber, new SmsCode(code, expireTime));
-        log.info(code);
 
         // 构建短信内容
         String message = String.format("您的验证码是：%s，%d分钟内有效，请勿泄露给他人。", code, CODE_EXPIRE_MINUTES);
 
-        // try {
-        //     // 所有环境都实际发送短信
-        //     SmsResponse result = sendSms(phoneNumber, message);
-        //     log.info("=== 短信验证码发送结果 ===");
-        //     log.info("手机号: {}", phoneNumber);
-        //     log.info("验证码: {}", code);
-        //     log.info("有效期: {} 分钟", CODE_EXPIRE_MINUTES);
-        //     log.info("短信内容: {}", message);
-        //     log.info("发送结果: {}", result);
-        //     log.info("========================");
-        // } catch (Exception e) {
-        //     log.error("发送短信验证码失败，手机号: {}, 错误: {}", phoneNumber, e.getMessage(), e);
-        //     // 发送失败时从缓存中移除验证码
-        //     SMS_CODE_MAP.remove(phoneNumber);
-        //     throw new RuntimeException("短信发送失败: " + e.getMessage());
-        // }
+        try {
+            // 所有环境都实际发送短信
+            SmsResponse result = sendSms(phoneNumber, message);
+            log.info("=== 短信验证码发送结果 ===");
+            log.info("手机号: {}", phoneNumber);
+            log.info("验证码: {}", code);
+            log.info("有效期: {} 分钟", CODE_EXPIRE_MINUTES);
+            log.info("短信内容: {}", message);
+            log.info("发送结果: {}", result);
+            log.info("========================");
+        } catch (Exception e) {
+            log.error("发送短信验证码失败，手机号: {}, 错误: {}", phoneNumber, e.getMessage(), e);
+            // 发送失败时从缓存中移除验证码
+            SMS_CODE_MAP.remove(phoneNumber);
+            throw new RuntimeException("短信发送失败: " + e.getMessage());
+        }
 
         return code;
     }
