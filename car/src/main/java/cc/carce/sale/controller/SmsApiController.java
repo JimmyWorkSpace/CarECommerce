@@ -56,7 +56,7 @@ public class SmsApiController {
             
             response.put("success", true);
             response.put("message", "驗證碼發送成功");
-            response.put("code", code); // 开发环境返回验证码，生产环境应该删除
+            // response.put("code", code); // 开发环境返回验证码，生产环境应该删除
             
             log.info("短信验证码发送成功，手机号: {}", phoneNumber);
             
@@ -64,6 +64,35 @@ public class SmsApiController {
             log.error("发送短信验证码失败", e);
             response.put("success", false);
             response.put("message", "發送失敗，請稍後重試");
+        }
+        
+        return response;
+    }
+    
+    /**
+     * 查询剩余等待时间（不发送短信）
+     */
+    @PostMapping("/check-remaining-time")
+    public Map<String, Object> checkRemainingTime(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            String phoneNumber = request.get("phoneNumber");
+            
+            if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("remainingTime", 0);
+                return response;
+            }
+            
+            int remainingTime = smsService.getRemainingWaitTime(phoneNumber);
+            response.put("success", true);
+            response.put("remainingTime", remainingTime);
+            
+        } catch (Exception e) {
+            log.error("查询剩余等待时间失败", e);
+            response.put("success", false);
+            response.put("remainingTime", 0);
         }
         
         return response;

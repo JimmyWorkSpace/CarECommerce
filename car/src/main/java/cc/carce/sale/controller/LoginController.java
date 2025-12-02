@@ -1,5 +1,11 @@
 package cc.carce.sale.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
@@ -62,14 +68,28 @@ public class LoginController extends BaseController {
             
             // 验证短信验证码
             if (!smsService.verifySmsCode(phoneNumber, smsCode)) {
-                return "redirect:/login?error=驗證碼錯誤或已過期";
+                String errorMsg = URLEncoder.encode("驗證碼錯誤或已過期", StandardCharsets.UTF_8.toString());
+                // 如果有returnUrl，清理后附加到跳转URL
+                String redirectUrl = "/login?error=" + errorMsg;
+                if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+                    String cleanedReturnUrl = cleanReturnUrl(returnUrl);
+                    redirectUrl += "&returnUrl=" + URLEncoder.encode(cleanedReturnUrl, StandardCharsets.UTF_8.toString());
+                }
+                return "redirect:" + redirectUrl;
             }
             
             // 用户登录或注册
             CarUserEntity user = carUserService.loginOrRegister(phoneNumber);
             
             if (user == null) {
-                return "redirect:/login?error=用戶創建失敗";
+                String errorMsg = URLEncoder.encode("用戶創建失敗", StandardCharsets.UTF_8.toString());
+                // 如果有returnUrl，清理后附加到跳转URL
+                String redirectUrl = "/login?error=" + errorMsg;
+                if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+                    String cleanedReturnUrl = cleanReturnUrl(returnUrl);
+                    redirectUrl += "&returnUrl=" + URLEncoder.encode(cleanedReturnUrl, StandardCharsets.UTF_8.toString());
+                }
+                return "redirect:" + redirectUrl;
             }
             
             String token = JwtUtils.generateToken(user.getPhoneNumber());
@@ -102,7 +122,9 @@ public class LoginController extends BaseController {
             
             // 如果有返回URL且是GET请求的页面，则跳转回去
             if (returnUrl != null && !returnUrl.trim().isEmpty() && isValidReturnUrl(returnUrl)) {
-                return "redirect:" + returnUrl;
+                // 清理URL中的不需要的参数
+                String cleanedUrl = cleanReturnUrl(returnUrl);
+                return "redirect:" + cleanedUrl;
             }
             
             // 重定向到首页
@@ -110,10 +132,142 @@ public class LoginController extends BaseController {
             
         } catch (Exception e) {
             log.error("登录失败", e);
-            return "redirect:/login?error=登入失敗：" + e.getMessage();
+            try {
+                String errorMsg = URLEncoder.encode("登入失敗：" + e.getMessage(), StandardCharsets.UTF_8.toString());
+                // 如果有returnUrl，清理后附加到跳转URL
+                String redirectUrl = "/login?error=" + errorMsg;
+                if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+                    String cleanedReturnUrl = cleanReturnUrl(returnUrl);
+                    redirectUrl += "&returnUrl=" + URLEncoder.encode(cleanedReturnUrl, StandardCharsets.UTF_8.toString());
+                }
+                return "redirect:" + redirectUrl;
+            } catch (UnsupportedEncodingException ex) {
+                log.error("编码错误信息失败", ex);
+                String redirectUrl = "/login?error=登入失敗";
+                if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+                    try {
+                        String cleanedReturnUrl = cleanReturnUrl(returnUrl);
+                        redirectUrl += "&returnUrl=" + URLEncoder.encode(cleanedReturnUrl, StandardCharsets.UTF_8.toString());
+                    } catch (UnsupportedEncodingException e2) {
+                        // 忽略编码错误
+                    }
+                }
+                return "redirect:" + redirectUrl;
+            }
         }
     }
     
+    /**
+     * 清理URL中的不需要的参数
+     * 移除 error, baseUrl, title, ogTitle, ogDescription, ogUrl, ogImage 等参数
+     */
+    private String cleanReturnUrl(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return url;
+        }
+        
+        try {
+            // 分离路径和查询参数
+            String path;
+            String queryString = null;
+            int queryIndex = url.indexOf('?');
+            
+            if (queryIndex >= 0) {
+                path = url.substring(0, queryIndex);
+                queryString = url.substring(queryIndex + 1);
+            } else {
+                path = url;
+            }
+            
+            // 如果没有查询参数，直接返回路径
+            if (queryString == null || queryString.trim().isEmpty()) {
+                return path;
+            }
+            
+            // 需要移除的参数名
+            String[] paramsToRemove = {
+                "error", "baseUrl", "title", "ogTitle", 
+                "ogDescription", "ogUrl", "ogImage"
+            };
+            
+            // 解析查询参数
+            Map<String, String> params = new LinkedHashMap<>();
+            String[] pairs = queryString.split("&");
+            
+            for (String pair : pairs) {
+                if (pair.trim().isEmpty()) {
+                    continue;
+                }
+                
+                int equalIndex = pair.indexOf('=');
+                String key;
+                String value = "";
+                
+                if (equalIndex >= 0) {
+                    key = pair.substring(0, equalIndex);
+                    if (equalIndex < pair.length() - 1) {
+                        value = pair.substring(equalIndex + 1);
+                    }
+                } else {
+                    key = pair;
+                }
+                
+                // URL解码
+                try {
+                    key = URLDecoder.decode(key, StandardCharsets.UTF_8.toString());
+                    if (!value.isEmpty()) {
+                        value = URLDecoder.decode(value, StandardCharsets.UTF_8.toString());
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    // 如果解码失败，使用原始值
+                }
+                
+                // 检查是否需要保留此参数
+                boolean shouldKeep = true;
+                for (String paramToRemove : paramsToRemove) {
+                    if (key.equals(paramToRemove)) {
+                        shouldKeep = false;
+                        break;
+                    }
+                }
+                
+                if (shouldKeep) {
+                    params.put(key, value);
+                }
+            }
+            
+            // 重新构建URL
+            if (params.isEmpty()) {
+                return path;
+            }
+            
+            StringBuilder newQueryString = new StringBuilder();
+            boolean first = true;
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (!first) {
+                    newQueryString.append("&");
+                }
+                first = false;
+                
+                try {
+                    String encodedKey = URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.toString());
+                    String encodedValue = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.toString());
+                    newQueryString.append(encodedKey).append("=").append(encodedValue);
+                } catch (UnsupportedEncodingException e) {
+                    // 如果编码失败，使用原始值
+                    newQueryString.append(entry.getKey()).append("=").append(entry.getValue());
+                }
+            }
+            
+            return path + "?" + newQueryString.toString();
+            
+        } catch (Exception e) {
+            log.warn("清理URL参数失败: {}", url, e);
+            // 如果清理失败，返回原始URL（但至少移除查询参数部分）
+            int queryIndex = url.indexOf('?');
+            return queryIndex >= 0 ? url.substring(0, queryIndex) : url;
+        }
+    }
 
     /**
      * 验证返回URL是否有效

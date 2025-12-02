@@ -27,8 +27,9 @@
                             <div class="mb-2" style="font-size: 0.95rem; color: #5ACFC9; font-weight: 500;">
                                 <i class="bi bi-info-circle me-1"></i>未註冊用戶將以此手機號註冊
                             </div>
+                            <div class="form-text">必須為10碼數字，以09開頭</div>
                             <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
-                                   placeholder="請輸入手機號碼" required <#noparse>v-model.trim="phoneNumber" @input="onPhoneInput"</#noparse>>
+                                   placeholder="請輸入手機號碼（09開頭）" required maxlength="10" <#noparse>:value="phoneNumber" @input="onPhoneInput"</#noparse>>
                         </div>
                         
                         <div class="mb-3">
@@ -232,17 +233,42 @@ new Vue({
     },
     methods: {
         isValidPhone(phone) {
-            return /^1[3-9]\d{9}$/.test(phone);
+            // 台湾手机号格式：10码数字，以09开头
+            return /^09\d{8}$/.test(phone);
         },
         isValidCode(code) {
             return /^\d{6}$/.test(code);
         },
         onPhoneInput(e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 11) {
-                value = value.substring(0, 11);
+            // 台湾手机号：限制为10码
+            if (value.length > 10) {
+                value = value.substring(0, 10);
             }
+            // 更新Vue数据
             this.phoneNumber = value;
+            // 确保输入框显示的值也是过滤后的值
+            e.target.value = value;
+            // 当手机号输入完整时，检查剩余等待时间
+            if (value.length === 10) {
+                this.checkRemainingTime(value);
+            }
+        },
+        async checkRemainingTime(phone) {
+            if (!phone || phone.trim().length !== 10) {
+                return;
+            }
+            try {
+                const res = await axios.post('/api/sms/check-remaining-time', { phoneNumber: phone });
+                const data = res.data;
+                if (data.success && data.remainingTime > 0) {
+                    // 如果有剩余等待时间，自动开始倒计时
+                    this.countdown = data.remainingTime;
+                    this.startCountdown();
+                }
+            } catch (err) {
+                console.error('检查剩余等待时间失败:', err);
+            }
         },
         onCodeInput(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -251,10 +277,16 @@ new Vue({
             }
             this.smsCode = value;
         },
-        startCountdown() {
-            this.countdown = 30; // 改为30秒倒计时
+        startCountdown(initialValue) {
+            // 如果传入了初始值，使用它；否则使用当前的countdown值
+            if (initialValue !== undefined) {
+                this.countdown = initialValue;
+            }
             if (this.countdownTimer) {
                 clearInterval(this.countdownTimer);
+            }
+            if (this.countdown <= 0) {
+                return;
             }
             this.countdownTimer = setInterval(() => {
                 this.countdown--;
@@ -266,11 +298,32 @@ new Vue({
             }, 1000);
         },
         async sendSms() {
-            const phone = this.phoneNumber.trim();
+            // 优先从Vue数据获取，如果为空则从输入框获取
+            let phone = this.phoneNumber ? this.phoneNumber.trim() : '';
+            if (!phone) {
+                const phoneInput = document.getElementById('phoneNumber');
+                if (phoneInput) {
+                    phone = phoneInput.value ? phoneInput.value.trim() : '';
+                }
+            }
             
-            // 验证手机号格式
-            if (!this.isValidPhone(phone)) {
+            // 验证手机号是否为空
+            if (!phone) {
                 this.showToast('請輸入手機號碼', 'warning');
+                return;
+            }
+            
+            // 验证手机号格式（台湾手机号：10码，以09开头）
+            if (phone.length !== 10) {
+                this.showToast('手機號長度必須為10碼', 'warning');
+                return;
+            }
+            if (!phone.startsWith('09')) {
+                this.showToast('手機號必須以09開頭', 'warning');
+                return;
+            }
+            if (!this.isValidPhone(phone)) {
+                this.showToast('請輸入正確的手機號碼格式（10碼數字，以09開頭）', 'warning');
                 return;
             }
             
@@ -278,6 +331,7 @@ new Vue({
                 const res = await axios.post('/api/sms/send', { phoneNumber: phone });
                 const data = res.data;
                 if (data.success) {
+                    this.countdown = 30; // 发送成功后设置为30秒倒计时
                     this.startCountdown();
                     this.showToast('驗證碼已發送，請查看手機簡訊，也留意垃圾簡訊內容', 'success');
                 } else {
@@ -362,6 +416,14 @@ new Vue({
             toast.addEventListener('hidden.bs.toast', function() {
                 toast.remove();
             });
+        }
+    },
+    mounted() {
+        // 页面加载时，如果已有手机号输入，检查剩余等待时间
+        const phoneInput = document.getElementById('phoneNumber');
+        if (phoneInput && phoneInput.value && phoneInput.value.length === 10) {
+            this.phoneNumber = phoneInput.value;
+            this.checkRemainingTime(phoneInput.value);
         }
     }
 });

@@ -463,66 +463,6 @@
         </div>
     </div>
     
-    <!-- 登录弹窗 -->
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%); color: white; border-radius: 15px 15px 0 0;">
-                    <h5 class="modal-title text-start" id="loginModalLabel">
-                        <i class="bi bi-person-circle me-2"></i>用戶登錄
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div id="loginError" class="alert alert-danger" role="alert" style="display: none;">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        <span id="loginErrorText"></span>
-                    </div>
-                    
-                    <form id="loginModalForm">
-                        <div class="mb-3">
-                            <label for="loginPhoneNumber" class="form-label">
-                                <i class="bi bi-phone me-2"></i>手機號碼
-                            </label>
-                            <div class="mb-2" style="font-size: 0.95rem; color: #5ACFC9; font-weight: 500;">
-                                <i class="bi bi-info-circle me-1"></i>未註冊用戶將以此手機號註冊
-                            </div>
-                            <input type="tel" class="form-control" id="loginPhoneNumber" 
-                                   placeholder="請輸入手機號碼" required v-model.trim="loginPhoneNumber" @input="onLoginPhoneInput">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="loginSmsCode" class="form-label">
-                                <i class="bi bi-shield-check me-2"></i>短信驗證碼
-                            </label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="loginSmsCode" 
-                                       placeholder="請輸入驗證碼" required maxlength="6" v-model.trim="loginSmsCode" @input="onLoginCodeInput">
-                                <button type="button" class="btn btn-outline-primary" id="loginSendSmsBtn" 
-                                        :disabled="loginCountdown>0" @click="sendLoginSms">
-                                    <span v-text="loginCountdown>0 ? loginCountdown + '秒後重發' : '發送驗證碼'"></span>
-                                </button>
-                            </div>
-                            <div class="form-text">驗證碼將發送到您的手機，有效期5分鐘</div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" @click="submitLoginModal" :disabled="loginSubmitting">
-                        <span v-if="loginSubmitting">
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            登錄中...
-                        </span>
-                        <span v-else>
-                            <i class="bi bi-box-arrow-in-right me-2"></i>登錄
-                        </span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- SEO描述 -->
     <section class="seo-description" style="display:none">
         <p><#if carInfo.saleDescription??>${carInfo.saleDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if><#if carInfo.saleDescription?? && ogDescription??>,</#if><#if ogDescription??>${ogDescription?replace('<[^>]*>', '', 'r')?replace('\\s+', ' ', 'r')?trim}</#if></p>
@@ -651,14 +591,7 @@ try {
         features: [],
         advertisements: [],
         mobileAdvertisementsSmall: [], // 小屏幕移动端广告数据（< 576px）
-        mobileAdvertisementsMedium: [], // 中等屏幕移动端广告数据（576px - 768px）
-        // 登录弹窗相关数据
-        loginPhoneNumber: '',
-        loginSmsCode: '',
-        loginCountdown: 0,
-        loginCountdownTimer: null,
-        loginSubmitting: false,
-        pendingAction: null // 登录后要执行的操作: 'appointment' 或 'report'
+        mobileAdvertisementsMedium: [] // 中等屏幕移动端广告数据（576px - 768px）
     },
     mounted() {
         console.log('车辆详情页Vue实例已挂载');
@@ -685,13 +618,17 @@ try {
             }, 500);
         }
         
-        // 监听登录弹窗关闭事件，清空表单
-        const loginModalElement = document.getElementById('loginModal');
-        if (loginModalElement) {
-            loginModalElement.addEventListener('hidden.bs.modal', () => {
-                this.resetLoginForm();
-            });
-        }
+        // 监听登录后待执行的操作事件（由main.ftl的loginManager触发）
+        window.addEventListener('pendingAction', (event) => {
+            const action = event.detail.action;
+            setTimeout(() => {
+                if (action === 'appointment') {
+                    this.openAppointmentModal();
+                } else if (action === 'report') {
+                    this.openReportModal();
+                }
+            }, 500);
+        });
         
         // 测试Vue实例是否正常工作
         setTimeout(() => {
@@ -950,10 +887,10 @@ try {
             const isLoggedIn = !userNameDisplay.querySelector('.text-danger');
             
             if (!isLoggedIn) {
-                // 未登录，打开登录弹窗
-                this.pendingAction = 'report';
-                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-                loginModal.show();
+                // 未登录，使用main.ftl的统一登录功能
+                if (window.loginManager) {
+                    window.loginManager.showLoginModal('report');
+                }
                 return;
             }
             
@@ -1048,10 +985,10 @@ try {
             const isLoggedIn = !userNameDisplay.querySelector('.text-danger');
             
             if (!isLoggedIn) {
-                // 未登录，打开登录弹窗
-                this.pendingAction = 'appointment';
-                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-                loginModal.show();
+                // 未登录，使用main.ftl的统一登录功能
+                if (window.loginManager) {
+                    window.loginManager.showLoginModal('appointment');
+                }
                 return;
             }
             
@@ -1156,205 +1093,6 @@ try {
                 console.error('提交预约失败:', error);
                 alert('预约失败，请稍后重试');
             }
-        },
-        
-        // 登录弹窗相关方法
-        onLoginPhoneInput(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 11) {
-                value = value.substring(0, 11);
-            }
-            this.loginPhoneNumber = value;
-        },
-        
-        onLoginCodeInput(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 6) {
-                value = value.substring(0, 6);
-            }
-            this.loginSmsCode = value;
-        },
-        
-        startLoginCountdown() {
-            this.loginCountdown = 30;
-            if (this.loginCountdownTimer) {
-                clearInterval(this.loginCountdownTimer);
-            }
-            this.loginCountdownTimer = setInterval(() => {
-                this.loginCountdown--;
-                if (this.loginCountdown <= 0) {
-                    clearInterval(this.loginCountdownTimer);
-                    this.loginCountdownTimer = null;
-                    this.loginCountdown = 0;
-                }
-            }, 1000);
-        },
-        
-        async sendLoginSms() {
-            const phone = this.loginPhoneNumber.trim();
-            
-            if (!phone) {
-                this.showToast('請輸入手機號碼', 'warning');
-                return;
-            }
-            
-            try {
-                const res = await axios.post('/api/sms/send', { phoneNumber: phone });
-                const data = res.data;
-                if (data.success) {
-                    this.startLoginCountdown();
-                    this.hideLoginError();
-                    this.showToast('驗證碼已發送，請查看手機簡訊，也留意垃圾簡訊內容', 'success');
-                } else {
-                    if (data.remainingTime) {
-                        this.showToast('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼', 'warning');
-                        this.loginCountdown = data.remainingTime;
-                        this.startLoginCountdown();
-                    } else {
-                        this.showToast(data.message || '發送失敗，請稍後重試', 'danger');
-                    }
-                }
-            } catch (err) {
-                console.error(err);
-                this.showToast('發送失敗，請稍後重試', 'danger');
-            }
-        },
-        
-        showToast(message, type) {
-            type = type || 'info';
-            // 创建toast容器（如果不存在）
-            let toastContainer = document.getElementById('toastContainer');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.id = 'toastContainer';
-                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-                toastContainer.style.zIndex = '9999';
-                document.body.appendChild(toastContainer);
-            }
-            
-            // 创建toast元素
-            const toastId = 'toast-' + Date.now();
-            const toast = document.createElement('div');
-            toast.id = toastId;
-            toast.className = 'toast';
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'assertive');
-            toast.setAttribute('aria-atomic', 'true');
-            
-            // 根据类型设置样式
-            const bgClass = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
-            const textClass = type === 'warning' ? 'text-dark' : 'text-white';
-            
-            // 根据类型设置图标
-            let iconClass = 'info-circle';
-            if (type === 'success') {
-                iconClass = 'check-circle';
-            } else if (type === 'danger' || type === 'warning') {
-                iconClass = 'exclamation-triangle';
-            }
-            
-            toast.innerHTML = '<div class="toast-header ' + bgClass + ' ' + textClass + '">' +
-                '<i class="bi bi-' + iconClass + ' me-2"></i>' +
-                '<strong class="me-auto">提示</strong>' +
-                '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>' +
-                '</div>' +
-                '<div class="toast-body">' +
-                message +
-                '</div>';
-            
-            toastContainer.appendChild(toast);
-            
-            // 初始化并显示toast
-            const bsToast = new bootstrap.Toast(toast, {
-                autohide: true,
-                delay: 3000
-            });
-            bsToast.show();
-            
-            // toast关闭后移除元素
-            toast.addEventListener('hidden.bs.toast', function() {
-                toast.remove();
-            });
-        },
-        
-        showLoginError(message) {
-            const errorDiv = document.getElementById('loginError');
-            const errorText = document.getElementById('loginErrorText');
-            if (errorDiv && errorText) {
-                errorText.textContent = message;
-                errorDiv.style.display = 'block';
-            }
-        },
-        
-        hideLoginError() {
-            const errorDiv = document.getElementById('loginError');
-            if (errorDiv) {
-                errorDiv.style.display = 'none';
-            }
-        },
-        
-        async submitLoginModal() {
-            const phone = this.loginPhoneNumber.trim();
-            const code = this.loginSmsCode.trim();
-            
-            if (!phone) {
-                this.showToast('請輸入手機號碼', 'warning');
-                return;
-            }
-            
-            if (!code || !/^\d{6}$/.test(code)) {
-                this.showToast('請輸入6位數字驗證碼', 'warning');
-                return;
-            }
-            
-            this.loginSubmitting = true;
-            this.hideLoginError();
-            
-            // 保存待执行的操作
-            if (this.pendingAction) {
-                sessionStorage.setItem('pendingAction', this.pendingAction);
-            }
-            
-            // 创建隐藏的表单并提交（因为后端返回重定向，axios无法处理）
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/login';
-            form.style.display = 'none';
-            
-            const phoneInput = document.createElement('input');
-            phoneInput.type = 'hidden';
-            phoneInput.name = 'phoneNumber';
-            phoneInput.value = phone;
-            form.appendChild(phoneInput);
-            
-            const codeInput = document.createElement('input');
-            codeInput.type = 'hidden';
-            codeInput.name = 'smsCode';
-            codeInput.value = code;
-            form.appendChild(codeInput);
-            
-            // 添加当前页面URL作为返回地址
-            const returnUrlInput = document.createElement('input');
-            returnUrlInput.type = 'hidden';
-            returnUrlInput.name = 'returnUrl';
-            returnUrlInput.value = window.location.pathname + window.location.search;
-            form.appendChild(returnUrlInput);
-            
-            document.body.appendChild(form);
-            form.submit();
-        },
-        
-        // 重置登录表单
-        resetLoginForm() {
-            this.loginPhoneNumber = '';
-            this.loginSmsCode = '';
-            this.loginSubmitting = false;
-            this.hideLoginError();
-            if (this.loginCountdownTimer) {
-                clearInterval(this.loginCountdownTimer);
-                this.loginCountdownTimer = null;
-            }
-            this.loginCountdown = 0;
         }
     }
 });
@@ -1566,62 +1304,6 @@ try {
 }
 
 /* 登录弹窗样式 */
-#loginModal .modal-content {
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-#loginModal .modal-header {
-    border-radius: 15px 15px 0 0;
-    border: none;
-}
-
-#loginModal .form-control {
-    border-radius: 10px;
-    border: 2px solid #e9ecef;
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
-}
-
-#loginModal .form-control:focus {
-    border-color: #5ACFC9;
-    box-shadow: 0 0 0 0.2rem rgba(90, 207, 201, 0.25);
-}
-
-#loginModal .btn-primary {
-    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
-    border: none;
-    border-radius: 10px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-#loginModal .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
-}
-
-#loginModal .btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-#loginModal .alert {
-    border-radius: 10px;
-    border: none;
-}
-
-#loginModal .input-group .btn {
-    border-radius: 0 10px 10px 0;
-}
-
-#loginModal .input-group .form-control {
-    border-radius: 10px 0 0 10px;
-}
-
 /* 功能块和广告块样式 */
 .features-ads-section {
     padding: 20px 0;
