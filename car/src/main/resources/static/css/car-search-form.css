@@ -1,0 +1,320 @@
+/* 车辆搜索表单样式 */
+.car-search-form-container {
+    padding: 30px 0;
+    margin-bottom: 30px;
+}
+
+.search-form-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.car-search-form {
+    background: linear-gradient(135deg, #a8e6cf 0%, #ffd3b6 100%);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.search-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.search-form-row:last-child {
+    margin-bottom: 0;
+}
+
+.search-form-group {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-form-group.full-width {
+    flex: 1 1 100%;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.search-form-label {
+    flex: 0 0 auto;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    min-width: 100px;
+    text-align: right;
+}
+
+.search-form-select,
+.search-form-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background-color: white;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    min-width: 0;
+    box-sizing: border-box;
+    height: 42px;
+}
+
+.search-form-select:focus,
+.search-form-input:focus {
+    outline: none;
+    border-color: #5ACFC9;
+    box-shadow: 0 0 0 3px rgba(90, 207, 201, 0.1);
+}
+
+.search-form-input::placeholder {
+    color: #999;
+}
+
+
+/* 所在地复选框样式 */
+.location-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.location-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    user-select: none;
+}
+
+.location-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 15px;
+    cursor: pointer;
+    accent-color: #5ACFC9;
+    flex-shrink: 0;
+}
+
+.location-checkbox span {
+    flex: 1;
+    text-align: left;
+}
+
+.location-checkbox:hover {
+    color: #5ACFC9;
+}
+
+/* 关键字和搜索按钮行 */
+.search-keyword-group {
+    flex: 1;
+    min-width: 300px;
+}
+
+.search-keyword-group .search-form-label {
+    min-width: 80px;
+}
+
+.keyword-input {
+    flex: 1;
+}
+
+.search-button-group {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    min-width: 120px;
+}
+
+.search-button-group .search-form-label {
+    display: none;
+}
+
+.search-submit-btn {
+    width: 100%;
+    height: 42px;
+    padding: 0 30px;
+    background-color: #5ACFC9;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-submit-btn:hover {
+    background-color: #4ab8b2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 207, 201, 0.3);
+}
+
+.search-submit-btn:active {
+    transform: translateY(0);
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .search-form-group {
+        min-width: 180px;
+    }
+    
+    .location-checkboxes {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+}
+
+@media (max-width: 992px) {
+    .car-search-form-container {
+        padding: 20px 0;
+    }
+    
+    .search-form-title {
+        font-size: 1.6rem;
+        margin-bottom: 25px;
+    }
+    
+    .car-search-form {
+        padding: 25px;
+    }
+    
+    .search-form-row {
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .search-form-group {
+        min-width: 150px;
+    }
+    
+    .search-form-label {
+        min-width: 90px;
+        font-size: 0.9rem;
+    }
+    
+    .location-checkboxes {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .car-search-form-container {
+        padding: 15px 0;
+    }
+    
+    .search-form-title {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+    }
+    
+    .car-search-form {
+        padding: 20px;
+        border-radius: 8px;
+    }
+    
+    .search-form-row {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .search-form-group {
+        min-width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .search-form-group.full-width {
+        flex-direction: column;
+    }
+    
+    .search-form-label {
+        text-align: left;
+        min-width: auto;
+        margin-bottom: 0;
+    }
+    
+    .search-form-select,
+    .search-form-input {
+        width: 100%;
+    }
+    
+    .location-checkboxes {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .search-keyword-group {
+        min-width: 100%;
+    }
+    
+    .search-keyword-group .search-form-label {
+        display: block;
+        text-align: left;
+        min-width: auto;
+    }
+    
+    .search-button-group {
+        min-width: 100%;
+    }
+    
+    .search-button-group .search-form-label {
+        display: none;
+    }
+    
+    .search-submit-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .search-form-title {
+        font-size: 1.2rem;
+    }
+    
+    .car-search-form {
+        padding: 15px;
+    }
+    
+    .search-form-label {
+        font-size: 0.9rem;
+    }
+    
+    .search-form-select,
+    .search-form-input {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        height: 38px;
+    }
+    
+    .search-submit-btn {
+        height: 38px;
+    }
+    
+    .location-checkboxes {
+        grid-template-columns: 1fr;
+    }
+    
+    .location-checkbox {
+        font-size: 0.85rem;
+    }
+}
+

@@ -1,6 +1,7 @@
 package cc.carce.sale.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,11 @@ import cc.carce.sale.service.SmsService;
 import cc.carce.sale.service.CarProductService;
 import cc.carce.sale.mapper.carcecloud.CarDealerMapper;
 import cc.carce.sale.dto.CarListDto;
+import cc.carce.sale.service.CarBrandService;
+import cc.carce.sale.service.CarFilterOptionsService;
+import cc.carce.sale.dto.CarSearchFilterDto;
+import cc.carce.sale.dto.CarFilterOptionsDto;
+import cc.carce.sale.entity.CarBrandEntity;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import tk.mybatis.mapper.entity.Example;
@@ -110,6 +116,12 @@ public class CarViewController extends BaseController {
 	
 	@Resource
 	private CarDealerMapper carDealerMapper;
+	
+	@Resource
+	private CarBrandService carBrandService;
+	
+	@Resource
+	private CarFilterOptionsService carFilterOptionsService;
 	
 	@Resource
 	private CarReportService carReportService;
@@ -183,8 +195,7 @@ public class CarViewController extends BaseController {
                 for (CarListDto carDto : recommendedCars) {
                     Map<String, String> car = new HashMap<>();
                     // 构建车型信息 - 使用品牌、型号、年份组合
-                    String carModel = carDto.getSaleTitleJoin() != null ? carDto.getSaleTitleJoin() : 
-                        (carDto.getSaleTitle() != null ? carDto.getSaleTitle() : "精選車輛");
+                    String carModel = carDto.getSaleTitleJoin() + " " + carDto.getSaleTitle();
                     car.put("model", carModel);
                     
                     // 格式化价格
@@ -255,6 +266,9 @@ public class CarViewController extends BaseController {
             
             model.addAttribute("dealers", dealers);
             
+            // 设置搜索过滤条件数据
+            addSearchFilterToModel(model);
+            
             // 设置模板内容
             model.addAttribute("content", "/home/index.ftl");
             
@@ -276,6 +290,9 @@ public class CarViewController extends BaseController {
             // 检查用户登录状态
             Object user = req.getSession().getAttribute("user");
             model.addAttribute("user", user);
+            
+            // 设置搜索过滤条件数据
+            addSearchFilterToModel(model);
             
             model.addAttribute("content", "/buy-cars/index.ftl");
         } catch (Exception e) {
@@ -1352,5 +1369,62 @@ public class CarViewController extends BaseController {
 		model.addAttribute("title", "拦截器测试页面");
 		model.addAttribute("content", "/test-interceptor.ftl");
 		return "/layout/main";
+	}
+	
+	/**
+	 * 添加搜索过滤条件到Model
+	 * @param model Model对象
+	 */
+	private void addSearchFilterToModel(Model model) {
+		try {
+			CarSearchFilterDto searchFilter = new CarSearchFilterDto();
+			// 获取已上架车辆的品牌列表
+			searchFilter.setBrands(carBrandService.getBrandsFromPublishedCars());
+			CarFilterOptionsDto filterOptions = carFilterOptionsService.getCarFilterOptions();
+			searchFilter.setFuelSystems(filterOptions.getFuelSystems());
+			searchFilter.setTransmissions(filterOptions.getTransmissions());
+			searchFilter.setDrivetrains(filterOptions.getDrivetrains());
+			searchFilter.setColors(filterOptions.getColors());
+			
+			// 获取车辆所在地并按照指定顺序排序
+			List<String> locationsFromDb = filterOptions.getLocations();
+			if (locationsFromDb != null && !locationsFromDb.isEmpty()) {
+				// 定义顺序
+				List<String> locationOrder = Arrays.asList(
+					"台北市", "新北市", "桃園市", "新竹縣", "新竹市", "苗栗縣", 
+					"台中市", "彰化縣", "雲林縣", "嘉義市", "嘉義縣", "台南市", 
+					"高雄市", "屏東縣", "基隆市", "宜蘭縣", "台東縣", "花蓮縣", "南投縣"
+				);
+				
+				// 按照指定顺序排序
+				List<String> sortedLocations = new ArrayList<>();
+				for (String location : locationOrder) {
+					if (locationsFromDb.contains(location)) {
+						sortedLocations.add(location);
+					}
+				}
+				// 添加不在顺序列表中的其他城市
+				for (String location : locationsFromDb) {
+					if (!sortedLocations.contains(location)) {
+						sortedLocations.add(location);
+					}
+				}
+				searchFilter.setLocations(sortedLocations);
+			} else {
+				searchFilter.setLocations(new ArrayList<>());
+			}
+			
+			// 设置出厂年份范围
+			searchFilter.setMinYear(filterOptions.getMinYear());
+			searchFilter.setMaxYear(filterOptions.getMaxYear());
+			
+			// 转换为JSON字符串
+			ObjectMapper objectMapper = new ObjectMapper();
+			String searchFilterJson = objectMapper.writeValueAsString(searchFilter);
+			model.addAttribute("searchFilterJson", searchFilterJson);
+		} catch (Exception e) {
+			log.error("获取搜索过滤条件失败", e);
+			model.addAttribute("searchFilterJson", "{}");
+		}
 	}
 } 

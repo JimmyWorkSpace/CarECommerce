@@ -307,102 +307,100 @@ body .navbar .navbar-toggler:focus {
 
 /* 通用页脚样式 */
 .footer {
-    background-color: #333;
-    color: white;
-    padding: 50px 0 20px;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    padding: 50px 0 30px;
     margin-top: 50px;
 }
 
-.footer h4 {
+.footer-column {
+    margin-bottom: 30px;
+}
+
+.footer-title {
     color: #5ACFC9;
     font-weight: bold;
+    font-size: 1.1rem;
     margin-bottom: 20px;
+    padding-bottom: 10px;
 }
 
-.footer p {
-    margin-bottom: 10px;
-    color: #ccc;
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.footer i {
-    margin-right: 10px;
-    color: #5ACFC9;
+.footer-links li {
+    margin-bottom: 12px;
 }
 
-.social-links {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.social-link {
+.footer-links a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
     display: inline-block;
-    width: 40px;
-    height: 40px;
-    background-color: #5ACFC9;
-    color: white;
-    text-align: center;
-    line-height: 40px;
-    border-radius: 50%;
+}
+
+.footer-links a:hover {
+    color: #5ACFC9;
     text-decoration: none;
+}
+
+.footer-line-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.line-button {
+    display: inline-block;
+    background-color: #00C300;
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: 500;
     transition: all 0.3s ease;
+    font-size: 0.95rem;
 }
 
-.social-link i {
-    color: white !important;
-}
-
-.social-link:hover {
-    background-color: #4AB8B2;
-    transform: translateY(-2px);
+.line-button:hover {
+    background-color: #00A300;
     color: white;
     text-decoration: none;
-}
-
-.social-link:hover i {
-    color: white !important;
-}
-
-.footer-bottom {
-    text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #555;
-    color: #999;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 195, 0, 0.3);
 }
 
 /* 页脚响应式设计 */
 @media (max-width: 768px) {
     .footer {
-        padding: 30px 0 15px;
+        padding: 30px 0 20px;
         margin-top: 30px;
     }
     
-    .footer h4 {
-        font-size: 1.2rem;
+    .footer-column {
+        margin-bottom: 25px;
+    }
+    
+    .footer-title {
+        font-size: 1rem;
         margin-bottom: 15px;
     }
     
-    .footer p {
-        font-size: 0.9rem;
-        margin-bottom: 8px;
+    .footer-links li {
+        margin-bottom: 10px;
     }
     
-    .social-links {
-        gap: 10px;
-        margin-top: 10px;
-    }
-    
-    .social-link {
-        width: 35px;
-        height: 35px;
-        line-height: 35px;
+    .footer-links a {
         font-size: 0.9rem;
     }
     
-    .footer-bottom {
-        margin-top: 20px;
-        padding-top: 15px;
+    .line-button {
+        padding: 10px 18px;
         font-size: 0.9rem;
     }
 }

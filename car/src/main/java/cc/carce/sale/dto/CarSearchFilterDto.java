@@ -1,11 +1,24 @@
 package cc.carce.sale.dto;
 
+import cc.carce.sale.entity.CarBrandEntity;
 import lombok.Data;
-
 import java.util.List;
 
+/**
+ * 车辆搜索过滤条件DTO
+ */
 @Data
-public class CarFilterOptionsDto {
+public class CarSearchFilterDto {
+    
+    /**
+     * 品牌列表
+     */
+    private List<CarBrandEntity> brands;
+    
+    /**
+     * 燃料系统选项
+     */
+    private List<String> fuelSystems;
     
     /**
      * 变速系统选项
@@ -16,11 +29,6 @@ public class CarFilterOptionsDto {
      * 驱动方式选项
      */
     private List<String> drivetrains;
-    
-    /**
-     * 燃料系统选项
-     */
-    private List<String> fuelSystems;
     
     /**
      * 车色选项
@@ -42,3 +50,4 @@ public class CarFilterOptionsDto {
      */
     private Integer maxYear;
 }
+

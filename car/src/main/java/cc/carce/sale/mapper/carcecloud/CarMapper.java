@@ -36,6 +36,18 @@ public interface CarMapper extends Mapper<CarEntity> {
 	// 查询燃料系统选项
 	List<String> selectDistinctFuelSystems();
 	
+	// 查询车色选项
+	List<String> selectDistinctColors();
+	
+	// 查询车辆所在地选项
+	List<String> selectDistinctLocationCities();
+	
+	// 查询出厂年份范围（最大值和最小值）
+	java.util.Map<String, Object> selectManufactureYearRange();
+	
+	// 根据品牌查询型号列表
+	List<String> selectModelsByBrand(@Param("brand") String brand);
+	
 	// 根据ID列表查询推荐车辆列表
 	List<CarListDto> selectRecommendedCarListWithCover(@Param("ids") List<Long> ids);
 }

@@ -12,4 +12,10 @@ public interface CarBrandMapper extends Mapper<CarBrandEntity> {
      * @return 品牌在售数量列表
      */
     List<CarBrandSaleCountDto> selectBrandSaleCount();
+    
+    /**
+     * 查询已上架车辆的品牌列表
+     * @return 品牌列表
+     */
+    List<CarBrandEntity> selectBrandsFromPublishedCars();
 }
