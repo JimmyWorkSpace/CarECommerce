@@ -1,111 +1,14 @@
 <link href="/css/buy-cars.css" rel="stylesheet">
+<link href="/css/car-search-form.css" rel="stylesheet">
+
+<!-- 搜索表单（在Vue实例外部） -->
+<#include "../components/car-search-form.ftl">
 
 <div class="buy-cars-page" id="app">
-    <!-- 搜索框 -->
-    <div class="search-header">
-        <div class="container">
-            <div class="search-box">
-                <div class="search-input-group">
-                    <input type="text" class="form-control search-input" placeholder="搜尋車型、品牌或關鍵詞..." v-model="searchForm.keyword" @keyup.enter="searchCars">
-                    <button class="btn search-btn" @click="searchCars">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="container">
         <div class="row">
-            <!-- 左侧筛选条件 -->
-            <div class="col-lg-3 col-md-4">
-                <div class="filter-sidebar">
-                    <h4 class="filter-title">篩選條件</h4>
-                    
-                    <!-- 品牌筛选 -->
-                    <div class="filter-section">
-                        <h5 class="filter-section-title">品牌</h5>
-                        <div class="filter-options">
-                            <label class="filter-option" v-for="brandItem in visibleBrands" :key="brandItem.brand">
-                                <input type="checkbox" :value="brandItem.brand" v-model="searchForm.brand">
-                                <span class="checkmark"></span>
-                                <span v-text="brandItem.brand"></span>
-                                <span class="brand-count">({{ brandItem.saleCount }})</span>
-                            </label>
-                        </div>
-                        <div class="brand-toggle" v-if="brandSaleCountList.length > 8">
-                            <button type="button" class="btn btn-link btn-sm" @click="toggleBrandExpanded">
-                                {{ brandExpanded ? '收起' : '展开全部' }}
-                                <i :class="brandExpanded ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 价格范围 -->
-                    <div class="filter-section">
-                        <h5 class="filter-section-title">價格範圍</h5>
-                        <div class="price-range">
-                            <input type="number" class="form-control" placeholder="最低價格" v-model="searchForm.priceMin">
-                            <span class="price-separator">-</span>
-                            <input type="number" class="form-control" placeholder="最高價格" v-model="searchForm.priceMax">
-                        </div>
-                    </div>
-
-                    <!-- 年份 -->
-                    <div class="filter-section">
-                        <h5 class="filter-section-title">年份</h5>
-                        <select class="form-control" v-model="searchForm.year">
-                            <option value="">所有年份</option>
-                            <option v-for="year in filterOptions.years" :key="year" :value="year" v-text="year"></option>
-                        </select>
-                    </div>
-
-
-                    <!-- 变速系统 -->
-                    <div class="filter-section">
-                        <h5 class="filter-section-title">變速系統</h5>
-                        <div class="filter-options">
-                            <label class="filter-option" v-for="transmission in filterOptions.transmissions" :key="transmission">
-                                <input type="checkbox" :value="transmission" v-model="searchForm.transmission">
-                                <span class="checkmark"></span>
-                                <span v-text="transmission"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- 驱动方式 -->
-                    <div class="filter-section">
-                        <h5 class="filter-section-title">驅動方式</h5>
-                        <div class="filter-options">
-                            <label class="filter-option" v-for="drivetrain in filterOptions.drivetrains" :key="drivetrain">
-                                <input type="checkbox" :value="drivetrain" v-model="searchForm.drivetrain">
-                                <span class="checkmark"></span>
-                                <span v-text="drivetrain"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- 燃料系统 -->
-                    <div class="filter-section">
-                        <h5 class="filter-section-title">燃料系統</h5>
-                        <div class="filter-options">
-                            <label class="filter-option" v-for="fuelSystem in filterOptions.fuelSystems" :key="fuelSystem">
-                                <input type="checkbox" :value="fuelSystem" v-model="searchForm.fuelSystem">
-                                <span class="checkmark"></span>
-                                <span v-text="fuelSystem"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- 应用筛选按钮 -->
-                    <button class="btn btn-primary apply-filters-btn" @click="searchCars">
-                        <i class="bi bi-funnel"></i> 應用篩選
-                    </button>
-                </div>
-            </div>
-
-            <!-- 右侧车辆列表 -->
-            <div class="col-lg-9 col-md-8">
+            <!-- 车辆列表 -->
+            <div class="col-12">
                 <div class="cars-content">
                     <!-- 结果统计 -->
                     <div class="results-header">
@@ -214,8 +117,14 @@ new Vue({
             brand: [],
             model: '',
             year: '',
+            yearFrom: '',
+            yearTo: '',
             priceMin: '',
             priceMax: '',
+            displacementFrom: '',
+            displacementTo: '',
+            color: '',
+            locations: [],
             sortBy: 'newest',
             pageNum: 1,
             pageSize: 24,
@@ -253,9 +162,19 @@ new Vue({
         }
     },
     mounted() {
+        // 从URL参数读取搜索条件
+        this.loadSearchParamsFromUrl();
+        // 同步搜索表单组件的值
+        this.syncSearchFormToComponent();
         this.loadCars();
         this.loadBrandSaleCount();
         this.loadCarFilterOptions();
+        
+        // 监听搜索表单组件的搜索事件
+        window.addEventListener('carSearch', (event) => {
+            // 如果是在车辆列表页触发的搜索，直接执行搜索
+            this.applySearchForm(event.detail);
+        });
     },
     methods: {
         async loadCars() {
@@ -264,7 +183,16 @@ new Vue({
                 this.searchForm.pageNum = this.currentPage;
                 this.searchForm.pageSize = this.pageSize;
                 
-                const response = await axios.post('/api/car-sales/list', this.searchForm);
+                // 构建请求参数，处理字段类型
+                const requestData = {
+                    ...this.searchForm,
+                    yearFrom: this.searchForm.yearFrom || null,
+                    yearTo: this.searchForm.yearTo || null,
+                    displacementFrom: this.searchForm.displacementFrom || null,
+                    displacementTo: this.searchForm.displacementTo || null
+                };
+                
+                const response = await axios.post('/api/car-sales/list', requestData);
                 
                 if (response.data.success) {
                     this.cars = response.data.data.list || [];
@@ -347,6 +275,134 @@ new Vue({
         
         toggleBrandExpanded() {
             this.brandExpanded = !this.brandExpanded;
+        },
+        
+        // 从URL参数加载搜索条件
+        loadSearchParamsFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // 品牌
+            const brand = urlParams.get('brand');
+            if (brand) {
+                this.searchForm.brand = [brand];
+            }
+            
+            // 型号
+            const model = urlParams.get('model');
+            if (model) {
+                this.searchForm.model = model;
+            }
+            
+            // 出厂年份
+            const yearFrom = urlParams.get('yearFrom');
+            if (yearFrom) {
+                this.searchForm.yearFrom = parseInt(yearFrom);
+            }
+            const yearTo = urlParams.get('yearTo');
+            if (yearTo) {
+                this.searchForm.yearTo = parseInt(yearTo);
+            }
+            
+            // 排量
+            const displacementFrom = urlParams.get('displacementFrom');
+            if (displacementFrom) {
+                this.searchForm.displacementFrom = parseInt(displacementFrom);
+            }
+            const displacementTo = urlParams.get('displacementTo');
+            if (displacementTo) {
+                this.searchForm.displacementTo = parseInt(displacementTo);
+            }
+            
+            // 车色
+            const color = urlParams.get('color');
+            if (color) {
+                this.searchForm.color = color;
+            }
+            
+            // 燃料系统
+            const fuelSystem = urlParams.get('fuelSystem');
+            if (fuelSystem) {
+                this.searchForm.fuelSystem = [fuelSystem];
+            }
+            
+            // 车辆所在地
+            const locations = urlParams.getAll('locations');
+            if (locations.length > 0) {
+                this.searchForm.locations = locations;
+            }
+            
+            // 关键字
+            const keyword = urlParams.get('keyword');
+            if (keyword) {
+                this.searchForm.keyword = keyword;
+            }
+        },
+        
+        // 同步搜索条件到搜索表单组件
+        syncSearchFormToComponent() {
+            // 等待搜索表单组件初始化完成
+            setTimeout(async () => {
+                if (window.carSearchFormVue) {
+                    // 先设置品牌，然后加载型号列表
+                    if (this.searchForm.brand && this.searchForm.brand.length > 0) {
+                        const brand = this.searchForm.brand[0];
+                        window.carSearchFormVue.searchForm.brand = brand;
+                        // 加载该品牌的型号列表
+                        if (window.carSearchFormVue.loadModelsByBrand) {
+                            await window.carSearchFormVue.loadModelsByBrand(brand);
+                            // 型号列表加载完成后再设置型号
+                            if (this.searchForm.model) {
+                                window.carSearchFormVue.searchForm.model = this.searchForm.model;
+                            }
+                        }
+                    } else if (this.searchForm.model) {
+                        window.carSearchFormVue.searchForm.model = this.searchForm.model;
+                    }
+                    if (this.searchForm.yearFrom) {
+                        window.carSearchFormVue.searchForm.yearFrom = this.searchForm.yearFrom.toString();
+                    }
+                    if (this.searchForm.yearTo) {
+                        window.carSearchFormVue.searchForm.yearTo = this.searchForm.yearTo.toString();
+                    }
+                    if (this.searchForm.displacementFrom) {
+                        window.carSearchFormVue.searchForm.displacementFrom = this.searchForm.displacementFrom;
+                    }
+                    if (this.searchForm.displacementTo) {
+                        window.carSearchFormVue.searchForm.displacementTo = this.searchForm.displacementTo;
+                    }
+                    if (this.searchForm.color) {
+                        window.carSearchFormVue.searchForm.color = this.searchForm.color;
+                    }
+                    if (this.searchForm.fuelSystem && this.searchForm.fuelSystem.length > 0) {
+                        window.carSearchFormVue.searchForm.fuelSystem = this.searchForm.fuelSystem[0];
+                    }
+                    if (this.searchForm.locations && this.searchForm.locations.length > 0) {
+                        window.carSearchFormVue.searchForm.locations = this.searchForm.locations;
+                    }
+                    if (this.searchForm.keyword) {
+                        window.carSearchFormVue.searchForm.keyword = this.searchForm.keyword;
+                    }
+                }
+            }, 100);
+        },
+        
+        // 应用搜索表单条件
+        applySearchForm(formData) {
+            // 更新searchForm
+            this.searchForm.brand = formData.brand ? [formData.brand] : [];
+            this.searchForm.model = formData.model || '';
+            this.searchForm.yearFrom = formData.yearFrom ? parseInt(formData.yearFrom) : null;
+            this.searchForm.yearTo = formData.yearTo ? parseInt(formData.yearTo) : null;
+            this.searchForm.displacementFrom = formData.displacementFrom || null;
+            this.searchForm.displacementTo = formData.displacementTo || null;
+            this.searchForm.color = formData.color || '';
+            this.searchForm.fuelSystem = formData.fuelSystem ? [formData.fuelSystem] : [];
+            this.searchForm.locations = formData.locations || [];
+            this.searchForm.keyword = formData.keyword || '';
+            
+            // 重置到第一页并搜索
+            this.currentPage = 1;
+            this.loadCars();
         }
     }
 });

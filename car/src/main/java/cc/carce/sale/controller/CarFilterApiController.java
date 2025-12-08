@@ -3,6 +3,7 @@ package cc.carce.sale.controller;
 import cc.carce.sale.common.R;
 import cc.carce.sale.dto.CarBrandSaleCountDto;
 import cc.carce.sale.dto.CarFilterOptionsDto;
+import cc.carce.sale.entity.CarBrandEntity;
 import cc.carce.sale.service.CarBrandService;
 import cc.carce.sale.service.CarFilterOptionsService;
 import io.swagger.annotations.Api;
@@ -41,6 +42,18 @@ public class CarFilterApiController {
         }
     }
     
+    @ApiOperation(value = "获取所有品牌列表", notes = "获取所有品牌信息，按品牌名称排序")
+    @GetMapping("/brands")
+    public R<List<CarBrandEntity>> getAllBrands() {
+        try {
+            List<CarBrandEntity> brands = carBrandService.getAllBrands();
+            return R.ok("查询成功", brands);
+        } catch (Exception e) {
+            log.error("获取所有品牌列表失败", e);
+            return R.fail("查询失败", null);
+        }
+    }
+    
     @ApiOperation(value = "获取车辆筛选选项", notes = "获取所有车辆筛选条件选项，包括乘客数、车门数、排气量、变速系统、驱动方式、燃料系统")
     @GetMapping("/options")
     public R<CarFilterOptionsDto> getCarFilterOptions() {
@@ -49,6 +62,18 @@ public class CarFilterApiController {
             return R.ok("查询成功", filterOptions);
         } catch (Exception e) {
             log.error("获取车辆筛选选项失败", e);
+            return R.fail("查询失败", null);
+        }
+    }
+    
+    @ApiOperation(value = "根据品牌获取型号列表", notes = "根据品牌名称获取该品牌下的所有型号列表")
+    @GetMapping("/models")
+    public R<List<String>> getModelsByBrand(@org.springframework.web.bind.annotation.RequestParam String brand) {
+        try {
+            List<String> models = carFilterOptionsService.getModelsByBrand(brand);
+            return R.ok("查询成功", models);
+        } catch (Exception e) {
+            log.error("根据品牌获取型号列表失败，品牌: {}", brand, e);
             return R.fail("查询失败", null);
         }
     }

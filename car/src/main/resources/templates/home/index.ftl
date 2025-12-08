@@ -187,22 +187,9 @@
         </div>
     </div>
 
-    <!-- 第三行：搜索框 -->
-    <div class="search-section">
-        <div class="container">
-            <div class="search-container">
-                <h2 class="search-title">尋找您的理想座駕</h2>
-                <div class="search-box">
-                    <div class="search-input-group">
-                        <input type="text" class="form-control search-input" placeholder="輸入車型、品牌或關鍵詞..." v-model="searchKeyword">
-                        <button class="btn search-btn" @click="performSearch">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- 第三行：搜索表单 -->
+    <link href="/css/car-search-form.css" rel="stylesheet">
+    <#include "../components/car-search-form.ftl">
 
     <!-- 第四行：廣告位 -->
     <div class="ad-section">

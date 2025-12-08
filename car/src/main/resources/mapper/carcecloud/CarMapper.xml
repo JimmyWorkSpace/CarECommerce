@@ -161,11 +161,52 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="year != null">
             AND c.manufacture_year = #{year}
         </if>
+        <if test="yearFrom != null">
+            AND (
+                CASE 
+                    WHEN c.manufacture_year LIKE '____-__-__' 
+                    THEN YEAR(STR_TO_DATE(c.manufacture_year, '%Y-%m-%d'))
+                    WHEN c.manufacture_year LIKE '____/__/__' 
+                    THEN YEAR(STR_TO_DATE(c.manufacture_year, '%Y/%m/%d'))
+                    WHEN c.manufacture_year REGEXP '^[0-9]{4}$'
+                    THEN CAST(c.manufacture_year AS UNSIGNED)
+                    ELSE NULL
+                END
+            ) >= #{yearFrom}
+        </if>
+        <if test="yearTo != null">
+            AND (
+                CASE 
+                    WHEN c.manufacture_year LIKE '____-__-__' 
+                    THEN YEAR(STR_TO_DATE(c.manufacture_year, '%Y-%m-%d'))
+                    WHEN c.manufacture_year LIKE '____/__/__' 
+                    THEN YEAR(STR_TO_DATE(c.manufacture_year, '%Y/%m/%d'))
+                    WHEN c.manufacture_year REGEXP '^[0-9]{4}$'
+                    THEN CAST(c.manufacture_year AS UNSIGNED)
+                    ELSE NULL
+                END
+            ) &lt;= #{yearTo}
+        </if>
         <if test="priceMin != null">
             AND cs.sale_price >= #{priceMin}
         </if>
         <if test="priceMax != null">
             AND cs.sale_price &lt;= #{priceMax}
+        </if>
+        <if test="displacementFrom != null">
+            AND c.displacement >= #{displacementFrom}
+        </if>
+        <if test="displacementTo != null">
+            AND c.displacement &lt;= #{displacementTo}
+        </if>
+        <if test="color != null and color != ''">
+            AND c.color = #{color}
+        </if>
+        <if test="locations != null and locations.size() > 0">
+            AND cs.car_location_city IN
+            <foreach collection="locations" item="location" open="(" separator="," close=")">
+                #{location}
+            </foreach>
         </if>
         <if test="transmission != null and transmission.size() > 0">
             AND c.transmission IN
@@ -240,11 +281,93 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT DISTINCT c.fuel_system 
         FROM cars c
         INNER JOIN car_sales cs ON c.id = cs.car_id
-        WHERE  cs.is_admin_check = 1
-        and cs.is_publish = 1
+        WHERE cs.is_admin_check = 1
+        AND cs.is_publish = 1
         AND c.fuel_system IS NOT NULL 
         AND c.fuel_system != ''
         ORDER BY c.fuel_system ASC
+    </select>
+    
+    <!-- 查询车色选项 -->
+    <select id="selectDistinctColors" resultType="java.lang.String">
+        SELECT DISTINCT c.color 
+        FROM cars c
+        INNER JOIN car_sales cs ON c.id = cs.car_id
+        WHERE cs.is_admin_check = 1
+        AND cs.is_publish = 1
+        AND c.color IS NOT NULL 
+        AND c.color != ''
+        ORDER BY c.color ASC
+    </select>
+    
+    <!-- 查询车辆所在地选项 -->
+    <select id="selectDistinctLocationCities" resultType="java.lang.String">
+        SELECT DISTINCT cs.car_location_city 
+        FROM car_sales cs
+        WHERE cs.is_admin_check = 1
+        AND cs.is_publish = 1
+        AND cs.car_location_city IS NOT NULL 
+        AND cs.car_location_city != ''
+    </select>
+    
+    <!-- 根据品牌查询型号列表 -->
+    <select id="selectModelsByBrand" resultType="java.lang.String">
+        SELECT DISTINCT 
+            CASE 
+                WHEN c.id_model = 0 OR c.id_model IS NULL THEN c.custom_model
+                ELSE cm.model
+            END as model
+        FROM car_sales cs
+        INNER JOIN cars c ON c.id = cs.car_id
+        LEFT JOIN car_brand cb ON cb.id = c.id_brand
+        LEFT JOIN car_model cm ON cm.id = c.id_model
+        WHERE cs.is_admin_check = 1
+        AND cs.is_publish = 1
+        AND cb.brand = #{brand}
+        AND (
+            (c.id_model = 0 OR c.id_model IS NULL) AND c.custom_model IS NOT NULL AND c.custom_model != ''
+            OR
+            (c.id_model != 0 AND c.id_model IS NOT NULL) AND cm.model IS NOT NULL AND cm.model != ''
+        )
+        ORDER BY model ASC
+    </select>
+    
+    <!-- 查询出厂年份范围（最大值和最小值） -->
+    <select id="selectManufactureYearRange" resultType="java.util.Map">
+        SELECT 
+            MIN(
+                CASE 
+                    WHEN c.manufacture_year LIKE '____-__-__' 
+                    THEN YEAR(STR_TO_DATE(c.manufacture_year, '%Y-%m-%d'))
+                    WHEN c.manufacture_year LIKE '____/__/__' 
+                    THEN YEAR(STR_TO_DATE(c.manufacture_year, '%Y/%m/%d'))
+                    WHEN c.manufacture_year REGEXP '^[0-9]{4}$'
+                    THEN CAST(c.manufacture_year AS UNSIGNED)
+                    ELSE NULL
+                END
+            ) as minYear,
+            MAX(
+                CASE 
+                    WHEN c.manufacture_year LIKE '____-__-__' 
+                    THEN YEAR(STR_TO_DATE(c.manufacture_year, '%Y-%m-%d'))
+                    WHEN c.manufacture_year LIKE '____/__/__' 
+                    THEN YEAR(STR_TO_DATE(c.manufacture_year, '%Y/%m/%d'))
+                    WHEN c.manufacture_year REGEXP '^[0-9]{4}$'
+                    THEN CAST(c.manufacture_year AS UNSIGNED)
+                    ELSE NULL
+                END
+            ) as maxYear
+        FROM cars c
+        INNER JOIN car_sales cs ON c.id = cs.car_id
+        WHERE cs.is_admin_check = 1
+        AND cs.is_publish = 1
+        AND c.manufacture_year IS NOT NULL
+        AND c.manufacture_year != ''
+        AND (
+            c.manufacture_year LIKE '____-__-__' 
+            OR c.manufacture_year LIKE '____/__/__'
+            OR c.manufacture_year REGEXP '^[0-9]{4}$'
+        )
     </select>
     
     <!-- 根据ID列表查询推荐车辆列表，包含封面图片 -->

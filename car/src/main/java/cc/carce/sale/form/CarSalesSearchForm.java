@@ -13,8 +13,14 @@ public class CarSalesSearchForm extends BasePageForm {
     private List<String> brand;     // 品牌列表
     private String model;           // 型号
     private Integer year;           // 年份
+    private Integer yearFrom;       // 出厂年份起
+    private Integer yearTo;         // 出厂年份至
     private Integer priceMin;       // 最低价格
     private Integer priceMax;       // 最高价格
+    private Integer displacementFrom;  // 排量起
+    private Integer displacementTo;    // 排量至
+    private String color;           // 车色
+    private List<String> locations; // 车辆所在地列表
     private String keyword;         // 关键词搜索
     private String sortBy;          // 排序方式：newest, price-low, price-high, year-new
     

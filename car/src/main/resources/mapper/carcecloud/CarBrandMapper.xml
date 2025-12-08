@@ -19,4 +19,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ORDER BY saleCount DESC
     </select>
     
+    <!-- 查询已上架车辆的品牌列表 -->
+    <select id="selectBrandsFromPublishedCars" resultType="cc.carce.sale.entity.CarBrandEntity">
+        SELECT DISTINCT cb.id, cb.brand
+        FROM car_sales cs
+        INNER JOIN cars c ON cs.car_id = c.id
+        INNER JOIN car_brand cb ON c.id_brand = cb.id
+        WHERE cs.is_admin_check = 1
+        AND cs.is_publish = 1
+        ORDER BY cb.brand ASC
+    </select>
+    
 </mapper>

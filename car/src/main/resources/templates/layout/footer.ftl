@@ -2,42 +2,58 @@
 <footer class="footer">
     <div class="container">
         <div class="row">
-            <div class="col-12 col-md-4 mb-4">
-                <h4>聯繫我們</h4>
-                <#if configContent??>
-                    <p><i class="bi bi-telephone"></i> 客服熱線：${configContent.kefu!'---'}</p>
-                    <p><i class="bi bi-envelope"></i> 郵箱：${configContent.youxiang!'---'}</p>
-                    <p><i class="bi bi-geo-alt"></i> 地址：${configContent.dizhi!'---'}</p>
-                <#else>
-                    <p><i class="bi bi-telephone"></i> 客服熱線：---</p>
-                    <p><i class="bi bi-envelope"></i> 郵箱：---</p>
-                    <p><i class="bi bi-geo-alt"></i> 地址：---</p>
-                </#if>
+            <!-- 第一列：車主專區 -->
+            <div class="col-12 col-md-6 col-lg footer-column">
+                <h4 class="footer-title">車主專區</h4>
+                <ul class="footer-links">
+                    <li><a href="#">車輛驗證認證</a></li>
+                    <li><a href="#">車主使用條款與規範</a></li>
+                    <li><a href="#">車勢買賣車公版合約</a></li>
+                    <li><a href="#">隱私權政策</a></li>
+                </ul>
             </div>
-            <div class="col-12 col-md-4 mb-4">
-                <h4>服務時間</h4>
-                <#if configContent??>
-                    <p><i class="bi bi-briefcase"></i> 工作日：${configContent.fwsj1!'---'}</p>
-                    <p><i class="bi bi-calendar"></i> 週末：${configContent.fwsj2!'---'}</p>
-                    <p><i class="bi bi-calendar-event"></i> 節假日：${configContent.fwsj3!'---'}</p>
-                <#else>
-                    <p><i class="bi bi-briefcase"></i> 工作日：---</p>
-                    <p><i class="bi bi-calendar"></i> 週末：---</p>
-                    <p><i class="bi bi-calendar-event"></i> 節假日：---</p>
-                </#if>
+            
+            <!-- 第二列：車勢週邊服務 -->
+            <div class="col-12 col-md-6 col-lg footer-column">
+                <h4 class="footer-title">車勢週邊服務</h4>
+                <ul class="footer-links">
+                    <li><a href="#">汽車保固</a></li>
+                    <li><a href="#">汽車保險</a></li>
+                    <li><a href="#">汽車貸款</a></li>
+                    <li><a href="#">汽車用品</a></li>
+                    <li><a href="#">汽車美容鍍膜</a></li>
+                    <li><a href="#">汽車保養維修</a></li>
+                </ul>
             </div>
-            <div class="col-12 col-md-4 mb-4">
-                <h4>關注我們</h4>
-                <div class="social-links">
-                    <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="social-link"><i class="bi bi-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="bi bi-youtube"></i></a>
+            
+            <!-- 第三列：車廠店家專區 -->
+            <div class="col-12 col-md-6 col-lg footer-column">
+                <h4 class="footer-title">車廠店家專區</h4>
+                <ul class="footer-links">
+                    <li><a href="#">優質車廠加盟</a></li>
+                    <li><a href="#">周邊企業加入</a></li>
+                    <li><a href="#">車勢買賣車公版合約</a></li>
+                </ul>
+            </div>
+            
+            <!-- 第四列：車勢資訊 -->
+            <div class="col-12 col-md-6 col-lg footer-column">
+                <h4 class="footer-title">車勢資訊</h4>
+                <ul class="footer-links">
+                    <li><a href="#" target="_blank">Facebook</a></li>
+                    <li><a href="#" target="_blank">YouTube</a></li>
+                    <li><a href="#">關於我們</a></li>
+                </ul>
+            </div>
+            
+            <!-- 第五列：聯繫車勢 -->
+            <div class="col-12 col-md-6 col-lg footer-column">
+                <h4 class="footer-title">聯繫車勢</h4>
+                <div class="footer-line-buttons">
+                    <a href="#" class="line-button">民眾專用LINE</a>
+                    <a href="#" class="line-button">車行專用LINE</a>
                 </div>
             </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 二手車銷售平台. 保留所有權利.</p>
         </div>
     </div>
 </footer>
