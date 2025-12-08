@@ -90,13 +90,25 @@
                         <span v-if="product.source" class="badge bg-warning me-2">{{ product.source }}</span>
                     </div>
                     <div class="product-tags" v-if="product.productTags">
-                        <span v-for="tag in getProductTags(product.productTags)" :key="tag" class="badge bg-primary me-1 mb-1">
+                        <span v-for="tag in getProductTags(product.productTags)" 
+                              :key="tag" 
+                              class="badge bg-primary me-1 mb-1 tag-clickable"
+                              @click.stop.prevent="searchByTag(tag, $event)">
                             {{ tag }}
                         </span>
                     </div>
                     <div class="product-price">
-                        <span class="price-symbol">${CurrencyUnit}</span>
-                        <span class="price-amount">{{ formatPrice(product.marketPrice) }}</span>
+                        <div class="price-row">
+                            <span v-if="product.promotionalPrice" class="price-label promotional-label">特惠價</span>
+                            <span v-if="product.promotionalPrice" class="price-symbol promotional-symbol">${CurrencyUnit}</span>
+                            <span v-if="product.promotionalPrice" class="price-amount promotional-amount">{{ formatPrice(product.promotionalPrice) }}</span>
+                            <span v-if="product.promotionalPrice" class="price-market text-decoration-line-through text-muted ms-2">
+                                售價 ${CurrencyUnit}{{ formatPrice(product.price) }}
+                            </span>
+                            <span v-if="!product.promotionalPrice" class="price-label">售價</span>
+                            <span v-if="!product.promotionalPrice" class="price-symbol">${CurrencyUnit}</span>
+                            <span v-if="!product.promotionalPrice" class="price-amount">{{ formatPrice(product.price) }}</span>
+                        </div>
                     </div>
                 </div>
             </a>
@@ -335,10 +347,33 @@
     padding: 5px 10px;
 }
 
+.tag-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tag-clickable:hover {
+    background-color: #4AB8B2 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 .product-price {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.price-row {
     display: flex;
     align-items: baseline;
     gap: 2px;
+}
+
+.price-label {
+    color: #666;
+    font-size: 0.85rem;
+    margin-right: 5px;
 }
 
 .price-symbol {
@@ -351,6 +386,29 @@
     color: #5ACFC9;
     font-size: 1.5rem;
     font-weight: 700;
+}
+
+.promotional-label {
+    color: #ff6b6b;
+    font-size: 1.3rem;
+}
+
+.promotional-symbol {
+    color: #ff6b6b;
+    font-size: 2.2rem;
+    font-weight: 600;
+}
+
+.promotional-amount {
+    color: #ff6b6b;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.price-market {
+    color: #999;
+    font-size: 0.9rem;
+    font-weight: 400;
 }
 
 .market-price {
@@ -475,6 +533,16 @@ new Vue({
     mounted() {
         this.loadCategoryTree();
         this.loadProducts();
+        
+        // 检查URL参数中是否有标签搜索
+        const urlParams = new URLSearchParams(window.location.search);
+        const tagParam = urlParams.get('tag');
+        if (tagParam) {
+            // 如果有标签参数，延迟执行标签搜索
+            setTimeout(() => {
+                this.searchByTag(decodeURIComponent(tagParam));
+            }, 500);
+        }
         
         // 监听登录后待执行的操作
         const self = this;
@@ -663,6 +731,51 @@ new Vue({
         getProductTags(tags) {
             if (!tags) return [];
             return tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        },
+        
+        // 根据标签搜索商品
+        async searchByTag(tag, event) {
+            // 阻止事件冒泡和默认行为，防止跳转到详情页
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            try {
+                this.loading = true;
+                this.currentPage = 1;
+                this.error = '';
+                
+                // 清除分类选择
+                this.selectedFirstCategory = '';
+                this.selectedSecondCategory = '';
+                this.secondLevelCategories = [];
+                
+                // 调用API获取标签商品
+                const response = await axios.get('/api/products/tag?tag=' + encodeURIComponent(tag));
+                
+                if (response.data.success) {
+                    this.filteredProducts = response.data.data || [];
+                    this.message = '已找到 ' + this.filteredProducts.length + ' 个包含标签"' + tag + '"的商品';
+                    // 3秒后自动清除消息
+                    setTimeout(() => {
+                        this.message = '';
+                    }, 3000);
+                } else {
+                    this.error = response.data.message || '搜索失败';
+                    this.filteredProducts = [];
+                }
+                
+                this.calculatePagination();
+                
+            } catch (error) {
+                console.error('根据标签搜索商品失败:', error);
+                this.error = '搜索失败，请稍后重试';
+                this.filteredProducts = [];
+                this.calculatePagination();
+            } finally {
+                this.loading = false;
+            }
         },
         
         // 计算分页

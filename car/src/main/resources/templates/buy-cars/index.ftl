@@ -138,7 +138,7 @@
                                 <div class="car-badge" v-text="car.manufactureYear"></div>
                             </div>
                             <div class="car-info">
-                                <h3 class="car-title" v-text="(car.brand || '') + ' ' + (car.model || '')"></h3>
+                                <h3 class="car-title" v-text="car.saleTitleJoin + ' ' + car.saleTitle"></h3>
                                 <div class="car-price-section">
                                     <span class="price-amount" v-text="'$' + formatPrice(car.salePrice)"></span>
                                 </div>

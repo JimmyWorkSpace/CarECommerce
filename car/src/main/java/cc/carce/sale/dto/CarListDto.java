@@ -2,6 +2,7 @@ package cc.carce.sale.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import cn.hutool.core.collection.CollUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
@@ -19,6 +20,9 @@ public class CarListDto {
     private Integer manufactureYear;    // 出厂年份
     private Integer salePrice;          // 售价
     private String saleTitle;           // 标题
+    public String getSaleTitleJoin(){
+        return CollUtil.join(CollUtil.newArrayList(brand, model, manufactureYear), " ");
+    }
     private String saleDescription;     // 描述
     private Integer mileage;            // 里程数
     private String transmission;        // 变速箱

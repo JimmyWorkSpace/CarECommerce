@@ -22,4 +22,5 @@ public class CarProductListDto {
     private String description;
     private Long categoryId;  // 分类ID
     private String productTags;  // 商品标签
+    private Long promotionalPrice;  // 特惠价
 }

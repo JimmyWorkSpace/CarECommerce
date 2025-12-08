@@ -1,7 +1,11 @@
 package cc.carce.sale.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 import javax.persistence.Column;
+
+import cn.hutool.core.collection.CollUtil;
 import lombok.Data;
 
 @Data
@@ -46,6 +50,12 @@ public class CarBaseInfoDto {
 
   @Column(name = "sale_title")
   private String saleTitle; // 标题
+
+  private String saleTitleJoin;
+  public String getSaleTitleJoin(){
+    List<Object> l = CollUtil.newArrayList(brand, customModel, manufactureYear);
+    return CollUtil.join(l, " ");
+  }
 
   @Column(name = "sale_description")
   private String saleDescription; // 详情

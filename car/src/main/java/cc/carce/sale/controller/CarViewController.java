@@ -179,27 +179,31 @@ public class CarViewController extends BaseController {
             // 设置精选好车数据 - 从数据库查询推荐车辆
             List<Map<String, String>> cars = new ArrayList<>();
             try {
-                List<CarSalesEntity> recommendedCars = carSalesService.getRecommendedCars(9);
-                for (CarSalesEntity carSales : recommendedCars) {
+                List<CarListDto> recommendedCars = carSalesService.getRecommendedCarListDto(9);
+                for (CarListDto carDto : recommendedCars) {
                     Map<String, String> car = new HashMap<>();
-                    // 构建车型信息
-                    String carModel = carSales.getSaleTitle() != null ? carSales.getSaleTitle() : "精選車輛";
+                    // 构建车型信息 - 使用品牌、型号、年份组合
+                    String carModel = carDto.getSaleTitleJoin() != null ? carDto.getSaleTitleJoin() : 
+                        (carDto.getSaleTitle() != null ? carDto.getSaleTitle() : "精選車輛");
                     car.put("model", carModel);
                     
                     // 格式化价格
                     String price = "面議";
-                    if (carSales.getSalePrice() != null && carSales.getSalePrice() > 0) {
-                        price = String.format("%,d", carSales.getSalePrice());
+                    if (carDto.getSalePrice() != null && carDto.getSalePrice() > 0) {
+                        price = String.format("%,d", carDto.getSalePrice());
                     }
                     car.put("price", price);
                     
-                    // 设置图片 - 使用默认图片或根据ID生成
-                    String image = "/img/car/car" + (8 + cars.size() + 1) + ".jpg";
+                    // 设置图片 - 使用封面图片，如果没有则使用默认图片
+                    String image = carDto.getCoverImage();
+                    if (image == null || image.isEmpty()) {
+                        image = "/img/car/car" + (8 + cars.size() + 1) + ".jpg";
+                    }
                     car.put("image", image);
                     
                     // 添加车辆ID用于链接
-                    car.put("id", carSales.getId().toString());
-                    car.put("uid", carSales.getUid() != null ? carSales.getUid() : "");
+                    car.put("id", carDto.getId() != null ? carDto.getId().toString() : "");
+                    car.put("uid", carDto.getUid() != null ? carDto.getUid() : "");
                     
                     cars.add(car);
                 }
@@ -563,10 +567,7 @@ public class CarViewController extends BaseController {
                         Map<String, String> car = new HashMap<>();
                         
                         // 构建车型信息
-                        String carModel = carDto.getSaleTitle() != null ? carDto.getSaleTitle() : 
-                            (carDto.getManufactureYear() != null ? carDto.getManufactureYear() + "年 " : "") +
-                            (carDto.getBrand() != null ? carDto.getBrand() + " " : "") +
-                            (carDto.getModel() != null ? carDto.getModel() : "精選車輛");
+                        String carModel = carDto.getSaleTitleJoin() + " " + carDto.getSaleTitle();
                         car.put("model", carModel);
                         
                         // 格式化价格
@@ -658,6 +659,7 @@ public class CarViewController extends BaseController {
             productDto.put("alias", product.getProductDespShort()); // 商品别名/简短描述
             productDto.put("price", product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L); // 售价
             productDto.put("marketPrice", product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L); // 市价
+            productDto.put("promotionalPrice", product.getPromotionalPrice() != null ? product.getPromotionalPrice().longValue() : null); // 特惠价
             productDto.put("memo", product.getProductDesp()); // 商品详细描述
             productDto.put("tag", product.getProductTags()); // 商品标签
             productDto.put("amount", product.getAmount()); // 库存数量

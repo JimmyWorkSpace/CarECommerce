@@ -84,8 +84,21 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="商品標題" align="center" prop="productTitle" :show-overflow-tooltip="true" />
       <el-table-column label="分類" align="center" prop="categoryName" width="120" />
-      <el-table-column label="供價" align="center" prop="supplyPrice" width="100" />
-      <el-table-column label="售價" align="center" prop="salePrice" width="100" />
+      <el-table-column label="供價" align="center" prop="supplyPrice" width="100">
+        <template slot-scope="scope">
+          {{ scope.row.supplyPrice ? Math.round(scope.row.supplyPrice) : '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="售價" align="center" prop="salePrice" width="100">
+        <template slot-scope="scope">
+          {{ scope.row.salePrice ? Math.round(scope.row.salePrice) : '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="特惠價" align="center" prop="promotionalPrice" width="100">
+        <template slot-scope="scope">
+          {{ scope.row.promotionalPrice ? Math.round(scope.row.promotionalPrice) : '-' }}
+        </template>
+      </el-table-column>
       <el-table-column label="數量" align="center" prop="amount" width="80" />
       <el-table-column label="上架狀態" align="center" prop="onSale" width="100">
         <template slot-scope="scope">
@@ -151,14 +164,19 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="供價" prop="supplyPrice">
-              <el-input-number v-model="form.supplyPrice" :precision="2" :min="0" :step="0.01" style="width: 100%" />
+              <el-input-number v-model="form.supplyPrice" :precision="0" :min="0" :step="1" style="width: 100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="售價" prop="salePrice">
-              <el-input-number v-model="form.salePrice" :precision="2" :min="0" :step="0.01" style="width: 100%" />
+              <el-input-number v-model="form.salePrice" :precision="0" :min="0" :step="1" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="特惠價" prop="promotionalPrice">
+              <el-input-number v-model="form.promotionalPrice" :precision="0" :min="0" :step="1" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -184,13 +202,13 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="詳細介紹" prop="productDesp">
-              <editor v-model="form.productDesp" :min-height="300"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
+         <el-row>
+           <el-col :span="24">
+             <el-form-item label="詳細介紹" prop="productDesp">
+               <editor v-model="form.productDesp" :min-height="300"/>
+             </el-form-item>
+           </el-col>
+         </el-row>
         <el-row>
           <el-col :span="24">
             <el-form-item label="商品圖片">
@@ -362,6 +380,7 @@ export default {
         productTags: null,
         supplyPrice: null,
         salePrice: null,
+        promotionalPrice: null,
         amount: 0,
         categoryId: null,
         onSale: 0,

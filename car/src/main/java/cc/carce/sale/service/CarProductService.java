@@ -218,6 +218,57 @@ public class CarProductService {
     }
     
     /**
+     * 根据标签搜索商品
+     * 标签在productTags字段中，使用英文逗号分隔
+     */
+    public List<CarProductListDto> getProductsByTag(String tag) {
+        try {
+            if (tag == null || tag.trim().isEmpty()) {
+                return new ArrayList<>();
+            }
+            
+            Example example = new Example(CarProductEntity.class);
+            Example.Criteria criteria = example.createCriteria()
+                .andEqualTo("onSale", 1)
+                .andEqualTo("delFlag", 0);
+            
+            // 使用LIKE查询，匹配包含该标签的商品
+            // 标签可能是：tag, tag, 或 ,tag, 或 tag, 或 ,tag
+            String searchPattern = "%" + tag.trim() + "%";
+            criteria.andLike("productTags", searchPattern);
+            
+            example.orderBy("id").desc();
+            
+            List<CarProductEntity> products = carProductMapper.selectByExample(example);
+            List<CarProductListDto> result = new ArrayList<>();
+            
+            // 过滤出真正包含该标签的商品（精确匹配）
+            String tagToMatch = tag.trim();
+            for (CarProductEntity product : products) {
+                if (product.getProductTags() != null) {
+                    String[] tags = product.getProductTags().split(",");
+                    boolean found = false;
+                    for (String t : tags) {
+                        if (t.trim().equals(tagToMatch)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        CarProductListDto dto = convertToDto(product);
+                        result.add(dto);
+                    }
+                }
+            }
+            
+            return result;
+        } catch (Exception e) {
+            log.error("根据标签搜索商品失败，标签：{}", tag, e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
      * 将实体转换为DTO
      */
     private CarProductListDto convertToDto(CarProductEntity product) {
@@ -228,6 +279,7 @@ public class CarProductService {
         dto.setModel(null); // 新表没有model字段
         dto.setPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
         dto.setMarketPrice(product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L);
+        dto.setPromotionalPrice(product.getPromotionalPrice() != null ? product.getPromotionalPrice().longValue() : null);
         dto.setBrand(null); // 新表没有brand字段
         dto.setTag(product.getProductTags());
         dto.setSource(null); // 新表没有source字段

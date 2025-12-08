@@ -8,6 +8,7 @@
       name="file"
       :show-file-list="false"
       :headers="headers"
+      :data="uploadData"
       style="display: none"
       ref="upload"
       v-if="this.type == 'url'"
@@ -60,9 +61,12 @@ export default {
   },
   data() {
     return {
-      uploadUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的圖片服务器地址
+      uploadUrl: process.env.VUE_APP_BASE_API + "/car/upload/image", // 上传的圖片服务器地址
       headers: {
         Authorization: "Bearer " + getToken()
+      },
+      uploadData: {
+        dir: "/img/car_product/editor" // 编辑器图片上传目录
       },
       Quill: null,
       currentValue: "",
@@ -175,12 +179,13 @@ export default {
       if (res.code == 200) {
         // 获取光标所在位置
         let length = quill.getSelection().index;
-        // 插入圖片  res.url为服务器返回的圖片地址
-        quill.insertEmbed(length, "image", process.env.VUE_APP_BASE_API + res.fileName);
+        // 插入圖片  res.url为服务器返回的完整圖片地址（已包含前缀）
+        const imageUrl = res.url || (process.env.VUE_APP_BASE_API + res.fileName);
+        quill.insertEmbed(length, "image", imageUrl);
         // 调整光标到最后
         quill.setSelection(length + 1);
       } else {
-        this.$message.error("圖片插入失败");
+        this.$message.error(res.msg || "圖片插入失败");
       }
     },
     handleUploadError() {

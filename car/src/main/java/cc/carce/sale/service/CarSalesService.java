@@ -191,6 +191,51 @@ public class CarSalesService {
 	}
 	
 	/**
+	 * 获取推荐车辆列表（返回CarListDto，包含完整信息）
+	 * @param limit 限制数量
+	 * @return 推荐车辆列表
+	 */
+	public List<CarListDto> getRecommendedCarListDto(int limit) {
+		// 查询推荐类型为1的推荐记录
+		Example recommandExample = new Example(CarRecommandEntity.class);
+		recommandExample.createCriteria()
+			.andEqualTo("recommandType", 1)
+			.andEqualTo("delFlag", 0);
+		recommandExample.orderBy("showOrder").asc();
+		
+		List<CarRecommandEntity> recommandList = carRecommandMapper.selectByExample(recommandExample);
+		
+		if (recommandList == null || recommandList.isEmpty()) {
+			return new ArrayList<>();
+		}
+		
+		// 提取推荐ID列表
+		List<Long> recommandIds = new ArrayList<>();
+		for (CarRecommandEntity recommand : recommandList) {
+			recommandIds.add(recommand.getRecommandId());
+		}
+		
+		// 限制ID数量
+		if (recommandIds.size() > limit) {
+			recommandIds = recommandIds.subList(0, limit);
+		}
+		
+		// 查询对应的车辆列表（包含完整信息）
+		List<CarListDto> carList = carMapper.selectRecommendedCarListWithCover(recommandIds);
+		
+		// 处理coverImage字段，添加前缀并转换为缩略图
+		if (carList != null) {
+			for (CarListDto car : carList) {
+				if (StrUtil.isNotBlank(car.getCoverImage())) {
+					car.setCoverImage(imageUrlUtil.getThumbnailUrlWithPrefix(car.getCoverImage()));
+				}
+			}
+		}
+		
+		return carList != null ? carList : new ArrayList<>();
+	}
+	
+	/**
 	 * 获取推荐店家列表（用于首页精选店家）
 	 * @param limit 限制数量
 	 * @return 推荐店家列表

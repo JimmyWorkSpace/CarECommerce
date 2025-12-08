@@ -60,6 +60,20 @@ public class CarProductApiController extends BaseController {
     }
 
     /**
+     * 根据标签搜索商品列表
+     */
+    @GetMapping("/tag")
+    public R<List<CarProductListDto>> getProductsByTag(@RequestParam(required = false) String tag) {
+        try {
+            List<CarProductListDto> products = carProductService.getProductsByTag(tag);
+            return R.ok("获取标签商品成功", products);
+        } catch (Exception e) {
+            log.error("获取标签商品失败，标签：{}", tag, e);
+            return R.fail("获取标签商品失败：" + e.getMessage(), null);
+        }
+    }
+
+    /**
      * 根据ID获取商品详情
      */
     @GetMapping("/{id}")

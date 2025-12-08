@@ -7,26 +7,50 @@
         <div class="col-md-6">
             <div class="swiper-wrapper-container" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
                 <div class="swiper-container">
-                    <div v-for="(photo, index) in photos" 
+                    <div class="swiper-wrapper">
+                        <div v-for="(photo, index) in photos" 
+                             :key="index"
+                             class="swiper-slide"
+                             :class="{ active: currentImageIndex === index }">
+                            <div class="image-container">
+                                <img class="swiper_image" 
+                                     :src="photo" 
+                                     :alt="dealerInfo.dealerName || '車商圖片'"
+                                     @click="openLightbox(index)"
+                                     @error="handleImageError">
+                            </div>
+                        </div>
+                        <!-- 如果没有图片，显示默认图片 -->
+                        <div v-if="!photos || photos.length === 0" class="swiper-slide active">
+                            <div class="image-container">
+                                <img class="swiper_image" 
+                                     src="/img/car/car4.jpg" 
+                                     alt="車商圖片"
+                                     @error="handleImageError">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 輪播圖导航按钮 -->
+                    <div class="swiper-button-prev" v-if="photos && photos.length > 1" @click="prevImage"></div>
+                    <div class="swiper-button-next" v-if="photos && photos.length > 1" @click="nextImage"></div>
+                    <!-- 輪播圖指示器 -->
+                    <div class="swiper-pagination" v-if="photos && photos.length > 1">
+                        <span v-for="(photo, index) in photos" 
+                              :key="index"
+                              class="swiper-pagination-bullet"
+                              :class="{ active: currentImageIndex === index }"
+                              @click="changeImage(index)"></span>
+                    </div>
+                </div>
+                <div class="thumbnail-container" v-if="photos && photos.length > 1">
+                    <img v-for="(photo, index) in photos" 
                          :key="index"
-                         class="swiper-slide">
-                        <div class="image-container">
-                            <img class="swiper_image" 
-                                 :src="photo" 
-                                 :alt="dealerInfo.dealerName || '車商圖片'"
-                                 @click="openLightbox(index)"
-                                 @error="handleImageError">
-                        </div>
-                    </div>
-                    <!-- 如果没有图片，显示默认图片 -->
-                    <div v-if="!photos || photos.length === 0" class="swiper-slide">
-                        <div class="image-container">
-                            <img class="swiper_image" 
-                                 src="/img/car/car4.jpg" 
-                                 alt="車商圖片"
-                                 @error="handleImageError">
-                        </div>
-                    </div>
+                         :src="getThumbnailUrl(photo)" 
+                         class="thumbnail" 
+                         :class="{ active: currentImageIndex === index }"
+                         @click="changeImage(index)"
+                         @error="handleThumbnailError"
+                         alt="縮略圖">
                 </div>
             </div>
         </div>
@@ -34,19 +58,31 @@
         <!-- 右侧信息 -->
         <div class="col-md-6">
             <div class="dealer-info-section">
-                <div class="info-row" v-if="dealerInfo.registeredName">
+                <div class="info-row">
                     <div class="info-label">
                         <i class="bi bi-building"></i> 登記名稱
                     </div>
+                    <div class="info-value">{{ dealerInfo.dealerName }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="bi bi-building"></i> 對外營業名稱
+                    </div>
                     <div class="info-value">{{ dealerInfo.registeredName }}</div>
                 </div>
-                <div class="info-row" v-if="dealerInfo.contactPerson">
+                <div class="info-row" >
+                    <div class="info-label">
+                        <i class="bi bi-building"></i> 統一編號
+                    </div>
+                    <div class="info-value">{{ dealerInfo.taxId }}</div>
+                </div>
+                <div class="info-row" >
                     <div class="info-label">
                         <i class="bi bi-person"></i> 聯絡人
                     </div>
                     <div class="info-value">{{ dealerInfo.contactPerson }}</div>
                 </div>
-                <div class="info-row" v-if="dealerInfo.companyPhone">
+                <div class="info-row" >
                     <div class="info-label">
                         <i class="bi bi-telephone"></i> 公司電話
                     </div>
@@ -54,7 +90,7 @@
                         <a :href="'tel:' + dealerInfo.companyPhone" class="contact-link">{{ dealerInfo.companyPhone }}</a>
                     </div>
                 </div>
-                <div class="info-row" v-if="dealerInfo.companyMobile">
+                <div class="info-row">
                     <div class="info-label">
                         <i class="bi bi-phone"></i> 行動電話
                     </div>
@@ -62,7 +98,7 @@
                         <a :href="'tel:' + dealerInfo.companyMobile" class="contact-link">{{ dealerInfo.companyMobile }}</a>
                     </div>
                 </div>
-                <div class="info-row" v-if="dealerInfo.publicAddress">
+                <div class="info-row" >
                     <div class="info-label">
                         <i class="bi bi-geo-alt"></i> 賞車地址
                     </div>
@@ -74,26 +110,7 @@
                         <span class="address-text">{{ dealerInfo.publicAddress }}</span>
                     </div>
                 </div>
-                <div class="info-row" v-if="dealerInfo.registeredAddress">
-                    <div class="info-label">
-                        <i class="bi bi-house"></i> 登記地址
-                    </div>
-                    <div class="info-value">{{ dealerInfo.registeredAddress }}</div>
-                </div>
-                <div class="info-row" v-if="dealerInfo.businessHours">
-                    <div class="info-label">
-                        <i class="bi bi-clock"></i> 營業時間
-                    </div>
-                    <div class="info-value">{{ dealerInfo.businessHours }}</div>
-                </div>
-                <div class="info-row" v-if="dealerInfo.website">
-                    <div class="info-label">
-                        <i class="bi bi-globe"></i> 官方網站
-                    </div>
-                    <div class="info-value">
-                        <a :href="dealerInfo.website" target="_blank" class="website-link">{{ dealerInfo.website }}</a>
-                    </div>
-                </div>
+                
             </div>
             <div class="action-buttons">
                 <button class="btn btn-line" @click="openLineContact" v-if="dealerInfo.lineId">
@@ -186,143 +203,108 @@ new Vue({
         ],
         cars: ${carsJson} || []
     },
-    mounted() {
-        this.initSwiper();
+    mounted: function() {
         this.setupContentFrame();
+        // 启动自动播放
+        this.startAutoPlay();
     },
-    beforeDestroy() {
+    beforeDestroy: function() {
         this.stopAutoPlay();
-        if (this.slickInstance) {
-            $(this.$el).find('.swiper-container').slick('unslick');
-        }
     },
     methods: {
-        initSwiper() {
-            let _this = this;
-            this.$nextTick(() => {
-                const swiperContainer = $(this.$el).find('.swiper-container');
-                if (swiperContainer.length) {
-                    // 如果有图片，初始化轮播
-                    if (this.photos && this.photos.length > 0) {
-                        swiperContainer.slick({
-                            infinite: true,
-                            speed: 300,
-                            slidesToShow: 1,
-                            slidesToScroll: 1,
-                            autoplay: this.photos.length > 1,
-                            autoplaySpeed: 3000,
-                            arrows: this.photos.length > 1,
-                            dots: this.photos.length > 1,
-                            prevArrow: '<div class="swiper-button-prev"></div>',
-                            nextArrow: '<div class="swiper-button-next"></div>',
-                            fade: true,
-                            cssEase: 'linear'
-                        }).on('afterChange', function(event, slick, currentSlide) {
-                            _this.currentImageIndex = currentSlide;
-                        });
-                    } else {
-                        // 没有图片时，也初始化但不显示导航
-                        swiperContainer.slick({
-                            infinite: false,
-                            speed: 300,
-                            slidesToShow: 1,
-                            slidesToScroll: 1,
-                            autoplay: false,
-                            arrows: false,
-                            dots: false,
-                            fade: false
-                        });
-                    }
-                    this.slickInstance = swiperContainer;
-                }
-            });
+        changeImage: function(index) {
+            this.currentImageIndex = index;
         },
-        changeImage(index) {
-            if (this.slickInstance) {
-                this.slickInstance.slick('slickGoTo', index);
-            } else {
-                this.currentImageIndex = index;
-            }
-        },
-        prevImage() {
-            if (this.slickInstance) {
-                this.slickInstance.slick('slickPrev');
-            } else if (this.photos && this.photos.length > 0) {
+        prevImage: function() {
+            if (this.photos && this.photos.length > 0) {
                 this.currentImageIndex = (this.currentImageIndex - 1 + this.photos.length) % this.photos.length;
             }
         },
-        nextImage() {
-            if (this.slickInstance) {
-                this.slickInstance.slick('slickNext');
-            } else if (this.photos && this.photos.length > 0) {
+        nextImage: function() {
+            if (this.photos && this.photos.length > 0) {
                 this.currentImageIndex = (this.currentImageIndex + 1) % this.photos.length;
             }
         },
-        openLightbox(index) {
+        openLightbox: function(index) {
             this.lightboxIndex = index;
             this.visibleLightbox = true;
             document.body.style.overflow = 'hidden';
         },
-        closeLightbox() {
+        closeLightbox: function() {
             this.visibleLightbox = false;
             document.body.style.overflow = '';
         },
-        prevLightboxImage() {
+        prevLightboxImage: function() {
             if (this.photos && this.photos.length > 0) {
                 this.lightboxIndex = (this.lightboxIndex - 1 + this.photos.length) % this.photos.length;
             }
         },
-        nextLightboxImage() {
+        nextLightboxImage: function() {
             if (this.photos && this.photos.length > 0) {
                 this.lightboxIndex = (this.lightboxIndex + 1) % this.photos.length;
             }
         },
-        getThumbnailUrl(url) {
+        getThumbnailUrl: function(url) {
             if (!url) return '';
-            // 如果URL包含图片处理参数，直接返回
-            if (url.includes('?') || url.includes('imageView')) {
+            
+            // 检查URL是否已经包含_90x90后缀
+            if (url.includes('_90x90.')) {
                 return url;
             }
-            // 否则添加缩略图参数（根据实际图片服务调整）
-            return url;
+            
+            // 获取文件扩展名
+            var lastDotIndex = url.lastIndexOf('.');
+            if (lastDotIndex === -1) {
+                return url;
+            }
+            
+            // 在扩展名前插入_90x90
+            var baseUrl = url.substring(0, lastDotIndex);
+            var extension = url.substring(lastDotIndex);
+            
+            return baseUrl + '_90x90' + extension;
         },
-        handleImageError(event) {
+        handleImageError: function(event) {
             event.target.src = '/img/car/car4.jpg';
         },
-        openLineContact() {
+        handleThumbnailError: function(event) {
+            event.target.src = '/img/car/car4.jpg';
+        },
+        openLineContact: function() {
             if (this.dealerInfo.lineId) {
                 window.open('https://line.me/ti/p/' + this.dealerInfo.lineId, '_blank');
             }
         },
-        openPhoneContact() {
-            const phone = this.dealerInfo.companyPhone || this.dealerInfo.companyMobile;
+        openPhoneContact: function() {
+            var phone = this.dealerInfo.companyPhone || this.dealerInfo.companyMobile;
             if (phone) {
                 window.location.href = 'tel:' + phone;
             }
         },
-        startAutoPlay() {
-            if (this.slickInstance && this.photos && this.photos.length > 1) {
-                this.slickInstance.slick('slickPlay');
+        startAutoPlay: function() {
+            var _this = this;
+            if (this.photos && this.photos.length > 1) {
+                this.autoPlayTimer = setInterval(function() {
+                    _this.nextImage();
+                }, 5000);
             }
         },
-        stopAutoPlay() {
-            if (this.slickInstance) {
-                this.slickInstance.slick('slickPause');
-            }
+        stopAutoPlay: function() {
             if (this.autoPlayTimer) {
                 clearInterval(this.autoPlayTimer);
                 this.autoPlayTimer = null;
             }
         },
-        handleCarImageError(event) {
+        handleCarImageError: function(event) {
             event.target.src = '/img/car/car4.jpg';
         },
-        setupContentFrame() {
-            this.$nextTick(() => {
-                const frame = this.$refs.dealerContentFrame;
+        setupContentFrame: function() {
+            var _this = this;
+            this.$nextTick(function() {
+                var frame = _this.$refs.dealerContentFrame;
                 if (frame) {
-                    frame.onload = () => {
-                        this.adjustIframeHeight(frame);
+                    frame.onload = function() {
+                        _this.adjustIframeHeight(frame);
                     };
                     if (frame.contentDocument && frame.contentDocument.readyState === 'complete') {
                         frame.onload();
@@ -330,14 +312,14 @@ new Vue({
                 }
             });
         },
-        adjustIframeHeight(frame) {
+        adjustIframeHeight: function(frame) {
             try {
-                const frameDoc = frame.contentWindow.document;
-                const frameBody = frameDoc.body;
+                var frameDoc = frame.contentWindow.document;
+                var frameBody = frameDoc.body;
                 
                 if (!frameBody) return;
                 
-                const contentHeight = Math.max(
+                var contentHeight = Math.max(
                     frameBody.scrollHeight,
                     frameBody.offsetHeight,
                     frameDoc.documentElement.scrollHeight,
@@ -350,7 +332,7 @@ new Vue({
                 frame.style.height = '300px';
             }
         },
-        getHtmlContent(htmlContent) {
+        getHtmlContent: function(htmlContent) {
             if (!htmlContent) return '';
             return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.8; color: #333; } img { max-width: 100%; height: auto; }</style></head><body>' + htmlContent + '</body></html>';
         }
@@ -612,7 +594,7 @@ new Vue({
     margin: 0;
 }
 
-/* 使用car-detail.css中的轮播图样式 */
+/* 轮播图样式 */
 .dealer-detail .swiper-wrapper-container {
     position: relative;
     width: 100%;
@@ -623,6 +605,21 @@ new Vue({
     position: relative;
     width: 100%;
     overflow: hidden;
+}
+
+.dealer-detail .swiper-wrapper {
+    display: flex;
+    transition: transform 0.3s ease;
+}
+
+.dealer-detail .swiper-slide {
+    min-width: 100%;
+    flex-shrink: 0;
+    display: none;
+}
+
+.dealer-detail .swiper-slide.active {
+    display: block;
 }
 
 .dealer-detail .swiper-slide .image-container {
@@ -685,8 +682,8 @@ new Vue({
     content: '›';
 }
 
-/* Slick dots样式 */
-.dealer-detail .slick-dots {
+/* 轮播图指示器 */
+.dealer-detail .swiper-pagination {
     position: absolute;
     bottom: 15px;
     left: 50%;
@@ -694,35 +691,56 @@ new Vue({
     display: flex;
     gap: 8px;
     z-index: 10;
-    list-style: none;
-    padding: 0;
-    margin: 0;
 }
 
-.dealer-detail .slick-dots li {
-    width: 12px;
-    height: 12px;
-}
-
-.dealer-detail .slick-dots li button {
+.dealer-detail .swiper-pagination-bullet {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.5);
-    border: none;
     cursor: pointer;
     transition: background 0.3s ease;
-    font-size: 0;
-    padding: 0;
 }
 
-.dealer-detail .slick-dots li.slick-active button {
+.dealer-detail .swiper-pagination-bullet.active {
     background: #FA9F42;
 }
 
-.dealer-detail .slick-dots li button:hover {
+.dealer-detail .swiper-pagination-bullet:hover {
     background: rgba(255, 255, 255, 0.8);
 }
+
+/* 缩略图容器 */
+.dealer-detail .thumbnail-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    margin-top: 10px;
+}
+
+.dealer-detail .thumbnail-container .thumbnail {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.dealer-detail .thumbnail-container .thumbnail:hover {
+    border-color: #5ACFC9;
+    transform: scale(1.05);
+}
+
+.dealer-detail .thumbnail-container .thumbnail.active {
+    border-color: #5ACFC9;
+    box-shadow: 0 2px 8px rgba(90, 207, 201, 0.4);
+}
+
+
 
 .action-buttons {
     display: flex;

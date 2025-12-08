@@ -74,17 +74,30 @@
             <h2 class="product-title" style="text-align: left">
                 {{ product.name || '商品名稱' }}
             </h2>
-            <!-- 类别 -->
+            <!-- 类别标签 -->
             <div v-if="product.tag" class="product-category mb-3">
-                <span class="badge bg-warning">{{ product.tag }}</span>
+                <span v-for="tag in getProductTags(product.tag)" 
+                      :key="tag" 
+                      class="badge bg-warning me-2 mb-2 tag-clickable"
+                      @click="searchByTag(tag)">
+                    {{ tag }}
+                </span>
             </div>
             
             <!-- 价格 -->
             <div class="price-section mb-3">
-                <div class="current-price mb-2">
-                    <span class="price-label text-muted">售價：</span>
+                <div class="price-row" v-if="product.promotionalPrice">
+                    <span class="price-label promotional-label">特惠價</span>
+                    <span class="price-symbol promotional-symbol">${CurrencyUnit}</span>
+                    <span class="price-amount promotional-amount">{{ formatPrice(product.promotionalPrice) }}</span>
+                    <span class="price-market text-decoration-line-through text-muted ms-2">
+                        售價 ${CurrencyUnit}{{ formatPrice(product.price) }}
+                    </span>
+                </div>
+                <div class="price-row" v-if="!product.promotionalPrice">
+                    <span class="price-label">售價</span>
                     <span class="price-symbol">${CurrencyUnit}</span>
-                    <span class="price-amount h4">{{ formatPrice(product.price) }}</span>
+                    <span class="price-amount">{{ formatPrice(product.price) }}</span>
                 </div>
                 <div class="market-price" v-if="product.marketPrice && product.marketPrice > product.price">
                     <span class="price-label text-muted">市價：</span>
@@ -553,6 +566,16 @@ new Vue({
         getHtmlContent(htmlContent) {
             if (!htmlContent) return '';
             return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.8; color: #333; } img { max-width: 100%; height: auto; }</style></head><body>' + htmlContent + '</body></html>';
+        },
+        // 解析商品标签（按逗号分隔）
+        getProductTags(tags) {
+            if (!tags) return [];
+            return tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        },
+        // 根据标签搜索商品
+        searchByTag(tag) {
+            // 跳转到商城页面并搜索标签
+            window.location.href = '/mall?tag=' + encodeURIComponent(tag);
         }
     }
 });
@@ -590,6 +613,17 @@ new Vue({
     font-weight: 500;
 }
 
+.tag-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tag-clickable:hover {
+    background-color: #ffc107 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* 价格区域样式 - 去掉块样式 */
 .price-section {
     text-align: left;
@@ -612,7 +646,7 @@ new Vue({
 }
 
 .price-symbol {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 600;
     color: #FA9F42;
 }
@@ -621,6 +655,30 @@ new Vue({
     font-weight: 700;
     color: #FA9F42;
     font-size: 1.8rem;
+}
+
+.promotional-label {
+    color: #ff6b6b;
+    font-size: 1.3rem;
+}
+
+.promotional-symbol {
+    color: #ff6b6b;
+    font-size: 2.2rem;
+    font-weight: 600;
+}
+
+.promotional-amount {
+    color: #ff6b6b;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin-bottom: 8px;
 }
 
 .market-price {

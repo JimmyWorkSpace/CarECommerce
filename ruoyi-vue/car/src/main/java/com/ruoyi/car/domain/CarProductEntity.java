@@ -66,6 +66,10 @@ public class CarProductEntity
     @Column(name = "delFlag", nullable = false, columnDefinition = "INT(11) NOT NULL DEFAULT '0' COMMENT '刪除標記 1 已刪 0 未刪'")
     private Integer delFlag;
 
+    /** 特惠價 */
+    @Column(name = "promotionalPrice", columnDefinition = "DECIMAL(10,2) DEFAULT NULL COMMENT '特惠價'")
+    private BigDecimal promotionalPrice;
+
     /** 商品圖片列表（臨時字段） */
     @Transient
     private List<CarProductImageEntity> images;

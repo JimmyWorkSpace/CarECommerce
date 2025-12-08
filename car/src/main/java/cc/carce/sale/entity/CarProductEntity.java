@@ -77,6 +77,12 @@ public class CarProductEntity {
      */
     @Column(name = "delFlag")
     private Integer delFlag;
+
+    /**
+     * 特惠价
+     */
+    @Column(name = "promotionalPrice")
+    private java.math.BigDecimal promotionalPrice;
 }
 
 

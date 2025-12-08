@@ -35,4 +35,7 @@ public interface CarMapper extends Mapper<CarEntity> {
 	
 	// 查询燃料系统选项
 	List<String> selectDistinctFuelSystems();
+	
+	// 根据ID列表查询推荐车辆列表
+	List<CarListDto> selectRecommendedCarListWithCover(@Param("ids") List<Long> ids);
 }

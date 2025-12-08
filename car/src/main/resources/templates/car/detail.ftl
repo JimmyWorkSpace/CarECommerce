@@ -6,7 +6,7 @@
             {{ dealerInfo.dealerName || '優質二手車商' }} /
         </div>
         <div class="second-title">
-            {{ carInfo.saleTitle || (carInfo.manufactureYear + '年 ' + carInfo.brand + ' ' + carInfo.customModel) || '車輛詳情' }}
+            {{ carInfo.saleTitleJoin + carInfo.saleTitle}}
         </div>
     </div>
     
@@ -74,7 +74,7 @@
         <!-- 右侧信息 -->
         <div class="col-md-6">
             <h2 class="car-title">
-                {{ carInfo.saleTitle || (carInfo.manufactureYear + '年 ' + carInfo.brand + ' ' + carInfo.customModel) || '車輛詳情' }}
+                {{ carInfo.saleTitleJoin}}
             </h2>
             <div class="price mb-3">
                 <span class="h4">$</span><span class="h4">

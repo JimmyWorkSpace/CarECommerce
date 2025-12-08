@@ -247,4 +247,49 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ORDER BY c.fuel_system ASC
     </select>
     
+    <!-- 根据ID列表查询推荐车辆列表，包含封面图片 -->
+    <select id="selectRecommendedCarListWithCover" resultType="cc.carce.sale.dto.CarListDto">
+        SELECT
+        cs.id,
+        cs.uid,
+        cs.car_id as carId,
+        cb.brand,
+        COALESCE(cm.model, c.custom_model) as model,
+        c.manufacture_year as manufactureYear,
+        cs.sale_price as salePrice,
+        cs.sale_title as saleTitle,
+        cs.sale_description as saleDescription,
+        cs.mileage,
+        c.transmission,
+        c.fuel_system as fuelSystem,
+        c.color,
+        cs.car_location_city as locationName,
+        csp.photo_url as coverImage,
+        cs.status,
+        cs.id_garage as garageId
+        FROM
+        car_sales cs
+        LEFT JOIN cars c ON c.id = cs.car_id
+        LEFT JOIN car_brand cb ON cb.id = c.id_brand
+        LEFT JOIN car_model cm ON cm.id = c.id_model
+        LEFT JOIN car_sale_photos csp ON csp.car_sales_id = cs.id AND csp.is_cover = 1
+        WHERE
+        cs.is_admin_check = 1
+        and cs.is_publish = 1
+        <if test="ids != null and ids.size() > 0">
+            AND cs.id IN
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            ORDER BY FIELD(cs.id,
+            <foreach collection="ids" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="ids == null or ids.size() == 0">
+            ORDER BY cs.c_dt DESC
+        </if>
+    </select>
+    
 </mapper>
