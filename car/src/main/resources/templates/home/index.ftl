@@ -118,8 +118,12 @@
     font-size: 1.1rem;
     font-weight: bold;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-}
+    }
 </style>
+<!-- 搜索表单（在Vue实例外部） -->
+<link href="/css/car-search-form.css" rel="stylesheet">
+<#include "../components/car-search-form.ftl">
+
 <div class="home-page" id="app">
     <!-- 第一行：輪播圖 -->
     <div class="hero-section">
@@ -186,10 +190,6 @@
             </div>
         </div>
     </div>
-
-    <!-- 第三行：搜索表单 -->
-    <link href="/css/car-search-form.css" rel="stylesheet">
-    <#include "../components/car-search-form.ftl">
 
     <!-- 第四行：廣告位 -->
     <div class="ad-section">

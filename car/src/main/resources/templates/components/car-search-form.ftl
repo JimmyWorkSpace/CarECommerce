@@ -108,6 +108,7 @@ console.log('=== 搜索表单脚本文件已加载 ===');
         const container = document.getElementById('carSearchFormContainer');
         if (!container) {
             console.error('找不到搜索表单容器元素 #carSearchFormContainer');
+            console.log('当前页面所有元素:', document.body.innerHTML.substring(0, 500));
             // 延迟重试
             setTimeout(function() {
                 const retryContainer = document.getElementById('carSearchFormContainer');
@@ -117,7 +118,7 @@ console.log('=== 搜索表单脚本文件已加载 ===');
                 } else {
                     console.error('延迟后仍然找不到搜索表单容器元素');
                 }
-            }, 500);
+            }, 1000);
             return;
         }
         console.log('找到搜索表单容器元素');
@@ -325,10 +326,10 @@ console.log('=== 搜索表单脚本文件已加载 ===');
     
     // 初始化函数
     function doInit() {
-        // 使用setTimeout确保DOM完全渲染
+        // 使用setTimeout确保DOM完全渲染，特别是FreeMarker模板渲染完成
         setTimeout(function() {
             initSearchForm();
-        }, 50);
+        }, 200);
     }
     
     // 如果DOM已经加载完成，直接初始化
