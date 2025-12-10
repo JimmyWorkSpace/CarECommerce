@@ -1,35 +1,65 @@
 <!-- 通用车辆搜索表单组件 -->
+<#assign searchFilter = searchFilter!{} />
+<#assign brands = (searchFilter.brands)![] />
+<#assign fuelSystems = (searchFilter.fuelSystems)![] />
+<#assign colors = (searchFilter.colors)![] />
+<#assign locations = (searchFilter.locations)![] />
+<#assign minYear = (searchFilter.minYear)!1990 />
+<#assign maxYear = (searchFilter.maxYear)!((.now?long?number_to_date?string("yyyy"))?number) />
+
+<#-- 生成年份列表（降序） -->
+<#assign years = [] />
+<#if maxYear?? && minYear?? && maxYear gte minYear>
+    <#list maxYear?int..minYear?int as year>
+        <#assign years = years + [year] />
+    </#list>
+<#else>
+    <#-- 如果年份数据有问题，生成默认年份列表 -->
+    <#assign currentYear = (.now?long?number_to_date?string("yyyy"))?number />
+    <#list currentYear..1990 as year>
+        <#assign years = years + [year] />
+    </#list>
+</#if>
+
+<#-- URL参数将通过JavaScript读取并填充表单 -->
+
 <div class="car-search-form-container" id="carSearchFormContainer">
     <div class="container">
-        <form class="car-search-form" id="carSearchForm" @submit.prevent="performSearch">
+        <form class="car-search-form" id="carSearchForm">
             <!-- 第一行 -->
             <div class="search-form-row">
                 <div class="search-form-group">
                     <label class="search-form-label">汽車品牌</label>
-                    <select class="search-form-select" id="carBrandSelect" v-model="searchForm.brand">
+                    <select class="search-form-select" id="carBrandSelect" name="brand">
                         <option value="">全部</option>
-                        <option v-for="brand in brands" :key="brand.id" :value="brand.brand" v-text="brand.brand"></option>
+                        <#list brands as brand>
+                            <option value="${brand.id?c}">${brand.brand!''}</option>
+                        </#list>
                     </select>
                 </div>
                 <div class="search-form-group">
                     <label class="search-form-label">汽車型號</label>
-                    <select class="search-form-select" v-model="searchForm.model" :disabled="!searchForm.brand">
+                    <select class="search-form-select" id="carModelSelect" name="model" disabled>
                         <option value="">全部</option>
-                        <option v-for="model in models" :key="model" :value="model" v-text="model"></option>
+                        <#-- 型号将通过JS动态加载 -->
                     </select>
                 </div>
                 <div class="search-form-group">
                     <label class="search-form-label">出廠年份起</label>
-                    <select class="search-form-select" v-model="searchForm.yearFrom">
+                    <select class="search-form-select" name="yearFrom" id="yearFromSelect">
                         <option value="">全部</option>
-                        <option v-for="year in years" :key="year" :value="year" v-text="year"></option>
+                        <#list years as year>
+                            <option value="${year?c}">${year?c}</option>
+                        </#list>
                     </select>
                 </div>
                 <div class="search-form-group">
                     <label class="search-form-label">出廠年份至</label>
-                    <select class="search-form-select" v-model="searchForm.yearTo">
+                    <select class="search-form-select" name="yearTo" id="yearToSelect">
                         <option value="">全部</option>
-                        <option v-for="year in years" :key="year" :value="year" v-text="year"></option>
+                        <#list years as year>
+                            <option value="${year?c}">${year?c}</option>
+                        </#list>
                     </select>
                 </div>
             </div>
@@ -38,24 +68,28 @@
             <div class="search-form-row">
                 <div class="search-form-group">
                     <label class="search-form-label">排氣量cc起</label>
-                    <input type="number" class="search-form-input" placeholder="自填" v-model.number="searchForm.displacementFrom" min="0" step="1">
+                    <input type="number" class="search-form-input" name="displacementFrom" id="displacementFromInput" placeholder="自填" min="0" step="1">
                 </div>
                 <div class="search-form-group">
                     <label class="search-form-label">排氣量cc迄</label>
-                    <input type="number" class="search-form-input" placeholder="自填" v-model.number="searchForm.displacementTo" min="0" step="1">
+                    <input type="number" class="search-form-input" name="displacementTo" id="displacementToInput" placeholder="自填" min="0" step="1">
                 </div>
                 <div class="search-form-group">
                     <label class="search-form-label">車色</label>
-                    <select class="search-form-select" v-model="searchForm.color">
+                    <select class="search-form-select" name="color" id="colorSelect">
                         <option value="">全部</option>
-                        <option v-for="color in colors" :key="color" :value="color" v-text="color"></option>
+                        <#list colors as color>
+                            <option value="${color}">${color}</option>
+                        </#list>
                     </select>
                 </div>
                 <div class="search-form-group">
                     <label class="search-form-label">燃料系統</label>
-                    <select class="search-form-select" v-model="searchForm.fuelSystem">
+                    <select class="search-form-select" name="fuelSystem" id="fuelSystemSelect">
                         <option value="">全部</option>
-                        <option v-for="fuel in fuelSystems" :key="fuel" :value="fuel" v-text="fuel"></option>
+                        <#list fuelSystems as fuel>
+                            <option value="${fuel}">${fuel}</option>
+                        </#list>
                     </select>
                 </div>
             </div>
@@ -65,10 +99,12 @@
                 <div class="search-form-group full-width">
                     <label class="search-form-label">車輛所在地 (可複選)</label>
                     <div class="location-checkboxes">
-                        <label class="location-checkbox" v-for="location in locations" :key="location">
-                            <input type="checkbox" :value="location" v-model="searchForm.locations">
-                            <span v-text="location"></span>
-                        </label>
+                        <#list locations as location>
+                            <label class="location-checkbox">
+                                <input type="checkbox" name="locations" value="${location}" class="location-checkbox-input">
+                                <span>${location}</span>
+                            </label>
+                        </#list>
                     </div>
                 </div>
             </div>
@@ -77,10 +113,10 @@
             <div class="search-form-row">
                 <div class="search-form-group search-keyword-group">
                     <label class="search-form-label">關鍵字</label>
-                    <input type="text" class="search-form-input keyword-input" placeholder="" v-model="searchForm.keyword" @keyup.enter="performSearch">
+                    <input type="text" class="search-form-input keyword-input" name="keyword" id="keywordInput" placeholder="">
                 </div>
                 <div class="search-form-group search-button-group">
-                    <button type="button" class="search-submit-btn" @click.prevent="performSearch">搜尋</button>
+                    <button type="button" class="search-submit-btn" id="searchSubmitBtn">搜尋</button>
                 </div>
             </div>
         </form>
@@ -88,263 +124,324 @@
 </div>
 
 <script>
-console.log('=== 搜索表单脚本文件已加载 ===');
-// 搜索表单Vue实例
 (function() {
-    console.log('搜索表单脚本开始执行');
+    'use strict';
     
-    // 确保DOM加载完成后再初始化
-    function initSearchForm() {
-        console.log('开始初始化搜索表单Vue实例');
+    // 全局变量
+    let brandSelect, modelSelect, searchForm, searchBtn, keywordInput;
+    
+    /**
+     * 从URL获取参数值
+     */
+    function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name) || '';
+    }
+    
+    /**
+     * 从URL获取多个参数值（用于多选）
+     */
+    function getUrlParameters(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.getAll(name) || [];
+    }
+    
+    /**
+     * 根据品牌ID加载型号列表
+     * @param {string} brandId - 品牌ID
+     * @param {string} selectedModel - 要选中的型号（可选）
+     */
+    function loadModelsByBrand(brandId, selectedModel) {
+        if (!modelSelect) return;
         
-        // 检查Vue是否可用
-        if (typeof Vue === 'undefined') {
-            console.error('Vue未加载，请检查vue.min.js是否正确加载');
+        if (!brandId) {
+            // 清空型号列表并禁用
+            modelSelect.innerHTML = '<option value="">全部</option>';
+            modelSelect.disabled = true;
             return;
         }
-        console.log('Vue已加载，版本:', Vue.version);
         
-        // 检查DOM元素是否存在
-        const container = document.getElementById('carSearchFormContainer');
-        if (!container) {
-            console.error('找不到搜索表单容器元素 #carSearchFormContainer');
-            console.log('当前页面所有元素:', document.body.innerHTML.substring(0, 500));
-            // 延迟重试
-            setTimeout(function() {
-                const retryContainer = document.getElementById('carSearchFormContainer');
-                if (retryContainer) {
-                    console.log('延迟后找到搜索表单容器元素，重新初始化');
-                    initSearchForm();
-                } else {
-                    console.error('延迟后仍然找不到搜索表单容器元素');
-                }
-            }, 1000);
-            return;
-        }
-        console.log('找到搜索表单容器元素');
+        // 启用型号选择框
+        modelSelect.disabled = false;
         
-        // 从页面获取过滤条件JSON数据
-        const searchFilterJson = <#if searchFilterJson??>'${searchFilterJson?js_string}'<#else>'{}'</#if>;
-        let searchFilter = {};
-        try {
-            searchFilter = JSON.parse(searchFilterJson);
-            console.log('解析搜索过滤条件成功');
-        } catch (e) {
-            console.error('解析搜索过滤条件JSON失败:', e);
-            searchFilter = {};
-        }
+        // 显示加载状态
+        modelSelect.innerHTML = '<option value="">加载中...</option>';
         
-        // 如果已经存在Vue实例，先销毁
-        if (window.carSearchFormVue) {
-            try {
-                window.carSearchFormVue.$destroy();
-                console.log('已销毁旧的Vue实例');
-            } catch (e) {
-                console.warn('销毁旧的Vue实例失败:', e);
-            }
-        }
-        
-        // 创建搜索表单的Vue实例
-        try {
-            window.carSearchFormVue = new Vue({
-        el: '#carSearchFormContainer',
-        data: {
-            brands: searchFilter.brands || [],
-            years: [],
-            models: [],
-            minYear: searchFilter.minYear || 1990,
-            maxYear: searchFilter.maxYear || new Date().getFullYear(),
-            fuelSystems: searchFilter.fuelSystems || [],
-            colors: searchFilter.colors || [],
-            locations: searchFilter.locations || [],
-            searchForm: {
-                brand: '',
-                model: '',
-                yearFrom: '',
-                yearTo: '',
-                displacementFrom: '',
-                displacementTo: '',
-                color: '',
-                fuelSystem: '',
-                locations: [],
-                keyword: ''
-            }
-        },
-        watch: {
-            // 监听品牌选择变化
-            'searchForm.brand': function(newBrand, oldBrand) {
-                if (newBrand && newBrand !== oldBrand) {
-                    this.loadModelsByBrand(newBrand);
-                } else if (!newBrand) {
-                    // 清空品牌时，清空型号列表
-                    this.models = [];
-                    this.searchForm.model = '';
-                }
-            }
-        },
-        mounted() {
-            this.initYears();
-            console.log('搜索表单初始化完成，品牌数量:', this.brands.length, '年份范围:', this.minYear, '-', this.maxYear);
-            console.log('Vue实例已创建:', window.carSearchFormVue);
-            
-            // 如果URL中有品牌参数，加载对应的型号列表
-            const urlParams = new URLSearchParams(window.location.search);
-            const brandFromUrl = urlParams.get('brand');
-            if (brandFromUrl) {
-                this.searchForm.brand = brandFromUrl;
-                this.loadModelsByBrand(brandFromUrl);
-            }
-            
-            // 测试按钮点击
-            const searchBtn = document.querySelector('.search-submit-btn');
-            if (searchBtn) {
-                console.log('搜索按钮已找到');
-            } else {
-                console.error('搜索按钮未找到');
-            }
-        },
-        methods: {
-            // 初始化年份列表
-            initYears() {
-                const years = [];
-                // 从最大值到最小值，降序排列
-                for (let i = this.maxYear; i >= this.minYear; i--) {
-                    years.push(i);
-                }
-                this.years = years;
-            },
-            
-            // 根据品牌加载型号列表
-            async loadModelsByBrand(brand) {
-                if (!brand) {
-                    this.models = [];
-                    this.searchForm.model = '';
-                    return;
-                }
-                
-                try {
-                    console.log('加载型号列表，品牌:', brand);
-                    const response = await axios.get('/api/car-filter/models', {
-                        params: { brand: brand }
-                    });
-                    
-                    if (response.data && response.data.success) {
-                        this.models = response.data.data || [];
-                        console.log('型号列表加载成功，数量:', this.models.length);
-                        // 如果当前选择的型号不在新列表中，清空选择
-                        if (this.searchForm.model && !this.models.includes(this.searchForm.model)) {
-                            this.searchForm.model = '';
+        // 使用fetch API加载型号列表，传递品牌ID
+        fetch('/api/car-filter/models?brandId=' + encodeURIComponent(brandId))
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(result) {
+                if (result && result.success && result.data) {
+                    // 清空并填充型号选项
+                    modelSelect.innerHTML = '<option value="">全部</option>';
+                    result.data.forEach(function(model) {
+                        const option = document.createElement('option');
+                        option.value = model;
+                        option.textContent = model;
+                        if (selectedModel && selectedModel === model) {
+                            option.selected = true;
                         }
-                    } else {
-                        console.error('加载型号列表失败:', response.data ? response.data.message : '未知错误');
-                        this.models = [];
-                    }
-                } catch (error) {
-                    console.error('加载型号列表异常:', error);
-                    this.models = [];
-                }
-            },
-            
-            // 执行搜索
-            performSearch() {
-                console.log('=== performSearch 方法被调用 ===');
-                console.log('执行搜索，当前路径:', window.location.pathname);
-                console.log('搜索条件:', JSON.stringify(this.searchForm, null, 2));
-                
-                // 如果在车辆列表页，触发事件让页面处理
-                if (window.location.pathname === '/buy-cars' || window.location.pathname.indexOf('/buy-cars') === 0) {
-                    console.log('在车辆列表页，触发carSearch事件');
-                    window.dispatchEvent(new CustomEvent('carSearch', { detail: this.searchForm }));
-                    return;
-                }
-                
-                // 在首页，构建URL参数并跳转
-                console.log('在首页，准备跳转到车辆列表页');
-                const params = new URLSearchParams();
-                
-                // 品牌
-                if (this.searchForm.brand) {
-                    params.append('brand', this.searchForm.brand);
-                }
-                
-                // 型号
-                if (this.searchForm.model) {
-                    params.append('model', this.searchForm.model);
-                }
-                
-                // 出厂年份
-                if (this.searchForm.yearFrom) {
-                    params.append('yearFrom', this.searchForm.yearFrom);
-                }
-                if (this.searchForm.yearTo) {
-                    params.append('yearTo', this.searchForm.yearTo);
-                }
-                
-                // 排量
-                if (this.searchForm.displacementFrom) {
-                    params.append('displacementFrom', this.searchForm.displacementFrom);
-                }
-                if (this.searchForm.displacementTo) {
-                    params.append('displacementTo', this.searchForm.displacementTo);
-                }
-                
-                // 车色
-                if (this.searchForm.color) {
-                    params.append('color', this.searchForm.color);
-                }
-                
-                // 燃料系统
-                if (this.searchForm.fuelSystem) {
-                    params.append('fuelSystem', this.searchForm.fuelSystem);
-                }
-                
-                // 车辆所在地（多个）
-                if (this.searchForm.locations && this.searchForm.locations.length > 0) {
-                    this.searchForm.locations.forEach(location => {
-                        params.append('locations', location);
+                        modelSelect.appendChild(option);
                     });
+                } else {
+                    modelSelect.innerHTML = '<option value="">全部</option>';
+                    console.error('加载型号列表失败:', result ? result.message : '未知错误');
                 }
-                
-                // 关键字
-                if (this.searchForm.keyword) {
-                    params.append('keyword', this.searchForm.keyword);
+            })
+            .catch(function(error) {
+                console.error('加载型号列表异常:', error);
+                if (modelSelect) {
+                    modelSelect.innerHTML = '<option value="">全部</option>';
                 }
-                
-                // 跳转到车辆列表页
-                const url = '/buy-cars' + (params.toString() ? '?' + params.toString() : '');
-                console.log('准备跳转，URL:', url);
-                window.location.href = url;
+            });
+    }
+    
+    /**
+     * 填充表单初始值
+     */
+    function fillFormFromUrl() {
+        const brand = getUrlParameter('brand');
+        const model = getUrlParameter('model');
+        const yearFrom = getUrlParameter('yearFrom');
+        const yearTo = getUrlParameter('yearTo');
+        const displacementFrom = getUrlParameter('displacementFrom');
+        const displacementTo = getUrlParameter('displacementTo');
+        const color = getUrlParameter('color');
+        const fuelSystem = getUrlParameter('fuelSystem');
+        const locations = getUrlParameters('locations');
+        const keyword = getUrlParameter('keyword');
+        
+        // 填充品牌
+        if (brand && brandSelect) {
+            brandSelect.value = brand;
+            // 如果选择了品牌，加载型号列表
+            if (brand) {
+                loadModelsByBrand(brand, model);
             }
         }
-            });
-            console.log('Vue实例创建成功');
-        } catch (e) {
-            console.error('创建Vue实例失败:', e);
-            console.error('错误详情:', e.stack);
+        
+        // 填充年份
+        if (yearFrom && document.getElementById('yearFromSelect')) {
+            document.getElementById('yearFromSelect').value = yearFrom;
         }
+        if (yearTo && document.getElementById('yearToSelect')) {
+            document.getElementById('yearToSelect').value = yearTo;
+        }
+        
+        // 填充排量
+        if (displacementFrom && document.getElementById('displacementFromInput')) {
+            document.getElementById('displacementFromInput').value = displacementFrom;
+        }
+        if (displacementTo && document.getElementById('displacementToInput')) {
+            document.getElementById('displacementToInput').value = displacementTo;
+        }
+        
+        // 填充车色
+        if (color && document.getElementById('colorSelect')) {
+            document.getElementById('colorSelect').value = color;
+        }
+        
+        // 填充燃料系统
+        if (fuelSystem && document.getElementById('fuelSystemSelect')) {
+            document.getElementById('fuelSystemSelect').value = fuelSystem;
+        }
+        
+        // 填充车辆所在地（多选）
+        if (locations && locations.length > 0) {
+            const locationInputs = document.querySelectorAll('.location-checkbox-input');
+            locationInputs.forEach(function(input) {
+                if (locations.indexOf(input.value) !== -1) {
+                    input.checked = true;
+                }
+            });
+        }
+        
+        // 填充关键字
+        if (keyword && keywordInput) {
+            keywordInput.value = keyword;
+        }
+    }
+    
+    /**
+     * 执行搜索
+     */
+    function performSearch() {
+        console.log('performSearch 被调用');
+        
+        if (!searchForm) {
+            console.error('搜索表单不存在');
+            return;
+        }
+        
+        const params = new URLSearchParams();
+        const searchConditions = {};
+        
+        // 直接获取表单元素的值
+        const brand = brandSelect ? brandSelect.value : '';
+        const model = modelSelect ? modelSelect.value : '';
+        const yearFrom = document.getElementById('yearFromSelect') ? document.getElementById('yearFromSelect').value : '';
+        const yearTo = document.getElementById('yearToSelect') ? document.getElementById('yearToSelect').value : '';
+        const displacementFrom = document.getElementById('displacementFromInput') ? document.getElementById('displacementFromInput').value : '';
+        const displacementTo = document.getElementById('displacementToInput') ? document.getElementById('displacementToInput').value : '';
+        const color = document.getElementById('colorSelect') ? document.getElementById('colorSelect').value : '';
+        const fuelSystem = document.getElementById('fuelSystemSelect') ? document.getElementById('fuelSystemSelect').value : '';
+        const keyword = keywordInput ? keywordInput.value : '';
+        
+        // 获取车辆所在地（多选）
+        const locationInputs = document.querySelectorAll('.location-checkbox-input:checked');
+        const locations = [];
+        locationInputs.forEach(function(input) {
+            locations.push(input.value);
+        });
+        
+        // 构建搜索条件对象
+        if (brand) {
+            searchConditions.brand = brand;
+            params.append('brand', brand);
+        }
+        if (model) {
+            searchConditions.model = model;
+            params.append('model', model);
+        }
+        if (yearFrom) {
+            const yearFromValue = parseInt(yearFrom);
+            if (!isNaN(yearFromValue) && yearFromValue > 0) {
+                searchConditions.yearFrom = yearFromValue.toString();
+                params.append('yearFrom', yearFromValue.toString());
+            }
+        }
+        if (yearTo) {
+            const yearToValue = parseInt(yearTo);
+            if (!isNaN(yearToValue) && yearToValue > 0) {
+                searchConditions.yearTo = yearToValue.toString();
+                params.append('yearTo', yearToValue.toString());
+            }
+        }
+        if (displacementFrom) {
+            searchConditions.displacementFrom = displacementFrom;
+            params.append('displacementFrom', displacementFrom);
+        }
+        if (displacementTo) {
+            searchConditions.displacementTo = displacementTo;
+            params.append('displacementTo', displacementTo);
+        }
+        if (color) {
+            searchConditions.color = color;
+            params.append('color', color);
+        }
+        if (fuelSystem) {
+            searchConditions.fuelSystem = fuelSystem;
+            params.append('fuelSystem', fuelSystem);
+        }
+        if (locations.length > 0) {
+            searchConditions.locations = locations;
+            locations.forEach(function(location) {
+                params.append('locations', location);
+            });
+        }
+        if (keyword) {
+            searchConditions.keyword = keyword;
+            params.append('keyword', keyword);
+        }
+        
+        const currentPath = window.location.pathname;
+        console.log('当前路径:', currentPath);
+        console.log('搜索条件:', searchConditions);
+        
+        // 如果在车辆列表页，触发事件让页面处理
+        if (currentPath === '/buy-cars' || currentPath.indexOf('/buy-cars') === 0) {
+            console.log('在车辆列表页，触发carSearch事件');
+            // 触发自定义事件
+            window.dispatchEvent(new CustomEvent('carSearch', { 
+                detail: searchConditions 
+            }));
+            return;
+        }
+        
+        // 在首页或其他页面，构建URL参数并跳转到车辆列表页
+        const url = '/buy-cars' + (params.toString() ? '?' + params.toString() : '');
+        console.log('跳转到车辆列表页，URL:', url);
+        window.location.href = url;
     }
     
     // 初始化函数
-    function doInit() {
-        // 使用setTimeout确保DOM完全渲染，特别是FreeMarker模板渲染完成
-        setTimeout(function() {
-            initSearchForm();
-        }, 200);
+    function initSearchForm() {
+        // 获取DOM元素
+        brandSelect = document.getElementById('carBrandSelect');
+        modelSelect = document.getElementById('carModelSelect');
+        searchForm = document.getElementById('carSearchForm');
+        searchBtn = document.getElementById('searchSubmitBtn');
+        keywordInput = document.getElementById('keywordInput');
+        
+        // 检查必要的元素是否存在
+        if (!searchForm) {
+            console.error('搜索表单元素不存在: #carSearchForm');
+            return;
+        }
+        if (!searchBtn) {
+            console.error('搜索按钮元素不存在: #searchSubmitBtn');
+            return;
+        }
+        
+        console.log('搜索表单初始化，找到元素:', {
+            searchForm: !!searchForm,
+            searchBtn: !!searchBtn,
+            brandSelect: !!brandSelect,
+            modelSelect: !!modelSelect,
+            keywordInput: !!keywordInput
+        });
+        
+        // 绑定品牌选择变化事件
+        if (brandSelect) {
+            brandSelect.addEventListener('change', function() {
+                const selectedBrand = this.value;
+                loadModelsByBrand(selectedBrand);
+                // 清空型号选择
+                if (modelSelect) {
+                    modelSelect.value = '';
+                }
+            });
+        }
+        
+        // 绑定搜索按钮点击事件
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('搜索按钮被点击');
+            performSearch();
+        });
+        
+        // 绑定关键字输入框回车事件
+        if (keywordInput) {
+            keywordInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    console.log('回车键触发搜索');
+                    performSearch();
+                }
+            });
+        }
+        
+        // 绑定表单提交事件
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('表单提交事件触发');
+            performSearch();
+        });
+        
+        // 从URL填充表单
+        fillFormFromUrl();
     }
     
-    // 如果DOM已经加载完成，直接初始化
+    // 页面加载完成后初始化
     if (document.readyState === 'loading') {
-        console.log('DOM正在加载，等待DOMContentLoaded事件...');
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOMContentLoaded事件触发，开始初始化');
-            doInit();
-        });
+        document.addEventListener('DOMContentLoaded', initSearchForm);
     } else {
-        // DOM已经加载完成，直接初始化
-        console.log('DOM已加载完成，立即初始化');
-        doInit();
+        // DOM已经加载完成，延迟一点确保所有元素都已渲染
+        setTimeout(initSearchForm, 100);
     }
 })();
-console.log('=== 搜索表单脚本执行完成 ===');
 </script>
-

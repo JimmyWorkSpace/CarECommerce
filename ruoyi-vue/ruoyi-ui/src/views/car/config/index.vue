@@ -64,12 +64,6 @@
       <el-table-column label="配置代碼" align="center" prop="code" />
       <el-table-column label="配置名稱" align="center" prop="name" />
       <el-table-column label="配置值" align="center" prop="value" />
-      <el-table-column label="顯示順序" align="center" prop="showOrder" />
-      <el-table-column label="創建時間" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button

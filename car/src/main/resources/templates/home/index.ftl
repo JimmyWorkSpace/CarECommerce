@@ -122,7 +122,6 @@
 </style>
 <!-- 搜索表单（在Vue实例外部） -->
 <link href="/css/car-search-form.css" rel="stylesheet">
-<#include "../components/car-search-form.ftl">
 
 <div class="home-page" id="app">
     <!-- 第一行：輪播圖 -->
@@ -191,6 +190,7 @@
         </div>
     </div>
 
+    <#include "../components/car-search-form.ftl">
     <!-- 第四行：廣告位 -->
     <div class="ad-section">
         <div class="container">

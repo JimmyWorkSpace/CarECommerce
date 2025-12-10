@@ -1418,13 +1418,35 @@ public class CarViewController extends BaseController {
 			searchFilter.setMinYear(filterOptions.getMinYear());
 			searchFilter.setMaxYear(filterOptions.getMaxYear());
 			
-			// 转换为JSON字符串
+			// 将 searchFilter 对象直接添加到 model 中，方便 FreeMarker 使用
+			model.addAttribute("searchFilter", searchFilter);
+			
+			// 转换为JSON字符串（保留用于向后兼容）
 			ObjectMapper objectMapper = new ObjectMapper();
 			String searchFilterJson = objectMapper.writeValueAsString(searchFilter);
 			model.addAttribute("searchFilterJson", searchFilterJson);
 		} catch (Exception e) {
 			log.error("获取搜索过滤条件失败", e);
-			model.addAttribute("searchFilterJson", "{}");
+			// 设置默认的空 searchFilter 对象
+			CarSearchFilterDto emptyFilter = new CarSearchFilterDto();
+			emptyFilter.setBrands(new ArrayList<>());
+			emptyFilter.setFuelSystems(new ArrayList<>());
+			emptyFilter.setTransmissions(new ArrayList<>());
+			emptyFilter.setDrivetrains(new ArrayList<>());
+			emptyFilter.setColors(new ArrayList<>());
+			emptyFilter.setLocations(new ArrayList<>());
+			emptyFilter.setMinYear(1990);
+			emptyFilter.setMaxYear(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
+			model.addAttribute("searchFilter", emptyFilter);
+			// 转换为JSON字符串（保留用于向后兼容）
+			ObjectMapper objectMapper = new ObjectMapper();
+			try {
+				String searchFilterJson = objectMapper.writeValueAsString(emptyFilter);
+				model.addAttribute("searchFilterJson", searchFilterJson);
+			} catch (Exception jsonException) {
+				log.error("转换searchFilter为JSON失败", jsonException);
+				model.addAttribute("searchFilterJson", "{}");
+			}
 		}
 	}
 } 

@@ -48,6 +48,9 @@ public interface CarMapper extends Mapper<CarEntity> {
 	// 根据品牌查询型号列表
 	List<String> selectModelsByBrand(@Param("brand") String brand);
 	
+	// 根据品牌ID查询型号列表
+	List<String> selectModelsByBrandId(@Param("brandId") Long brandId);
+	
 	// 根据ID列表查询推荐车辆列表
 	List<CarListDto> selectRecommendedCarListWithCover(@Param("ids") List<Long> ids);
 }

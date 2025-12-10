@@ -4,6 +4,12 @@
     margin-bottom: 30px;
 }
 
+/* 去掉容器内的 padding */
+.car-search-form-container .container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .search-form-title {
     text-align: center;
     font-size: 2rem;

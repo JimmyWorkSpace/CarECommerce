@@ -140,7 +140,7 @@
 
 /* 第二行：功能区域 */
 .features-section {
-    padding: 20px 0 40px 0;
+    padding: 20px 0 20px 0;
     background-color: white;
 }
 
@@ -234,7 +234,7 @@
 
 /* 第四行：广告位 */
 .ad-section {
-    padding: 60px 0 0 0;
+    padding: 20px 0 0 0;
     background-color: white;
 }
 
