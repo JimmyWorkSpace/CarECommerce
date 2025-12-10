@@ -150,9 +150,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         cs.is_admin_check = 1
         and cs.is_publish = 1
         <if test="brand != null and brand.size() > 0">
-            AND cb.brand IN
-            <foreach collection="brand" item="brandName" open="(" separator="," close=")">
-                #{brandName}
+            AND c.id_brand IN
+            <foreach collection="brand" item="brandId" open="(" separator="," close=")">
+                CAST(#{brandId} AS UNSIGNED)
             </foreach>
         </if>
         <if test="model != null and model != ''">
@@ -324,6 +324,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE cs.is_admin_check = 1
         AND cs.is_publish = 1
         AND cb.brand = #{brand}
+        AND (
+            (c.id_model = 0 OR c.id_model IS NULL) AND c.custom_model IS NOT NULL AND c.custom_model != ''
+            OR
+            (c.id_model != 0 AND c.id_model IS NOT NULL) AND cm.model IS NOT NULL AND cm.model != ''
+        )
+        ORDER BY model ASC
+    </select>
+    
+    <!-- 根据品牌ID查询型号列表 -->
+    <select id="selectModelsByBrandId" resultType="java.lang.String">
+        SELECT DISTINCT 
+            CASE 
+                WHEN c.id_model = 0 OR c.id_model IS NULL THEN c.custom_model
+                ELSE cm.model
+            END as model
+        FROM car_sales cs
+        INNER JOIN cars c ON c.id = cs.car_id
+        LEFT JOIN car_brand cb ON cb.id = c.id_brand
+        LEFT JOIN car_model cm ON cm.id = c.id_model
+        WHERE cs.is_admin_check = 1
+        AND cs.is_publish = 1
+        AND c.id_brand = #{brandId}
         AND (
             (c.id_model = 0 OR c.id_model IS NULL) AND c.custom_model IS NOT NULL AND c.custom_model != ''
             OR

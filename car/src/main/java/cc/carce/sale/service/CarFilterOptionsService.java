@@ -117,4 +117,22 @@ public class CarFilterOptionsService {
             return new java.util.ArrayList<>();
         }
     }
+    
+    /**
+     * 根据品牌ID获取型号列表
+     * @param brandId 品牌ID
+     * @return 型号列表
+     */
+    public List<String> getModelsByBrandId(Long brandId) {
+        log.info("根据品牌ID查询型号列表，品牌ID: {}", brandId);
+        if (brandId == null) {
+            return new java.util.ArrayList<>();
+        }
+        try {
+            return carMapper.selectModelsByBrandId(brandId);
+        } catch (Exception e) {
+            log.error("根据品牌ID查询型号列表失败，品牌ID: {}", brandId, e);
+            return new java.util.ArrayList<>();
+        }
+    }
 }

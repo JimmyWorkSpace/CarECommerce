@@ -164,8 +164,6 @@ new Vue({
     mounted() {
         // 从URL参数读取搜索条件
         this.loadSearchParamsFromUrl();
-        // 同步搜索表单组件的值
-        this.syncSearchFormToComponent();
         this.loadCars();
         this.loadBrandSaleCount();
         this.loadCarFilterOptions();
@@ -338,63 +336,42 @@ new Vue({
             }
         },
         
-        // 同步搜索条件到搜索表单组件
-        syncSearchFormToComponent() {
-            // 等待搜索表单组件初始化完成
-            setTimeout(async () => {
-                if (window.carSearchFormVue) {
-                    // 先设置品牌，然后加载型号列表
-                    if (this.searchForm.brand && this.searchForm.brand.length > 0) {
-                        const brand = this.searchForm.brand[0];
-                        window.carSearchFormVue.searchForm.brand = brand;
-                        // 加载该品牌的型号列表
-                        if (window.carSearchFormVue.loadModelsByBrand) {
-                            await window.carSearchFormVue.loadModelsByBrand(brand);
-                            // 型号列表加载完成后再设置型号
-                            if (this.searchForm.model) {
-                                window.carSearchFormVue.searchForm.model = this.searchForm.model;
-                            }
-                        }
-                    } else if (this.searchForm.model) {
-                        window.carSearchFormVue.searchForm.model = this.searchForm.model;
-                    }
-                    if (this.searchForm.yearFrom) {
-                        window.carSearchFormVue.searchForm.yearFrom = this.searchForm.yearFrom.toString();
-                    }
-                    if (this.searchForm.yearTo) {
-                        window.carSearchFormVue.searchForm.yearTo = this.searchForm.yearTo.toString();
-                    }
-                    if (this.searchForm.displacementFrom) {
-                        window.carSearchFormVue.searchForm.displacementFrom = this.searchForm.displacementFrom;
-                    }
-                    if (this.searchForm.displacementTo) {
-                        window.carSearchFormVue.searchForm.displacementTo = this.searchForm.displacementTo;
-                    }
-                    if (this.searchForm.color) {
-                        window.carSearchFormVue.searchForm.color = this.searchForm.color;
-                    }
-                    if (this.searchForm.fuelSystem && this.searchForm.fuelSystem.length > 0) {
-                        window.carSearchFormVue.searchForm.fuelSystem = this.searchForm.fuelSystem[0];
-                    }
-                    if (this.searchForm.locations && this.searchForm.locations.length > 0) {
-                        window.carSearchFormVue.searchForm.locations = this.searchForm.locations;
-                    }
-                    if (this.searchForm.keyword) {
-                        window.carSearchFormVue.searchForm.keyword = this.searchForm.keyword;
-                    }
-                }
-            }, 100);
-        },
-        
         // 应用搜索表单条件
         applySearchForm(formData) {
             // 更新searchForm
             this.searchForm.brand = formData.brand ? [formData.brand] : [];
             this.searchForm.model = formData.model || '';
-            this.searchForm.yearFrom = formData.yearFrom ? parseInt(formData.yearFrom) : null;
-            this.searchForm.yearTo = formData.yearTo ? parseInt(formData.yearTo) : null;
-            this.searchForm.displacementFrom = formData.displacementFrom || null;
-            this.searchForm.displacementTo = formData.displacementTo || null;
+            
+            // 处理年份字段，确保正确解析
+            if (formData.yearFrom) {
+                const yearFrom = parseInt(formData.yearFrom);
+                this.searchForm.yearFrom = (!isNaN(yearFrom) && yearFrom > 0) ? yearFrom : null;
+            } else {
+                this.searchForm.yearFrom = null;
+            }
+            
+            if (formData.yearTo) {
+                const yearTo = parseInt(formData.yearTo);
+                this.searchForm.yearTo = (!isNaN(yearTo) && yearTo > 0) ? yearTo : null;
+            } else {
+                this.searchForm.yearTo = null;
+            }
+            
+            // 处理排量字段
+            if (formData.displacementFrom) {
+                const displacementFrom = parseInt(formData.displacementFrom);
+                this.searchForm.displacementFrom = (!isNaN(displacementFrom) && displacementFrom > 0) ? displacementFrom : null;
+            } else {
+                this.searchForm.displacementFrom = null;
+            }
+            
+            if (formData.displacementTo) {
+                const displacementTo = parseInt(formData.displacementTo);
+                this.searchForm.displacementTo = (!isNaN(displacementTo) && displacementTo > 0) ? displacementTo : null;
+            } else {
+                this.searchForm.displacementTo = null;
+            }
+            
             this.searchForm.color = formData.color || '';
             this.searchForm.fuelSystem = formData.fuelSystem ? [formData.fuelSystem] : [];
             this.searchForm.locations = formData.locations || [];

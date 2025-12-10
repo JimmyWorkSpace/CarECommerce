@@ -66,14 +66,25 @@ public class CarFilterApiController {
         }
     }
     
-    @ApiOperation(value = "根据品牌获取型号列表", notes = "根据品牌名称获取该品牌下的所有型号列表")
+    @ApiOperation(value = "根据品牌获取型号列表", notes = "根据品牌ID获取该品牌下的所有型号列表")
     @GetMapping("/models")
-    public R<List<String>> getModelsByBrand(@org.springframework.web.bind.annotation.RequestParam String brand) {
+    public R<List<String>> getModelsByBrand(
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String brand,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) Long brandId) {
         try {
-            List<String> models = carFilterOptionsService.getModelsByBrand(brand);
+            List<String> models;
+            if (brandId != null) {
+                // 优先使用品牌ID
+                models = carFilterOptionsService.getModelsByBrandId(brandId);
+            } else if (brand != null && !brand.trim().isEmpty()) {
+                // 兼容旧的品牌名称方式
+                models = carFilterOptionsService.getModelsByBrand(brand);
+            } else {
+                return R.fail("品牌ID或品牌名称不能为空", null);
+            }
             return R.ok("查询成功", models);
         } catch (Exception e) {
-            log.error("根据品牌获取型号列表失败，品牌: {}", brand, e);
+            log.error("根据品牌获取型号列表失败，品牌ID: {}, 品牌名称: {}", brandId, brand, e);
             return R.fail("查询失败", null);
         }
     }

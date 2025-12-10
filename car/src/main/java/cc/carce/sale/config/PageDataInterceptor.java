@@ -98,6 +98,21 @@ public class PageDataInterceptor implements HandlerInterceptor {
             // 添加网站配置数据到页脚
             modelAndView.addObject("config", carConfigService.getAllConfigs());
             
+            // 添加页脚链接配置Map，方便模板通过code获取value
+            java.util.Map<String, String> footerLinks = new java.util.HashMap<>();
+            try {
+                java.util.List<cc.carce.sale.entity.CarConfigEntity> configs = carConfigService.getAllConfigs();
+                for (cc.carce.sale.entity.CarConfigEntity config : configs) {
+                    // 只添加页脚相关的配置（code以footer_开头）
+                    if (config.getCode() != null && config.getCode().startsWith("footer_")) {
+                        footerLinks.put(config.getCode(), config.getValue() != null ? config.getValue() : "#");
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("获取页脚链接配置失败", e);
+            }
+            modelAndView.addObject("footerLinks", footerLinks);
+            
             // 添加配置内容对象（用于模板中的configContent）
             try {
                 cc.carce.sale.entity.dto.CarConfigContent configContent = carConfigService.getConfigContent();
@@ -118,6 +133,7 @@ public class PageDataInterceptor implements HandlerInterceptor {
             log.error("获取页脚配置数据失败", e);
             // 如果获取配置失败，设置空对象避免模板报错
             modelAndView.addObject("config", new java.util.HashMap<>());
+            modelAndView.addObject("footerLinks", new java.util.HashMap<>());
         }
     }
 
