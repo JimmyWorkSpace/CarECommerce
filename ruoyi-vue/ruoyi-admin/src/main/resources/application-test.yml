@@ -2,6 +2,7 @@ ruoyi:
   profile: /root/files
 carce:
   prefix: https://testcloud.carce.cc
+  carbuy-prefix: https://carbuy.com.tw
   webUrl: http://localhost:8080
   ftp:
     server: testcloud.carce.cc

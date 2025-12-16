@@ -94,4 +94,9 @@ public class CarAppointmentDto {
      * 车辆封面圖片
      */
     private String carCoverImage;
+
+    /**
+     * 車輛網址
+     */
+    private String carUrl;
 }

@@ -160,6 +160,13 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="車輛網址" v-if="form.carSaleId && form.carUrl">
+          <el-input v-model="form.carUrl" readonly placeholder="車輛網址">
+            <template slot="append">
+              <el-button @click="openCarUrl" icon="el-icon-link" size="small">打開</el-button>
+            </template>
+          </el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">確 定</el-button>
@@ -170,7 +177,7 @@
 </template>
 
 <script>
-import { listAppointment, getAppointment, delAppointment, addAppointment, updateAppointment } from "@/api/car/appointment";
+import { listAppointment, getAppointment, delAppointment, addAppointment, updateAppointment, getCarbuyPrefix } from "@/api/car/appointment";
 
 export default {
   name: "Appointment",
@@ -195,6 +202,8 @@ export default {
       title: "",
       // 是否顯示彈出層
       open: false,
+      // 車輛網址前綴
+      carbuyPrefix: '',
       // 查詢參數
       queryParams: {
         pageNum: 1,
@@ -224,6 +233,7 @@ export default {
   },
   created() {
     this.getList();
+    this.getCarbuyPrefixConfig();
   },
   methods: {
     /** 查詢預約看車列表 */
@@ -253,7 +263,8 @@ export default {
         appointmentStatus: 1,
         delFlag: false,
         createTime: null,
-        updateTime: null
+        updateTime: null,
+        carUrl: null
       };
       this.resetForm("form");
     },
@@ -278,6 +289,12 @@ export default {
       this.reset();
       this.open = true;
       this.title = "添加預約";
+      // 如果新增时有carSaleId（例如从URL参数传入），则计算车辆网址
+      this.$nextTick(() => {
+        if (this.form.carSaleId) {
+          this.calculateCarUrl();
+        }
+      });
     },
     /** 修改按鈕操作 */
     handleUpdate(row) {
@@ -285,9 +302,36 @@ export default {
       const id = row.id || this.ids
       getAppointment(id).then(response => {
         this.form = response.data;
+        // 如果后端没有返回carUrl，则根据carSaleId计算
+        if (!this.form.carUrl && this.form.carSaleId) {
+          this.calculateCarUrl();
+        }
         this.open = true;
         this.title = "修改預約";
       });
+    },
+    /** 獲取車輛網址前綴配置 */
+    getCarbuyPrefixConfig() {
+      getCarbuyPrefix().then(response => {
+        if (response.data) {
+          this.carbuyPrefix = response.data;
+        }
+      }).catch(() => {
+        // 如果获取失败，使用默认值
+        this.carbuyPrefix = 'https://carbuy.com.tw';
+      });
+    },
+    /** 計算車輛網址 */
+    calculateCarUrl() {
+      if (this.form.carSaleId && this.carbuyPrefix) {
+        this.form.carUrl = this.carbuyPrefix + '/detail/' + this.form.carSaleId;
+      }
+    },
+    /** 打開車輛網址 */
+    openCarUrl() {
+      if (this.form.carUrl) {
+        window.open(this.form.carUrl, '_blank');
+      }
     },
     /** 提交按鈕 */
     submitForm() {

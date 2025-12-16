@@ -1,4 +1,5 @@
 <link href="/css/car-detail.css" rel="stylesheet">
+<link href="/css/buy-cars.css" rel="stylesheet">
 <link rel="canonical" href="${ogUrl!''}">
 <div class="dealer-detail" id="app">
     <!-- 第一行：图片和信息 -->
@@ -148,14 +149,70 @@
             
             <!-- 店家精選 Tab -->
             <div v-show="activeTab.code === 'dealer_cars'">
-                <div v-if="cars && cars.length > 0" class="cars-list">
+                <div v-if="cars && cars.length > 0" class="cars-list-detail-style">
                     <div class="row">
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" v-for="(car, index) in cars" :key="index">
-                            <a :href="'/detail/' + car.id" class="car-card-link">
-                                <div class="car-card">
-                                    <img :src="car.image" :alt="car.model" class="car-image" @error="handleCarImageError">
-                                    <h3 class="car-model">{{ car.model }}</h3>
-                                    <p class="car-price">{{ '$' + car.price }}</p>
+                        <div v-for="(car, index) in cars" :key="index" class="col-12 col-lg-6 mb-3">
+                            <a :href="'/detail/' + car.id" class="car-item-detail-link">
+                                <div class="car-item-detail">
+                                    <div class="row">
+                                        <!-- 左侧图片 -->
+                                        <div class="col-md-6">
+                                            <div class="car-image-wrapper">
+                                                <img :src="car.coverImage || '/img/car/car6.jpg'" 
+                                                     :alt="car.saleTitleJoin || ''" 
+                                                     class="car-detail-image" 
+                                                     @error="handleCarImageError">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 右侧信息 -->
+                                        <div class="col-md-6">
+                                            <h2 class="car-title">
+                                                {{ car.saleTitleJoin || '' }}
+                                            </h2>
+                                            <div class="price">
+                                                <span>$</span><span>
+                                                    {{ car.salePrice ? formatPrice(car.salePrice) : '面議' }}
+                                                </span>
+                                            </div>
+                                            <div class="specs">
+                                                <div class="row">
+                                                    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                        <div class="spec-name text-muted">年份</div>
+                                                        <div class="spec-value">{{ car.manufactureYear || '--' }}</div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                        <div class="spec-name text-muted">里程</div>
+                                                        <div class="spec-value">{{ car.mileage ? formatMileage(car.mileage) + ' km' : '--' }}</div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                        <div class="spec-name text-muted">排量</div>
+                                                        <div class="spec-value">{{ car.displacement || '--' }}</div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                        <div class="spec-name text-muted">變速箱</div>
+                                                        <div class="spec-value">{{ car.transmission || '--' }}</div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                        <div class="spec-name text-muted">燃料</div>
+                                                        <div class="spec-value">{{ car.fuelSystem || '--' }}</div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                        <div class="spec-name text-muted">顏色</div>
+                                                        <div class="spec-value">{{ car.color || '--' }}</div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                        <div class="spec-name text-muted">車門</div>
+                                                        <div class="spec-value">{{ car.doorCount ? car.doorCount + '門' : '--' }}</div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                        <div class="spec-name text-muted">座位</div>
+                                                        <div class="spec-value">{{ car.passengerCount ? car.passengerCount + '座' : '--' }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </a>
                         </div>
@@ -296,7 +353,15 @@ new Vue({
             }
         },
         handleCarImageError: function(event) {
-            event.target.src = '/img/car/car4.jpg';
+            event.target.src = '/img/car/car6.jpg';
+        },
+        formatPrice: function(price) {
+            if (!price) return '0';
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        },
+        formatMileage: function(mileage) {
+            if (!mileage) return '0';
+            return mileage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         },
         setupContentFrame: function() {
             var _this = this;

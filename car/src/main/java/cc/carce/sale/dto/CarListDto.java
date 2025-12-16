@@ -28,6 +28,9 @@ public class CarListDto {
     private String transmission;        // 变速箱
     private String fuelSystem;          // 燃料系统
     private String color;               // 颜色
+    private String displacement;        // 排量
+    private Integer doorCount;          // 车门数
+    private Integer passengerCount;     // 乘坐人数
     private String locationName;        // 地点
     private String coverImage;          // 封面图片URL
     private String status;              // 状态

@@ -1,4 +1,6 @@
 <link href="/css/home.css" rel="stylesheet">
+<link href="/css/car-detail.css" rel="stylesheet">
+<link href="/css/buy-cars.css" rel="stylesheet">
 <link href="/assets/swiper/css/swiper.min.css" rel="stylesheet">
 <script src="/assets/swiper/js/swiper.min.js"></script>
 <style>
@@ -242,15 +244,49 @@
             <div class="section-header">
                 <h2 class="section-title">精選店家</h2>
             </div>
-            <div class="marquee-container">
-                <div class="marquee-content dealers-marquee">
+            <div class="dealers-list-detail-style">
+                <div class="row">
                     <#list dealers as dealer>
-                    <a href="/dealer/${dealer.id}" class="dealer-card-link">
-                        <div class="dealer-card">
-                            <img src="${dealer.image}" alt="${dealer.name}" class="dealer-image">
-                            <h3 class="dealer-name">${dealer.name}</h3>
-                        </div>
-                    </a>
+                    <div class="col-12 col-lg-6 mb-3">
+                        <a href="/dealer/${dealer.id!''}" class="dealer-item-detail-link">
+                            <div class="dealer-item-detail">
+                                <div class="row">
+                                    <!-- 左侧照片 -->
+                                    <div class="col-md-6">
+                                        <div class="dealer-image-wrapper">
+                                            <#if dealer.photos?? && (dealer.photos?size > 0)>
+                                                <img src="${dealer.photos[0]}" 
+                                                     alt="${dealer.dealer_name!''}" 
+                                                     class="dealer-detail-image" 
+                                                     onerror="this.src='/img/car/car4.jpg'">
+                                            <#else>
+                                                <img src="/img/car/car4.jpg" 
+                                                     alt="${dealer.dealer_name!''}" 
+                                                     class="dealer-detail-image">
+                                            </#if>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 右侧信息 -->
+                                    <div class="col-md-6">
+                                        <div class="dealer-info-content">
+                                            <h3 class="dealer-registered-name">
+                                                ${dealer.dealer_name!''}
+                                            </h3>
+                                            <div class="dealer-public-address">
+                                                <i class="bi bi-geo-alt"></i>
+                                                ${dealer.public_address!''}
+                                            </div>
+                                            <div class="dealer-contact-person">
+                                                <i class="bi bi-person"></i>
+                                                聯絡人：${dealer.contact_person!''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                     </#list>
                 </div>
             </div>
@@ -263,16 +299,96 @@
             <div class="section-header">
                 <h2 class="section-title">精選好車</h2>
             </div>
-            <div class="marquee-container">
-                <div class="marquee-content cars-marquee">
+            <div class="cars-list-detail-style">
+                <div class="row">
                     <#list cars as car>
-                    <a href="/detail/${car.id}" class="car-card-link">
-                        <div class="car-card">
-                            <img src="${car.image}" alt="${car.model}" class="car-image">
-                            <h3 class="car-model">${car.model}</h3>
-                            <p class="car-price">$${car.price}</p>
-                        </div>
-                    </a>
+                    <div class="col-12 col-lg-6 mb-3">
+                        <a href="/detail/${car.id}" class="car-item-detail-link">
+                            <div class="car-item-detail">
+                                <div class="row">
+                                    <!-- 左侧图片 -->
+                                    <div class="col-md-6">
+                                        <div class="car-image-wrapper">
+                                            <img src="${car.coverImage!('/img/car/car6.jpg')}" 
+                                                 alt="${car.saleTitleJoin!''}" 
+                                                 class="car-detail-image" 
+                                                 onerror="this.src='/img/car/car6.jpg'">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 右侧信息 -->
+                                    <div class="col-md-6">
+                                        <h2 class="car-title">
+                                            ${car.saleTitleJoin!''}
+                                        </h2>
+                                        <div class="price">
+                                            <span>$</span><span>
+                                                <#if car.salePrice?? && car.salePrice gt 0>
+                                                    ${car.salePrice?string(',###')}
+                                                <#else>
+                                                    面議
+                                                </#if>
+                                            </span>
+                                        </div>
+                                        <div class="specs">
+                                            <div class="row">
+                                                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                    <div class="spec-name text-muted">年份</div>
+                                                    <div class="spec-value">${car.manufactureYear!''}</div>
+                                                </div>
+                                                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                    <div class="spec-name text-muted">里程</div>
+                                                    <div class="spec-value">
+                                                        <#if car.mileage?? && car.mileage gt 0>
+                                                            ${car.mileage?string(',###')} km
+                                                        <#else>
+                                                            --
+                                                        </#if>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                    <div class="spec-name text-muted">排量</div>
+                                                    <div class="spec-value">${car.displacement!''}</div>
+                                                </div>
+                                                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                    <div class="spec-name text-muted">變速箱</div>
+                                                    <div class="spec-value">${car.transmission!''}</div>
+                                                </div>
+                                                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                    <div class="spec-name text-muted">燃料</div>
+                                                    <div class="spec-value">${car.fuelSystem!''}</div>
+                                                </div>
+                                                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                    <div class="spec-name text-muted">顏色</div>
+                                                    <div class="spec-value">${car.color!''}</div>
+                                                </div>
+                                                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                    <div class="spec-name text-muted">車門</div>
+                                                    <div class="spec-value">
+                                                        <#if car.doorCount?? && car.doorCount gt 0>
+                                                            ${car.doorCount}門
+                                                        <#else>
+                                                            --
+                                                        </#if>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                    <div class="spec-name text-muted">座位</div>
+                                                    <div class="spec-value">
+                                                        <#if car.passengerCount?? && car.passengerCount gt 0>
+                                                            ${car.passengerCount}座
+                                                        <#else>
+                                                            --
+                                                        </#if>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                     </#list>
                 </div>
             </div>

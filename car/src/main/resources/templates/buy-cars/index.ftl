@@ -1,5 +1,43 @@
 <link href="/css/buy-cars.css" rel="stylesheet">
 <link href="/css/car-search-form.css" rel="stylesheet">
+<link href="/css/car-detail.css" rel="stylesheet">
+<link href="/css/home.css" rel="stylesheet">
+<style>
+/* 车辆列表页专用样式 - 图片正方形，左右比例4:8 */
+.buy-cars-page .car-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* 1:1 Aspect Ratio (正方形) */
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.buy-cars-page .car-detail-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.spec-name.text-muted{
+    padding-left: 2px !important;
+    height: 1.2rem !important;
+    border-left-width: 2px !important;
+    font-size: 13px !important;
+}
+.spec-value{
+    font-size: 13px !important;
+}
+.car-item-detail{
+    padding-bottom: 5px;
+}
+.buy-cars-page .car-item-detail:hover .car-detail-image {
+    transform: scale(1.03);
+}
+</style>
 
 <!-- 搜索表单（在Vue实例外部） -->
 <#include "../components/car-search-form.ftl">
@@ -8,7 +46,7 @@
     <div class="container">
         <div class="row">
             <!-- 车辆列表 -->
-            <div class="col-12">
+            <div class="col-12 col-lg-9">
                 <div class="cars-content">
                     <!-- 结果统计 -->
                     <div class="results-header">
@@ -33,35 +71,68 @@
                         <p>正在加载车辆数据...</p>
                     </div>
 
-                    <!-- 车辆网格 -->
-                    <div v-else class="cars-grid">
-                        <div v-for="car in cars" :key="car.id" class="car-card" @click="goToCarDetail(car.id)">
-                            <div class="car-image-container">
-                                <img :src="car.coverImage || '/img/car/car6.jpg'" :alt="car.saleTitle" class="car-image" @error="handleImageError">
-                                <div class="car-badge" v-text="car.manufactureYear"></div>
-                            </div>
-                            <div class="car-info">
-                                <h3 class="car-title" v-text="car.saleTitleJoin + ' ' + car.saleTitle"></h3>
-                                <div class="car-price-section">
-                                    <span class="price-amount" v-text="'$' + formatPrice(car.salePrice)"></span>
-                                </div>
-                                <div class="car-specs">
-                                    <div class="spec-item" v-if="car.fuelSystem">
-                                        <div class="spec-content">
-                                            <div class="spec-label">燃料类型</div>
-                                            <div class="spec-value" v-text="car.fuelSystem"></div>
+                    <!-- 车辆列表 -->
+                    <div v-else class="cars-list-detail-style">
+                        <div class="row">
+                            <div v-for="car in cars" :key="car.id" class="col-12 col-lg-6 mb-3">
+                                <div class="car-item-detail" @click="goToCarDetail(car.id)">
+                                    <div class="row">
+                                        <!-- 左侧图片 -->
+                                        <div class="col-md-4">
+                                            <div class="car-image-wrapper">
+                                                <img :src="car.coverImage || '/img/car/car6.jpg'" 
+                                                     :alt="car.saleTitle" 
+                                                     class="car-detail-image" 
+                                                     @error="handleImageError">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 右侧信息 -->
+                                        <div class="col-md-8">
+                                    <h2 class="car-title" style="padding-bottom: 0px;margin-bottom: 0px;">
+                                        {{ car.saleTitleJoin }}
+                                    </h2>
+                                    <div class="price" style="margin-bottom: 3px;">
+                                        <span>$</span><span>
+                                            {{ car.salePrice ? formatPrice(car.salePrice) : '面議' }}
+                                        </span>
+                                    </div>
+                                    <div class="specs">
+                                        <div class="row">
+                                            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                <div class="spec-name text-muted">年份</div>
+                                                <div class="spec-value">{{ car.manufactureYear || '--' }}</div>
+                                            </div>
+                                            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                <div class="spec-name text-muted">里程</div>
+                                                <div class="spec-value">{{ car.mileage ? formatMileage(car.mileage) + ' km' : '--' }}</div>
+                                            </div>
+                                            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                <div class="spec-name text-muted">排量</div>
+                                                <div class="spec-value">{{ car.displacement || '--' }}</div>
+                                            </div>
+                                            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                <div class="spec-name text-muted">變速箱</div>
+                                                <div class="spec-value">{{ car.transmission || '--' }}</div>
+                                            </div>
+                                            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                <div class="spec-name text-muted">燃料</div>
+                                                <div class="spec-value">{{ car.fuelSystem || '--' }}</div>
+                                            </div>
+                                            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                <div class="spec-name text-muted">顏色</div>
+                                                <div class="spec-value">{{ car.color || '--' }}</div>
+                                            </div>
+                                            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                <div class="spec-name text-muted">車門</div>
+                                                <div class="spec-value">{{ car.doorCount ? car.doorCount + '門' : '--' }}</div>
+                                            </div>
+                                            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                                                <div class="spec-name text-muted">座位</div>
+                                                <div class="spec-value">{{ car.passengerCount ? car.passengerCount + '座' : '--' }}</div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="spec-item" v-if="car.mileage">
-                                        <div class="spec-content">
-                                            <div class="spec-label">里程</div>
-                                            <div class="spec-value" v-text="formatMileage(car.mileage) + ' km'"></div>
-                                        </div>
-                                    </div>
-                                    <div class="spec-item" v-if="car.transmission">
-                                        <div class="spec-content">
-                                            <div class="spec-label">变速箱</div>
-                                            <div class="spec-value" v-text="car.transmission"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -98,6 +169,88 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 右侧广告栏（PC端） -->
+            <div class="col-12 col-lg-3 d-none d-lg-block">
+                <div class="cars-ads-sidebar">
+                    <div v-for="(ad, index) in advertisements.slice(0, 2)" :key="ad.id" class="mb-3">
+                        <div class="ad-card" :data-ad-id="ad.id">
+                            <!-- 連結類型广告 -->
+                            <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
+                                <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
+                                     @error="handleAdImageError($event, ad.title)">
+                                <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                                <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                            </a>
+                            <!-- 內容類型广告 -->
+                            <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                                <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
+                                     @error="handleAdImageError($event, ad.title)">
+                                <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                                <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 當沒有廣告數據时顯示默認内容 -->
+                    <template v-if="!advertisements || advertisements.length === 0">
+                        <div class="mb-3">
+                            <div class="ad-card">
+                                <img src="/img/ad1.jpg" alt="专业检测" class="ad-image" 
+                                     @error="handleAdImageError($event, '專業檢測')">
+                                <div class="ad-title-overlay" style="display: none;">專業檢測</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="ad-card">
+                                <iframe src="/ad-content.html" class="ad-iframe" frameborder="0"></iframe>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 手机端广告（显示在页面下方） -->
+        <div class="row d-lg-none mt-4">
+            <div class="col-12">
+                <div class="cars-ads-mobile">
+                    <div v-for="(ad, index) in advertisements.slice(0, 2)" :key="ad.id" class="mb-3">
+                        <div class="ad-card" :data-ad-id="ad.id">
+                            <!-- 連結類型广告 -->
+                            <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
+                                <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
+                                     @error="handleAdImageError($event, ad.title)">
+                                <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                                <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                            </a>
+                            <!-- 內容類型广告 -->
+                            <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                                <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
+                                     @error="handleAdImageError($event, ad.title)">
+                                <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
+                                <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 當沒有廣告數據时顯示默認内容 -->
+                    <template v-if="!advertisements || advertisements.length === 0">
+                        <div class="mb-3">
+                            <div class="ad-card">
+                                <img src="/img/ad1.jpg" alt="专业检测" class="ad-image" 
+                                     @error="handleAdImageError($event, '專業檢測')">
+                                <div class="ad-title-overlay" style="display: none;">專業檢測</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="ad-card">
+                                <iframe src="/ad-content.html" class="ad-iframe" frameborder="0"></iframe>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -112,6 +265,7 @@ new Vue({
         currentPage: 1,
         totalPages: 0,
         pageSize: 24,
+        advertisements: [],
         searchForm: {
             keyword: '',
             brand: [],
@@ -167,6 +321,7 @@ new Vue({
         this.loadCars();
         this.loadBrandSaleCount();
         this.loadCarFilterOptions();
+        this.getAdvertisements();
         
         // 监听搜索表单组件的搜索事件
         window.addEventListener('carSearch', (event) => {
@@ -333,6 +488,45 @@ new Vue({
             const keyword = urlParams.get('keyword');
             if (keyword) {
                 this.searchForm.keyword = keyword;
+            }
+        },
+        
+        // 获取广告数据
+        getAdvertisements() {
+            let _this = this;
+            $.ajax({
+                url: '/api/advertisement/list',
+                method: 'GET',
+                success: (data) => {
+                    // 过滤出 advType=0 的前两条数据
+                    const filteredAds = data.data.filter(ad => ad.advType === 0).slice(0, 2);
+                    _this.advertisements = filteredAds;
+                },
+                error: (error) => {
+                    console.log('获取广告数据失败:', error);
+                }
+            });
+        },
+        
+        // 顯示廣告內容
+        showAdContent(adId, title, content) {
+            // 檢查adId是否有效
+            if (!adId || adId === 'null' || adId === '') {
+                console.error('廣告ID無效:', adId);
+                return;
+            }
+            // 打開新窗口顯示廣告內容頁面
+            window.open('/ad-content/' + adId, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+        },
+        
+        handleAdImageError(event, title) {
+            // 图片加载失败时的处理
+            if (title) {
+                event.target.style.display = 'none';
+                const titleElement = event.target.nextElementSibling;
+                if (titleElement && titleElement.classList.contains('ad-title-overlay')) {
+                    titleElement.style.display = 'block';
+                }
             }
         },
         

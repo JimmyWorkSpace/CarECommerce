@@ -23,4 +23,5 @@ public class CarProductListDto {
     private Long categoryId;  // 分类ID
     private String productTags;  // 商品标签
     private Long promotionalPrice;  // 特惠价
+    private Long originalPrice;  // 原价（salePrice），用于显示划线价格
 }

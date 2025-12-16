@@ -332,15 +332,20 @@ public class ECPayService {
                         Long productId = cartItem.getProductId();
                         Integer productAmount = cartItem.getProductAmount();
                         
-                        // 从car_product表查询salePrice
+                        // 从car_product表查询商品信息
                         CarProductEntity product = carProductService.getProductById(productId);
                         if (product == null) {
                             log.error("商品不存在，商品ID：{}", productId);
                             return R.fail("商品不存在，商品ID：" + productId, null);
                         }
                         
-                        // 使用salePrice作为商品价格
-                        int productPrice = product.getSalePrice() != null ? product.getSalePrice().intValue() : 0;
+                        // 优先使用特惠价，如果特惠价为null则使用销售价
+                        int productPrice = 0;
+                        if (product.getPromotionalPrice() != null) {
+                            productPrice = product.getPromotionalPrice().intValue();
+                        } else if (product.getSalePrice() != null) {
+                            productPrice = product.getSalePrice().intValue();
+                        }
                         int itemTotal = productPrice * productAmount;
                         totalAmount += itemTotal;
                         

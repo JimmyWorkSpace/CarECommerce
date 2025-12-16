@@ -42,3 +42,11 @@ export function delAppointment(id) {
     method: 'delete'
   })
 }
+
+// 获取车辆网址前缀配置
+export function getCarbuyPrefix() {
+  return request({
+    url: '/car/appointment/carbuy-prefix',
+    method: 'get'
+  })
+}

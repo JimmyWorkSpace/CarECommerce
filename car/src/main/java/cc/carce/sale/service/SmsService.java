@@ -72,23 +72,23 @@ public class SmsService {
         SMS_CODE_MAP.put(phoneNumber, new SmsCode(code, expireTime));
 
         // 构建短信内容
-        String message = String.format("您的验证码是：%s，%d分钟内有效，请勿泄露给他人。", code, CODE_EXPIRE_MINUTES);
+        String message = String.format("您的驗證碼是：%s，%d分鐘內有效，請勿洩露給他人。", code, CODE_EXPIRE_MINUTES);
 
         try {
             // 所有环境都实际发送短信
             SmsResponse result = sendSms(phoneNumber, message);
-            log.info("=== 短信验证码发送结果 ===");
-            log.info("手机号: {}", phoneNumber);
-            log.info("验证码: {}", code);
-            log.info("有效期: {} 分钟", CODE_EXPIRE_MINUTES);
-            log.info("短信内容: {}", message);
-            log.info("发送结果: {}", result);
+            log.info("=== 簡訊驗證碼發送結果 ===");
+            log.info("手機號: {}", phoneNumber);
+            log.info("驗證碼: {}", code);
+            log.info("有效期: {} 分鐘", CODE_EXPIRE_MINUTES);
+            log.info("簡訊內容: {}", message);
+            log.info("發送結果: {}", result);
             log.info("========================");
         } catch (Exception e) {
-            log.error("发送短信验证码失败，手机号: {}, 错误: {}", phoneNumber, e.getMessage(), e);
+            log.error("發送簡訊驗證碼失敗，手機號: {}, 錯誤: {}", phoneNumber, e.getMessage(), e);
             // 发送失败时从缓存中移除验证码
             SMS_CODE_MAP.remove(phoneNumber);
-            throw new RuntimeException("短信发送失败: " + e.getMessage());
+            throw new RuntimeException("發送簡訊驗證碼失敗: " + e.getMessage());
         }
 
         return code;
@@ -105,26 +105,26 @@ public class SmsService {
         SmsCode smsCode = SMS_CODE_MAP.get(phoneNumber);
 
         if (smsCode == null) {
-            log.warn("手机号 {} 没有发送过验证码", phoneNumber);
+            log.warn("手機號 {} 沒有發送過驗證碼", phoneNumber);
             return false;
         }
 
         // 检查验证码是否过期
         if (System.currentTimeMillis() > smsCode.getExpireTime()) {
-            log.warn("手机号 {} 的验证码已过期", phoneNumber);
+            log.warn("手機號 {} 的驗證碼已過期", phoneNumber);
             SMS_CODE_MAP.remove(phoneNumber);
             return false;
         }
 
         // 检查验证码是否正确
         if (!smsCode.getCode().equals(code)) {
-            log.warn("手机号 {} 的验证码不正确，输入: {}, 正确: {}", phoneNumber, code, smsCode.getCode());
+            log.warn("手機號 {} 的驗證碼不正確，輸入: {}, 正確: {}", phoneNumber, code, smsCode.getCode());
             return false;
         }
 
         // 验证成功后删除验证码
         SMS_CODE_MAP.remove(phoneNumber);
-        log.info("手机号 {} 验证码验证成功", phoneNumber);
+        log.info("手機號 {} 驗證碼驗證成功", phoneNumber);
         return true;
     }
 
@@ -145,7 +145,7 @@ public class SmsService {
         long timeSinceLastSend = currentTime - lastSendTime;
         
         if (timeSinceLastSend < SEND_INTERVAL_SECONDS * 1000) {
-            log.info("手机号 {} 距离上次发送验证码不足 {} 秒，剩余 {} 秒", 
+            log.info("手機號 {} 距離上次發送驗證碼不足 {} 秒，剩余 {} 秒", 
                     phoneNumber, SEND_INTERVAL_SECONDS, 
                     (SEND_INTERVAL_SECONDS * 1000 - timeSinceLastSend) / 1000);
             return false;
