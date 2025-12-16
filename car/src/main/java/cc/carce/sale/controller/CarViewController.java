@@ -189,76 +189,33 @@ public class CarViewController extends BaseController {
             // 设置首页主图
             
             // 设置精选好车数据 - 从数据库查询推荐车辆
-            List<Map<String, String>> cars = new ArrayList<>();
+            List<CarListDto> recommendedCars = new ArrayList<>();
             try {
-                List<CarListDto> recommendedCars = carSalesService.getRecommendedCarListDto(9);
-                for (CarListDto carDto : recommendedCars) {
-                    Map<String, String> car = new HashMap<>();
-                    // 构建车型信息 - 使用品牌、型号、年份组合
-                    String carModel = carDto.getSaleTitleJoin() + " " + carDto.getSaleTitle();
-                    car.put("model", carModel);
-                    
-                    // 格式化价格
-                    String price = "面議";
-                    if (carDto.getSalePrice() != null && carDto.getSalePrice() > 0) {
-                        price = String.format("%,d", carDto.getSalePrice());
-                    }
-                    car.put("price", price);
-                    
-                    // 设置图片 - 使用封面图片，如果没有则使用默认图片
-                    String image = carDto.getCoverImage();
-                    if (image == null || image.isEmpty()) {
-                        image = "/img/car/car" + (8 + cars.size() + 1) + ".jpg";
-                    }
-                    car.put("image", image);
-                    
-                    // 添加车辆ID用于链接
-                    car.put("id", carDto.getId() != null ? carDto.getId().toString() : "");
-                    car.put("uid", carDto.getUid() != null ? carDto.getUid() : "");
-                    
-                    cars.add(car);
-                }
+                recommendedCars = carSalesService.getRecommendedCarListDto(9);
             } catch (Exception e) {
                 log.error("获取推荐车辆失败，使用默认数据", e);
             }
             
-            model.addAttribute("cars", cars);
+            model.addAttribute("cars", recommendedCars);
 			model.addAttribute("allCars", carSalesService.getAllCars());
             
             // 设置精选店家数据 - 从数据库查询推荐店家
-            List<Map<String, String>> dealers = new ArrayList<>();
+            List<Map<String, Object>> dealers = new ArrayList<>();
             try {
                 List<CarDealerEntity> recommendedDealers = carSalesService.getRecommendedDealers(6);
-                String[] carImages = {
-                    "/img/car/car4.jpg", "/img/car/car6.jpg", "/img/car/car8.jpg", 
-                    "/img/car/car9.jpg", "/img/car/car10.jpg", "/img/car/car11.jpg"
-                };
                 
-                for (int i = 0; i < recommendedDealers.size(); i++) {
-                    CarDealerEntity dealerEntity = recommendedDealers.get(i);
-                    Map<String, String> dealer = new HashMap<>();
-                    
-                    // 设置店家名称
-                    String dealerName = dealerEntity.getDealerName() != null ? 
-                        dealerEntity.getDealerName() : "精選店家";
-                    dealer.put("name", dealerName);
-                    
-                    // 设置图片 - 使用默认图片或根据索引生成
-                    String image = carImages[i % carImages.length];
-                    dealer.put("image", image);
-                    
-                    // 添加店家ID用于链接
-                    dealer.put("id", dealerEntity.getId().toString());
-                    
-                    // 添加其他有用信息
-                    if (dealerEntity.getPublicAddress() != null) {
-                        dealer.put("address", dealerEntity.getPublicAddress());
+                for (CarDealerEntity dealerEntity : recommendedDealers) {
+                    // 获取完整的店家信息（包括照片）
+                    CarDealerInfoDto dealerInfo = carDealerService.getInfoByDealerId(dealerEntity.getId());
+                    if (dealerInfo != null) {
+                        Map<String, Object> dealer = new HashMap<>();
+                        dealer.put("id", dealerEntity.getId());
+                        dealer.put("dealer_name", dealerEntity.getDealerName());
+                        dealer.put("public_address", dealerEntity.getPublicAddress());
+                        dealer.put("contact_person", dealerEntity.getContactPerson());
+                        dealer.put("photos", dealerInfo.getPhotos());
+                        dealers.add(dealer);
                     }
-                    if (dealerEntity.getCompanyPhone() != null) {
-                        dealer.put("phone", dealerEntity.getCompanyPhone());
-                    }
-                    
-                    dealers.add(dealer);
                 }
             } catch (Exception e) {
                 log.error("获取推荐店家失败，使用默认数据", e);
@@ -570,41 +527,10 @@ public class CarViewController extends BaseController {
             }
             
             // 获取该店家的车辆列表
-            List<Map<String, String>> cars = new ArrayList<>();
+            List<CarListDto> cars = new ArrayList<>();
             if (idGarage != null) {
                 try {
-                    List<CarListDto> carList = carSalesService.getCarsByGarageId(idGarage);
-                    String[] carImages = {
-                        "/img/car/car4.jpg", "/img/car/car6.jpg", "/img/car/car8.jpg", 
-                        "/img/car/car9.jpg", "/img/car/car10.jpg", "/img/car/car11.jpg"
-                    };
-                    
-                    for (int i = 0; i < carList.size(); i++) {
-                        CarListDto carDto = carList.get(i);
-                        Map<String, String> car = new HashMap<>();
-                        
-                        // 构建车型信息
-                        String carModel = carDto.getSaleTitleJoin() + " " + carDto.getSaleTitle();
-                        car.put("model", carModel);
-                        
-                        // 格式化价格
-                        String price = "面議";
-                        if (carDto.getSalePrice() != null && carDto.getSalePrice() > 0) {
-                            price = String.format("%,d", carDto.getSalePrice());
-                        }
-                        car.put("price", price);
-                        
-                        // 设置图片
-                        String image = carDto.getCoverImage() != null && !carDto.getCoverImage().isEmpty() ? 
-                            carDto.getCoverImage() : carImages[i % carImages.length];
-                        car.put("image", image);
-                        
-                        // 添加车辆ID用于链接
-                        car.put("id", carDto.getId().toString());
-                        car.put("uid", carDto.getUid() != null ? carDto.getUid() : "");
-                        
-                        cars.add(car);
-                    }
+                    cars = carSalesService.getCarsByGarageId(idGarage);
                 } catch (Exception e) {
                     log.error("获取店家车辆列表失败", e);
                 }

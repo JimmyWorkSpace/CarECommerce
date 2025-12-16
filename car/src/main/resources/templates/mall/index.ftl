@@ -101,9 +101,9 @@
                         <div class="price-row">
                             <span v-if="product.promotionalPrice" class="price-label promotional-label">特惠價</span>
                             <span v-if="product.promotionalPrice" class="price-symbol promotional-symbol">${CurrencyUnit}</span>
-                            <span v-if="product.promotionalPrice" class="price-amount promotional-amount">{{ formatPrice(product.promotionalPrice) }}</span>
-                            <span v-if="product.promotionalPrice" class="price-market text-decoration-line-through text-muted ms-2">
-                                售價 ${CurrencyUnit}{{ formatPrice(product.price) }}
+                            <span v-if="product.promotionalPrice" class="price-amount promotional-amount">{{ formatPrice(product.price) }}</span>
+                            <span v-if="product.originalPrice" class="price-market text-decoration-line-through text-muted ms-2">
+                                售價 ${CurrencyUnit}{{ formatPrice(product.originalPrice) }}
                             </span>
                             <span v-if="!product.promotionalPrice" class="price-label">售價</span>
                             <span v-if="!product.promotionalPrice" class="price-symbol">${CurrencyUnit}</span>
@@ -562,7 +562,7 @@ new Vue({
                             }
                         }, 300);
                     } catch (e) {
-                        console.error('解析待加购商品信息失败:', e);
+                        console.error('解析待加購商品信息失敗:', e);
                     }
                 }
             }
@@ -577,10 +577,10 @@ new Vue({
                     this.categoryTree = response.data.data || [];
                     this.firstLevelCategories = this.categoryTree;
                 } else {
-                    console.error('加载分类树失败:', response.data.message);
+                    console.error('載入分類樹失敗:', response.data.message);
                 }
             } catch (error) {
-                console.error('加载分类树失败:', error);
+                console.error('載入分類樹失敗:', error);
             }
         },
         
@@ -627,12 +627,12 @@ new Vue({
                     this.filteredProducts = [...this.products];
                     this.calculatePagination();
                 } else {
-                    this.error = response.data.message || '加载商品失败';
+                    this.error = response.data.message || '載入商品失敗';
                 }
                 
             } catch (error) {
-                console.error('加载商品失败:', error);
-                this.error = '加载商品失败，请稍后重试';
+                console.error('載入商品失敗:', error);
+                this.error = '載入商品失敗，請稍後重試';
             } finally {
                 this.loading = false;
             }
@@ -683,7 +683,7 @@ new Vue({
                 this.calculatePagination();
                 
             } catch (error) {
-                console.error('过滤商品失败:', error);
+                console.error('過濾商品失敗:', error);
                 // 使用本地过滤作为备选方案
                 if (!this.selectedFirstCategory && !this.selectedSecondCategory) {
                     this.filteredProducts = [...this.products];
@@ -756,21 +756,21 @@ new Vue({
                 
                 if (response.data.success) {
                     this.filteredProducts = response.data.data || [];
-                    this.message = '已找到 ' + this.filteredProducts.length + ' 个包含标签"' + tag + '"的商品';
+                    this.message = '已找到 ' + this.filteredProducts.length + ' 個包含標籤"' + tag + '"的商品';
                     // 3秒后自动清除消息
                     setTimeout(() => {
                         this.message = '';
                     }, 3000);
                 } else {
-                    this.error = response.data.message || '搜索失败';
+                    this.error = response.data.message || '搜索失敗';
                     this.filteredProducts = [];
                 }
                 
                 this.calculatePagination();
                 
             } catch (error) {
-                console.error('根据标签搜索商品失败:', error);
-                this.error = '搜索失败，请稍后重试';
+                console.error('根據標籤搜索商品失敗:', error);
+                this.error = '搜索失敗，請稍後重試';
                 this.filteredProducts = [];
                 this.calculatePagination();
             } finally {
@@ -840,9 +840,9 @@ new Vue({
             } catch (error) {
                 console.error('添加到購物車失敗:', error);
                 if (error.response && error.response.data) {
-                    this.error = error.response.data.message || '添加到購物車失敗';
+                    this.error = error.response.data.message || '加入購物車失敗';
                 } else {
-                    this.error = '网络错误，请稍后重试';
+                    this.error = '網絡錯誤，請稍後重試';
                 }
             } finally {
                 this.addingToCart = null;

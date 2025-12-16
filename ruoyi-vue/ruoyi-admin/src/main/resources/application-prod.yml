@@ -1,5 +1,6 @@
 carce:
   prefix: https://testcloud.carce.cc
+  carbuy-prefix: https://carbuy.com.tw
   webUrl: https://sale.carce.cc
   ftp:
     server: 125.227.138.209

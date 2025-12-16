@@ -277,7 +277,15 @@ public class CarProductService {
         dto.setName(product.getProductTitle());
         dto.setAlias(product.getProductDespShort());
         dto.setModel(null); // 新表没有model字段
-        dto.setPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
+        // 优先使用特惠价，如果特惠价为null则使用销售价
+        if (product.getPromotionalPrice() != null) {
+            dto.setPrice(product.getPromotionalPrice().longValue());
+            // 如果有特惠价，保存原价（salePrice）用于显示
+            dto.setOriginalPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : null);
+        } else {
+            dto.setPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
+            dto.setOriginalPrice(null);
+        }
         dto.setMarketPrice(product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L);
         dto.setPromotionalPrice(product.getPromotionalPrice() != null ? product.getPromotionalPrice().longValue() : null);
         dto.setBrand(null); // 新表没有brand字段

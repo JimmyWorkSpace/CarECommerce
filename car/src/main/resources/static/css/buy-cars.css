@@ -5,6 +5,11 @@
     min-height: 100vh;
 }
 
+.buy-cars-page .container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 /* 加载状态样式 */
 .loading-container {
     text-align: center;
@@ -272,6 +277,295 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
+}
+
+/* 车辆列表详情样式 */
+.cars-list-detail-style {
+    margin-bottom: 30px;
+}
+
+.car-item-detail {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    cursor: pointer;
+    padding: 15px;
+    height: 100%;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.car-item-detail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    text-decoration: none;
+    color: inherit;
+}
+
+.car-item-detail-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.car-item-detail-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* 店家列表详情样式 */
+.dealers-list-detail-style {
+    margin-bottom: 30px;
+}
+
+.dealer-item-detail {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    cursor: pointer;
+    padding: 15px;
+    height: 100%;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.dealer-item-detail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    text-decoration: none;
+    color: inherit;
+}
+
+.dealer-item-detail-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.dealer-item-detail-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.dealer-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 60%; /* 16:9 Aspect Ratio */
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.dealer-detail-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.dealer-item-detail:hover .dealer-detail-image {
+    transform: scale(1.03);
+}
+
+.dealer-info-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-left: 15px;
+    margin-top: 10px;
+}
+
+.dealer-registered-name {
+    color: #5ACFC9;
+    font-size: 1.2rem;
+    font-weight: 560;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.dealer-public-address {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.dealer-public-address i {
+    color: #5ACFC9;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.dealer-contact-person {
+    color: #666;
+    font-size: 0.95rem;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dealer-contact-person i {
+    color: #5ACFC9;
+    flex-shrink: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 991.98px) {
+    .dealer-item-detail {
+        padding: 12px;
+    }
+    
+    .dealer-registered-name {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+    
+    .dealer-public-address,
+    .dealer-contact-person {
+        font-size: 0.9rem;
+    }
+    
+    .dealer-info-content {
+        padding-left: 12px;
+    }
+}
+
+/* 车辆列表页广告样式 */
+.cars-ads-sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+.cars-ads-sidebar .ad-card {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.cars-ads-mobile .ad-card {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.car-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 60%; /* 16:9 Aspect Ratio */
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.car-detail-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.car-item-detail:hover .car-detail-image {
+    transform: scale(1.03);
+}
+
+/* 调整车辆列表中的标题和价格样式 */
+.cars-list-detail-style .car-title {
+    color: #5ACFC9;
+    text-align: left;
+    font-weight: 560;
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 10;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.cars-list-detail-style .price {
+    text-align: left;
+    padding-left: 2px;
+    color: #FA9F42;
+    margin-bottom: 10px;
+}
+
+.cars-list-detail-style .price span {
+    font-size: 1.1rem;
+    font-weight: 540;
+    color: #FA9F42;
+}
+
+.cars-list-detail-style .specs {
+    margin-bottom: 0;
+}
+
+.cars-list-detail-style .specs .mb-3 {
+    margin-bottom: 6px !important;
+}
+
+.cars-list-detail-style .spec-name {
+    font-size: 0.9rem;
+    height: 1.5rem;
+    font-weight: normal;
+    border-left: 3px solid #5ACFC9;
+    padding-left: 0.5rem;
+    width: 100%;
+    text-align: left;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cars-list-detail-style .spec-value {
+    font-size: 0.9rem;
+    height: 1.3rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 991.98px) {
+    .cars-list-detail-style .car-item-detail {
+        padding: 12px;
+    }
+    
+    .cars-list-detail-style .car-title {
+        font-size: 1rem;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    
+    .cars-list-detail-style .price span {
+        font-size: 1rem;
+    }
+    
+    .cars-list-detail-style .spec-name {
+        font-size: 0.9rem;
+        height: 1.5rem;
+        font-weight: normal;
+        border-left: 3px solid #5ACFC9;
+        padding-left: 0.5rem;
+        width: 100%;
+        text-align: left;
+        text-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .cars-list-detail-style .spec-value {
+        font-size: 0.85rem;
+        height: 1.2rem;
+    }
 }
 
 /* 车辆卡片 */

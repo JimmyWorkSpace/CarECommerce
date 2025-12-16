@@ -61,6 +61,27 @@ public class CarShoppingCartService {
 	 */
 	public boolean addToCart(CarShoppingCartEntity cartItem) {
 		try {
+			// 从数据库重新获取商品信息，确保使用最新的价格
+			CarProductEntity product = carProductService.getProductById(cartItem.getProductId());
+			if (product == null) {
+				log.error("商品不存在，商品ID：{}", cartItem.getProductId());
+				return false;
+			}
+			
+			// 优先使用特惠价，如果特惠价为null则使用销售价
+			int productPrice = 0;
+			if (product.getPromotionalPrice() != null) {
+				productPrice = product.getPromotionalPrice().intValue();
+			} else if (product.getSalePrice() != null) {
+				productPrice = product.getSalePrice().intValue();
+			}
+			cartItem.setProductPrice(productPrice);
+			
+			// 如果商品名称为空，使用商品标题
+			if (cartItem.getProductName() == null || cartItem.getProductName().trim().isEmpty()) {
+				cartItem.setProductName(product.getProductTitle());
+			}
+			
 			// 检查是否已存在相同商品
 			CarShoppingCartEntity query = new CarShoppingCartEntity();
 			query.setUserId(cartItem.getUserId());
@@ -69,9 +90,10 @@ public class CarShoppingCartService {
 			
 			List<CarShoppingCartEntity> existing = carShoppingCartMapper.select(query);
 			if (!existing.isEmpty()) {
-				// 更新数量
+				// 更新数量，同时更新价格（以防价格变化）
 				CarShoppingCartEntity existingItem = existing.get(0);
 				existingItem.setProductAmount(existingItem.getProductAmount() + cartItem.getProductAmount());
+				existingItem.setProductPrice(productPrice); // 更新为最新价格
 				return carShoppingCartMapper.updateByPrimaryKey(existingItem) > 0;
 			} else {
 				// 新增
@@ -186,7 +208,12 @@ public class CarShoppingCartService {
 			dto.setAlias(product.getProductDespShort());
 			dto.setModel(null); // 新表没有model字段
 			dto.setMarketPrice(product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L);
-			dto.setProductPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
+			// 优先使用特惠价，如果特惠价为null则使用销售价
+			if (product.getPromotionalPrice() != null) {
+				dto.setProductPrice(product.getPromotionalPrice().longValue());
+			} else {
+				dto.setProductPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
+			}
 			dto.setBrand(null); // 新表没有brand字段
 			dto.setTag(product.getProductTags());
 			// 设置商品图片路径

@@ -44,7 +44,7 @@ public class CarUserService {
     public CarUserEntity createUser(String phoneNumber, String nickName) {
         CarUserEntity user = new CarUserEntity();
         user.setPhoneNumber(phoneNumber);
-        user.setNickName(nickName != null ? nickName : "用户" + phoneNumber.substring(7));
+        user.setNickName(nickName != null ? nickName : "用戶" + phoneNumber.substring(Math.max(0, phoneNumber.length() - 5)));
         user.setDelFlag(false);
         user.setCreateTime(new Date());
         user.setLastLoginTime(new Date());

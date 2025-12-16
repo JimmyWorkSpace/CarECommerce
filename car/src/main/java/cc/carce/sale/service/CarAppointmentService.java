@@ -3,6 +3,7 @@ package cc.carce.sale.service;
 import cc.carce.sale.dto.CarAppointmentDto;
 import cc.carce.sale.dto.CarBaseInfoDto;
 import cc.carce.sale.entity.CarAppointmentEntity;
+import cc.carce.sale.entity.CarDealerEntity;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.form.CarAppointmentForm;
 import cc.carce.sale.mapper.manager.CarAppointmentMapper;
@@ -31,9 +32,15 @@ public class CarAppointmentService {
     
     @Resource
     private CarSalesService carSalesService;
+
+    @Resource
+    private CarDealerService carDealerService;
     
     @Resource
     private SmsService smsService;
+    
+    @Value("${carce.webUrl}")
+    private String webUrl;
     
     private String dealerMobile = "0975760203";
 
@@ -226,27 +233,48 @@ public class CarAppointmentService {
             
             // 获取车辆信息用于短信内容
             String carTitle = "车辆";
+            String dealerPhone = "";
             try {
                 CarSalesEntity carSales = carSalesService.getById(appointment.getCarSaleId());
+                // CarDealerEntity dealer = carDealerService.getById(carSales.getIdGarage());
                 if (carSales != null) {
                     carTitle = carSales.getSaleTitle();
+                    // dealerPhone = carSales.getd();
                 }
             } catch (Exception e) {
                 log.warn("获取车辆信息失败，使用默认标题，carSaleId: {}", appointment.getCarSaleId());
             }
             
+            String detailUrl = webUrl + "/detail/" + appointment.getCarSaleId();
             // 1. 发送短信给客户
             String customerMsg = String.format(
-                    "親愛的 %s 您好，預約已完成！車輛: %s, 時間: %s, 如有疑問請聯繫客服。",
-                    appointment.getAppointmentName(), carTitle, formattedTime
+                    "手機號碼%s的車主,預約%s,觀看車輛資訊 %s",
+                    appointment.getAppointmentPhone(), formattedTime, detailUrl
             );
             smsService.sendSms(appointment.getAppointmentPhone(), customerMsg);
             log.info("客户预约确认短信发送成功，手机号: {}", appointment.getAppointmentPhone());
             
             // 2. 发送短信给后台管理员
+            // 掩码处理手机号：显示前3位和后4位，中间用X代替
+            String phone = appointment.getAppointmentPhone();
+            String maskedPhone = phone;
+            if (phone != null && phone.length() >= 7) {
+                int length = phone.length();
+                if (length >= 10) {
+                    // 10位或以上：前3位 + X...X + 后4位
+                    maskedPhone = phone.substring(0, 3) + "XXXXXXX" + phone.substring(length - 4);
+                } else {
+                    // 7-9位：前3位 + X...X + 后4位
+                    maskedPhone = phone.substring(0, 3) + "XXXX" + phone.substring(length - 4);
+                }
+            }
+            
+            // 构建车辆详情页URL
+            
+            // 格式化短信内容：手機號碼XXXXXXXXXX的車主,預約2025-12-14 08:00,觀看車輛資訊 https://carbuy.com.tw/detail/16
             String dealerMsg = String.format(
-                    "有新的預約: 姓名: %s, 電話: %s, 車輛: %s, 時間: %s",
-                    appointment.getAppointmentName(), appointment.getAppointmentPhone(), carTitle, formattedTime
+                    "手機號碼%s的車主,預約%s,觀看車輛資訊 %s",
+                    maskedPhone, formattedTime, detailUrl
             );
             smsService.sendSms(dealerMobile, dealerMsg);
             log.info("管理员预约通知短信发送成功，手机号: {}", dealerMobile);

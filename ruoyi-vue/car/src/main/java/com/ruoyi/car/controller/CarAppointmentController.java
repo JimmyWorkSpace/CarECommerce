@@ -21,6 +21,8 @@ import com.ruoyi.car.dto.CarAppointmentDto;
 import com.ruoyi.car.service.CarAppointmentService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.BeanUtils;
 
 /**
  * 预约看车Controller
@@ -34,6 +36,9 @@ public class CarAppointmentController extends BaseController
 {
     @Autowired
     private CarAppointmentService carAppointmentService;
+
+    @Value("${carce.carbuy-prefix}")
+    private String carbuyPrefix;
 
     /**
      * 查询预约看车列表
@@ -67,7 +72,17 @@ public class CarAppointmentController extends BaseController
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
-        return AjaxResult.success(carAppointmentService.selectCarAppointmentById(id));
+        CarAppointmentEntity entity = carAppointmentService.selectCarAppointmentById(id);
+        if (entity != null && entity.getCarSaleId() != null) {
+            // 计算车辆网址
+            String carUrl = carbuyPrefix + "/detail/" + entity.getCarSaleId();
+            // 转换为DTO并设置车辆网址
+            CarAppointmentDto dto = new CarAppointmentDto();
+            BeanUtils.copyProperties(entity, dto);
+            dto.setCarUrl(carUrl);
+            return AjaxResult.success(dto);
+        }
+        return AjaxResult.success(entity);
     }
 
     /**
@@ -101,5 +116,14 @@ public class CarAppointmentController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(carAppointmentService.deleteCarAppointmentByIds(ids));
+    }
+
+    /**
+     * 获取车辆网址前缀配置
+     */
+    @GetMapping("/carbuy-prefix")
+    public AjaxResult getCarbuyPrefix()
+    {
+        return AjaxResult.success(carbuyPrefix);
     }
 }
