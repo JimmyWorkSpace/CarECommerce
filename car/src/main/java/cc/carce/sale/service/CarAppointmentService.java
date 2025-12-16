@@ -2,6 +2,7 @@ package cc.carce.sale.service;
 
 import cc.carce.sale.dto.CarAppointmentDto;
 import cc.carce.sale.dto.CarBaseInfoDto;
+import cc.carce.sale.dto.CarDealerInfoDto;
 import cc.carce.sale.entity.CarAppointmentEntity;
 import cc.carce.sale.entity.CarDealerEntity;
 import cc.carce.sale.entity.CarSalesEntity;
@@ -39,10 +40,10 @@ public class CarAppointmentService {
     @Resource
     private SmsService smsService;
     
-    @Value("${carce.webUrl}")
+    @Value("${carce.carbuy-prefix}")
     private String webUrl;
     
-    private String dealerMobile = "0975760203";
+    // private String dealerMobile = "0975760203";
 
     /**
      * 创建预约
@@ -230,6 +231,7 @@ public class CarAppointmentService {
             // 格式化预约时间
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             String formattedTime = dateFormat.format(appointment.getAppointmentTime());
+            String custPhone = appointment.getAppointmentPhone();
             
             // 获取车辆信息用于短信内容
             String carTitle = "车辆";
@@ -239,6 +241,10 @@ public class CarAppointmentService {
                 // CarDealerEntity dealer = carDealerService.getById(carSales.getIdGarage());
                 if (carSales != null) {
                     carTitle = carSales.getSaleTitle();
+                    CarDealerInfoDto dealerInfo = carDealerService.getInfoById(carSales.getIdGarage());
+                    if (dealerInfo != null) {
+                        dealerPhone = dealerInfo.getCompanyMobile();
+                    }
                     // dealerPhone = carSales.getd();
                 }
             } catch (Exception e) {
@@ -249,35 +255,34 @@ public class CarAppointmentService {
             // 1. 发送短信给客户
             String customerMsg = String.format(
                     "手機號碼%s的車主,預約%s,觀看車輛資訊 %s",
-                    appointment.getAppointmentPhone(), formattedTime, detailUrl
+                    custPhone, formattedTime, detailUrl
             );
-            smsService.sendSms(appointment.getAppointmentPhone(), customerMsg);
-            log.info("客户预约确认短信发送成功，手机号: {}", appointment.getAppointmentPhone());
+            smsService.sendSms(custPhone, customerMsg);
+            log.info("客户预约确认短信发送成功，手机号: {}", custPhone);
             
             // 2. 发送短信给后台管理员
             // 掩码处理手机号：显示前3位和后4位，中间用X代替
-            String phone = appointment.getAppointmentPhone();
-            String maskedPhone = phone;
-            if (phone != null && phone.length() >= 7) {
-                int length = phone.length();
-                if (length >= 10) {
-                    // 10位或以上：前3位 + X...X + 后4位
-                    maskedPhone = phone.substring(0, 3) + "XXXXXXX" + phone.substring(length - 4);
-                } else {
-                    // 7-9位：前3位 + X...X + 后4位
-                    maskedPhone = phone.substring(0, 3) + "XXXX" + phone.substring(length - 4);
-                }
-            }
+            // String maskedPhone = phone;
+            // if (phone != null && phone.length() >= 7) {
+            //     int length = phone.length();
+            //     if (length >= 10) {
+            //         // 10位或以上：前3位 + X...X + 后4位
+            //         maskedPhone = phone.substring(0, 3) + "XXXXXXX" + phone.substring(length - 4);
+            //     } else {
+            //         // 7-9位：前3位 + X...X + 后4位
+            //         maskedPhone = phone.substring(0, 3) + "XXXX" + phone.substring(length - 4);
+            //     }
+            // }
             
             // 构建车辆详情页URL
             
             // 格式化短信内容：手機號碼XXXXXXXXXX的車主,預約2025-12-14 08:00,觀看車輛資訊 https://carbuy.com.tw/detail/16
             String dealerMsg = String.format(
                     "手機號碼%s的車主,預約%s,觀看車輛資訊 %s",
-                    maskedPhone, formattedTime, detailUrl
+                    custPhone, formattedTime, detailUrl
             );
-            smsService.sendSms(dealerMobile, dealerMsg);
-            log.info("管理员预约通知短信发送成功，手机号: {}", dealerMobile);
+            smsService.sendSms(dealerPhone, dealerMsg);
+            log.info("管理员预约通知短信发送成功，手机号: {}", dealerPhone);
             
         } catch (Exception e) {
             log.error("发送预约通知短信异常: {}", e.getMessage(), e);
