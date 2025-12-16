@@ -203,7 +203,7 @@
                      v-for="(ad, index) in advertisements.slice(0, 2)" :key="ad.id">
                     <div class="ad-card" :data-ad-id="ad.id">
                         <!-- 連結類型广告 -->
-                        <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link" target="_blank">
+                        <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link">
                             <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
                                  @error="handleImageError($event, ad.title)">
                             <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
@@ -564,8 +564,8 @@ new Vue({
                 console.error('廣告ID無效:', adId);
                 return;
             }
-            // 打開新窗口顯示廣告內容頁面
-            window.open('/ad-content/' + adId, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+            // 在新頁面打開廣告內容頁面
+            window.location.href = '/ad-content/' + adId;
         },
 
         // 處理圖片加載失敗

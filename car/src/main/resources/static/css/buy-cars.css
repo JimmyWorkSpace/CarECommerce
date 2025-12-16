@@ -451,13 +451,97 @@
 }
 
 .cars-ads-sidebar .ad-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
     width: 100%;
     margin-bottom: 15px;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.cars-ads-sidebar .ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.cars-ads-sidebar .ad-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cars-ads-sidebar .ad-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.cars-ads-sidebar .ad-content-link {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .cars-ads-mobile .ad-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
     width: 100%;
     margin-bottom: 15px;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.cars-ads-mobile .ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.cars-ads-mobile .ad-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cars-ads-mobile .ad-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.cars-ads-mobile .ad-content-link {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .car-image-wrapper {
