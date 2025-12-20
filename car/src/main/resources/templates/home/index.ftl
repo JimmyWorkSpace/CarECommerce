@@ -108,6 +108,48 @@
     padding-right: 0.5rem;
 }
 
+/* 首页精选好车图片样式 - 高度填满，居中裁剪 */
+.cars-section .car-item-detail .row {
+    display: flex;
+    align-items: stretch;
+}
+
+.cars-section .car-image-wrapper {
+    height: 100%;
+    padding-top: 0;
+    display: flex;
+    align-items: stretch;
+}
+
+.cars-section .car-detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    position: relative;
+}
+
+/* 首页精选店家图片样式 - 高度填满，居中裁剪 */
+.dealers-section .dealer-item-detail .row {
+    display: flex;
+    align-items: stretch;
+}
+
+.dealers-section .dealer-image-wrapper {
+    height: 100%;
+    padding-top: 0;
+    display: flex;
+    align-items: stretch;
+}
+
+.dealers-section .dealer-detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    position: relative;
+}
+
 .ad-title-bottom, .feature-title {
     position: absolute;
     bottom: 0;
@@ -252,7 +294,7 @@
                             <div class="dealer-item-detail">
                                 <div class="row">
                                     <!-- 左侧照片 -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="dealer-image-wrapper">
                                             <#if dealer.photos?? && (dealer.photos?size > 0)>
                                                 <img src="${dealer.photos[0]}" 
@@ -268,7 +310,7 @@
                                     </div>
                                     
                                     <!-- 右侧信息 -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-8">
                                         <div class="dealer-info-content">
                                             <h3 class="dealer-registered-name">
                                                 ${dealer.dealer_name!''}
@@ -307,7 +349,7 @@
                             <div class="car-item-detail">
                                 <div class="row">
                                     <!-- 左侧图片 -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="car-image-wrapper">
                                             <img src="${car.coverImage!('/img/car/car6.jpg')}" 
                                                  alt="${car.saleTitleJoin!''}" 
@@ -317,7 +359,7 @@
                                     </div>
                                     
                                     <!-- 右侧信息 -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-8">
                                         <h2 class="car-title">
                                             ${car.saleTitleJoin!''}
                                         </h2>
