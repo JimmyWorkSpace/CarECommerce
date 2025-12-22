@@ -104,4 +104,9 @@ public class CarReportDto {
     private String carBrand;
     private String carModel;
     private Integer carYear;
+    
+    /**
+     * 車輛網址
+     */
+    private String carUrl;
 }
