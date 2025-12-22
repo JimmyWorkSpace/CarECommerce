@@ -19,7 +19,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.car.domain.CarMenuEntity;
 import com.ruoyi.car.service.CarMenuService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 菜單維護Controller
@@ -35,15 +34,26 @@ public class CarMenuController extends BaseController
     private CarMenuService carMenuService;
 
     /**
-     * 查詢菜單維護列表
+     * 查詢菜單維護列表（樹狀結構）
      */
     @PreAuthorize("@ss.hasPermi('car:menu:list')")
     @GetMapping("/list")
-    public TableDataInfo list(CarMenuEntity carMenu)
+    public AjaxResult list(CarMenuEntity carMenu)
     {
-        startPage();
         List<CarMenuEntity> list = carMenuService.selectCarMenuList(carMenu);
-        return getDataTable(list);
+        List<CarMenuEntity> treeList = carMenuService.buildMenuTree(list);
+        return AjaxResult.success(treeList);
+    }
+
+    /**
+     * 查詢父菜單列表（用於下拉選擇）
+     */
+    @PreAuthorize("@ss.hasPermi('car:menu:list')")
+    @GetMapping("/parentList")
+    public AjaxResult parentList()
+    {
+        List<CarMenuEntity> list = carMenuService.selectParentMenuList();
+        return AjaxResult.success(list);
     }
 
     /**

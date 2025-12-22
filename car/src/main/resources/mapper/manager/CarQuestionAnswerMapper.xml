@@ -49,4 +49,11 @@
         ORDER BY showOrder ASC, createTime DESC
     </select>
 
+    <!-- 根据菜单ID查询问答列表（按排序） -->
+    <select id="selectByMenuIdOrderByShowOrder" resultType="cc.carce.sale.entity.CarQuestionAnswerEntity">
+        SELECT * FROM car_question_answer 
+        WHERE menuId = #{menuId} AND delFlag = 0 
+        ORDER BY showOrder ASC, createTime DESC
+    </select>
+
 </mapper>

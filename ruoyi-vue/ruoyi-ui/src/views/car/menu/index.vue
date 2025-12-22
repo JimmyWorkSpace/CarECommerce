@@ -33,63 +33,17 @@
           v-hasPermi="['car:menu:add']"
         >新增</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-arrow-up"
-          size="mini"
-          :disabled="single"
-          @click="handleMoveUp"
-        >上移</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-arrow-down"
-          size="mini"
-          :disabled="single"
-          @click="handleMoveDown"
-        >下移</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-check"
-          size="mini"
-          :disabled="!orderChanged"
-          @click="handleSaveOrder"
-        >儲存排序</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['car:menu:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['car:menu:remove']"
-        >刪除</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="menuList" @selection-change="handleSelectionChange" style="width: 100%">
-      <el-table-column type="selection" width="55" align="center" />
+    <el-table 
+      v-loading="loading" 
+      :data="menuList" 
+      style="width: 100%"
+      row-key="id"
+      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+      default-expand-all
+    >
       <el-table-column label="選單名稱" align="center" prop="title" />
       <el-table-column label="是否顯示" align="center" prop="isShow" width="100">
         <template slot-scope="scope">
@@ -127,8 +81,29 @@
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="120">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-arrow-up"
+            @click="handleMoveUp(scope.row)"
+            :disabled="!canMoveUp(scope.row)"
+          >上移</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-arrow-down"
+            @click="handleMoveDown(scope.row)"
+            :disabled="!canMoveDown(scope.row)"
+          >下移</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-chat-line-round"
+            @click="handleQuestionAnswer(scope.row)"
+            v-if="scope.row.linkType === 1"
+          >問答</el-button>
           <el-button
             size="mini"
             type="text"
@@ -147,17 +122,21 @@
       </el-table-column>
     </el-table>
     
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
 
     <!-- 添加或修改選單維護對話框 -->
     <el-dialog :title="title" :visible.sync="open" width="70%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="父菜單" prop="parentId">
+          <el-select v-model="form.parentId" placeholder="請選擇父菜單（不選則為頂級菜單）" clearable style="width: 100%">
+            <el-option label="無（頂級菜單）" :value="null" />
+            <el-option
+              v-for="item in filteredParentMenuOptions"
+              :key="item.id"
+              :label="item.title"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="選單名稱" prop="title">
           <el-input v-model="form.title" placeholder="請輸入選單名稱" />
         </el-form-item>
@@ -170,12 +149,6 @@
             <el-radio :label="0">隱藏</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="是否可刪除" prop="canDel">
-          <el-radio-group v-model="form.canDel">
-            <el-radio :label="1">可刪除</el-radio>
-            <el-radio :label="0">不可刪除</el-radio>
-          </el-radio-group>
-        </el-form-item>
         <el-form-item label="選單類型" prop="linkType">
           <el-radio-group v-model="form.linkType" @change="handleLinkTypeChange">
             <el-radio :label="0">鏈接</el-radio>
@@ -186,7 +159,7 @@
           <el-input v-model="form.linkUrl" type="textarea" placeholder="請輸入鏈接地址" />
         </el-form-item>
         <el-form-item label="富文本內容" prop="content" v-if="form.linkType === 1">
-          <editor v-model="form.content" :min-height="400"/>
+          <quill-editor v-model="form.content" :min-height="400"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -194,36 +167,136 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 問答管理對話框 -->
+    <el-dialog :title="qaTitle" :visible.sync="qaOpen" width="80%" :top="'5vh'" append-to-body>
+      <el-row :gutter="10" class="mb8">
+        <el-col :span="1.5">
+          <el-button
+            type="primary"
+            plain
+            icon="el-icon-plus"
+            size="mini"
+            @click="handleQaAdd"
+          >新增問答</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="success"
+            plain
+            icon="el-icon-edit"
+            size="mini"
+            :disabled="qaSingle"
+            @click="handleQaUpdate"
+          >修改</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="danger"
+            plain
+            icon="el-icon-delete"
+            size="mini"
+            :disabled="qaMultiple"
+            @click="handleQaDelete"
+          >刪除</el-button>
+        </el-col>
+      </el-row>
+
+      <el-table v-loading="qaLoading" :data="qaList" @selection-change="handleQaSelectionChange">
+        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column label="問題" align="center" prop="question" show-overflow-tooltip />
+        <el-table-column label="排序" align="center" prop="showOrder" width="100" />
+        <el-table-column label="建立時間" align="center" prop="createTime" width="180">
+          <template slot-scope="scope">
+            <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="120">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleQaUpdate(scope.row)"
+            >修改</el-button>
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-delete"
+              @click="handleQaDelete(scope.row)"
+            >刪除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 問答表單對話框 -->
+      <el-dialog :title="qaFormTitle" :visible.sync="qaFormOpen" width="70%" :top="'10vh'" append-to-body>
+        <el-form ref="qaForm" :model="qaForm" :rules="qaRules" label-width="80px">
+          <el-form-item label="排序" prop="showOrder">
+            <el-input-number v-model="qaForm.showOrder" :min="0" placeholder="請輸入排序" style="width: 100%" />
+          </el-form-item>
+          <el-form-item label="問題" prop="question">
+            <el-input v-model="qaForm.question" type="textarea" :rows="3" placeholder="請輸入問題" />
+          </el-form-item>
+          <el-form-item label="回答" prop="answer">
+            <quill-editor v-model="qaForm.answer" :min-height="300"/>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitQaForm">確 定</el-button>
+          <el-button @click="cancelQaForm">取 消</el-button>
+        </div>
+      </el-dialog>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listMenu, getMenu, delMenu, addMenu, updateMenu, updateMenuShowStatus, updateMenuOrder, batchUpdateMenuOrder } from "@/api/car/menu";
+import { listMenu, getMenu, delMenu, addMenu, updateMenu, updateMenuShowStatus, updateMenuOrder, batchUpdateMenuOrder, listParentMenu } from "@/api/car/menu";
+import { listQuestionAnswer, getQuestionAnswer, delQuestionAnswer, addQuestionAnswer, updateQuestionAnswer } from "@/api/car/questionAnswer";
+import QuillEditor from "@/components/QuillEditor";
 
 export default {
   name: "Menu",
+  components: {
+    QuillEditor
+  },
   data() {
     return {
       // 遮罩層
       loading: true,
-      // 選中數組
-      ids: [],
-      // 非單個禁用
-      single: true,
-      // 非多個禁用
-      multiple: true,
       // 顯示搜索條件
       showSearch: true,
       // 總條數
       total: 0,
       // 選單維護表格數據
       menuList: [],
-      // 排序是否改變
-      orderChanged: false,
+      // 父菜單選項
+      parentMenuOptions: [],
       // 彈出層標題
       title: "",
       // 是否顯示彈出層
       open: false,
+      // 問答相關
+      qaOpen: false,
+      qaTitle: "",
+      qaLoading: false,
+      qaList: [],
+      qaIds: [],
+      qaSingle: true,
+      qaMultiple: true,
+      currentMenuId: null,
+      qaFormOpen: false,
+      qaFormTitle: "",
+      qaForm: {},
+      qaRules: {
+        question: [
+          { required: true, message: "問題不能為空", trigger: "blur" }
+        ],
+        answer: [
+          { required: true, message: "回答不能為空", trigger: "blur" }
+        ]
+      },
       // 查詢參數
       queryParams: {
         pageNum: 1,
@@ -244,29 +317,62 @@ export default {
         isShow: [
           { required: true, message: "是否顯示不能為空", trigger: "change" }
         ],
-        canDel: [
-          { required: true, message: "是否可刪除不能為空", trigger: "change" }
-        ],
         linkType: [
           { required: true, message: "選單類型不能為空", trigger: "change" }
         ]
       }
     };
   },
+  computed: {
+    // 過濾父菜單選項，排除當前編輯的菜單及其子菜單
+    filteredParentMenuOptions() {
+      if (!this.form.id) {
+        // 新增時，返回所有父菜單
+        return this.parentMenuOptions;
+      }
+      // 修改時，排除當前菜單及其子菜單
+      const excludeIds = this.getMenuAndChildrenIds(this.form.id, this.menuList);
+      return this.parentMenuOptions.filter(item => !excludeIds.includes(item.id));
+    }
+  },
   created() {
     this.getList();
+    this.getParentMenuList();
   },
   methods: {
+    // 獲取菜單及其所有子菜單的ID（遞歸處理樹狀結構）
+    getMenuAndChildrenIds(menuId, menuList) {
+      const ids = [menuId];
+      const findChildren = (parentId, list) => {
+        list.forEach(menu => {
+          if (menu.id === parentId && menu.children && menu.children.length > 0) {
+            menu.children.forEach(child => {
+              ids.push(child.id);
+              if (child.children && child.children.length > 0) {
+                findChildren(child.id, [child]);
+              }
+            });
+          }
+        });
+      };
+      findChildren(menuId, menuList);
+      return ids;
+    },
     /** 查詢選單維護列表 */
     getList() {
       this.loading = true;
       listMenu(this.queryParams).then(response => {
-        this.menuList = response.rows || [];
-        this.total = response.total || 0;
-        this.orderChanged = false; // 重置排序變更狀態
+        this.menuList = response.data || [];
+        this.total = this.menuList.length;
         this.loading = false;
       }).catch(error => {
         this.loading = false;
+      });
+    },
+    /** 查詢父菜單列表 */
+    getParentMenuList() {
+      listParentMenu().then(response => {
+        this.parentMenuOptions = response.data || [];
       });
     },
     // 取消按鈕
@@ -286,7 +392,8 @@ export default {
         canDel: 1,
         linkUrl: null,
         linkType: 0,
-        content: null
+        content: null,
+        parentId: null
       };
       this.resetForm("form");
     },
@@ -300,24 +407,22 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多選框選中數據
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
-      this.multiple = !selection.length
-    },
     /** 新增按鈕操作 */
     handleAdd() {
       this.reset();
+      // 重新加载父菜单列表，确保数据是最新的
+      this.getParentMenuList();
       this.open = true;
       this.title = "添加選單維護";
     },
     /** 修改按鈕操作 */
     handleUpdate(row) {
       this.reset();
-      const id = row.id || this.ids
+      const id = row.id;
       getMenu(id).then(response => {
         this.form = response.data;
+        // 重新加载父菜单列表，确保数据是最新的
+        this.getParentMenuList();
         this.open = true;
         this.title = "修改選單維護";
       });
@@ -374,9 +479,9 @@ export default {
     },
     /** 刪除按鈕操作 */
     handleDelete(row) {
-      const ids = row.id || this.ids;
-      this.$modal.confirm('是否確認刪除選單維護編號為"' + ids + '"的數據項？').then(function() {
-        return delMenu(ids);
+      const id = row.id;
+      this.$modal.confirm('是否確認刪除選單維護編號為"' + id + '"的數據項？').then(() => {
+        return delMenu(id);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("刪除成功");
@@ -399,15 +504,54 @@ export default {
         row.isShow = row.isShow === 0 ? 1 : 0;
       });
     },
+    /** 獲取所有菜單（扁平化） */
+    getAllMenus(menuList) {
+      const result = [];
+      const flatten = (menus) => {
+        menus.forEach(menu => {
+          result.push(menu);
+          if (menu.children && menu.children.length > 0) {
+            flatten(menu.children);
+          }
+        });
+      };
+      flatten(menuList);
+      return result;
+    },
+    /** 獲取同級菜單列表 */
+    getSiblingMenus(menu) {
+      const allMenus = this.getAllMenus(this.menuList);
+      const parentId = menu.parentId || null;
+      return allMenus.filter(m => {
+        const mParentId = m.parentId || null;
+        return mParentId === parentId && m.id !== menu.id;
+      }).sort((a, b) => a.showOrder - b.showOrder);
+    },
+    /** 判斷是否可以上移 */
+    canMoveUp(menu) {
+      const siblings = this.getSiblingMenus(menu);
+      if (siblings.length === 0) return false;
+      const sortedSiblings = siblings.concat([menu]).sort((a, b) => a.showOrder - b.showOrder);
+      return sortedSiblings[0].id !== menu.id;
+    },
+    /** 判斷是否可以下移 */
+    canMoveDown(menu) {
+      const siblings = this.getSiblingMenus(menu);
+      if (siblings.length === 0) return false;
+      const sortedSiblings = siblings.concat([menu]).sort((a, b) => a.showOrder - b.showOrder);
+      return sortedSiblings[sortedSiblings.length - 1].id !== menu.id;
+    },
     /** 上移操作 */
-    handleMoveUp() {
-      if (this.ids.length !== 1) {
-        this.$modal.msgWarning("請選擇一條記錄進行上移操作");
+    handleMoveUp(row) {
+      const siblings = this.getSiblingMenus(row);
+      if (siblings.length === 0) {
+        this.$modal.msgWarning("已經是第一條記錄，無法上移");
         return;
       }
       
-      const selectedId = this.ids[0];
-      const currentIndex = this.menuList.findIndex(item => item.id === selectedId);
+      // 獲取排序後的同級菜單（包括當前菜單）
+      const sortedSiblings = siblings.concat([row]).sort((a, b) => a.showOrder - b.showOrder);
+      const currentIndex = sortedSiblings.findIndex(m => m.id === row.id);
       
       if (currentIndex <= 0) {
         this.$modal.msgWarning("已經是第一條記錄，無法上移");
@@ -415,63 +559,145 @@ export default {
       }
       
       // 交換當前記錄與上一條記錄的排序
-      const currentItem = this.menuList[currentIndex];
-      const prevItem = this.menuList[currentIndex - 1];
+      const currentItem = sortedSiblings[currentIndex];
+      const prevItem = sortedSiblings[currentIndex - 1];
       
       // 交換排序值
       const tempOrder = currentItem.showOrder;
       currentItem.showOrder = prevItem.showOrder;
       prevItem.showOrder = tempOrder;
       
-      // 重新排序陣列
-      this.menuList.sort((a, b) => a.showOrder - b.showOrder);
-      
-      // 標記排序已改變
-      this.orderChanged = true;
+      // 立即保存排序
+      this.saveMenuOrder([currentItem, prevItem]);
     },
     /** 下移操作 */
-    handleMoveDown() {
-      if (this.ids.length !== 1) {
-        this.$modal.msgWarning("請選擇一條記錄進行下移操作");
+    handleMoveDown(row) {
+      const siblings = this.getSiblingMenus(row);
+      if (siblings.length === 0) {
+        this.$modal.msgWarning("已經是最後一條記錄，無法下移");
         return;
       }
       
-      const selectedId = this.ids[0];
-      const currentIndex = this.menuList.findIndex(item => item.id === selectedId);
+      // 獲取排序後的同級菜單（包括當前菜單）
+      const sortedSiblings = siblings.concat([row]).sort((a, b) => a.showOrder - b.showOrder);
+      const currentIndex = sortedSiblings.findIndex(m => m.id === row.id);
       
-      if (currentIndex >= this.menuList.length - 1) {
+      if (currentIndex >= sortedSiblings.length - 1) {
         this.$modal.msgWarning("已經是最後一條記錄，無法下移");
         return;
       }
       
       // 交換當前記錄與下一條記錄的排序
-      const currentItem = this.menuList[currentIndex];
-      const nextItem = this.menuList[currentIndex + 1];
+      const currentItem = sortedSiblings[currentIndex];
+      const nextItem = sortedSiblings[currentIndex + 1];
       
       // 交換排序值
       const tempOrder = currentItem.showOrder;
       currentItem.showOrder = nextItem.showOrder;
       nextItem.showOrder = tempOrder;
       
-      // 重新排序陣列
-      this.menuList.sort((a, b) => a.showOrder - b.showOrder);
-      
-      // 標記排序已改變
-      this.orderChanged = true;
+      // 立即保存排序
+      this.saveMenuOrder([currentItem, nextItem]);
     },
-    /** 保存排序 */
-    handleSaveOrder() {
-      if (!this.orderChanged) {
-        this.$modal.msgWarning("沒有排序變更需要保存");
-        return;
-      }
-      
+    /** 保存菜單排序 */
+    saveMenuOrder(menus) {
       // 批量更新排序
-      batchUpdateMenuOrder(this.menuList).then(() => {
+      batchUpdateMenuOrder(menus).then(() => {
         this.$modal.msgSuccess("排序保存成功");
-        this.orderChanged = false;
+        // 重新加載列表以刷新顯示
+        this.getList();
       }).catch(() => {
         this.$modal.msgError("排序保存失敗");
+        // 重新加載列表以恢復原狀
+        this.getList();
+      });
+    },
+    /** 問答按鈕操作 */
+    handleQuestionAnswer(row) {
+      this.currentMenuId = row.id;
+      this.qaTitle = `問答管理 - ${row.title}`;
+      this.qaOpen = true;
+      this.getQaList();
+    },
+    /** 查詢問答列表 */
+    getQaList() {
+      this.qaLoading = true;
+      const query = { menuId: this.currentMenuId };
+      listQuestionAnswer(query).then(response => {
+        this.qaList = response.rows || [];
+        this.qaLoading = false;
+      }).catch(() => {
+        this.qaLoading = false;
+      });
+    },
+    // 問答多選框選中數據
+    handleQaSelectionChange(selection) {
+      this.qaIds = selection.map(item => item.id);
+      this.qaSingle = selection.length !== 1;
+      this.qaMultiple = !selection.length;
+    },
+    /** 新增問答按鈕操作 */
+    handleQaAdd() {
+      this.resetQaForm();
+      this.qaFormOpen = true;
+      this.qaFormTitle = "添加問答";
+    },
+    /** 修改問答按鈕操作 */
+    handleQaUpdate(row) {
+      this.resetQaForm();
+      const id = row ? row.id : this.qaIds[0];
+      getQuestionAnswer(id).then(response => {
+        this.qaForm = response.data;
+        this.qaFormOpen = true;
+        this.qaFormTitle = "修改問答";
+      });
+    },
+    /** 刪除問答按鈕操作 */
+    handleQaDelete(row) {
+      const ids = row ? row.id : this.qaIds;
+      this.$modal.confirm('是否確認刪除問答編號為"' + ids + '"的數據項？').then(() => {
+        return delQuestionAnswer(ids);
+      }).then(() => {
+        this.getQaList();
+        this.$modal.msgSuccess("刪除成功");
+      }).catch(() => {});
+    },
+    // 問答表單重置
+    resetQaForm() {
+      this.qaForm = {
+        id: null,
+        menuId: this.currentMenuId,
+        question: null,
+        answer: null,
+        showOrder: 0
+      };
+      if (this.$refs.qaForm) {
+        this.$refs.qaForm.resetFields();
+      }
+    },
+    // 取消問答表單
+    cancelQaForm() {
+      this.qaFormOpen = false;
+      this.resetQaForm();
+    },
+    /** 提交問答表單 */
+    submitQaForm() {
+      this.$refs["qaForm"].validate(valid => {
+        if (valid) {
+          if (this.qaForm.id != null) {
+            updateQuestionAnswer(this.qaForm).then(() => {
+              this.$modal.msgSuccess("修改成功");
+              this.qaFormOpen = false;
+              this.getQaList();
+            });
+          } else {
+            addQuestionAnswer(this.qaForm).then(() => {
+              this.$modal.msgSuccess("新增成功");
+              this.qaFormOpen = false;
+              this.getQaList();
+            });
+          }
+        }
       });
     }
   }

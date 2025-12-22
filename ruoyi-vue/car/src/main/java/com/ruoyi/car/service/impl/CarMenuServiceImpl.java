@@ -1,5 +1,7 @@
 package com.ruoyi.car.service.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +92,14 @@ public class CarMenuServiceImpl implements CarMenuService
     {
         int result = 0;
         for (Long id : ids) {
+            // 先刪除子菜單
+            CarMenuEntity query = new CarMenuEntity();
+            query.setParentId(id);
+            List<CarMenuEntity> children = carMenuMapper.selectCarMenuList(query);
+            for (CarMenuEntity child : children) {
+                carMenuMapper.deleteByPrimaryKey(child.getId());
+            }
+            // 再刪除父菜單
             result += carMenuMapper.deleteByPrimaryKey(id);
         }
         return result;
@@ -104,6 +114,14 @@ public class CarMenuServiceImpl implements CarMenuService
     @Override
     public int deleteCarMenuById(Long id)
     {
+        // 先刪除子菜單
+        CarMenuEntity query = new CarMenuEntity();
+        query.setParentId(id);
+        List<CarMenuEntity> children = carMenuMapper.selectCarMenuList(query);
+        for (CarMenuEntity child : children) {
+            carMenuMapper.deleteByPrimaryKey(child.getId());
+        }
+        // 再刪除父菜單
         return carMenuMapper.deleteByPrimaryKey(id);
     }
 
@@ -131,5 +149,94 @@ public class CarMenuServiceImpl implements CarMenuService
     public int updateCarMenuOrder(Long id, Integer showOrder)
     {
         return carMenuMapper.updateCarMenuOrder(id, showOrder);
+    }
+
+    /**
+     * 查詢父菜單列表（parentId為null的菜單）
+     * 
+     * @return 父菜單集合
+     */
+    @Override
+    public List<CarMenuEntity> selectParentMenuList()
+    {
+        return carMenuMapper.selectParentMenuList();
+    }
+
+    /**
+     * 構建前端所需要樹結構
+     * 
+     * @param menus 菜單列表
+     * @return 樹結構列表
+     */
+    @Override
+    public List<CarMenuEntity> buildMenuTree(List<CarMenuEntity> menus)
+    {
+        List<CarMenuEntity> returnList = new ArrayList<CarMenuEntity>();
+        List<Long> tempList = new ArrayList<Long>();
+        for (CarMenuEntity menu : menus)
+        {
+            tempList.add(menu.getId());
+        }
+        for (Iterator<CarMenuEntity> iterator = menus.iterator(); iterator.hasNext();)
+        {
+            CarMenuEntity menu = (CarMenuEntity) iterator.next();
+            // 如果是頂級節點, 遍歷該父節點的所有子節點
+            if (menu.getParentId() == null || !tempList.contains(menu.getParentId()))
+            {
+                recursionFn(menus, menu);
+                returnList.add(menu);
+            }
+        }
+        if (returnList.isEmpty())
+        {
+            returnList = menus;
+        }
+        return returnList;
+    }
+
+    /**
+     * 遞歸列表
+     * 
+     * @param list 菜單列表
+     * @param t 菜單節點
+     */
+    private void recursionFn(List<CarMenuEntity> list, CarMenuEntity t)
+    {
+        // 得到子節點列表
+        List<CarMenuEntity> childList = getChildList(list, t);
+        t.setChildren(childList);
+        for (CarMenuEntity tChild : childList)
+        {
+            if (hasChild(list, tChild))
+            {
+                recursionFn(list, tChild);
+            }
+        }
+    }
+
+    /**
+     * 得到子節點列表
+     */
+    private List<CarMenuEntity> getChildList(List<CarMenuEntity> list, CarMenuEntity t)
+    {
+        List<CarMenuEntity> tlist = new ArrayList<CarMenuEntity>();
+        Iterator<CarMenuEntity> it = list.iterator();
+        while (it.hasNext())
+        {
+            CarMenuEntity n = (CarMenuEntity) it.next();
+            if (n.getParentId() != null && n.getParentId().longValue() == t.getId().longValue())
+            {
+                tlist.add(n);
+            }
+        }
+        return tlist;
+    }
+
+    /**
+     * 判斷是否有子節點
+     */
+    private boolean hasChild(List<CarMenuEntity> list, CarMenuEntity t)
+    {
+        return getChildList(list, t).size() > 0 ? true : false;
     }
 }

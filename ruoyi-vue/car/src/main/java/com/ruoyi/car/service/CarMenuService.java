@@ -76,4 +76,19 @@ public interface CarMenuService
      * @return 結果
      */
     public int updateCarMenuOrder(Long id, Integer showOrder);
+
+    /**
+     * 查詢父菜單列表（parentId為null的菜單）
+     * 
+     * @return 父菜單集合
+     */
+    public List<CarMenuEntity> selectParentMenuList();
+
+    /**
+     * 構建前端所需要樹結構
+     * 
+     * @param menus 菜單列表
+     * @return 樹結構列表
+     */
+    public List<CarMenuEntity> buildMenuTree(List<CarMenuEntity> menus);
 }

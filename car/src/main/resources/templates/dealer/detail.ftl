@@ -156,7 +156,7 @@
                                 <div class="car-item-detail">
                                     <div class="row">
                                         <!-- 左侧图片 -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="car-image-wrapper">
                                                 <img :src="car.coverImage || '/img/car/car6.jpg'" 
                                                      :alt="car.saleTitleJoin || ''" 
@@ -166,9 +166,9 @@
                                         </div>
                                         
                                         <!-- 右侧信息 -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-8">
                                             <h2 class="car-title">
-                                                {{ car.saleTitleJoin || '' }}
+                                                {{ formatTitle(car.brand, car.model, car.manufactureYear) }}
                                             </h2>
                                             <div class="price">
                                                 <span>$</span><span>
@@ -362,6 +362,13 @@ new Vue({
         formatMileage: function(mileage) {
             if (!mileage) return '0';
             return mileage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        },
+        formatTitle: function(brand, model, year) {
+            var parts = [];
+            if (brand) parts.push(brand);
+            if (model) parts.push(model);
+            if (year) parts.push(year);
+            return parts.join(' ');
         },
         setupContentFrame: function() {
             var _this = this;
@@ -608,6 +615,22 @@ new Vue({
     padding: 0;
 }
 
+.car-title{
+    margin: 0px;
+    font-size: 1rem;
+}
+
+.price{
+    margin: 0px !important;
+}
+
+.cars-list-detail-style .spec-name {
+    height: 1.2rem;
+}
+
+.cars-list-detail-style .spec-value {
+    margin-top: 3px;
+}
 .car-card-link {
     text-decoration: none;
     color: inherit;
@@ -945,6 +968,27 @@ new Vue({
         top: 10px;
         right: 10px;
     }
+}
+
+/* 店家详情页店家精选车辆图片样式 - 高度填满，居中裁剪 */
+.dealer-detail .cars-list-detail-style .car-item-detail .row {
+    display: flex;
+    align-items: stretch;
+}
+
+.dealer-detail .cars-list-detail-style .car-image-wrapper {
+    height: 100%;
+    padding-top: 0;
+    display: flex;
+    align-items: stretch;
+}
+
+.dealer-detail .cars-list-detail-style .car-detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    position: relative;
 }
 </style>
 

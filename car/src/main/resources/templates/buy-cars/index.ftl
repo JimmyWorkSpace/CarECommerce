@@ -3,11 +3,11 @@
 <link href="/css/car-detail.css" rel="stylesheet">
 <link href="/css/home.css" rel="stylesheet">
 <style>
-/* 车辆列表页专用样式 - 图片正方形，左右比例4:8 */
+/* 车辆列表页专用样式 - 图片3:2比例 */
 .buy-cars-page .car-image-wrapper {
     position: relative;
     width: 100%;
-    padding-top: 100%; /* 1:1 Aspect Ratio (正方形) */
+    padding-top: 66.67%; /* 3:2 Aspect Ratio */
     overflow: hidden;
     border-radius: 6px;
 }
@@ -24,15 +24,17 @@
 
 .spec-name.text-muted{
     padding-left: 2px !important;
+    margin-bottom: 7px !important;
     height: 1.2rem !important;
     border-left-width: 2px !important;
-    font-size: 13px !important;
+    font-size: 17px !important;
 }
 .spec-value{
-    font-size: 13px !important;
+    font-size: 17px !important;
+    text-align: left !important;
+    margin-bottom: 7px !important;
 }
 .car-item-detail{
-    padding-bottom: 5px;
 }
 .buy-cars-page .car-item-detail:hover .car-detail-image {
     transform: scale(1.03);
@@ -74,7 +76,7 @@
                     <!-- 车辆列表 -->
                     <div v-else class="cars-list-detail-style">
                         <div class="row">
-                            <div v-for="car in cars" :key="car.id" class="col-12 col-lg-6 mb-3">
+                            <div v-for="car in cars" :key="car.id" class="col-12 mb-3">
                                 <div class="car-item-detail" @click="goToCarDetail(car.id)">
                                     <div class="row">
                                         <!-- 左侧图片 -->

@@ -82,7 +82,7 @@ public class PageDataInterceptor implements HandlerInterceptor {
      */
     private void addMenuData(ModelAndView modelAndView) {
         try {
-            modelAndView.addObject("menus", carMenuService.getVisibleMenus());
+            modelAndView.addObject("menus", carMenuService.getVisibleMenusWithChildren());
         } catch (Exception e) {
             log.error("获取菜单数据失败", e);
             // 如果获取菜单失败，设置空列表避免模板报错

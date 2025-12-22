@@ -52,9 +52,9 @@ public class CarQuestionAnswerServiceImpl implements ICarQuestionAnswerService
         // 只查询未刪除的数据
         criteria.andEqualTo("delFlag", false);
         
-        // 根据頻道ID查询
-        if (carQuestionAnswer.getChannelId() != null) {
-            criteria.andEqualTo("channelId", carQuestionAnswer.getChannelId());
+        // 根据菜單ID查询
+        if (carQuestionAnswer.getMenuId() != null) {
+            criteria.andEqualTo("menuId", carQuestionAnswer.getMenuId());
         }
         
         // 根据問題模糊查询

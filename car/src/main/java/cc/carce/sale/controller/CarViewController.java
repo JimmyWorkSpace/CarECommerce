@@ -416,9 +416,16 @@ public class CarViewController extends BaseController {
 			CarRichContentEntity richContent = new CarRichContentEntity();
 			richContent.setContent(menu.getContent());
             
+            // 获取该菜单的问答数据
+            List<CarQuestionAnswerEntity> qaList = carQuestionAnswerService.getQuestionAnswersByMenuIdOrderByShowOrder(id);
+            
             // 设置页面数据
+            model.addAttribute("menu", menu);
             model.addAttribute("richContent", richContent);
- 			model.addAttribute("content", "/rich-content/content-iframe.ftl");
+            model.addAttribute("qaList", qaList);
+            model.addAttribute("content", "/rich-content/content-iframe.ftl");
+ 			// model.addAttribute("content", "/menu/index.ftl");
+            
             
         } catch (Exception e) {
             log.error("获取菜单富文本内容失败，ID: {}", id, e);

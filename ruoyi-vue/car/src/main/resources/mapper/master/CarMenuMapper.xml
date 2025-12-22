@@ -15,10 +15,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="linkUrl"    column="linkUrl"    />
         <result property="linkType"    column="linkType"    />
         <result property="content"    column="content"    />
+        <result property="parentId"    column="parentId"    />
     </resultMap>
 
     <sql id="selectCarMenuVo">
-        select id, title, showOrder, delFlag, createTime, isShow, canDel, linkUrl, linkType, content from car_menu
+        select id, title, showOrder, delFlag, createTime, isShow, canDel, linkUrl, linkType, content, parentId from car_menu
     </sql>
 
     <select id="selectCarMenuList" parameterType="com.ruoyi.car.domain.CarMenuEntity" resultMap="CarMenuResult">
@@ -33,7 +34,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null  and linkUrl != ''"> and linkUrl = #{linkUrl}</if>
             <if test="linkType != null "> and linkType = #{linkType}</if>
             <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="parentId != null "> and parentId = #{parentId}</if>
         </where>
+        order by showOrder asc, createTime desc
+    </select>
+    
+    <select id="selectParentMenuList" resultMap="CarMenuResult">
+        <include refid="selectCarMenuVo"/>
+        where parentId is null and delFlag = 0
         order by showOrder asc, createTime desc
     </select>
     
@@ -54,6 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null">linkUrl,</if>
             <if test="linkType != null">linkType,</if>
             <if test="content != null">content,</if>
+            <if test="parentId != null">parentId,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="title != null and title != ''">#{title},</if>
@@ -65,6 +74,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null">#{linkUrl},</if>
             <if test="linkType != null">#{linkType},</if>
             <if test="content != null">#{content},</if>
+            <if test="parentId != null">#{parentId},</if>
          </trim>
     </insert>
 
@@ -80,6 +90,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null">linkUrl = #{linkUrl},</if>
             <if test="linkType != null">linkType = #{linkType},</if>
             <if test="content != null">content = #{content},</if>
+            <if test="parentId != null">parentId = #{parentId},</if>
         </trim>
         where id = #{id}
     </update>

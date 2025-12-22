@@ -33,4 +33,11 @@ public interface CarMenuMapper extends Mapper<CarMenuEntity>{
      * @return 結果
      */
     int updateCarMenuOrder(@Param("id") Long id, @Param("showOrder") Integer showOrder);
+
+    /**
+     * 查詢父菜單列表（parentId為null的菜單）
+     * 
+     * @return 父菜單集合
+     */
+    List<CarMenuEntity> selectParentMenuList();
 }

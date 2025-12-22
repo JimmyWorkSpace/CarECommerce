@@ -571,7 +571,7 @@
     color: #5ACFC9;
     text-align: left;
     font-weight: 560;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     margin-top: 0;
     margin-bottom: 10;
     padding-left: 0;
@@ -586,7 +586,7 @@
 }
 
 .cars-list-detail-style .price span {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 540;
     color: #FA9F42;
 }
@@ -615,6 +615,7 @@
 .cars-list-detail-style .spec-value {
     font-size: 0.9rem;
     height: 1.3rem;
+    text-align: left;
 }
 
 /* 响应式调整 */
@@ -624,13 +625,13 @@
     }
     
     .cars-list-detail-style .car-title {
-        font-size: 1rem;
+        font-size: 1.3rem;
         margin-top: 0;
         margin-bottom: 0;
     }
     
     .cars-list-detail-style .price span {
-        font-size: 1rem;
+        font-size: 1.2rem;
     }
     
     .cars-list-detail-style .spec-name {
@@ -647,8 +648,9 @@
     }
     
     .cars-list-detail-style .spec-value {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         height: 1.2rem;
+        text-align: left;
     }
 }
 

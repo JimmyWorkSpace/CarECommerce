@@ -107,4 +107,16 @@ public class CarQuestionAnswerService {
             return null;
         }
     }
+    
+    /**
+     * 根据菜单ID获取问答列表（按排序）
+     */
+    public List<CarQuestionAnswerEntity> getQuestionAnswersByMenuIdOrderByShowOrder(Long menuId) {
+        try {
+            return carQuestionAnswerMapper.selectByMenuIdOrderByShowOrder(menuId);
+        } catch (Exception e) {
+            log.error("根据菜单ID获取问答失败，菜单ID: {}", menuId, e);
+            return null;
+        }
+    }
 }
