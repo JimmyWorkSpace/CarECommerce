@@ -44,7 +44,7 @@
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       default-expand-all
     >
-      <el-table-column label="選單名稱" align="center" prop="title" />
+      <el-table-column label="選單名稱" align="left" prop="title" />
       <el-table-column label="是否顯示" align="center" prop="isShow" width="100">
         <template slot-scope="scope">
           <el-switch
