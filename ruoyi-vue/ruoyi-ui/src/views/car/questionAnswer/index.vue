@@ -1,13 +1,13 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="頻道" prop="channelId">
-        <el-select v-model="queryParams.channelId" placeholder="请选择頻道" clearable size="small">
+      <el-form-item label="菜單" prop="menuId">
+        <el-select v-model="queryParams.menuId" placeholder="请选择菜單" clearable size="small">
           <el-option
-            v-for="channel in channelList"
-            :key="channel.id"
-            :label="channel.title"
-            :value="channel.id"
+            v-for="menu in menuList"
+            :key="menu.id"
+            :label="menu.title"
+            :value="menu.id"
           />
         </el-select>
       </el-form-item>
@@ -74,7 +74,7 @@
 
     <el-table v-loading="loading" :data="questionAnswerList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="頻道" align="center" prop="channelTitle" />
+      <el-table-column label="菜單" align="center" prop="menuTitle" />
       <el-table-column label="問題" align="center" prop="question" show-overflow-tooltip />
       <!-- <el-table-column label="回答" align="center" prop="answer" show-overflow-tooltip /> -->
       <el-table-column label="排序" align="center" prop="showOrder" />
@@ -116,13 +116,13 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="頻道" prop="channelId">
-              <el-select v-model="form.channelId" placeholder="请选择頻道" style="width: 100%">
+            <el-form-item label="菜單" prop="menuId">
+              <el-select v-model="form.menuId" placeholder="请选择菜單" style="width: 100%">
                 <el-option
-                  v-for="channel in channelList"
-                  :key="channel.id"
-                  :label="channel.title"
-                  :value="channel.id"
+                  v-for="menu in menuList"
+                  :key="menu.id"
+                  :label="menu.title"
+                  :value="menu.id"
                 />
               </el-select>
             </el-form-item>
@@ -150,7 +150,7 @@
 
 <script>
 import { listQuestionAnswer, getQuestionAnswer, delQuestionAnswer, addQuestionAnswer, updateQuestionAnswer } from "@/api/car/questionAnswer";
-import { listRichContent } from "@/api/car/richContent";
+import { listMenu } from "@/api/car/menu";
 
 export default {
   name: "QuestionAnswer",
@@ -170,8 +170,8 @@ export default {
       total: 0,
       // 问答模块表格数据
       questionAnswerList: [],
-      // 頻道列表
-      channelList: [],
+      // 菜單列表
+      menuList: [],
       // 弹出层標題
       title: "",
       // 是否显示弹出层
@@ -180,15 +180,15 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        channelId: null,
+        menuId: null,
         question: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        channelId: [
-          { required: true, message: "頻道不能为空", trigger: "change" }
+        menuId: [
+          { required: true, message: "菜單不能为空", trigger: "change" }
         ],
         question: [
           { required: true, message: "問題不能为空", trigger: "blur" }
@@ -200,16 +200,36 @@ export default {
     };
   },
   created() {
-    this.getChannelList();
+    this.getMenuList();
     this.getList();
   },
   methods: {
-    /** 查询頻道列表 */
-    getChannelList() {
-      const query = { contentType: 2 }; // 查询頻道類型的内容
-      listRichContent(query).then(response => {
-        this.channelList = response.rows || [];
+    /** 查询菜單列表（包括子菜单，扁平化显示） */
+    getMenuList() {
+      listMenu({}).then(response => {
+        const treeList = response.data || [];
+        // 将树状结构扁平化，提取所有菜单（包括子菜单）
+        this.menuList = this.flattenMenuList(treeList);
       });
+    },
+    /** 将树状菜单列表扁平化 */
+    flattenMenuList(menuList) {
+      const result = [];
+      const flatten = (menus) => {
+        menus.forEach(menu => {
+          // 添加当前菜单
+          result.push({
+            id: menu.id,
+            title: menu.title
+          });
+          // 如果有子菜单，递归处理
+          if (menu.children && menu.children.length > 0) {
+            flatten(menu.children);
+          }
+        });
+      };
+      flatten(menuList);
+      return result;
     },
     /** 查询问答模块列表 */
     getList() {
@@ -219,10 +239,10 @@ export default {
         this.total = response.total;
         this.loading = false;
         
-        // 为每个问答项添加頻道標題
+        // 为每个问答项添加菜單標題
         this.questionAnswerList.forEach(item => {
-          const channel = this.channelList.find(c => c.id === item.channelId);
-          item.channelTitle = channel ? channel.title : '未知頻道';
+          const menu = this.menuList.find(m => m.id === item.menuId);
+          item.menuTitle = menu ? menu.title : '未知菜單';
         });
       });
     },
@@ -283,7 +303,7 @@ export default {
     reset() {
       this.form = {
         id: null,
-        channelId: null,
+        menuId: null,
         question: null,
         answer: null,
         showOrder: 0

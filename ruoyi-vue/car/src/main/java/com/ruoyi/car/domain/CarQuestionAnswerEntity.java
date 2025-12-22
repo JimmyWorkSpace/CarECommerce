@@ -26,10 +26,10 @@ public class CarQuestionAnswerEntity {
     private Long id;
     
     /**
-     * 頻道ID
+     * 菜單ID
      */
-    @Column(name = "channelId", nullable = false, columnDefinition = "BIGINT(20) COMMENT '頻道ID'")
-    private Long channelId;
+    @Column(name = "menuId", nullable = false, columnDefinition = "BIGINT(20) COMMENT '菜單ID'")
+    private Long menuId;
     
     /**
      * 問題

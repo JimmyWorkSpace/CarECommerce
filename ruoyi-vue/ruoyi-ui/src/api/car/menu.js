@@ -1,11 +1,19 @@
 import request from '@/utils/request'
 
-// 查詢菜單維護列表
+// 查詢菜單維護列表（樹狀結構）
 export function listMenu(query) {
   return request({
     url: '/car/menu/list',
     method: 'get',
     params: query
+  })
+}
+
+// 查詢父菜單列表（用於下拉選擇）
+export function listParentMenu() {
+  return request({
+    url: '/car/menu/parentList',
+    method: 'get'
   })
 }
 

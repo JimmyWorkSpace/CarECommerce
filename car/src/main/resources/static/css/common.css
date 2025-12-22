@@ -543,6 +543,102 @@ body .navbar .navbar-toggler:focus {
     color: #6c757d;
 }
 
+/* 導航欄下拉菜單樣式 */
+.navbar-nav .nav-item.dropdown {
+    position: relative;
+}
+
+.navbar-nav .dropdown-menu {
+    background-color: #5ACFC9;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-top: 0;
+    padding: 8px 0;
+    min-width: 180px;
+    top: 100%;
+    left: 0;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    /* 使用padding-top创建不可见的连接区域，减少间隙 */
+    padding-top: 4px;
+    /* 覆盖Bootstrap的CSS变量 */
+    --bs-dropdown-link-hover-bg: transparent;
+    --bs-dropdown-link-active-bg: transparent;
+}
+
+/* 创建一个不可见的连接区域，连接父菜单和子菜单，避免鼠标移出时菜单消失 */
+.navbar-nav .nav-item.dropdown .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: transparent;
+    z-index: 1;
+}
+
+.navbar-nav .dropdown-item {
+    padding: 10px 20px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+body .navbar-nav .dropdown-item:hover,
+body .navbar-nav .dropdown-item:focus,
+body .navbar-nav .dropdown-item:active,
+body .navbar-nav .dropdown-item:hover:focus,
+body .navbar-nav .dropdown-item:hover:active,
+body .navbar .navbar-nav .dropdown-item:hover,
+body .navbar .navbar-nav .dropdown-item:focus,
+body .navbar .navbar-nav .dropdown-item:active {
+    color: white !important;
+    background-color: transparent !important;
+    background: transparent !important;
+    background-image: none !important;
+    transform: translateX(4px);
+}
+
+.navbar-nav .dropdown-toggle::after {
+    margin-left: 6px;
+    vertical-align: 0.15em;
+    border-top: 0.4em solid;
+    border-right: 0.4em solid transparent;
+    border-bottom: 0;
+    border-left: 0.4em solid transparent;
+}
+
+/* 確保下拉菜單在懸停時顯示，包括父菜单和子菜单区域 */
+@media (min-width: 992px) {
+    .navbar-nav .nav-item.dropdown:hover .dropdown-menu {
+        display: block !important;
+        animation: fadeInDown 0.3s ease;
+    }
+    
+    /* 当鼠标悬停在父菜单或子菜单上时，保持子菜单显示 */
+    .navbar-nav .nav-item.dropdown .dropdown-menu:hover {
+        display: block !important;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* 導航欄品牌文字樣式 */
 body .navbar .navbar-brand .brand-text {
     display: flex;

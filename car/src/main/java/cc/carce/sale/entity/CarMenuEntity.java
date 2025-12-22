@@ -42,4 +42,7 @@ public class CarMenuEntity {
 
     @Column(name = "content")
     private String content;
+
+    @Column(name = "parentId")
+    private Long parentId;
 }

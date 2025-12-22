@@ -77,15 +77,38 @@
                     <ul class="navbar-nav ms-auto">
                         <#if menus?? && menus?has_content>
                             <#list menus as menu>
-                                <li class="nav-item">
-                                    <#if menu.linkType?? && menu.linkType == 1>
-                                        <!-- 富文本类型菜单，跳转到富文本显示页面 -->
-                                        <a class="nav-link" href="/menu-content/${menu.id}">${menu.title!''}</a>
-                                    <#else>
-                                        <!-- 普通链接类型菜单，跳转到指定URL -->
-                                        <a class="nav-link" href="${menu.linkUrl!''}">${menu.title!''}</a>
-                                    </#if>
-                                </li>
+                                <#if menu.children?? && menu.children?has_content>
+                                    <!-- 有子菜单的主菜单，显示下拉菜单 -->
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
+                                            ${menu.title!''}
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <#list menu.children as child>
+                                                <li>
+                                                    <#if child.linkType?? && child.linkType == 1>
+                                                        <!-- 富文本类型子菜单，跳转到富文本显示页面 -->
+                                                        <a class="dropdown-item" href="/menu-content/${child.id}">${child.title!''}</a>
+                                                    <#else>
+                                                        <!-- 普通链接类型子菜单，跳转到指定URL -->
+                                                        <a class="dropdown-item" href="${child.linkUrl!''}">${child.title!''}</a>
+                                                    </#if>
+                                                </li>
+                                            </#list>
+                                        </ul>
+                                    </li>
+                                <#else>
+                                    <!-- 没有子菜单的普通菜单 -->
+                                    <li class="nav-item">
+                                        <#if menu.linkType?? && menu.linkType == 1>
+                                            <!-- 富文本类型菜单，跳转到富文本显示页面 -->
+                                            <a class="nav-link" href="/menu-content/${menu.id}">${menu.title!''}</a>
+                                        <#else>
+                                            <!-- 普通链接类型菜单，跳转到指定URL -->
+                                            <a class="nav-link" href="${menu.linkUrl!''}">${menu.title!''}</a>
+                                        </#if>
+                                    </li>
+                                </#if>
                             </#list>
                         </#if>
                         <#if user?? && user?has_content>

@@ -45,4 +45,9 @@ public interface CarQuestionAnswerMapper extends Mapper<CarQuestionAnswerEntity>
      * 根据频道ID查询问答列表（按排序）
      */
     List<CarQuestionAnswerEntity> selectByChannelIdOrderByShowOrder(@Param("channelId") Long channelId);
+    
+    /**
+     * 根据菜单ID查询问答列表（按排序）
+     */
+    List<CarQuestionAnswerEntity> selectByMenuIdOrderByShowOrder(@Param("menuId") Long menuId);
 }

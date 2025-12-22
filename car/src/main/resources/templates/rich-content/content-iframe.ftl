@@ -166,7 +166,40 @@
                         <iframe id="richContentIframe" 
                                 style="width: 100%; border: none; min-height: 200px;">
                         </iframe>
-                        
+                        <!-- QA模块 - 放在iframe外面 -->
+                <#if qaList?? && qaList?has_content>
+                    <div class="qa-section">
+                        <h3 class="qa-title">
+                            <i class="bi bi-question-circle"></i>
+                            常見問題
+                        </h3>
+                        <div class="accordion" id="qaAccordion-${menu.id}">
+                            <#list qaList as qa>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-${qa.id}">
+                                        <button class="accordion-button collapsed" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#collapse-${qa.id}" 
+                                                aria-expanded="false" 
+                                                aria-controls="collapse-${qa.id}">
+                                            <i class="bi bi-question-circle-fill me-2"></i>
+                                            ${qa.question}
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-${qa.id}" 
+                                         class="accordion-collapse collapse" 
+                                         aria-labelledby="heading-${qa.id}" 
+                                         data-bs-parent="#qaAccordion-${menu.id}">
+                                        <div class="accordion-body">
+                                            ${qa.answer}
+                                        </div>
+                                    </div>
+                                </div>
+                            </#list>
+                        </div>
+                    </div>
+                </#if>
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
                                 const iframe = document.getElementById('richContentIframe');

@@ -1,12 +1,15 @@
 package cc.carce.sale.service;
 
+import cc.carce.sale.dto.CarMenuDto;
 import cc.carce.sale.entity.CarMenuEntity;
 import cc.carce.sale.mapper.manager.CarMenuMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CarMenuService {
@@ -30,6 +33,50 @@ public class CarMenuService {
         example.orderBy("showOrder").asc();
         
         return carMenuMapper.selectByExample(example);
+    }
+    
+    /**
+     * 获取所有显示的菜单项（带子菜单结构），按显示顺序排序
+     * @return 菜单DTO列表（只包含主菜单，子菜单在children中）
+     */
+    public List<CarMenuDto> getVisibleMenusWithChildren() {
+        // 获取所有显示的菜单
+        List<CarMenuEntity> allMenus = getVisibleMenus();
+        
+        // 转换为DTO
+        List<CarMenuDto> allMenuDtos = allMenus.stream()
+                .map(CarMenuDto::fromEntity)
+                .collect(Collectors.toList());
+        
+        // 构建父子关系
+        List<CarMenuDto> parentMenus = new ArrayList<>();
+        for (CarMenuDto menu : allMenuDtos) {
+            if (menu.getParentId() == null) {
+                // 主菜单
+                parentMenus.add(menu);
+            } else {
+                // 子菜单，找到对应的父菜单并添加到children中
+                for (CarMenuDto parent : allMenuDtos) {
+                    if (parent.getId().equals(menu.getParentId())) {
+                        parent.getChildren().add(menu);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // 对子菜单也进行排序
+        for (CarMenuDto parent : parentMenus) {
+            if (parent.hasChildren()) {
+                parent.getChildren().sort((a, b) -> {
+                    Integer orderA = a.getShowOrder() != null ? a.getShowOrder() : 0;
+                    Integer orderB = b.getShowOrder() != null ? b.getShowOrder() : 0;
+                    return orderA.compareTo(orderB);
+                });
+            }
+        }
+        
+        return parentMenus;
     }
     
     /**
