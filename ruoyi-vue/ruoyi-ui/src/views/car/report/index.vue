@@ -180,6 +180,13 @@
         <el-form-item label="詳細說明" prop="description">
           <el-input v-model="form.description" type="textarea" placeholder="請輸入詳細說明" :disabled="form.id != null" />
         </el-form-item>
+        <el-form-item label="車輛網址" v-if="form.saleId && form.carUrl">
+          <el-input v-model="form.carUrl" readonly placeholder="車輛網址">
+            <template slot="append">
+              <el-button @click="openCarUrl" icon="el-icon-link" size="small">打開</el-button>
+            </template>
+          </el-input>
+        </el-form-item>
         <el-row>
           <el-col :span="12">
             <el-form-item label="處理狀態" prop="status">
@@ -222,6 +229,7 @@
 
 <script>
 import { listReport, getReport, delReport, addReport, updateReport } from "@/api/car/report";
+import { getCarbuyPrefix } from "@/api/car/appointment";
 
 export default {
   name: "Report",
@@ -259,6 +267,8 @@ export default {
       },
       // 表單參數
       form: {},
+      // 車輛網址前綴
+      carbuyPrefix: '',
       // 表單校驗
       rules: {
         saleId: [
@@ -284,6 +294,7 @@ export default {
   },
   created() {
     this.getList();
+    this.getCarbuyPrefixConfig();
   },
   methods: {
     /** 查詢車輛檢舉列表 */
@@ -317,7 +328,8 @@ export default {
         status: "submitted",
         processNote: null,
         processorId: null,
-        processedAt: null
+        processedAt: null,
+        carUrl: null
       };
       this.resetForm("form");
     },
@@ -344,12 +356,39 @@ export default {
       const id = row.id || this.ids
       getReport(id).then(response => {
         this.form = response.data;
+        // 如果后端没有返回carUrl，则根据saleId计算
+        if (!this.form.carUrl && this.form.saleId) {
+          this.calculateCarUrl();
+        }
         // 設置默認值
         this.form.processorId = this.$store.state.user.id;
         this.form.processedAt = new Date();
         this.open = true;
         this.title = "修改車輛檢舉";
       });
+    },
+    /** 獲取車輛網址前綴配置 */
+    getCarbuyPrefixConfig() {
+      getCarbuyPrefix().then(response => {
+        if (response.data) {
+          this.carbuyPrefix = response.data;
+        }
+      }).catch(() => {
+        // 如果获取失败，使用默认值
+        this.carbuyPrefix = 'https://carbuy.com.tw';
+      });
+    },
+    /** 計算車輛網址 */
+    calculateCarUrl() {
+      if (this.form.saleId && this.carbuyPrefix) {
+        this.form.carUrl = this.carbuyPrefix + '/detail/' + this.form.saleId;
+      }
+    },
+    /** 打開車輛網址 */
+    openCarUrl() {
+      if (this.form.carUrl) {
+        window.open(this.form.carUrl, '_blank');
+      }
     },
     /** 提交按鈕 */
     submitForm() {

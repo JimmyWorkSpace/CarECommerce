@@ -20,6 +20,9 @@ import com.ruoyi.car.domain.CarReportEntity;
 import com.ruoyi.car.service.CarReportService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.BeanUtils;
+import com.ruoyi.car.dto.CarReportDto;
 
 /**
  * 車輛檢舉Controller
@@ -33,6 +36,9 @@ public class CarReportController extends BaseController
 {
     @Autowired
     private CarReportService carReportService;
+    
+    @Value("${carce.carbuy-prefix}")
+    private String carbuyPrefix;
 
     /**
      * 查询車輛檢舉列表
@@ -66,7 +72,20 @@ public class CarReportController extends BaseController
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
-        return AjaxResult.success(carReportService.selectCarReportById(id));
+        CarReportEntity entity = carReportService.selectCarReportById(id);
+        if (entity != null) {
+            // 转换为DTO
+            CarReportDto dto = new CarReportDto();
+            BeanUtils.copyProperties(entity, dto);
+            
+            // 如果存在saleId，计算车辆网址
+            if (dto.getSaleId() != null) {
+                String carUrl = carbuyPrefix + "/detail/" + dto.getSaleId();
+                dto.setCarUrl(carUrl);
+            }
+            return AjaxResult.success(dto);
+        }
+        return AjaxResult.success(entity);
     }
 
     /**
