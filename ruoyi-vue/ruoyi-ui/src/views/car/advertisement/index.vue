@@ -38,48 +38,13 @@
           v-hasPermi="['car:advertisement:add']"
         >新增</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-arrow-up"
-          size="mini"
-          :disabled="single"
-          @click="handleMoveUp"
-          v-hasPermi="['car:advertisement:edit']"
-        >上移</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-arrow-down"
-          size="mini"
-          :disabled="single"
-          @click="handleMoveDown"
-          v-hasPermi="['car:advertisement:edit']"
-        >下移</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-sort"
-          size="mini"
-          @click="handleSaveOrder"
-          v-hasPermi="['car:advertisement:edit']"
-        >儲存排序</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table 
       v-loading="loading" 
       :data="advertisementList" 
-      @selection-change="handleSelectionChange"
-      row-key="id"
-      :row-class-name="tableRowClassName">
-      <el-table-column type="selection" width="55" align="center" />
+      row-key="id">
       <el-table-column label="圖片" align="center" prop="imageUrl" width="200">
         <template slot-scope="scope">
           <el-image 
@@ -113,8 +78,24 @@
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-arrow-up"
+            @click="handleMoveUp(scope.row)"
+            :disabled="!canMoveUp(scope.row)"
+            v-hasPermi="['car:advertisement:edit']"
+          >上移</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-arrow-down"
+            @click="handleMoveDown(scope.row)"
+            :disabled="!canMoveDown(scope.row)"
+            v-hasPermi="['car:advertisement:edit']"
+          >下移</el-button>
           <el-button
             size="mini"
             type="text"
@@ -176,7 +157,7 @@
         <!-- 富文本標題模式 -->
         <template v-if="form.titleType === 1">
           <el-form-item label="富文本標題" prop="titleHtml">
-            <wang-editor v-model="form.titleHtml" :min-height="192" :height="200"/>
+            <quill-editor v-model="form.titleHtml" :min-height="400"/>
           </el-form-item>
         </template>
         <el-form-item label="類型" prop="advType">
@@ -196,7 +177,7 @@
           <el-input v-model="form.linkUrl" placeholder="請輸入跳轉地址" />
         </el-form-item>
         <el-form-item label="顯示內容" prop="content" v-if="form.isLink === 0">
-          <wang-editor v-model="form.content" :min-height="192" :height="200"/>
+          <quill-editor v-model="form.content" :min-height="400"/>
         </el-form-item>
         <el-form-item label="是否刪除" prop="delFlag">
           <el-radio-group v-model="form.delFlag">
@@ -215,13 +196,13 @@
 
 <script>
 import { listAdvertisement, getAdvertisement, delAdvertisement, addAdvertisement, updateAdvertisement, updateAdvertisementOrder } from "@/api/car/advertisement";
-import WangEditor from "@/components/WangEditor";
+import QuillEditor from "@/components/QuillEditor";
 
 export default {
   name: "Advertisement",
   dicts: ['sys_yes_no_num'],
   components: {
-    WangEditor
+    QuillEditor
   },
   data() {
     return {
@@ -263,10 +244,7 @@ export default {
       uploadUrl: process.env.VUE_APP_BASE_API + "/car/advertisement/upload",
       uploadHeaders: {
         Authorization: 'Bearer ' + this.$store.getters.token
-      },
-      // 排序相關
-      orderChanged: false,
-      originalOrder: []
+      }
     };
   },
   created() {
@@ -280,8 +258,6 @@ export default {
         this.advertisementList = response.rows;
         this.total = response.total;
         this.loading = false;
-        // 儲存原始排序
-        this.originalOrder = this.advertisementList.map(item => ({ id: item.id, showOrder: item.showOrder }));
       });
     },
     // 取消按鈕
@@ -399,81 +375,100 @@ export default {
         ...this.queryParams
       }, `advertisement_${new Date().getTime()}.xlsx`)
     },
+    /** 判斷是否可以上移 */
+    canMoveUp(row) {
+      const sortedList = [...this.advertisementList].sort((a, b) => {
+        const orderA = a.showOrder || 0;
+        const orderB = b.showOrder || 0;
+        return orderA - orderB;
+      });
+      return sortedList[0].id !== row.id;
+    },
+    /** 判斷是否可以下移 */
+    canMoveDown(row) {
+      const sortedList = [...this.advertisementList].sort((a, b) => {
+        const orderA = a.showOrder || 0;
+        const orderB = b.showOrder || 0;
+        return orderA - orderB;
+      });
+      return sortedList[sortedList.length - 1].id !== row.id;
+    },
     /** 上移操作 */
-    handleMoveUp() {
-      if (this.ids.length !== 1) {
-        this.$modal.msgWarning("請選擇一條記錄進行上移操作");
-        return;
-      }
-      
-      const selectedId = this.ids[0];
-      const currentIndex = this.advertisementList.findIndex(item => item.id === selectedId);
+    handleMoveUp(row) {
+      // 先对列表进行排序，处理null值
+      const sortedList = [...this.advertisementList].sort((a, b) => {
+        const orderA = a.showOrder || 0;
+        const orderB = b.showOrder || 0;
+        return orderA - orderB;
+      });
+      const currentIndex = sortedList.findIndex(item => item.id === row.id);
       
       if (currentIndex <= 0) {
         this.$modal.msgWarning("已經是第一條記錄，無法上移");
         return;
       }
       
-      // 交換當前記錄與上一條記錄的排序
-      const currentItem = this.advertisementList[currentIndex];
-      const prevItem = this.advertisementList[currentIndex - 1];
+      // 從原列表中查找對應的對象（確保修改的是原列表中的對象）
+      const currentItem = this.advertisementList.find(item => item.id === row.id);
+      const prevItem = this.advertisementList.find(item => item.id === sortedList[currentIndex - 1].id);
       
+      if (!currentItem || !prevItem) {
+        this.$modal.msgError("找不到對應的記錄");
+        return;
+      }
+      
+      // 交換排序值
       const tempOrder = currentItem.showOrder;
       currentItem.showOrder = prevItem.showOrder;
       prevItem.showOrder = tempOrder;
       
-      // 重新排序陣列
-      this.advertisementList.sort((a, b) => a.showOrder - b.showOrder);
-      
-      this.orderChanged = true;
+      // 立即保存排序
+      this.saveAdvertisementOrder([currentItem, prevItem]);
     },
     /** 下移操作 */
-    handleMoveDown() {
-      if (this.ids.length !== 1) {
-        this.$modal.msgWarning("請選擇一條記錄進行下移操作");
-        return;
-      }
+    handleMoveDown(row) {
+      // 先对列表进行排序，处理null值
+      const sortedList = [...this.advertisementList].sort((a, b) => {
+        const orderA = a.showOrder || 0;
+        const orderB = b.showOrder || 0;
+        return orderA - orderB;
+      });
+      const currentIndex = sortedList.findIndex(item => item.id === row.id);
       
-      const selectedId = this.ids[0];
-      const currentIndex = this.advertisementList.findIndex(item => item.id === selectedId);
-      
-      if (currentIndex >= this.advertisementList.length - 1) {
+      if (currentIndex >= sortedList.length - 1) {
         this.$modal.msgWarning("已經是最後一條記錄，無法下移");
         return;
       }
       
-      // 交換當前記錄與下一條記錄的排序
-      const currentItem = this.advertisementList[currentIndex];
-      const nextItem = this.advertisementList[currentIndex + 1];
+      // 從原列表中查找對應的對象（確保修改的是原列表中的對象）
+      const currentItem = this.advertisementList.find(item => item.id === row.id);
+      const nextItem = this.advertisementList.find(item => item.id === sortedList[currentIndex + 1].id);
       
+      if (!currentItem || !nextItem) {
+        this.$modal.msgError("找不到對應的記錄");
+        return;
+      }
+      
+      // 交換排序值
       const tempOrder = currentItem.showOrder;
       currentItem.showOrder = nextItem.showOrder;
       nextItem.showOrder = tempOrder;
       
-      // 重新排序陣列
-      this.advertisementList.sort((a, b) => a.showOrder - b.showOrder);
-      
-      this.orderChanged = true;
+      // 立即保存排序
+      this.saveAdvertisementOrder([currentItem, nextItem]);
     },
-    /** 儲存排序 */
-    handleSaveOrder() {
-      // 批次更新排序
-      updateAdvertisementOrder(this.advertisementList).then(response => {
-        this.$modal.msgSuccess("排序儲存成功");
-        this.orderChanged = false;
+    /** 保存廣告排序 */
+    saveAdvertisementOrder(advertisements) {
+      // 批量更新排序
+      updateAdvertisementOrder(advertisements).then(() => {
+        this.$modal.msgSuccess("排序保存成功");
+        // 重新加載列表以刷新顯示
+        this.getList();
+      }).catch(() => {
+        this.$modal.msgError("排序保存失敗");
+        // 重新加載列表以恢復原狀
         this.getList();
       });
-    },
-    /** 表格行樣式 */
-    tableRowClassName({row, rowIndex}) {
-      // 如果排序發生變化，給行添加高亮樣式
-      if (this.orderChanged) {
-        const original = this.originalOrder.find(o => o.id === row.id);
-        if (original && original.showOrder !== row.showOrder) {
-          return 'order-changed-row';
-        }
-      }
-      return '';
     },
     /** 上傳成功回調 */
     handleUploadSuccess(response, file, fileList) {
@@ -523,7 +518,4 @@ export default {
 </script>
 
 <style scoped>
-.order-changed-row {
-  background-color: #f0f9ff !important;
-}
 </style> 

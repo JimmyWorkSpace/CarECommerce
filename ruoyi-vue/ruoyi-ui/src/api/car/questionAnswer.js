@@ -42,3 +42,12 @@ export function delQuestionAnswer(id) {
     method: 'delete'
   })
 }
+
+// 批量更新问答排序
+export function batchUpdateQuestionAnswerOrder(data) {
+  return request({
+    url: '/car/questionAnswer/batchUpdateOrder',
+    method: 'put',
+    data: data
+  })
+}

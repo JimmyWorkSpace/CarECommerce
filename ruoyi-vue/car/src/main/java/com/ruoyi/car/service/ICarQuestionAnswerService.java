@@ -58,4 +58,13 @@ public interface ICarQuestionAnswerService
      * @return 结果
      */
     public int deleteCarQuestionAnswerById(Long id);
+
+    /**
+     * 更新问答排序
+     * 
+     * @param id 问答ID
+     * @param showOrder 顯示順序
+     * @return 結果
+     */
+    public int updateCarQuestionAnswerOrder(Long id, Integer showOrder);
 }

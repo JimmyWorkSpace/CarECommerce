@@ -47,4 +47,11 @@ public interface CarQuestionAnswerMapper extends Mapper<CarQuestionAnswerEntity>
      * 根据頻道ID查询问答列表（按排序）
      */
     List<CarQuestionAnswerEntity> selectByChannelIdOrderByShowOrder(@Param("channelId") Long channelId);
+
+    /**
+     * 查詢最大的顯示順序
+     * 
+     * @return 最大的顯示順序，如果沒有記錄則返回0
+     */
+    Integer selectMaxShowOrder();
 }

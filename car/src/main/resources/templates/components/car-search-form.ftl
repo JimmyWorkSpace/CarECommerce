@@ -67,12 +67,12 @@
             <!-- 第二行 -->
             <div class="search-form-row">
                 <div class="search-form-group">
-                    <label class="search-form-label">排氣量cc起</label>
-                    <input type="number" class="search-form-input" name="displacementFrom" id="displacementFromInput" placeholder="自填" min="0" step="1">
+                    <label class="search-form-label">排氣量起</label>
+                    <input type="number" class="search-form-input" name="displacementFrom" id="displacementFromInput" placeholder="自填範圍1.1至6.0" min="1.1" step="0.1">
                 </div>
                 <div class="search-form-group">
-                    <label class="search-form-label">排氣量cc迄</label>
-                    <input type="number" class="search-form-input" name="displacementTo" id="displacementToInput" placeholder="自填" min="0" step="1">
+                    <label class="search-form-label">排氣量迄</label>
+                    <input type="number" class="search-form-input" name="displacementTo" id="displacementToInput" placeholder="自填範圍1.1至6.0" min="6.0" step="0.1">
                 </div>
                 <div class="search-form-group">
                     <label class="search-form-label">車色</label>
@@ -230,12 +230,22 @@
             document.getElementById('yearToSelect').value = yearTo;
         }
         
-        // 填充排量
+        // 填充排量（将URL参数中的毫升值转换为升值显示，如果值小于100则视为升值）
         if (displacementFrom && document.getElementById('displacementFromInput')) {
-            document.getElementById('displacementFromInput').value = displacementFrom;
+            const displacementFromValue = parseFloat(displacementFrom);
+            if (!isNaN(displacementFromValue)) {
+                // 如果值小于100，可能是升值，直接显示；否则是毫升值，除以1000显示为升值
+                const displayValue = displacementFromValue < 100 ? displacementFromValue : displacementFromValue / 1000;
+                document.getElementById('displacementFromInput').value = displayValue;
+            }
         }
         if (displacementTo && document.getElementById('displacementToInput')) {
-            document.getElementById('displacementToInput').value = displacementTo;
+            const displacementToValue = parseFloat(displacementTo);
+            if (!isNaN(displacementToValue)) {
+                // 如果值小于100，可能是升值，直接显示；否则是毫升值，除以1000显示为升值
+                const displayValue = displacementToValue < 100 ? displacementToValue : displacementToValue / 1000;
+                document.getElementById('displacementToInput').value = displayValue;
+            }
         }
         
         // 填充车色
@@ -320,12 +330,22 @@
             }
         }
         if (displacementFrom) {
-            searchConditions.displacementFrom = displacementFrom;
-            params.append('displacementFrom', displacementFrom);
+            // 将排量从升转换为毫升（乘以1000）
+            const displacementFromValue = parseFloat(displacementFrom);
+            if (!isNaN(displacementFromValue) && displacementFromValue > 0) {
+                const displacementFromMl = Math.round(displacementFromValue * 1000);
+                searchConditions.displacementFrom = displacementFromMl.toString();
+                params.append('displacementFrom', displacementFromMl.toString());
+            }
         }
         if (displacementTo) {
-            searchConditions.displacementTo = displacementTo;
-            params.append('displacementTo', displacementTo);
+            // 将排量从升转换为毫升（乘以1000）
+            const displacementToValue = parseFloat(displacementTo);
+            if (!isNaN(displacementToValue) && displacementToValue > 0) {
+                const displacementToMl = Math.round(displacementToValue * 1000);
+                searchConditions.displacementTo = displacementToMl.toString();
+                params.append('displacementTo', displacementToMl.toString());
+            }
         }
         if (color) {
             searchConditions.color = color;

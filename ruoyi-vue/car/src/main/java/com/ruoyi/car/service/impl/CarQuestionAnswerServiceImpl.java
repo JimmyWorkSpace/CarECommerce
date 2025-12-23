@@ -79,6 +79,14 @@ public class CarQuestionAnswerServiceImpl implements ICarQuestionAnswerService
     {
         carQuestionAnswer.setCreateTime(LocalDateTime.now());
         carQuestionAnswer.setDelFlag(false);
+        // 新增时自动计算showOrder：查找最大的showOrder，然后加100
+        if (carQuestionAnswer.getId() == null) {
+            Integer maxShowOrder = carQuestionAnswerMapper.selectMaxShowOrder();
+            if (maxShowOrder == null) {
+                maxShowOrder = 0;
+            }
+            carQuestionAnswer.setShowOrder(maxShowOrder + 100);
+        }
         // 使用tkMyBatis现成的方法
         return carQuestionAnswerMapper.insertSelective(carQuestionAnswer);
     }
@@ -127,6 +135,22 @@ public class CarQuestionAnswerServiceImpl implements ICarQuestionAnswerService
         CarQuestionAnswerEntity entity = new CarQuestionAnswerEntity();
         entity.setId(id);
         entity.setDelFlag(true);
+        return carQuestionAnswerMapper.updateByPrimaryKeySelective(entity);
+    }
+
+    /**
+     * 更新问答排序
+     * 
+     * @param id 问答ID
+     * @param showOrder 顯示順序
+     * @return 結果
+     */
+    @Override
+    public int updateCarQuestionAnswerOrder(Long id, Integer showOrder)
+    {
+        CarQuestionAnswerEntity entity = new CarQuestionAnswerEntity();
+        entity.setId(id);
+        entity.setShowOrder(showOrder);
         return carQuestionAnswerMapper.updateByPrimaryKeySelective(entity);
     }
 }

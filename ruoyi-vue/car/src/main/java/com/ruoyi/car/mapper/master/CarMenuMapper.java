@@ -40,4 +40,19 @@ public interface CarMenuMapper extends Mapper<CarMenuEntity>{
      * @return 父菜單集合
      */
     List<CarMenuEntity> selectParentMenuList();
+
+    /**
+     * 更新菜單維護（支持 parentId 為 null 的情況）
+     * 
+     * @param carMenu 菜單信息
+     * @return 結果
+     */
+    int updateCarMenu(CarMenuEntity carMenu);
+
+    /**
+     * 查詢最大的顯示順序
+     * 
+     * @return 最大的顯示順序，如果沒有記錄則返回0
+     */
+    Integer selectMaxShowOrder();
 }

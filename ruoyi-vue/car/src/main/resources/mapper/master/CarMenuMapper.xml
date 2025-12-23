@@ -49,6 +49,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectCarMenuVo"/>
         where id = #{id}
     </select>
+    
+    <select id="selectMaxShowOrder" resultType="java.lang.Integer">
+        select COALESCE(MAX(showOrder), 0) from car_menu where delFlag = 0
+    </select>
         
     <insert id="insertCarMenu" parameterType="com.ruoyi.car.domain.CarMenuEntity" useGeneratedKeys="true" keyProperty="id">
         insert into car_menu
@@ -90,7 +94,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null">linkUrl = #{linkUrl},</if>
             <if test="linkType != null">linkType = #{linkType},</if>
             <if test="content != null">content = #{content},</if>
-            <if test="parentId != null">parentId = #{parentId},</if>
+            <!-- 使用 choose 来处理 parentId，包括 null 值的情况 -->
+            <!-- 由于前端总是会传递 parentId 字段（要么是 null，要么是数字），所以这里总是更新 -->
+            <choose>
+                <when test="parentId != null">parentId = #{parentId},</when>
+                <otherwise>parentId = null,</otherwise>
+            </choose>
         </trim>
         where id = #{id}
     </update>

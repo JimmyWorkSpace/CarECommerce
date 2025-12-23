@@ -124,13 +124,13 @@ public class CarSalesService {
 		});
 		
 		// 处理coverImage字段，添加前缀并转换为缩略图
-		if (pageInfo.getList() != null) {
-			for (CarListDto car : pageInfo.getList()) {
-				if (StrUtil.isNotBlank(car.getCoverImage())) {
-					car.setCoverImage(imageUrlUtil.getThumbnailUrlWithPrefix(car.getCoverImage()));
-				}
-			}
-		}
+		// if (pageInfo.getList() != null) {
+		// 	for (CarListDto car : pageInfo.getList()) {
+		// 		if (StrUtil.isNotBlank(car.getCoverImage())) {
+		// 			car.setCoverImage(imageUrlUtil.getThumbnailUrlWithPrefix(car.getCoverImage()));
+		// 		}
+		// 	}
+		// }
 		
 		return pageInfo;
 	}
@@ -224,13 +224,13 @@ public class CarSalesService {
 		List<CarListDto> carList = carMapper.selectRecommendedCarListWithCover(recommandIds);
 		
 		// 处理coverImage字段，添加前缀并转换为缩略图
-		if (carList != null) {
-			for (CarListDto car : carList) {
-				if (StrUtil.isNotBlank(car.getCoverImage())) {
-					car.setCoverImage(imageUrlUtil.getThumbnailUrlWithPrefix(car.getCoverImage()));
-				}
-			}
-		}
+		// if (carList != null) {
+		// 	for (CarListDto car : carList) {
+		// 		if (StrUtil.isNotBlank(car.getCoverImage())) {
+		// 			car.setCoverImage(imageUrlUtil.getThumbnailUrlWithPrefix(car.getCoverImage()));
+		// 		}
+		// 	}
+		// }
 		
 		return carList != null ? carList : new ArrayList<>();
 	}

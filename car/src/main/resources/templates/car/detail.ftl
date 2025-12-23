@@ -88,11 +88,11 @@
                         <div class="spec-value">{{ carInfo.manufactureYear || '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                        <div class="spec-name text-muted">里程</div>
-                        <div class="spec-value">{{ carInfo.mileage ? formatMileage(carInfo.mileage) + ' km' : '--' }}</div>
+                        <div class="spec-name text-muted">公里數</div>
+                        <div class="spec-value">{{ carInfo.mileage ? formatMileage(carInfo.mileage) : '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                        <div class="spec-name text-muted">排量</div>
+                        <div class="spec-name text-muted">排氣量(L)</div>
                         <div class="spec-value">{{ carInfo.displacement || '--' }}</div>
                     </div>
                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">

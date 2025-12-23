@@ -23,4 +23,11 @@ public interface CarAdvertisementMapper extends Mapper<CarAdvertisementEntity> {
      * 批量更新排序
      */
     int batchUpdateShowOrder(@Param("advertisements") List<CarAdvertisementEntity> advertisements);
+    
+    /**
+     * 查詢最大的顯示順序
+     * 
+     * @return 最大的顯示順序，如果沒有記錄則返回0
+     */
+    Integer selectMaxShowOrder();
 } 
