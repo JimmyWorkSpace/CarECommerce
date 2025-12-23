@@ -414,7 +414,13 @@
                                                 </div>
                                                 <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                                                     <div class="spec-name text-muted">排氣量(L)</div>
-                                                    <div class="spec-value">${car.displacement!''}</div>
+                                                    <div class="spec-value">
+                                                        <#if car.displacement?? && car.displacement?number gt 0>
+                                                            ${(car.displacement?number / 1000)?string("0.0")}
+                                                        <#else>
+                                                            --
+                                                        </#if>
+                                                    </div>
                                                 </div>
                                                 <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                                                     <div class="spec-name text-muted">變速箱</div>
