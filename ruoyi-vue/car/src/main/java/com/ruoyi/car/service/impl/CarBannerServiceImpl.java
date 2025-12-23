@@ -22,7 +22,14 @@ public class CarBannerServiceImpl implements CarBannerService {
 
     @Override
     public List<CarBannerEntity> selectAllBanners() {
-        return carBannerMapper.selectAllOrderByShowOrder();
+        List<CarBannerEntity> banners = carBannerMapper.selectAllOrderByShowOrder();
+        // 确保所有记录的showOrder不为null
+        for (CarBannerEntity banner : banners) {
+            if (banner.getShowOrder() == null) {
+                banner.setShowOrder(0);
+            }
+        }
+        return banners;
     }
 
     @Override
@@ -34,14 +41,19 @@ public class CarBannerServiceImpl implements CarBannerService {
     @Transactional
     public int insertBanner(CarBannerEntity carBanner) {
         // 设置默认值
-        if (carBanner.getShowOrder() == null) {
-            carBanner.setShowOrder(0);
-        }
         if (carBanner.getDelFlag() == null) {
             carBanner.setDelFlag(0);
         }
         if (carBanner.getIsLink() == null) {
             carBanner.setIsLink(0);
+        }
+        // 新增时自动计算showOrder：查找最大的showOrder，然后加100
+        if (carBanner.getId() == null) {
+            Integer maxShowOrder = carBannerMapper.selectMaxShowOrder();
+            if (maxShowOrder == null) {
+                maxShowOrder = 0;
+            }
+            carBanner.setShowOrder(maxShowOrder + 100);
         }
         return carBannerMapper.insert(carBanner);
     }

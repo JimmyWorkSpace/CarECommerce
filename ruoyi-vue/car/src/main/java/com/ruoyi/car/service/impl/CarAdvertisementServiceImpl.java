@@ -39,9 +39,6 @@ public class CarAdvertisementServiceImpl implements CarAdvertisementService {
     @Transactional
     public int insertAdvertisement(CarAdvertisementEntity carAdvertisement) {
         // 设置默认值
-        if (carAdvertisement.getShowOrder() == null) {
-            carAdvertisement.setShowOrder(0);
-        }
         if (carAdvertisement.getDelFlag() == null) {
             carAdvertisement.setDelFlag(0);
         }
@@ -53,6 +50,14 @@ public class CarAdvertisementServiceImpl implements CarAdvertisementService {
         }
         if (carAdvertisement.getTitleType() == null) {
             carAdvertisement.setTitleType(0);
+        }
+        // 新增时自动计算showOrder：查找最大的showOrder，然后加100
+        if (carAdvertisement.getId() == null) {
+            Integer maxShowOrder = carAdvertisementMapper.selectMaxShowOrder();
+            if (maxShowOrder == null) {
+                maxShowOrder = 0;
+            }
+            carAdvertisement.setShowOrder(maxShowOrder + 100);
         }
         return carAdvertisementMapper.insert(carAdvertisement);
     }

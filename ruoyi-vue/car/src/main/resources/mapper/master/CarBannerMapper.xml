@@ -20,19 +20,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
     
     <select id="selectAllOrderByShowOrder" resultMap="CarBannerResult">
-        <include refid="selectCarBannerVo"/>
+        select id, imageUrl, linkUrl, isLink, COALESCE(showOrder, 0) as showOrder, delFlag, createTime 
+        from car_banner
         where delFlag = 0 or delFlag is null
-        order by showOrder asc, createTime desc
+        order by COALESCE(showOrder, 0) asc, createTime desc
     </select>
     
     <update id="batchUpdateShowOrder" parameterType="java.util.List">
-            update car_banner 
-            set showOrder = 
-            case id 
+        update car_banner 
+        set showOrder = 
+        case id 
         <foreach collection="banners" item="banner">
             when #{banner.id} then #{banner.showOrder}
         </foreach>
-        	end
+        end
+        where id in
+        <foreach collection="banners" item="banner" open="(" separator="," close=")">
+            #{banner.id}
+        </foreach>
     </update>
+    
+    <select id="selectMaxShowOrder" resultType="java.lang.Integer">
+        select COALESCE(MAX(showOrder), 0) from car_banner where delFlag = 0 or delFlag is null
+    </select>
     
 </mapper> 

@@ -81,6 +81,21 @@ public class CarQuestionAnswerController extends BaseController
     }
 
     /**
+     * 批量更新问答排序
+     */
+    @PreAuthorize("@ss.hasPermi('car:questionAnswer:edit')")
+    @Log(title = "问答模块", businessType = BusinessType.UPDATE)
+    @PutMapping("/batchUpdateOrder")
+    public AjaxResult batchUpdateOrder(@RequestBody List<CarQuestionAnswerEntity> questionAnswerList)
+    {
+        int result = 0;
+        for (CarQuestionAnswerEntity questionAnswer : questionAnswerList) {
+            result += carQuestionAnswerService.updateCarQuestionAnswerOrder(questionAnswer.getId(), questionAnswer.getShowOrder());
+        }
+        return toAjax(result);
+    }
+
+    /**
      * 修改问答模块
      */
     @PreAuthorize("@ss.hasPermi('car:questionAnswer:edit')")

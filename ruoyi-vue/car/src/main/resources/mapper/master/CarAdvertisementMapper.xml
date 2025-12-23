@@ -51,13 +51,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
     
     <update id="batchUpdateShowOrder" parameterType="java.util.List">
-            update car_advertisement 
-            set showOrder = 
-            case id 
+        update car_advertisement 
+        set showOrder = 
+        case id 
         <foreach collection="advertisements" item="advertisement">
             when #{advertisement.id} then #{advertisement.showOrder}
         </foreach>
-        	end
+        end
+        where id in
+        <foreach collection="advertisements" item="advertisement" open="(" separator="," close=")">
+            #{advertisement.id}
+        </foreach>
     </update>
+    
+    <select id="selectMaxShowOrder" resultType="java.lang.Integer">
+        select COALESCE(MAX(showOrder), 0) from car_advertisement where delFlag = 0 or delFlag is null
+    </select>
     
 </mapper> 

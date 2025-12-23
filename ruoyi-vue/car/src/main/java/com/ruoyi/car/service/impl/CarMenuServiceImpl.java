@@ -57,8 +57,13 @@ public class CarMenuServiceImpl implements CarMenuService
     {
         carMenu.setCreateTime(DateUtils.getNowDate());
         carMenu.setDelFlag(0);
-        if (carMenu.getShowOrder() == null) {
-            carMenu.setShowOrder(0);
+        // 新增时自动计算showOrder：查找最大的showOrder，然后加100
+        if (carMenu.getId() == null) {
+            Integer maxShowOrder = carMenuMapper.selectMaxShowOrder();
+            if (maxShowOrder == null) {
+                maxShowOrder = 0;
+            }
+            carMenu.setShowOrder(maxShowOrder + 100);
         }
         if (carMenu.getIsShow() == null) {
             carMenu.setIsShow(1);
@@ -78,7 +83,8 @@ public class CarMenuServiceImpl implements CarMenuService
     @Override
     public int updateCarMenu(CarMenuEntity carMenu)
     {
-        return carMenuMapper.updateByPrimaryKeySelective(carMenu);
+        // 使用自定义的更新方法，确保 parentId 为 null 时也能正确更新
+        return carMenuMapper.updateCarMenu(carMenu);
     }
 
     /**

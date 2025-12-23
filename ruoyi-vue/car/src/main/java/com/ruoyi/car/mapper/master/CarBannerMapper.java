@@ -18,4 +18,11 @@ public interface CarBannerMapper extends Mapper<CarBannerEntity> {
      * 批量更新排序
      */
     int batchUpdateShowOrder(@Param("banners") List<CarBannerEntity> banners);
+
+    /**
+     * 查詢最大的顯示順序
+     * 
+     * @return 最大的顯示順序，如果沒有記錄則返回0
+     */
+    Integer selectMaxShowOrder();
 } 

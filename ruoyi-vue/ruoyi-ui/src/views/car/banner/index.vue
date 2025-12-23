@@ -36,48 +36,13 @@
           v-hasPermi="['car:banner:add']"
         >新增</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-arrow-up"
-          size="mini"
-          :disabled="single"
-          @click="handleMoveUp"
-          v-hasPermi="['car:banner:edit']"
-        >上移</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-arrow-down"
-          size="mini"
-          :disabled="single"
-          @click="handleMoveDown"
-          v-hasPermi="['car:banner:edit']"
-        >下移</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-sort"
-          size="mini"
-          @click="handleSaveOrder"
-          v-hasPermi="['car:banner:edit']"
-        >儲存排序</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table 
       v-loading="loading" 
       :data="bannerList" 
-      @selection-change="handleSelectionChange"
-      row-key="id"
-      :row-class-name="tableRowClassName">
-      <el-table-column type="selection" width="55" align="center" />
+      row-key="id">
       <el-table-column label="圖片" align="center" prop="imageUrl" width="200">
         <template slot-scope="scope">
           <el-image 
@@ -107,8 +72,22 @@
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-arrow-up"
+            @click="handleMoveUp(scope.row)"
+            :disabled="!canMoveUp(scope.row)"
+          >上移</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-arrow-down"
+            @click="handleMoveDown(scope.row)"
+            :disabled="!canMoveDown(scope.row)"
+          >下移</el-button>
           <el-button
             size="mini"
             type="text"
@@ -219,10 +198,7 @@ export default {
       uploadUrl: process.env.VUE_APP_BASE_API + "/car/banner/upload",
       uploadHeaders: {
         Authorization: 'Bearer ' + this.$store.getters.token
-      },
-      // 排序相關
-      orderChanged: false,
-      originalOrder: []
+      }
     };
   },
   created() {
@@ -233,11 +209,15 @@ export default {
     getList() {
       this.loading = true;
       listBanner(this.queryParams).then(response => {
-        this.bannerList = response.rows;
+        this.bannerList = response.rows || [];
+        // 確保所有記錄的showOrder不為null
+        this.bannerList.forEach(banner => {
+          if (banner.showOrder == null) {
+            banner.showOrder = 0;
+          }
+        });
         this.total = response.total;
         this.loading = false;
-        // 儲存原始排序
-        this.originalOrder = this.bannerList.map(item => ({ id: item.id, showOrder: item.showOrder }));
       });
     },
     // 取消按鈕
@@ -296,10 +276,8 @@ export default {
         } else {
           this.form.delFlag = 0;
         }
-        // 如果 isLink 为 0，清空 linkUrl
-        if (this.form.isLink === 0) {
-          this.form.linkUrl = '';
-        }
+        // 不再在修改时清空 linkUrl，保留数据库中的值
+        // 如果 isLink 为 0，linkUrl 可能已经有值，但提交时会根据 isLink 清空
         this.open = true;
         this.title = "修改輪播圖";
       });
@@ -348,83 +326,109 @@ export default {
         ...this.queryParams
       }, `banner_${new Date().getTime()}.xlsx`)
     },
+    /** 判斷是否可以上移 */
+    canMoveUp(banner) {
+      const sortedList = [...this.bannerList].sort((a, b) => {
+        const orderA = a.showOrder || 0;
+        const orderB = b.showOrder || 0;
+        return orderA - orderB;
+      });
+      return sortedList[0].id !== banner.id;
+    },
+    /** 判斷是否可以下移 */
+    canMoveDown(banner) {
+      const sortedList = [...this.bannerList].sort((a, b) => {
+        const orderA = a.showOrder || 0;
+        const orderB = b.showOrder || 0;
+        return orderA - orderB;
+      });
+      return sortedList[sortedList.length - 1].id !== banner.id;
+    },
     /** 上移操作 */
-    handleMoveUp() {
-      if (this.ids.length !== 1) {
-        this.$modal.msgWarning("請選擇一條記錄進行上移操作");
-        return;
-      }
-      
-      const selectedId = this.ids[0];
-      const currentIndex = this.bannerList.findIndex(item => item.id === selectedId);
+    handleMoveUp(row) {
+      const sortedList = [...this.bannerList].sort((a, b) => {
+        const orderA = a.showOrder || 0;
+        const orderB = b.showOrder || 0;
+        return orderA - orderB;
+      });
+      const currentIndex = sortedList.findIndex(banner => banner.id === row.id);
       
       if (currentIndex <= 0) {
         this.$modal.msgWarning("已經是第一條記錄，無法上移");
         return;
       }
       
-      // 交換當前記錄與上一條記錄的排序
-      const currentItem = this.bannerList[currentIndex];
-      const prevItem = this.bannerList[currentIndex - 1];
+      // 找到原始列表中的对象（通过ID）
+      const currentItem = this.bannerList.find(banner => banner.id === row.id);
+      const prevItem = this.bannerList.find(banner => banner.id === sortedList[currentIndex - 1].id);
       
-      const tempOrder = currentItem.showOrder;
-      currentItem.showOrder = prevItem.showOrder;
-      prevItem.showOrder = tempOrder;
-      
-      // 重新排序陣列
-      this.bannerList.sort((a, b) => a.showOrder - b.showOrder);
-      
-      this.orderChanged = true;
-      // this.$modal.msgSuccess("上移成功");
-    },
-    /** 下移操作 */
-    handleMoveDown() {
-      if (this.ids.length !== 1) {
-        this.$modal.msgWarning("請選擇一條記錄進行下移操作");
+      if (!currentItem || !prevItem) {
+        this.$modal.msgError("找不到對應的記錄");
         return;
       }
       
-      const selectedId = this.ids[0];
-      const currentIndex = this.bannerList.findIndex(item => item.id === selectedId);
+      // 確保showOrder不為null
+      const currentOrder = currentItem.showOrder != null ? currentItem.showOrder : 0;
+      const prevOrder = prevItem.showOrder != null ? prevItem.showOrder : 0;
       
-      if (currentIndex >= this.bannerList.length - 1) {
+      // 交換排序值
+      currentItem.showOrder = prevOrder;
+      prevItem.showOrder = currentOrder;
+      
+      // 立即保存排序
+      this.saveBannerOrder([currentItem, prevItem]);
+    },
+    /** 下移操作 */
+    handleMoveDown(row) {
+      const sortedList = [...this.bannerList].sort((a, b) => {
+        const orderA = a.showOrder || 0;
+        const orderB = b.showOrder || 0;
+        return orderA - orderB;
+      });
+      const currentIndex = sortedList.findIndex(banner => banner.id === row.id);
+      
+      if (currentIndex >= sortedList.length - 1) {
         this.$modal.msgWarning("已經是最後一條記錄，無法下移");
         return;
       }
       
-      // 交換當前記錄與下一條記錄的排序
-      const currentItem = this.bannerList[currentIndex];
-      const nextItem = this.bannerList[currentIndex + 1];
+      // 找到原始列表中的对象（通过ID）
+      const currentItem = this.bannerList.find(banner => banner.id === row.id);
+      const nextItem = this.bannerList.find(banner => banner.id === sortedList[currentIndex + 1].id);
       
-      const tempOrder = currentItem.showOrder;
-      currentItem.showOrder = nextItem.showOrder;
-      nextItem.showOrder = tempOrder;
+      if (!currentItem || !nextItem) {
+        this.$modal.msgError("找不到對應的記錄");
+        return;
+      }
       
-      // 重新排序陣列
-      this.bannerList.sort((a, b) => a.showOrder - b.showOrder);
+      // 確保showOrder不為null
+      const currentOrder = currentItem.showOrder != null ? currentItem.showOrder : 0;
+      const nextOrder = nextItem.showOrder != null ? nextItem.showOrder : 0;
       
-      this.orderChanged = true;
-      // this.$modal.msgSuccess("下移成功");
+      // 交換排序值
+      currentItem.showOrder = nextOrder;
+      nextItem.showOrder = currentOrder;
+      
+      // 立即保存排序
+      this.saveBannerOrder([currentItem, nextItem]);
     },
-    /** 儲存排序 */
-    handleSaveOrder() {
-      // 批次更新排序
-      updateBannerOrder(this.bannerList).then(response => {
-        this.$modal.msgSuccess("排序儲存成功");
-        this.orderChanged = false;
+    /** 保存輪播圖排序 */
+    saveBannerOrder(banners) {
+      // 確保所有記錄的showOrder不為null
+      const bannersToSave = banners.map(banner => ({
+        ...banner,
+        showOrder: banner.showOrder != null ? banner.showOrder : 0
+      }));
+      // 批量更新排序
+      updateBannerOrder(bannersToSave).then(() => {
+        this.$modal.msgSuccess("排序保存成功");
+        // 重新加載列表以刷新顯示
+        this.getList();
+      }).catch(() => {
+        this.$modal.msgError("排序保存失敗");
+        // 重新加載列表以恢復原狀
         this.getList();
       });
-    },
-    /** 表格行樣式 */
-    tableRowClassName({row, rowIndex}) {
-      // 如果排序發生變化，給行添加高亮樣式
-      if (this.orderChanged) {
-        const original = this.originalOrder.find(o => o.id === row.id);
-        if (original && original.showOrder !== row.showOrder) {
-          return 'order-changed-row';
-        }
-      }
-      return '';
     },
     /** 上傳成功回調 */
     handleUploadSuccess(response, file, fileList) {
@@ -456,17 +460,12 @@ export default {
     },
     /** 是否跳转改变时的处理 */
     handleIsLinkChange(value) {
-      // 如果选择"否"（值为0），清空跳转地址
-      if (value === 0 || value === '0') {
-        this.form.linkUrl = '';
-      }
+      // 不再清空跳转地址，保留用户输入的内容
+      // 这样用户可以在"是"和"否"之间切换而不丢失已输入的地址
     }
   }
 };
 </script>
 
 <style scoped>
-.order-changed-row {
-  background-color: #f0f9ff !important;
-}
 </style> 

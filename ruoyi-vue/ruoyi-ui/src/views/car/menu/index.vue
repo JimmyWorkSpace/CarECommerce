@@ -70,10 +70,12 @@
         </template>
       </el-table-column>
       <el-table-column label="鏈接地址" align="center" prop="linkUrl" show-overflow-tooltip v-if="false" />
-      <el-table-column label="內容" align="center" prop="content" show-overflow-tooltip>
+      <el-table-column label="內容" align="center" prop="content" show-overflow-tooltip width="300">
         <template slot-scope="scope">
           <span v-if="scope.row.linkType === 0">{{ scope.row.linkUrl }}</span>
-          <span v-else-if="scope.row.linkType === 1" v-html="scope.row.content ? scope.row.content.substring(0, 50) + '...' : ''"></span>
+          <span v-else-if="scope.row.linkType === 1" class="content-text" :title="getPlainText(scope.row.content)">
+            {{ getPlainText(scope.row.content) }}
+          </span>
         </template>
       </el-table-column>
       <el-table-column label="建立時間" align="center" prop="createTime" width="180">
@@ -124,7 +126,7 @@
     
 
     <!-- 添加或修改選單維護對話框 -->
-    <el-dialog :title="title" :visible.sync="open" width="70%" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="70%" append-to-body :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="父菜單" prop="parentId">
           <el-select v-model="form.parentId" placeholder="請選擇父菜單（不選則為頂級菜單）" clearable style="width: 100%">
@@ -140,7 +142,7 @@
         <el-form-item label="選單名稱" prop="title">
           <el-input v-model="form.title" placeholder="請輸入選單名稱" />
         </el-form-item>
-        <el-form-item label="顯示順序" prop="showOrder">
+        <el-form-item label="顯示順序" prop="showOrder" v-if="form.id != null">
           <el-input-number v-model="form.showOrder" :min="0" :max="999" placeholder="請輸入顯示順序" />
         </el-form-item>
         <el-form-item label="是否顯示" prop="isShow">
@@ -211,8 +213,22 @@
             <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="120">
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
           <template slot-scope="scope">
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-arrow-up"
+              @click="handleQaMoveUp(scope.row)"
+              :disabled="!canQaMoveUp(scope.row)"
+            >上移</el-button>
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-arrow-down"
+              @click="handleQaMoveDown(scope.row)"
+              :disabled="!canQaMoveDown(scope.row)"
+            >下移</el-button>
             <el-button
               size="mini"
               type="text"
@@ -232,7 +248,7 @@
       <!-- 問答表單對話框 -->
       <el-dialog :title="qaFormTitle" :visible.sync="qaFormOpen" width="70%" :top="'10vh'" append-to-body>
         <el-form ref="qaForm" :model="qaForm" :rules="qaRules" label-width="80px">
-          <el-form-item label="排序" prop="showOrder">
+          <el-form-item label="排序" prop="showOrder" v-if="qaForm.id != null">
             <el-input-number v-model="qaForm.showOrder" :min="0" placeholder="請輸入排序" style="width: 100%" />
           </el-form-item>
           <el-form-item label="問題" prop="question">
@@ -253,8 +269,9 @@
 
 <script>
 import { listMenu, getMenu, delMenu, addMenu, updateMenu, updateMenuShowStatus, updateMenuOrder, batchUpdateMenuOrder, listParentMenu } from "@/api/car/menu";
-import { listQuestionAnswer, getQuestionAnswer, delQuestionAnswer, addQuestionAnswer, updateQuestionAnswer } from "@/api/car/questionAnswer";
+import { listQuestionAnswer, getQuestionAnswer, delQuestionAnswer, addQuestionAnswer, updateQuestionAnswer, batchUpdateQuestionAnswerOrder } from "@/api/car/questionAnswer";
 import QuillEditor from "@/components/QuillEditor";
+import { html2Text } from "@/utils";
 
 export default {
   name: "Menu",
@@ -312,7 +329,7 @@ export default {
           { required: true, message: "選單名稱不能為空", trigger: "blur" }
         ],
         showOrder: [
-          { required: true, message: "顯示順序不能為空", trigger: "blur" }
+          { required: false, message: "顯示順序不能為空", trigger: "blur" }
         ],
         isShow: [
           { required: true, message: "是否顯示不能為空", trigger: "change" }
@@ -385,7 +402,7 @@ export default {
       this.form = {
         id: null,
         title: null,
-        showOrder: 0,
+        showOrder: null, // 新增时设为null，后端会自动计算
         delFlag: null,
         createTime: null,
         isShow: 1,
@@ -435,13 +452,17 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
+            // 更新时保留传入的showOrder
             updateMenu(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addMenu(this.form).then(response => {
+            // 新增时，不传递showOrder，让后端自动计算
+            const formData = { ...this.form };
+            formData.showOrder = null;
+            addMenu(formData).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -669,7 +690,7 @@ export default {
         menuId: this.currentMenuId,
         question: null,
         answer: null,
-        showOrder: 0
+        showOrder: null // 新增时设为null，后端会自动计算
       };
       if (this.$refs.qaForm) {
         this.$refs.qaForm.resetFields();
@@ -685,13 +706,17 @@ export default {
       this.$refs["qaForm"].validate(valid => {
         if (valid) {
           if (this.qaForm.id != null) {
+            // 更新时保留传入的showOrder
             updateQuestionAnswer(this.qaForm).then(() => {
               this.$modal.msgSuccess("修改成功");
               this.qaFormOpen = false;
               this.getQaList();
             });
           } else {
-            addQuestionAnswer(this.qaForm).then(() => {
+            // 新增时，不传递showOrder，让后端自动计算
+            const formData = { ...this.qaForm };
+            formData.showOrder = null;
+            addQuestionAnswer(formData).then(() => {
               this.$modal.msgSuccess("新增成功");
               this.qaFormOpen = false;
               this.getQaList();
@@ -699,7 +724,93 @@ export default {
           }
         }
       });
+    },
+    /** 判斷問答是否可以上移 */
+    canQaMoveUp(qa) {
+      const sortedList = [...this.qaList].sort((a, b) => a.showOrder - b.showOrder);
+      return sortedList[0].id !== qa.id;
+    },
+    /** 判斷問答是否可以下移 */
+    canQaMoveDown(qa) {
+      const sortedList = [...this.qaList].sort((a, b) => a.showOrder - b.showOrder);
+      return sortedList[sortedList.length - 1].id !== qa.id;
+    },
+    /** 問答上移操作 */
+    handleQaMoveUp(row) {
+      const sortedList = [...this.qaList].sort((a, b) => a.showOrder - b.showOrder);
+      const currentIndex = sortedList.findIndex(qa => qa.id === row.id);
+      
+      if (currentIndex <= 0) {
+        this.$modal.msgWarning("已經是第一條記錄，無法上移");
+        return;
+      }
+      
+      // 交換當前記錄與上一條記錄的排序
+      const currentItem = sortedList[currentIndex];
+      const prevItem = sortedList[currentIndex - 1];
+      
+      // 交換排序值
+      const tempOrder = currentItem.showOrder;
+      currentItem.showOrder = prevItem.showOrder;
+      prevItem.showOrder = tempOrder;
+      
+      // 立即保存排序
+      this.saveQaOrder([currentItem, prevItem]);
+    },
+    /** 問答下移操作 */
+    handleQaMoveDown(row) {
+      const sortedList = [...this.qaList].sort((a, b) => a.showOrder - b.showOrder);
+      const currentIndex = sortedList.findIndex(qa => qa.id === row.id);
+      
+      if (currentIndex >= sortedList.length - 1) {
+        this.$modal.msgWarning("已經是最後一條記錄，無法下移");
+        return;
+      }
+      
+      // 交換當前記錄與下一條記錄的排序
+      const currentItem = sortedList[currentIndex];
+      const nextItem = sortedList[currentIndex + 1];
+      
+      // 交換排序值
+      const tempOrder = currentItem.showOrder;
+      currentItem.showOrder = nextItem.showOrder;
+      nextItem.showOrder = tempOrder;
+      
+      // 立即保存排序
+      this.saveQaOrder([currentItem, nextItem]);
+    },
+    /** 保存問答排序 */
+    saveQaOrder(qaList) {
+      // 批量更新排序
+      batchUpdateQuestionAnswerOrder(qaList).then(() => {
+        this.$modal.msgSuccess("排序保存成功");
+        // 重新加載列表以刷新顯示
+        this.getQaList();
+      }).catch(() => {
+        this.$modal.msgError("排序保存失敗");
+        // 重新加載列表以恢復原狀
+        this.getQaList();
+      });
+    },
+    /** 提取富文本的纯文字内容 */
+    getPlainText(html) {
+      if (!html) return '';
+      const text = html2Text(html);
+      return text.trim();
     }
   }
 };
 </script>
+
+<style scoped>
+.content-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  line-height: 1.5;
+  max-height: 3em; /* 2行，每行1.5em */
+}
+</style>
