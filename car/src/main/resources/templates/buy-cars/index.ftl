@@ -114,7 +114,7 @@
                                             </div>
                                             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                                                 <div class="spec-name text-muted">排氣量(L)</div>
-                                                <div class="spec-value">{{ car.displacement || '--' }}</div>
+                                                <div class="spec-value">{{ car.displacement ? formatDisplacement(car.displacement) : '--' }}</div>
                                             </div>
                                             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                                                 <div class="spec-name text-muted">變速箱</div>
@@ -392,6 +392,13 @@ new Vue({
         formatMileage(mileage) {
             if (!mileage) return '0';
             return mileage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        },
+        
+        formatDisplacement(displacement) {
+            if (!displacement) return '--';
+            const displacementNum = parseFloat(displacement);
+            if (isNaN(displacementNum) || displacementNum <= 0) return '--';
+            return (displacementNum / 1000).toFixed(1);
         },
         
         handleImageError(event) {
