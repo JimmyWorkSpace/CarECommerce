@@ -33,6 +33,9 @@
     font-size: 17px !important;
     text-align: left !important;
     margin-bottom: 7px !important;
+    height: 1.2rem !important;
+    border-left: 2px solid #F0F0F2 !important;
+    padding-left: 2px !important;
 }
 .car-item-detail{
 }
@@ -106,11 +109,11 @@
                                                 <div class="spec-value">{{ car.manufactureYear || '--' }}</div>
                                             </div>
                                             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                                                <div class="spec-name text-muted">里程</div>
-                                                <div class="spec-value">{{ car.mileage ? formatMileage(car.mileage) + ' km' : '--' }}</div>
+                                                <div class="spec-name text-muted">公里數</div>
+                                                <div class="spec-value">{{ car.mileage ? formatMileage(car.mileage) : '--' }}</div>
                                             </div>
                                             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                                                <div class="spec-name text-muted">排量</div>
+                                                <div class="spec-name text-muted">排氣量(L)</div>
                                                 <div class="spec-value">{{ car.displacement || '--' }}</div>
                                             </div>
                                             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
@@ -458,14 +461,26 @@ new Vue({
                 this.searchForm.yearTo = parseInt(yearTo);
             }
             
-            // 排量
+            // 排量（URL参数可能是升值或毫升值，需要智能判断）
             const displacementFrom = urlParams.get('displacementFrom');
             if (displacementFrom) {
-                this.searchForm.displacementFrom = parseInt(displacementFrom);
+                const displacementFromValue = parseFloat(displacementFrom);
+                if (!isNaN(displacementFromValue) && displacementFromValue > 0) {
+                    // 如果值小于100，可能是升值，需要乘以1000；否则是毫升值，直接使用
+                    this.searchForm.displacementFrom = displacementFromValue < 100 
+                        ? Math.round(displacementFromValue * 1000) 
+                        : Math.round(displacementFromValue);
+                }
             }
             const displacementTo = urlParams.get('displacementTo');
             if (displacementTo) {
-                this.searchForm.displacementTo = parseInt(displacementTo);
+                const displacementToValue = parseFloat(displacementTo);
+                if (!isNaN(displacementToValue) && displacementToValue > 0) {
+                    // 如果值小于100，可能是升值，需要乘以1000；否则是毫升值，直接使用
+                    this.searchForm.displacementTo = displacementToValue < 100 
+                        ? Math.round(displacementToValue * 1000) 
+                        : Math.round(displacementToValue);
+                }
             }
             
             // 车色
@@ -553,17 +568,25 @@ new Vue({
                 this.searchForm.yearTo = null;
             }
             
-            // 处理排量字段
+            // 处理排量字段（将升转换为毫升，乘以1000）
             if (formData.displacementFrom) {
-                const displacementFrom = parseInt(formData.displacementFrom);
-                this.searchForm.displacementFrom = (!isNaN(displacementFrom) && displacementFrom > 0) ? displacementFrom : null;
+                const displacementFrom = parseFloat(formData.displacementFrom);
+                if (!isNaN(displacementFrom) && displacementFrom > 0) {
+                    this.searchForm.displacementFrom = Math.round(displacementFrom);
+                } else {
+                    this.searchForm.displacementFrom = null;
+                }
             } else {
                 this.searchForm.displacementFrom = null;
             }
             
             if (formData.displacementTo) {
-                const displacementTo = parseInt(formData.displacementTo);
-                this.searchForm.displacementTo = (!isNaN(displacementTo) && displacementTo > 0) ? displacementTo : null;
+                const displacementTo = parseFloat(formData.displacementTo);
+                if (!isNaN(displacementTo) && displacementTo > 0) {
+                    this.searchForm.displacementTo = Math.round(displacementTo);
+                } else {
+                    this.searchForm.displacementTo = null;
+                }
             } else {
                 this.searchForm.displacementTo = null;
             }

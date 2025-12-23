@@ -163,6 +163,30 @@
     font-weight: bold;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
+
+/* 首页车辆规格样式 */
+.cars-section .specs .spec-name.text-muted {
+    font-size: 0.9rem;
+    height: 1.5rem;
+    font-weight: normal;
+    border-left: 3px solid #5ACFC9;
+    padding-left: 0.5rem;
+    width: 100%;
+    text-align: left;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cars-section .specs .spec-value {
+    font-size: 1.2rem;
+    height: 1.5rem;
+    font-weight: 500;
+    border-left: 3px solid #F0F0F2;
+    padding-left: 0.5rem;
+    width: 100%;
+    text-align: left;
+}
 </style>
 <!-- 搜索表单（在Vue实例外部） -->
 <link href="/css/car-search-form.css" rel="stylesheet">
@@ -379,17 +403,17 @@
                                                     <div class="spec-value">${car.manufactureYear!''}</div>
                                                 </div>
                                                 <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                                                    <div class="spec-name text-muted">里程</div>
+                                                    <div class="spec-name text-muted">公里數</div>
                                                     <div class="spec-value">
                                                         <#if car.mileage?? && car.mileage gt 0>
-                                                            ${car.mileage?string(',###')} km
+                                                            ${car.mileage?string(',###')}
                                                         <#else>
                                                             --
                                                         </#if>
                                                     </div>
                                                 </div>
                                                 <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                                                    <div class="spec-name text-muted">排量</div>
+                                                    <div class="spec-name text-muted">排氣量(L)</div>
                                                     <div class="spec-value">${car.displacement!''}</div>
                                                 </div>
                                                 <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
@@ -561,7 +585,10 @@ new Vue({
                 return 'col-md-6'; // 默认情况
             }
         },
-        
+        formatMileage(mileage) {
+            if (!mileage) return '0';
+            return mileage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        },
         performSearch() {
             if (this.searchKeyword.trim()) {
                 // 執行搜尋邏輯

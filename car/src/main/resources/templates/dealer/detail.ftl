@@ -182,11 +182,11 @@
                                                         <div class="spec-value">{{ car.manufactureYear || '--' }}</div>
                                                     </div>
                                                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                                                        <div class="spec-name text-muted">里程</div>
-                                                        <div class="spec-value">{{ car.mileage ? formatMileage(car.mileage) + ' km' : '--' }}</div>
+                                                        <div class="spec-name text-muted">公里數</div>
+                                                        <div class="spec-value">{{ car.mileage ? formatMileage(car.mileage) : '--' }}</div>
                                                     </div>
                                                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                                                        <div class="spec-name text-muted">排量</div>
+                                                        <div class="spec-name text-muted">排氣量(L)</div>
                                                         <div class="spec-value">{{ car.displacement || '--' }}</div>
                                                     </div>
                                                     <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
@@ -630,6 +630,9 @@ new Vue({
 
 .cars-list-detail-style .spec-value {
     margin-top: 3px;
+    height: 1.5rem;
+    border-left: 3px solid #F0F0F2;
+    padding-left: 0.5rem;
 }
 .car-card-link {
     text-decoration: none;
