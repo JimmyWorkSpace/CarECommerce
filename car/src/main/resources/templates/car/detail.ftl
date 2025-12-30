@@ -630,6 +630,11 @@ try {
             }, 500);
         });
         
+        // 初始化iframe高度调整
+        this.$nextTick(() => {
+            this.initializeIframeHeights();
+        });
+        
         // 测试Vue实例是否正常工作
         setTimeout(() => {
             console.log('Vue实例测试 - 3秒后执行');
@@ -647,6 +652,25 @@ try {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = this.carInfo.saleDescription;
             return tempDiv.textContent || tempDiv.innerText || '';
+        }
+    },
+    watch: {
+        // 监听tab切换，重新调整iframe高度
+        activeTab: {
+            handler(newTab) {
+                this.$nextTick(() => {
+                    if (newTab.code === 'car_equipments' && this.$refs.contentFrame) {
+                        setTimeout(() => {
+                            this.adjustIframeHeight(this.$refs.contentFrame);
+                        }, 300);
+                    } else if (newTab.code === 'dealer_intro' && this.$refs.dealerContentFrame) {
+                        setTimeout(() => {
+                            this.adjustIframeHeight(this.$refs.dealerContentFrame);
+                        }, 300);
+                    }
+                });
+            },
+            immediate: false
         }
     },
     methods: {
@@ -718,10 +742,64 @@ try {
             this.activeTab = tab;
         },
         
-        // 获取HTML内容
+        // 获取HTML内容，包装成完整HTML文档并添加样式
         getHtmlContent(htmlContent) {
             if (!htmlContent) return '';
-            return htmlContent;
+            
+            // 创建完整的HTML文档，包含样式
+            // 使用字符串拼接避免FreeMarker语法冲突
+            const fullHtml = '<!DOCTYPE html>\n' +
+                '<html>\n' +
+                '<head>\n' +
+                '    <meta charset="UTF-8">\n' +
+                '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+                '    <style>\n' +
+                '        body {\n' +
+                '            margin: 0;\n' +
+                '            padding: 10px;\n' +
+                '            font-family: Arial, sans-serif;\n' +
+                '            line-height: 1.6;\n' +
+                '            word-wrap: break-word;\n' +
+                '        }\n' +
+                '        /* 图片样式 */\n' +
+                '        img {\n' +
+                '            max-width: 99%;\n' +
+                '            height: auto;\n' +
+                '            display: block;\n' +
+                '            margin: 15px auto;\n' +
+                '            border-radius: 8px;\n' +
+                '        }\n' +
+                '        /* Video和YouTube视频样式 */\n' +
+                '        video,\n' +
+                '        iframe[src*="youtube.com"],\n' +
+                '        iframe[src*="youtu.be"],\n' +
+                '        iframe[src*="youtube-nocookie.com"] {\n' +
+                '            max-width: 99%;\n' +
+                '            height: auto;\n' +
+                '            display: block;\n' +
+                '            margin: 15px auto;\n' +
+                '            border-radius: 8px;\n' +
+                '        }\n' +
+                '        /* 确保YouTube iframe保持16:9比例 */\n' +
+                '        iframe[src*="youtube.com"],\n' +
+                '        iframe[src*="youtu.be"],\n' +
+                '        iframe[src*="youtube-nocookie.com"] {\n' +
+                '            aspect-ratio: 16 / 9;\n' +
+                '            width: 99%;\n' +
+                '            max-width: 99%;\n' +
+                '        }\n' +
+                '        table {\n' +
+                '            max-width: 100%;\n' +
+                '            overflow-x: auto;\n' +
+                '        }\n' +
+                '    </style>\n' +
+                '</head>\n' +
+                '<body>\n' +
+                htmlContent +
+                '</body>\n' +
+                '</html>';
+            
+            return fullHtml;
         },
         
         // 获取纯文本内容（去除HTML标签）
@@ -731,6 +809,95 @@ try {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             return tempDiv.textContent || tempDiv.innerText || '';
+        },
+        
+        // 初始化iframe高度调整
+        initializeIframeHeights() {
+            // 调整车辆描述iframe高度
+            this.$nextTick(() => {
+                if (this.$refs.contentFrame) {
+                    this.adjustIframeHeight(this.$refs.contentFrame);
+                    
+                    // 监听iframe加载完成
+                    this.$refs.contentFrame.onload = () => {
+                        this.adjustIframeHeight(this.$refs.contentFrame);
+                    };
+                }
+                
+                // 调整店家描述iframe高度
+                if (this.$refs.dealerContentFrame) {
+                    this.adjustIframeHeight(this.$refs.dealerContentFrame);
+                    
+                    // 监听iframe加载完成
+                    this.$refs.dealerContentFrame.onload = () => {
+                        this.adjustIframeHeight(this.$refs.dealerContentFrame);
+                    };
+                }
+            });
+            
+            // 监听窗口大小变化
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (this.$refs.contentFrame) {
+                        this.adjustIframeHeight(this.$refs.contentFrame);
+                    }
+                    if (this.$refs.dealerContentFrame) {
+                        this.adjustIframeHeight(this.$refs.dealerContentFrame);
+                    }
+                }, 300);
+            });
+            
+            // 监听设备方向变化
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    if (this.$refs.contentFrame) {
+                        this.adjustIframeHeight(this.$refs.contentFrame);
+                    }
+                    if (this.$refs.dealerContentFrame) {
+                        this.adjustIframeHeight(this.$refs.dealerContentFrame);
+                    }
+                }, 500);
+            });
+        },
+        
+        // 调整iframe高度
+        adjustIframeHeight(iframe) {
+            if (!iframe) return;
+            
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                if (!iframeDoc) return;
+                
+                const body = iframeDoc.body;
+                const html = iframeDoc.documentElement;
+                
+                if (!body || !html) return;
+                
+                // 计算内容高度
+                const contentHeight = Math.max(
+                    body.scrollHeight,
+                    body.offsetHeight,
+                    html.clientHeight,
+                    html.scrollHeight,
+                    html.offsetHeight
+                );
+                
+                // 设置最小高度，不限制最大高度
+                const minHeight = 200;
+                const finalHeight = Math.max(contentHeight + 20, minHeight);
+                
+                // 设置iframe高度
+                iframe.style.height = finalHeight + 'px';
+                
+                console.log('商品详情页iframe高度已调整:', finalHeight + 'px');
+                
+            } catch (error) {
+                console.error('调整iframe高度失败:', error);
+                // 设置默认高度
+                iframe.style.height = '200px';
+            }
         },
         
         // 联系Line

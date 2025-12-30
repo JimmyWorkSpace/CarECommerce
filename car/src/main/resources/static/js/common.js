@@ -215,6 +215,25 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
                     max-width: 100%;
                     overflow-x: auto;
                 }
+                /* Video和YouTube视频样式 */
+                video,
+                iframe[src*="youtube.com"],
+                iframe[src*="youtu.be"],
+                iframe[src*="youtube-nocookie.com"] {
+                    max-width: 99%;
+                    height: auto;
+                    display: block;
+                    margin: 15px auto;
+                    border-radius: 8px;
+                }
+                /* 确保YouTube iframe保持16:9比例 */
+                iframe[src*="youtube.com"],
+                iframe[src*="youtu.be"],
+                iframe[src*="youtube-nocookie.com"] {
+                    aspect-ratio: 16 / 9;
+                    width: 99%;
+                    max-width: 99%;
+                }
             </style>
         </head>
         <body>
@@ -223,6 +242,13 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
         </html>
     `;
     
+    // 调整高度的函数
+    const adjustHeight = function() {
+        setTimeout(() => {
+            adjustIframeHeight(iframe, config);
+        }, config.adjustDelay);
+    };
+    
     // 加载HTML内容
     try {
         // 使用srcdoc属性加载HTML内容
@@ -230,17 +256,12 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
         
         // 监听iframe加载完成事件
         iframe.onload = function() {
-            // 延迟调整高度，确保内容完全渲染
-            setTimeout(() => {
-                adjustIframeHeight(iframe, config);
-            }, config.adjustDelay);
+            adjustHeight();
         };
         
         // 如果iframe已经加载完成，直接调整高度
         if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
-            setTimeout(() => {
-                adjustIframeHeight(iframe, config);
-            }, config.adjustDelay);
+            adjustHeight();
         }
         
     } catch (error) {
@@ -251,14 +272,49 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
             iframe.src = dataUrl;
             
             iframe.onload = function() {
-                setTimeout(() => {
-                    adjustIframeHeight(iframe, config);
-                }, config.adjustDelay);
+                adjustHeight();
             };
         } catch (fallbackError) {
             console.error('loadHtmlToIframe: 降级方案也失败', fallbackError);
         }
     }
+    
+    // 监听窗口大小变化，重新调整iframe高度
+    let resizeTimer;
+    const handleResize = function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            adjustHeight();
+        }, 300); // 防抖，300ms后执行
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // 监听设备方向变化（移动设备）
+    window.addEventListener('orientationchange', function() {
+        setTimeout(function() {
+            adjustHeight();
+        }, 500);
+    });
+    
+    // 监听媒体查询变化（PC转手机版）
+    if (window.matchMedia) {
+        const mediaQuery = window.matchMedia('(max-width: 768px)');
+        let lastIsMobile = mediaQuery.matches;
+        
+        mediaQuery.addEventListener('change', function(e) {
+            const isMobile = e.matches;
+            if (isMobile !== lastIsMobile) {
+                lastIsMobile = isMobile;
+                setTimeout(function() {
+                    adjustHeight();
+                }, 300);
+            }
+        });
+    }
+    
+    // 将调整函数保存到iframe元素上，以便外部可以调用
+    iframe._adjustHeight = adjustHeight;
 };
 
 /**

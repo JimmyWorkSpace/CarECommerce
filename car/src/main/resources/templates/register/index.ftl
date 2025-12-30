@@ -1,0 +1,493 @@
+<div class="register-container" id="app">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-plus me-2"></i>
+                        用戶註冊/修改密碼
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <#if error??>
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            ${error}
+                        </div>
+                    </#if>
+                    
+                    <div id="phoneRegisteredAlert" class="alert alert-info" role="alert" style="display: none;">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span id="phoneRegisteredText">該手機號碼已註冊，繼續將修改密碼</span>
+                    </div>
+                    
+                    <form action="/register" method="post" id="registerForm" <#noparse>@submit.prevent="handleSubmit"</#noparse>>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">
+                                <i class="bi bi-phone me-2"></i>手機號碼
+                            </label>
+                            <div class="form-text">必須為10碼數字，以09開頭</div>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
+                                   placeholder="請輸入手機號碼（09開頭）" required maxlength="10" 
+                                   <#noparse>v-model.trim="phoneNumber" @input="onPhoneInput" @blur="checkPhoneRegistered"</#noparse>>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="smsCode" class="form-label">
+                                <i class="bi bi-shield-check me-2"></i>短信驗證碼
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="smsCode" name="smsCode" 
+                                       placeholder="請輸入驗證碼" required maxlength="6" 
+                                       <#noparse>v-model.trim="smsCode"</#noparse>>
+                                <button type="button" class="btn btn-outline-primary" id="sendSmsBtn" 
+                                        <#noparse>@click="sendSmsCode" :disabled="smsCountdown > 0 || !isValidPhone(phoneNumber)"</#noparse>>
+                                    <span id="smsBtnText" <#noparse>v-if="smsCountdown === 0"</#noparse>>發送驗證碼</span>
+                                    <span <#noparse>v-else</#noparse>>{{ smsCountdown }}秒後重發</span>
+                                </button>
+                            </div>
+                            <div class="form-text">驗證碼將發送到您的手機，有效期5分鐘</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock me-2"></i>密碼
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="請輸入密碼" required 
+                                   <#noparse>v-model.trim="password"</#noparse>>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">
+                                <i class="bi bi-lock-fill me-2"></i>確認密碼
+                            </label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" 
+                                   placeholder="請再次輸入密碼" required 
+                                   <#noparse>v-model.trim="confirmPassword"</#noparse>>
+                            <div class="form-text text-danger" <#noparse>v-if="password && confirmPassword && password !== confirmPassword"</#noparse>>
+                                兩次輸入的密碼不一致
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="bi bi-check-circle me-2"></i>
+                                <span id="submitBtnText">註冊</span>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            已有帳號？ 
+                            <a href="/login" class="text-decoration-none">立即登錄</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="/" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    返回首頁
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.register-container {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.register-container .row {
+    width: 100%;
+    max-width: 800px;
+}
+
+.card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%) !important;
+    border: none;
+    padding: 1.5rem;
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #5ACFC9;
+    box-shadow: 0 0 0 0.2rem rgba(90, 207, 201, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1200px) {
+    .register-container .row {
+        max-width: 900px;
+    }
+    
+    .card-body {
+        padding: 2.5rem !important;
+    }
+    
+    .card-header {
+        padding: 2rem !important;
+    }
+    
+    .form-control {
+        padding: 1rem 1.25rem;
+        font-size: 1.1rem;
+    }
+    
+    .btn-lg {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+}
+
+/* 中等屏幕优化 */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .register-container .row {
+        max-width: 850px;
+    }
+    
+    .card-body {
+        padding: 2rem !important;
+    }
+    
+    .form-control {
+        padding: 0.875rem 1.125rem;
+    }
+}
+
+/* 响应式设计优化 */
+@media (max-width: 768px) {
+    .register-container {
+        min-height: 80vh;
+        padding: 1rem;
+    }
+    
+    .register-container .row {
+        max-width: 100%;
+    }
+    
+    .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .btn-lg {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .register-container {
+        min-height: 90vh;
+        padding: 0.5rem;
+    }
+    
+    .card-body {
+        padding: 1rem !important;
+    }
+    
+    .card-header {
+        padding: 1rem !important;
+    }
+    
+    .card-header h4 {
+        font-size: 1.25rem;
+    }
+}
+</style>
+
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        phoneNumber: '',
+        smsCode: '',
+        password: '',
+        confirmPassword: '',
+        smsCountdown: 0,
+        isPhoneRegistered: false,
+        countdownTimer: null
+    },
+    methods: {
+        isValidPhone(phone) {
+            // 台湾手机号格式：10码数字，以09开头
+            return /^09\d{8}$/.test(phone);
+        },
+        onPhoneInput(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            // 台湾手机号：限制为10码
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            // 更新Vue数据
+            this.phoneNumber = value;
+            // 确保输入框显示的值也是过滤后的值
+            e.target.value = value;
+            // 重置注册状态
+            this.isPhoneRegistered = false;
+            this.hidePhoneRegisteredAlert();
+        },
+        async checkPhoneRegistered() {
+            const phone = this.phoneNumber.trim();
+            if (!this.isValidPhone(phone)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/user/check-phone?phoneNumber=' + encodeURIComponent(phone));
+                const data = await response.json();
+                if (data.success && data.registered) {
+                    this.isPhoneRegistered = true;
+                    this.showPhoneRegisteredAlert();
+                    this.updateSubmitButton();
+                } else {
+                    this.isPhoneRegistered = false;
+                    this.hidePhoneRegisteredAlert();
+                    this.updateSubmitButton();
+                }
+            } catch (error) {
+                console.error('检查手机号失败:', error);
+            }
+        },
+        showPhoneRegisteredAlert() {
+            const alert = document.getElementById('phoneRegisteredAlert');
+            if (alert) {
+                alert.style.display = 'block';
+            }
+        },
+        hidePhoneRegisteredAlert() {
+            const alert = document.getElementById('phoneRegisteredAlert');
+            if (alert) {
+                alert.style.display = 'none';
+            }
+        },
+        updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const submitBtnText = document.getElementById('submitBtnText');
+            if (submitBtn && submitBtnText) {
+                if (this.isPhoneRegistered) {
+                    submitBtnText.textContent = '修改密碼';
+                } else {
+                    submitBtnText.textContent = '註冊';
+                }
+            }
+        },
+        async sendSmsCode() {
+            const phone = this.phoneNumber.trim();
+            
+            if (!phone) {
+                this.showToast('請輸入手機號碼', 'warning');
+                return;
+            }
+            
+            if (!this.isValidPhone(phone)) {
+                this.showToast('請輸入正確的手機號碼格式（10碼數字，以09開頭）', 'warning');
+                return;
+            }
+            
+            // 检查手机号是否已注册
+            try {
+                const checkResponse = await fetch('/api/user/check-phone?phoneNumber=' + encodeURIComponent(phone));
+                const checkData = await checkResponse.json();
+                if (checkData.success && checkData.registered) {
+                    this.isPhoneRegistered = true;
+                    this.showPhoneRegisteredAlert();
+                    this.updateSubmitButton();
+                } else {
+                    this.isPhoneRegistered = false;
+                    this.hidePhoneRegisteredAlert();
+                    this.updateSubmitButton();
+                }
+            } catch (error) {
+                console.error('检查手机号失败:', error);
+            }
+            
+            try {
+                const response = await fetch('/api/sms/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'phoneNumber=' + encodeURIComponent(phone)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.showToast('驗證碼已發送，請查收', 'success');
+                    this.startCountdown();
+                } else {
+                    this.showToast(data.message || '發送驗證碼失敗', 'danger');
+                }
+            } catch (error) {
+                console.error('发送验证码失败:', error);
+                this.showToast('發送驗證碼失敗，請稍後再試', 'danger');
+            }
+        },
+        startCountdown() {
+            this.smsCountdown = 60;
+            if (this.countdownTimer) {
+                clearInterval(this.countdownTimer);
+            }
+            this.countdownTimer = setInterval(() => {
+                this.smsCountdown--;
+                if (this.smsCountdown <= 0) {
+                    clearInterval(this.countdownTimer);
+                    this.countdownTimer = null;
+                }
+            }, 1000);
+        },
+        handleSubmit() {
+            const phone = this.phoneNumber.trim();
+            const code = this.smsCode.trim();
+            const pwd = this.password.trim();
+            const confirmPwd = this.confirmPassword.trim();
+            
+            if (!phone) {
+                this.showToast('請輸入手機號碼', 'warning');
+                return;
+            }
+            
+            if (!this.isValidPhone(phone)) {
+                this.showToast('請輸入正確的手機號碼格式（10碼數字，以09開頭）', 'warning');
+                return;
+            }
+            
+            if (!code) {
+                this.showToast('請輸入驗證碼', 'warning');
+                return;
+            }
+            
+            if (!pwd) {
+                this.showToast('請輸入密碼', 'warning');
+                return;
+            }
+            
+            if (pwd.length < 6) {
+                this.showToast('密碼長度至少6位', 'warning');
+                return;
+            }
+            
+            if (pwd !== confirmPwd) {
+                this.showToast('兩次輸入的密碼不一致', 'warning');
+                return;
+            }
+            
+            // 手动提交表单
+            const form = document.getElementById('registerForm');
+            form.submit();
+        },
+        showToast(message, type) {
+            type = type || 'info';
+            // 创建toast容器（如果不存在）
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // 创建toast元素
+            const toastId = 'toast-' + Date.now();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            // 根据类型设置样式
+            const bgClass = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
+            const textClass = type === 'warning' ? 'text-dark' : 'text-white';
+            
+            // 根据类型设置图标
+            let iconClass = 'info-circle';
+            if (type === 'success') {
+                iconClass = 'check-circle';
+            } else if (type === 'danger' || type === 'warning') {
+                iconClass = 'exclamation-triangle';
+            }
+            
+            toast.innerHTML = '<div class="toast-header ' + bgClass + ' ' + textClass + '">' +
+                '<i class="bi bi-' + iconClass + ' me-2"></i>' +
+                '<strong class="me-auto">提示</strong>' +
+                '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                '</div>' +
+                '<div class="toast-body">' +
+                message +
+                '</div>';
+            
+            toastContainer.appendChild(toast);
+            
+            // 初始化并显示toast
+            const bsToast = new bootstrap.Toast(toast, {
+                autohide: true,
+                delay: 3000
+            });
+            bsToast.show();
+            
+            // toast关闭后移除元素
+            toast.addEventListener('hidden.bs.toast', function() {
+                toast.remove();
+            });
+        }
+    },
+    beforeDestroy() {
+        if (this.countdownTimer) {
+            clearInterval(this.countdownTimer);
+        }
+    }
+});
+</script>
+

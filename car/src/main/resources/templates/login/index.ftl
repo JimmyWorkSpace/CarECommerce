@@ -24,26 +24,17 @@
                             <label for="phoneNumber" class="form-label">
                                 <i class="bi bi-phone me-2"></i>手機號碼
                             </label>
-                            <div class="mb-2" style="font-size: 0.95rem; color: #5ACFC9; font-weight: 500;">
-                                <i class="bi bi-info-circle me-1"></i>未註冊用戶將以此手機號註冊
-                            </div>
                             <div class="form-text">必須為10碼數字，以09開頭</div>
                             <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
                                    placeholder="請輸入手機號碼（09開頭）" required maxlength="10" <#noparse>:value="phoneNumber" @input="onPhoneInput"</#noparse>>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="smsCode" class="form-label">
-                                <i class="bi bi-shield-check me-2"></i>短信驗證碼
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock me-2"></i>密碼
                             </label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="smsCode" name="smsCode" 
-                                       placeholder="請輸入驗證碼" required maxlength="6" <#noparse>v-model.trim="smsCode" @input="onCodeInput"</#noparse>>
-                                <button type="button" class="btn btn-outline-primary" id="sendSmsBtn" <#noparse>:disabled="countdown>0" @click="sendSms"</#noparse>>
-                                    <span id="sendSmsText"><#noparse>{{ countdown>0 ? `${countdown}秒後重發` : '發送驗證碼' }}</#noparse></span>
-                                </button>
-                            </div>
-                            <div class="form-text">驗證碼將發送到您的手機，有效期5分鐘</div>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="請輸入密碼" required <#noparse>v-model.trim="password"</#noparse>>
                         </div>
                         
                         <div class="d-grid gap-2">
@@ -56,8 +47,8 @@
                     
                     <div class="text-center mt-3">
                         <small class="text-muted">
-                            還沒有帳號？ 
-                            <a href="#" class="text-decoration-none">立即註冊</a>
+                            <#--  還沒有帳號？   -->
+                            <a href="/register" class="text-decoration-none">立即註冊/忘記密碼</a>
                         </small>
                     </div>
                 </div>
@@ -226,18 +217,13 @@ new Vue({
     el: '#app',
     data: {
         phoneNumber: '',
-        smsCode: '',
-        countdown: 0,
-        countdownTimer: null,
+        password: '',
         returnUrl: '${returnUrl!''}'
     },
     methods: {
         isValidPhone(phone) {
             // 台湾手机号格式：10码数字，以09开头
             return /^09\d{8}$/.test(phone);
-        },
-        isValidCode(code) {
-            return /^\d{6}$/.test(code);
         },
         onPhoneInput(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -249,115 +235,27 @@ new Vue({
             this.phoneNumber = value;
             // 确保输入框显示的值也是过滤后的值
             e.target.value = value;
-            // 当手机号输入完整时，检查剩余等待时间
-            if (value.length === 10) {
-                this.checkRemainingTime(value);
-            }
         },
-        async checkRemainingTime(phone) {
-            if (!phone || phone.trim().length !== 10) {
-                return;
-            }
-            try {
-                const res = await axios.post('/api/sms/check-remaining-time', { phoneNumber: phone });
-                const data = res.data;
-                if (data.success && data.remainingTime > 0) {
-                    // 如果有剩余等待时间，自动开始倒计时
-                    this.countdown = data.remainingTime;
-                    this.startCountdown();
-                }
-            } catch (err) {
-                console.error('检查剩余等待时间失败:', err);
-            }
-        },
-        onCodeInput(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 6) {
-                value = value.substring(0, 6);
-            }
-            this.smsCode = value;
-        },
-        startCountdown(initialValue) {
-            // 如果传入了初始值，使用它；否则使用当前的countdown值
-            if (initialValue !== undefined) {
-                this.countdown = initialValue;
-            }
-            if (this.countdownTimer) {
-                clearInterval(this.countdownTimer);
-            }
-            if (this.countdown <= 0) {
-                return;
-            }
-            this.countdownTimer = setInterval(() => {
-                this.countdown--;
-                if (this.countdown <= 0) {
-                    clearInterval(this.countdownTimer);
-                    this.countdownTimer = null;
-                    this.countdown = 0;
-                }
-            }, 1000);
-        },
-        async sendSms() {
-            // 优先从Vue数据获取，如果为空则从输入框获取
-            let phone = this.phoneNumber ? this.phoneNumber.trim() : '';
-            if (!phone) {
-                const phoneInput = document.getElementById('phoneNumber');
-                if (phoneInput) {
-                    phone = phoneInput.value ? phoneInput.value.trim() : '';
-                }
-            }
+        handleSubmit() {
+            const phone = this.phoneNumber.trim();
+            const password = this.password.trim();
             
-            // 验证手机号是否为空
             if (!phone) {
                 this.showToast('請輸入手機號碼', 'warning');
                 return;
             }
             
-            // 验证手机号格式（台湾手机号：10码，以09开头）
-            if (phone.length !== 10) {
-                this.showToast('手機號長度必須為10碼', 'warning');
-                return;
-            }
-            if (!phone.startsWith('09')) {
-                this.showToast('手機號必須以09開頭', 'warning');
-                return;
-            }
             if (!this.isValidPhone(phone)) {
                 this.showToast('請輸入正確的手機號碼格式（10碼數字，以09開頭）', 'warning');
                 return;
             }
             
-            try {
-                const res = await axios.post('/api/sms/send', { phoneNumber: phone });
-                const data = res.data;
-                if (data.success) {
-                    this.countdown = 30; // 发送成功后设置为30秒倒计时
-                    this.startCountdown();
-                    this.showToast('驗證碼已發送，請查看手機簡訊，也留意垃圾簡訊內容', 'success');
-                } else {
-                    // 如果服务器返回剩余等待时间，显示更友好的提示
-                    if (data.remainingTime) {
-                        this.showToast('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼', 'warning');
-                        // 如果服务器返回剩余时间，设置前端倒计时
-                        this.countdown = data.remainingTime;
-                        this.startCountdown();
-                    } else {
-                        this.showToast(data.message || '發送失敗，請稍後重試', 'danger');
-                    }
-                }
-            } catch (err) {
-                console.error(err);
-                this.showToast('發送失敗，請稍後重試', 'danger');
-            }
-        },
-        handleSubmit() {
-            const phone = this.phoneNumber.trim();
-            const code = this.smsCode.trim();
-            if (!this.isValidCode(code)) {
-                this.showToast('請輸入6位數字驗證碼', 'warning');
+            if (!password) {
+                this.showToast('請輸入密碼', 'warning');
                 return;
             }
-            // 手动提交表单，保留原有後端處理
+            
+            // 手动提交表单
             const form = document.getElementById('loginForm');
             form.submit();
         },
@@ -419,11 +317,10 @@ new Vue({
         }
     },
     mounted() {
-        // 页面加载时，如果已有手机号输入，检查剩余等待时间
+        // 页面加载时，如果已有手机号输入
         const phoneInput = document.getElementById('phoneNumber');
-        if (phoneInput && phoneInput.value && phoneInput.value.length === 10) {
+        if (phoneInput && phoneInput.value) {
             this.phoneNumber = phoneInput.value;
-            this.checkRemainingTime(phoneInput.value);
         }
     }
 });

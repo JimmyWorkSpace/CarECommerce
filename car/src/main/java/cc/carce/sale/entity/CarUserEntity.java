@@ -30,4 +30,7 @@ public class CarUserEntity {
 
     @Column(name = "lastLoginTime", columnDefinition = "DATETIME COMMENT '上次登录时间'")
     private Date lastLoginTime;
+
+    @Column(name = "pwd", columnDefinition = "VARCHAR(255) COMMENT '密码（MD5加密，全大写）'")
+    private String pwd;
 }

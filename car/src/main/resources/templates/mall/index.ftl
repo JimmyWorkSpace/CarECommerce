@@ -70,16 +70,6 @@
             <a :href="'/product/' + product.id" class="product-card-link">
                 <div class="product-image">
                     <img :src="product.image" :alt="product.name" @error="handleImageError">
-                    <div class="product-overlay">
-                        <button class="btn btn-primary add-to-cart-btn" 
-                                @click.stop.prevent="addToCart(product, $event)"
-                                :disabled="addingToCart === product.id"
-                                type="button">
-                            <i v-if="addingToCart !== product.id" class="bi bi-cart-plus"></i>
-                            <span v-else class="spinner-border spinner-border-sm me-2" role="status"></span>
-                            {{ addingToCart === product.id ? '添加中...' : '加入購物車' }}
-                        </button>
-                    </div>
                 </div>
                 <div class="product-info">
                     <h5 class="product-name">{{ product.name }}</h5>
@@ -266,48 +256,6 @@
     transform: scale(1.05);
 }
 
-.product-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.product-card:hover .product-overlay {
-    opacity: 1;
-}
-
-.add-to-cart-btn {
-    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(90, 207, 201, 0.3);
-}
-
-.add-to-cart-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(90, 207, 201, 0.4);
-}
-
-.add-to-cart-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.add-to-cart-btn i {
-    margin-right: 8px;
-}
 
 .product-info {
     padding: 20px;
@@ -507,7 +455,6 @@ new Vue({
         loading: true,
         error: '',
         message: '',
-        addingToCart: null,
         currentPage: 1,
         pageSize: 12,
         totalPages: 1,
@@ -544,29 +491,7 @@ new Vue({
             }, 500);
         }
         
-        // 监听登录后待执行的操作
-        const self = this;
-        window.addEventListener('pendingAction', function(event) {
-            if (event.detail && event.detail.action === 'addToCart') {
-                // 登录后自动执行加购操作
-                const pendingCartItem = sessionStorage.getItem('pendingAddToCart');
-                if (pendingCartItem) {
-                    try {
-                        const cartItem = JSON.parse(pendingCartItem);
-                        sessionStorage.removeItem('pendingAddToCart');
-                        // 延迟执行，确保页面已完全加载
-                        setTimeout(() => {
-                            const product = self.products.find(p => p.id === cartItem.productId);
-                            if (product) {
-                                self.addToCart(product);
-                            }
-                        }, 300);
-                    } catch (e) {
-                        console.error('解析待加購商品信息失敗:', e);
-                    }
-                }
-            }
-        });
+        // 列表页已移除加购功能，不再监听登录后自动加购
     },
     methods: {
         // 加载分类树
@@ -788,64 +713,6 @@ new Vue({
         changePage(page) {
             if (page >= 1 && page <= this.totalPages) {
                 this.currentPage = page;
-            }
-        },
-        
-        // 添加到购物车
-        async addToCart(product, event) {
-            // 阻止事件冒泡和默认行为，防止跳转到详情页
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            // 检查登录状态，如果未登录则显示登录弹窗
-            if (!window.checkLoginAndShowModal('addToCart')) {
-                // 保存商品信息，登录后自动加购
-                sessionStorage.setItem('pendingAddToCart', JSON.stringify({
-                    productId: product.id,
-                    productAmount: 1,
-                    productPrice: product.price,
-                    productName: product.name
-                }));
-                return;
-            }
-            
-            try {
-                this.addingToCart = product.id;
-                
-                const cartItem = {
-                    productId: product.id,
-                    productAmount: 1,
-                    productPrice: product.price,
-                    productName: product.name
-                };
-                
-                const response = await axios.post('/api/shopping-cart/add', cartItem);
-                const data = response.data;
-                
-                if (data.success) {
-                    this.message = '成功添加到購物車！';
-                    // 3秒后自动清除消息
-                    setTimeout(() => {
-                        this.message = '';
-                    }, 3000);
-                    
-                    // 更新全局购物车数量
-                    this.updateGlobalCartCount();
-                } else {
-                    this.error = data.message || '添加到購物車失敗';
-                }
-                
-            } catch (error) {
-                console.error('添加到購物車失敗:', error);
-                if (error.response && error.response.data) {
-                    this.error = error.response.data.message || '加入購物車失敗';
-                } else {
-                    this.error = '網絡錯誤，請稍後重試';
-                }
-            } finally {
-                this.addingToCart = null;
             }
         },
         
