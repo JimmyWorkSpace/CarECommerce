@@ -20,15 +20,29 @@ public class SmsApiController {
     private SmsService smsService;
 
     /**
-     * 发送短信验证码
+     * 发送短信验证码（表单提交方式）
      */
-    @PostMapping("/send")
-    public Map<String, Object> sendSmsCode(@RequestBody Map<String, String> request) {
+    @PostMapping(value = "/send", consumes = "application/x-www-form-urlencoded")
+    public Map<String, Object> sendSmsCodeByForm(@RequestParam String phoneNumber) {
+        return sendSmsCode(phoneNumber);
+    }
+    
+    /**
+     * 发送短信验证码（JSON提交方式）
+     */
+    @PostMapping(value = "/send", consumes = "application/json")
+    public Map<String, Object> sendSmsCodeByJson(@RequestBody Map<String, String> request) {
+        String phoneNumber = request != null ? request.get("phoneNumber") : null;
+        return sendSmsCode(phoneNumber);
+    }
+    
+    /**
+     * 发送短信验证码的通用方法
+     */
+    private Map<String, Object> sendSmsCode(String phoneNumber) {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            String phoneNumber = request.get("phoneNumber");
-            
             if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
                 response.put("success", false);
                 response.put("message", "手機號碼不能為空");

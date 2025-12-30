@@ -120,6 +120,34 @@
         color: #333;
     }
     
+    /* Video和YouTube视频样式 */
+    .rich-content-text video,
+    .rich-content-text iframe[src*="youtube.com"],
+    .rich-content-text iframe[src*="youtu.be"],
+    .rich-content-text iframe[src*="youtube-nocookie.com"],
+    video,
+    iframe[src*="youtube.com"],
+    iframe[src*="youtu.be"],
+    iframe[src*="youtube-nocookie.com"] {
+        max-width: 99%;
+        height: auto;
+        display: block;
+        margin: 15px auto;
+        border-radius: 8px;
+    }
+    
+    /* 确保YouTube iframe保持16:9比例 */
+    .rich-content-text iframe[src*="youtube.com"],
+    .rich-content-text iframe[src*="youtu.be"],
+    .rich-content-text iframe[src*="youtube-nocookie.com"],
+    iframe[src*="youtube.com"],
+    iframe[src*="youtu.be"],
+    iframe[src*="youtube-nocookie.com"] {
+        aspect-ratio: 16 / 9;
+        width: 99%;
+        max-width: 99%;
+    }
+    
     /* 响应式设计 */
     @media (max-width: 768px) {
         .rich-content-text h1 {
@@ -209,7 +237,7 @@
                                 if (typeof window.loadHtmlToIframe === 'function') {
                                     window.loadHtmlToIframe(iframe, htmlContent, {
                                         minHeight: 200,
-                                        maxHeight: 3000,
+                                        maxHeight: Infinity,
                                         adjustDelay: 150,
                                         removeScrollbars: true
                                     });

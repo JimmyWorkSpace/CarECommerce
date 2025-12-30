@@ -9,12 +9,15 @@
 .hero-section {
     position: relative;
     width: 100%;
-    height: 500px;
+    padding-top: 50%; /* 2:1 比例 (高度 = 宽度 / 2) */
     overflow: hidden;
     margin-bottom: 50px;
 }
 
 .hero-swiper {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
 }
@@ -23,7 +26,7 @@
 .hero-swiper .swiper-slide {
     position: relative;
     width: 100%;
-    height: 500px;
+    height: 100%;
 }
 
 /* Swiper分页器样式 */
@@ -246,7 +249,7 @@
     transition: all 0.3s ease;
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    padding-top: 60%; /* 5:3 Aspect Ratio (高度/宽度 = 3/5 = 0.6) */
 }
 
 .ad-card:hover {
@@ -260,7 +263,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill; /* 拉伸显示，不裁切 */
 }
 
 .ad-title-overlay {
@@ -556,11 +559,7 @@
     }
     
     .hero-section {
-        height: calc(100vw / 2.4);
-    }
-    
-    .hero-swiper .swiper-slide {
-        height: calc(100vw / 2.4);
+        padding-top: 50%; /* 2:1 比例 (高度 = 宽度 / 2) */
     }
     
     .hero-title {
@@ -625,11 +624,7 @@
 
 @media (max-width: 576px) {
     .hero-section {
-        height: calc(100vw / 2.4);
-    }
-    
-    .hero-swiper .swiper-slide {
-        height: calc(100vw / 2.4);
+        padding-top: 50%; /* 2:1 比例 (高度 = 宽度 / 2) */
     }
     
     .hero-title {

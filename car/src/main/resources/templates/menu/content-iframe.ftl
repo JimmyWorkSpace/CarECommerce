@@ -108,6 +108,27 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
+    /* Video和YouTube视频样式 */
+    .menu-content-text video,
+    .menu-content-text iframe[src*="youtube.com"],
+    .menu-content-text iframe[src*="youtu.be"],
+    .menu-content-text iframe[src*="youtube-nocookie.com"] {
+        max-width: 99%;
+        height: auto;
+        display: block;
+        margin: 15px auto;
+        border-radius: 8px;
+    }
+    
+    /* 确保YouTube iframe保持16:9比例 */
+    .menu-content-text iframe[src*="youtube.com"],
+    .menu-content-text iframe[src*="youtu.be"],
+    .menu-content-text iframe[src*="youtube-nocookie.com"] {
+        aspect-ratio: 16 / 9;
+        width: 99%;
+        max-width: 99%;
+    }
+    
     .menu-content-text blockquote {
         border-left: 4px solid #5ACFC9;
         padding-left: 20px;
@@ -223,34 +244,83 @@
 <script>
 // 页面加载完成后通知父页面调整高度
 document.addEventListener('DOMContentLoaded', function() {
-    // 监听来自父页面的高度请求
-    window.addEventListener('message', function(event) {
-        if (event.data && event.data.type === 'request-height') {
+    const menuId = '${menu.id}';
+    
+    // 计算并发送高度的函数
+    function calculateAndSendHeight() {
+        // 等待DOM完全渲染
+        requestAnimationFrame(function() {
             // 计算页面内容高度
             const bodyHeight = document.body.scrollHeight;
             const documentHeight = document.documentElement.scrollHeight;
             const contentHeight = Math.max(bodyHeight, documentHeight);
             
             // 发送高度信息给父页面
-            window.parent.postMessage({
-                type: 'iframe-height-change',
-                contentId: '${menu.id}',
-                height: contentHeight
-            }, '*');
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'iframe-height-change',
+                    contentId: menuId,
+                    height: contentHeight
+                }, '*');
+            }
+        });
+    }
+    
+    // 监听来自父页面的高度请求
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'request-height') {
+            calculateAndSendHeight();
         }
     });
     
-    // 页面加载完成后自动请求高度调整
-    setTimeout(function() {
-        const bodyHeight = document.body.scrollHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        const contentHeight = Math.max(bodyHeight, documentHeight);
+    // 页面加载完成后自动发送高度
+    setTimeout(calculateAndSendHeight, 100);
+    
+    // 监听窗口大小变化
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            calculateAndSendHeight();
+        }, 300); // 防抖，300ms后执行
+    });
+    
+    // 监听设备方向变化（移动设备）
+    window.addEventListener('orientationchange', function() {
+        // 方向变化后延迟执行，等待布局完成
+        setTimeout(function() {
+            calculateAndSendHeight();
+        }, 500);
+    });
+    
+    // 监听图片加载完成（可能影响高度）
+    const images = document.querySelectorAll('img');
+    let loadedImages = 0;
+    const totalImages = images.length;
+    
+    if (totalImages > 0) {
+        images.forEach(function(img) {
+            if (img.complete) {
+                loadedImages++;
+            } else {
+                img.addEventListener('load', function() {
+                    loadedImages++;
+                    if (loadedImages === totalImages) {
+                        calculateAndSendHeight();
+                    }
+                });
+                img.addEventListener('error', function() {
+                    loadedImages++;
+                    if (loadedImages === totalImages) {
+                        calculateAndSendHeight();
+                    }
+                });
+            }
+        });
         
-        window.parent.postMessage({
-            type: 'iframe-height-change',
-            contentId: '${menu.id}',
-            height: contentHeight
-        }, '*');
-    }, 100);
+        if (loadedImages === totalImages) {
+            setTimeout(calculateAndSendHeight, 200);
+        }
+    }
 });
 </script>

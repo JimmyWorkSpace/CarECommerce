@@ -23,7 +23,6 @@ import cc.carce.sale.common.JwtUtils;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.entity.CarUserEntity;
 import cc.carce.sale.service.CarUserService;
-import cc.carce.sale.service.SmsService;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,9 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginController extends BaseController {
 
     @Resource
-    private SmsService smsService;
-
-    @Resource
     private CarUserService carUserService;
     
     @Resource
@@ -45,31 +41,19 @@ public class LoginController extends BaseController {
 
 
     /**
-     * 处理登录请求
+     * 处理登录请求（密码登录）
      */
     @PostMapping("/login")
     public String login(@RequestParam String phoneNumber, 
-                       @RequestParam String smsCode,
+                       @RequestParam String password,
                        @RequestParam(required = false) String returnUrl,
                        HttpSession session,
                        HttpServletResponse response) {
         
         try {
-//            // 验证手机号格式
-//            if (phoneNumber == null || !phoneNumber.matches("^1[3-9]\\d{9}$")) {
-//                model.addAttribute("error", "手機號碼格式不正確");
-//                return getLoginPage(model);
-//            }
-            
-            // // 验证验证码格式
-            // if (smsCode == null || !smsCode.matches("\\d{6}")) {
-            //     return "redirect:/login?error=驗證碼格式不正確";
-            // }
-            
-            // 验证短信验证码
-            if (!smsService.verifySmsCode(phoneNumber, smsCode)) {
-                String errorMsg = URLEncoder.encode("驗證碼錯誤或已過期", StandardCharsets.UTF_8.toString());
-                // 如果有returnUrl，清理后附加到跳转URL
+            // 验证手机号格式
+            if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+                String errorMsg = URLEncoder.encode("請輸入手機號碼", StandardCharsets.UTF_8.toString());
                 String redirectUrl = "/login?error=" + errorMsg;
                 if (returnUrl != null && !returnUrl.trim().isEmpty()) {
                     String cleanedReturnUrl = cleanReturnUrl(returnUrl);
@@ -78,12 +62,22 @@ public class LoginController extends BaseController {
                 return "redirect:" + redirectUrl;
             }
             
-            // 用户登录或注册
-            CarUserEntity user = carUserService.loginOrRegister(phoneNumber);
+            // 验证密码
+            if (password == null || password.trim().isEmpty()) {
+                String errorMsg = URLEncoder.encode("請輸入密碼", StandardCharsets.UTF_8.toString());
+                String redirectUrl = "/login?error=" + errorMsg;
+                if (returnUrl != null && !returnUrl.trim().isEmpty()) {
+                    String cleanedReturnUrl = cleanReturnUrl(returnUrl);
+                    redirectUrl += "&returnUrl=" + URLEncoder.encode(cleanedReturnUrl, StandardCharsets.UTF_8.toString());
+                }
+                return "redirect:" + redirectUrl;
+            }
+            
+            // 使用密码登录
+            CarUserEntity user = carUserService.loginWithPassword(phoneNumber.trim(), password);
             
             if (user == null) {
-                String errorMsg = URLEncoder.encode("用戶創建失敗", StandardCharsets.UTF_8.toString());
-                // 如果有returnUrl，清理后附加到跳转URL
+                String errorMsg = URLEncoder.encode("手機號碼或密碼錯誤", StandardCharsets.UTF_8.toString());
                 String redirectUrl = "/login?error=" + errorMsg;
                 if (returnUrl != null && !returnUrl.trim().isEmpty()) {
                     String cleanedReturnUrl = cleanReturnUrl(returnUrl);

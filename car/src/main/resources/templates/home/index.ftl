@@ -43,14 +43,15 @@
 .ad-image, .feature-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill; /* 拉伸显示，不裁切 */
     object-position: center;
 }
 
 .ad-card {
     position: relative;
     overflow: visible;
-    height: 250px;
+    padding-top: 60%; /* 5:3 Aspect Ratio (高度/宽度 = 3/5 = 0.6) */
+    height: auto;
 }
 
 .feature-card {

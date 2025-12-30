@@ -10,6 +10,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cc.carce.sale.entity.CarSmsLogEntity;
@@ -38,6 +39,9 @@ public class SmsService {
 
     @Autowired
     private CarSmsLogMapper carSmsLogMapper;
+    
+    @Autowired
+    private Environment environment;
 
     // 存储验证码的Map，key为手机号，value为验证码和过期时间
     private static final Map<String, SmsCode> SMS_CODE_MAP = new ConcurrentHashMap<>();
@@ -74,21 +78,41 @@ public class SmsService {
         // 构建短信内容
         String message = String.format("您的驗證碼是：%s，%d分鐘內有效，請勿洩露給他人。", code, CODE_EXPIRE_MINUTES);
 
-        try {
-            // 所有环境都实际发送短信
-            SmsResponse result = sendSms(phoneNumber, message);
-            log.info("=== 簡訊驗證碼發送結果 ===");
+        // 检查当前环境是否为dev
+        String[] activeProfiles = environment.getActiveProfiles();
+        boolean isDev = false;
+        for (String profile : activeProfiles) {
+            if ("dev".equals(profile)) {
+                isDev = true;
+                break;
+            }
+        }
+
+        if (isDev) {
+            // dev环境：不实际发送短信，只在控制台打印
+            log.info("=== [DEV環境] 簡訊驗證碼（未實際發送） ===");
             log.info("手機號: {}", phoneNumber);
             log.info("驗證碼: {}", code);
             log.info("有效期: {} 分鐘", CODE_EXPIRE_MINUTES);
             log.info("簡訊內容: {}", message);
-            log.info("發送結果: {}", result);
-            log.info("========================");
-        } catch (Exception e) {
-            log.error("發送簡訊驗證碼失敗，手機號: {}, 錯誤: {}", phoneNumber, e.getMessage(), e);
-            // 发送失败时从缓存中移除验证码
-            SMS_CODE_MAP.remove(phoneNumber);
-            throw new RuntimeException("發送簡訊驗證碼失敗: " + e.getMessage());
+            log.info("==========================================");
+        } else {
+            // 非dev环境：实际发送短信
+            try {
+                SmsResponse result = sendSms(phoneNumber, message);
+                log.info("=== 簡訊驗證碼發送結果 ===");
+                log.info("手機號: {}", phoneNumber);
+                log.info("驗證碼: {}", code);
+                log.info("有效期: {} 分鐘", CODE_EXPIRE_MINUTES);
+                log.info("簡訊內容: {}", message);
+                log.info("發送結果: {}", result);
+                log.info("========================");
+            } catch (Exception e) {
+                log.error("發送簡訊驗證碼失敗，手機號: {}, 錯誤: {}", phoneNumber, e.getMessage(), e);
+                // 发送失败时从缓存中移除验证码
+                SMS_CODE_MAP.remove(phoneNumber);
+                throw new RuntimeException("發送簡訊驗證碼失敗: " + e.getMessage());
+            }
         }
 
         return code;

@@ -3,6 +3,7 @@ package cc.carce.sale.service;
 import cc.carce.sale.entity.CarUserEntity;
 import cc.carce.sale.mapper.manager.CarUserMapper;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.MD5;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
@@ -85,5 +86,89 @@ public class CarUserService {
         }
         
         return user;
+    }
+
+    /**
+     * 使用密码登录
+     * @param phoneNumber 手机号
+     * @param password 密码（明文）
+     * @return 用户实体，如果密码错误返回null
+     */
+    public CarUserEntity loginWithPassword(String phoneNumber, String password) {
+        if (StrUtil.isBlank(phoneNumber) || StrUtil.isBlank(password)) {
+            return null;
+        }
+        
+        CarUserEntity user = findByPhoneNumber(phoneNumber);
+        if (user == null) {
+            log.warn("用户不存在: {}", phoneNumber);
+            return null;
+        }
+        
+        // 验证密码
+        String encryptedPassword = encryptPassword(password);
+        if (!encryptedPassword.equals(user.getPwd())) {
+            log.warn("密码错误: 手机号={}", phoneNumber);
+            return null;
+        }
+        
+        // 更新最后登录时间
+        updateLastLoginTime(user.getId());
+        return user;
+    }
+
+    /**
+     * 注册新用户或修改密码
+     * @param phoneNumber 手机号
+     * @param password 密码（明文）
+     * @return 用户实体
+     */
+    public CarUserEntity registerOrUpdatePassword(String phoneNumber, String password) {
+        if (StrUtil.isBlank(phoneNumber) || StrUtil.isBlank(password)) {
+            return null;
+        }
+        
+        CarUserEntity user = findByPhoneNumber(phoneNumber);
+        String encryptedPassword = encryptPassword(password);
+        
+        if (user == null) {
+            // 新用户注册
+            user = createUser(phoneNumber, null);
+            user.setPwd(encryptedPassword);
+            carUserMapper.updateByPrimaryKeySelective(user);
+            log.info("新用户注册成功: 手机号={}", phoneNumber);
+        } else {
+            // 修改密码
+            user.setPwd(encryptedPassword);
+            carUserMapper.updateByPrimaryKeySelective(user);
+            log.info("用户密码修改成功: 手机号={}", phoneNumber);
+        }
+        
+        return user;
+    }
+
+    /**
+     * 加密密码（MD5，转大写）
+     * @param password 明文密码
+     * @return 加密后的密码（大写）
+     */
+    public String encryptPassword(String password) {
+        if (StrUtil.isBlank(password)) {
+            return null;
+        }
+        return MD5.create().digestHex(password).toUpperCase();
+    }
+
+    /**
+     * 检查手机号是否已注册
+     * @param phoneNumber 手机号
+     * @return true表示已注册，false表示未注册
+     */
+    public boolean isPhoneNumberRegistered(String phoneNumber) {
+        if (StrUtil.isBlank(phoneNumber)) {
+            return false;
+        }
+        CarUserEntity user = findByPhoneNumber(phoneNumber);
+        return user != null;
     }
 }

@@ -57,6 +57,65 @@
                     link.parentElement.classList.add('active');
                 }
             });
+            
+            // 手机版下拉菜单点击处理
+            if (window.innerWidth <= 991.98) {
+                const dropdownToggles = document.querySelectorAll('.navbar-nav .dropdown-toggle');
+                dropdownToggles.forEach(toggle => {
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const dropdown = this.closest('.dropdown');
+                        const isOpen = dropdown.classList.contains('show');
+                        
+                        // 关闭所有其他下拉菜单
+                        document.querySelectorAll('.navbar-nav .dropdown').forEach(d => {
+                            if (d !== dropdown) {
+                                d.classList.remove('show');
+                                const menu = d.querySelector('.dropdown-menu');
+                                if (menu) {
+                                    menu.classList.remove('show');
+                                }
+                            }
+                        });
+                        
+                        // 切换当前下拉菜单
+                        if (isOpen) {
+                            dropdown.classList.remove('show');
+                            const menu = dropdown.querySelector('.dropdown-menu');
+                            if (menu) {
+                                menu.classList.remove('show');
+                            }
+                            this.setAttribute('aria-expanded', 'false');
+                        } else {
+                            dropdown.classList.add('show');
+                            const menu = dropdown.querySelector('.dropdown-menu');
+                            if (menu) {
+                                menu.classList.add('show');
+                            }
+                            this.setAttribute('aria-expanded', 'true');
+                        }
+                    });
+                });
+                
+                // 点击其他地方时关闭下拉菜单
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.dropdown')) {
+                        document.querySelectorAll('.navbar-nav .dropdown').forEach(dropdown => {
+                            dropdown.classList.remove('show');
+                            const menu = dropdown.querySelector('.dropdown-menu');
+                            if (menu) {
+                                menu.classList.remove('show');
+                            }
+                            const toggle = dropdown.querySelector('.dropdown-toggle');
+                            if (toggle) {
+                                toggle.setAttribute('aria-expanded', 'false');
+                            }
+                        });
+                    }
+                });
+            }
         });
     </script>
 </head>
@@ -67,7 +126,7 @@
                 <a class="navbar-brand" href="/">
                     <div class="brand-text">
                         <span class="brand-main">車勢汽車交易網</span>
-                        <span class="brand-sub">最保障消費者的一站式買賣二手車平台</span>
+                        <span class="brand-sub">最保障消費者的二手車平台</span>
                     </div>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +139,7 @@
                                 <#if menu.children?? && menu.children?has_content>
                                     <!-- 有子菜单的主菜单，显示下拉菜单 -->
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
+                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             ${menu.title!''}
                                         </a>
                                         <ul class="dropdown-menu">
@@ -120,8 +179,7 @@
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link user-status dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle me-1"></i>
-                                    ${user.name!'已登錄'}
+                                    <i class="bi bi-person-circle"></i>
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="/my-order/index">
