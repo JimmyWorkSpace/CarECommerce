@@ -138,8 +138,8 @@
             <div v-show="activeTab.code === 'dealer_intro'">
                 <div v-if="dealerInfo.description" class="iframe-container">
                     <iframe ref="dealerContentFrame" 
+                            id="dealerContentFrame"
                             class="content-frame" 
-                            :srcdoc="getHtmlContent(dealerInfo.description)"
                             frameborder="0" 
                             width="100%">
                     </iframe>
@@ -261,9 +261,9 @@ new Vue({
         cars: ${carsJson} || []
     },
     mounted: function() {
-        this.setupContentFrame();
         // 启动自动播放
         this.startAutoPlay();
+        window.doFrameResize('dealerContentFrame', this.dealerInfo.description);
     },
     beforeDestroy: function() {
         this.stopAutoPlay();
@@ -376,44 +376,6 @@ new Vue({
             if (year) parts.push(year);
             return parts.join(' ');
         },
-        setupContentFrame: function() {
-            var _this = this;
-            this.$nextTick(function() {
-                var frame = _this.$refs.dealerContentFrame;
-                if (frame) {
-                    frame.onload = function() {
-                        _this.adjustIframeHeight(frame);
-                    };
-                    if (frame.contentDocument && frame.contentDocument.readyState === 'complete') {
-                        frame.onload();
-                    }
-                }
-            });
-        },
-        adjustIframeHeight: function(frame) {
-            try {
-                var frameDoc = frame.contentWindow.document;
-                var frameBody = frameDoc.body;
-                
-                if (!frameBody) return;
-                
-                var contentHeight = Math.max(
-                    frameBody.scrollHeight,
-                    frameBody.offsetHeight,
-                    frameDoc.documentElement.scrollHeight,
-                    frameDoc.documentElement.offsetHeight
-                );
-                
-                frame.style.height = (contentHeight + 20) + 'px';
-            } catch (e) {
-                console.error('调整iframe高度失败', e);
-                frame.style.height = '300px';
-            }
-        },
-        getHtmlContent: function(htmlContent) {
-            if (!htmlContent) return '';
-            return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.8; color: #333; } img { max-width: 100%; height: auto; }</style></head><body>' + htmlContent + '</body></html>';
-        }
     }
 });
 </script>
