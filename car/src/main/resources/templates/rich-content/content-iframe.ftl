@@ -230,22 +230,8 @@
                 </#if>
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
-                                const iframe = document.getElementById('richContentIframe');
                                 const htmlContent = `${richContent.content!''}`;
-                                
-                                // 使用loadHtmlToIframe方法加载内容并自动调整高度
-                                if (typeof window.loadHtmlToIframe === 'function') {
-                                    window.loadHtmlToIframe(iframe, htmlContent, {
-                                        minHeight: 200,
-                                        maxHeight: Infinity,
-                                        adjustDelay: 150,
-                                        removeScrollbars: true
-                                    });
-                                } else {
-                                    console.error('loadHtmlToIframe方法未找到，请确保common.js已加载');
-                                    // 降级方案：直接设置内容
-                                    iframe.srcdoc = htmlContent;
-                                }
+                                doFrameResize('richContentIframe', htmlContent);
                             });
                         </script>
                     <#else>

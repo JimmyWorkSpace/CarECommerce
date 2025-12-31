@@ -165,8 +165,8 @@
                 <div v-if="product.memo" class="product-description">
                     <div class="iframe-container">
                         <iframe ref="productContentFrame" 
+                        id="productContentFrame"
                                 class="content-frame" 
-                                :srcdoc="getHtmlContent(product.memo)"
                                 frameborder="0" 
                                 width="100%">
                         </iframe>
@@ -241,7 +241,6 @@ new Vue({
         autoPlayInterval: 5000
     },
     mounted() {
-        this.setupContentFrame();
         this.startAutoPlay();
         
         // 监听登录后待执行的操作
@@ -267,6 +266,7 @@ new Vue({
                 }
             }
         });
+        window.doFrameResize('productContentFrame', this.product.memo);
     },
     beforeDestroy() {
         this.stopAutoPlay();
@@ -529,43 +529,6 @@ new Vue({
                 clearInterval(this.autoPlayTimer);
                 this.autoPlayTimer = null;
             }
-        },
-        setupContentFrame() {
-            this.$nextTick(() => {
-                const frame = this.$refs.productContentFrame;
-                if (frame) {
-                    frame.onload = () => {
-                        this.adjustIframeHeight(frame);
-                    };
-                    if (frame.contentDocument && frame.contentDocument.readyState === 'complete') {
-                        frame.onload();
-                    }
-                }
-            });
-        },
-        adjustIframeHeight(frame) {
-            try {
-                const frameDoc = frame.contentWindow.document;
-                const frameBody = frameDoc.body;
-                
-                if (!frameBody) return;
-                
-                const contentHeight = Math.max(
-                    frameBody.scrollHeight,
-                    frameBody.offsetHeight,
-                    frameDoc.documentElement.scrollHeight,
-                    frameDoc.documentElement.offsetHeight
-                );
-                
-                frame.style.height = (contentHeight + 20) + 'px';
-            } catch (e) {
-                console.error('调整iframe高度失败', e);
-                frame.style.height = '300px';
-            }
-        },
-        getHtmlContent(htmlContent) {
-            if (!htmlContent) return '';
-            return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.8; color: #333; } img { max-width: 100%; height: auto; }</style></head><body>' + htmlContent + '</body></html>';
         },
         // 解析商品标签（按逗号分隔）
         getProductTags(tags) {

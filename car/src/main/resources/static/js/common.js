@@ -208,7 +208,7 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
                     word-wrap: break-word;
                 }
                 img {
-                    max-width: 100%;
+                    max-width: 99%;
                     height: auto;
                 }
                 table {
@@ -235,6 +235,8 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
                     max-width: 99%;
                 }
             </style>
+            <script src="/assets/iframe-resizer/iframe-resizer.child.js"></script>
+
         </head>
         <body>
             ${htmlContent}
@@ -243,26 +245,26 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
     `;
     
     // 调整高度的函数
-    const adjustHeight = function() {
-        setTimeout(() => {
-            adjustIframeHeight(iframe, config);
-        }, config.adjustDelay);
-    };
+    // const adjustHeight = function() {
+    //     setTimeout(() => {
+    //         adjustIframeHeight(iframe, config);
+    //     }, config.adjustDelay);
+    // };
     
     // 加载HTML内容
     try {
         // 使用srcdoc属性加载HTML内容
         iframe.srcdoc = fullHtml;
         
-        // 监听iframe加载完成事件
-        iframe.onload = function() {
-            adjustHeight();
-        };
+        // // 监听iframe加载完成事件
+        // iframe.onload = function() {
+        //     adjustHeight();
+        // };
         
-        // 如果iframe已经加载完成，直接调整高度
-        if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
-            adjustHeight();
-        }
+        // // 如果iframe已经加载完成，直接调整高度
+        // if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+        //     adjustHeight();
+        // }
         
     } catch (error) {
         console.error('loadHtmlToIframe: 加载HTML内容失败', error);
@@ -271,50 +273,50 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
             const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(fullHtml);
             iframe.src = dataUrl;
             
-            iframe.onload = function() {
-                adjustHeight();
-            };
+            // iframe.onload = function() {
+            //     adjustHeight();
+            // };
         } catch (fallbackError) {
             console.error('loadHtmlToIframe: 降级方案也失败', fallbackError);
         }
     }
     
     // 监听窗口大小变化，重新调整iframe高度
-    let resizeTimer;
-    const handleResize = function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            adjustHeight();
-        }, 300); // 防抖，300ms后执行
-    };
+    // let resizeTimer;
+    // const handleResize = function() {
+    //     clearTimeout(resizeTimer);
+    //     resizeTimer = setTimeout(function() {
+    //         adjustHeight();
+    //     }, 300); // 防抖，300ms后执行
+    // };
     
-    window.addEventListener('resize', handleResize);
+    // window.addEventListener('resize', handleResize);
     
-    // 监听设备方向变化（移动设备）
-    window.addEventListener('orientationchange', function() {
-        setTimeout(function() {
-            adjustHeight();
-        }, 500);
-    });
+    // // 监听设备方向变化（移动设备）
+    // window.addEventListener('orientationchange', function() {
+    //     setTimeout(function() {
+    //         adjustHeight();
+    //     }, 500);
+    // });
     
-    // 监听媒体查询变化（PC转手机版）
-    if (window.matchMedia) {
-        const mediaQuery = window.matchMedia('(max-width: 768px)');
-        let lastIsMobile = mediaQuery.matches;
+    // // 监听媒体查询变化（PC转手机版）
+    // if (window.matchMedia) {
+    //     const mediaQuery = window.matchMedia('(max-width: 768px)');
+    //     let lastIsMobile = mediaQuery.matches;
         
-        mediaQuery.addEventListener('change', function(e) {
-            const isMobile = e.matches;
-            if (isMobile !== lastIsMobile) {
-                lastIsMobile = isMobile;
-                setTimeout(function() {
-                    adjustHeight();
-                }, 300);
-            }
-        });
-    }
+    //     mediaQuery.addEventListener('change', function(e) {
+    //         const isMobile = e.matches;
+    //         if (isMobile !== lastIsMobile) {
+    //             lastIsMobile = isMobile;
+    //             setTimeout(function() {
+    //                 adjustHeight();
+    //             }, 300);
+    //         }
+    //     });
+    // }
     
-    // 将调整函数保存到iframe元素上，以便外部可以调用
-    iframe._adjustHeight = adjustHeight;
+    // // 将调整函数保存到iframe元素上，以便外部可以调用
+    // iframe._adjustHeight = adjustHeight;
 };
 
 /**
@@ -323,46 +325,46 @@ window.loadHtmlToIframe = function(iframe, htmlContent, options = {}) {
  * @param {Object} config - 配置参数
  */
 function adjustIframeHeight(iframe, config) {
-    try {
-        // 获取iframe内容的高度
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        const body = iframeDoc.body;
-        const html = iframeDoc.documentElement;
+    // try {
+    //     // 获取iframe内容的高度
+    //     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    //     const body = iframeDoc.body;
+    //     const html = iframeDoc.documentElement;
         
-        if (!body || !html) {
-            console.warn('adjustIframeHeight: 无法获取iframe内容');
-            return;
-        }
+    //     if (!body || !html) {
+    //         console.warn('adjustIframeHeight: 无法获取iframe内容');
+    //         return;
+    //     }
         
-        // 计算内容高度
-        const contentHeight = Math.max(
-            body.scrollHeight,
-            body.offsetHeight,
-            html.clientHeight,
-            html.scrollHeight,
-            html.offsetHeight
-        );
+    //     // 计算内容高度
+    //     const contentHeight = Math.max(
+    //         body.scrollHeight,
+    //         body.offsetHeight,
+    //         html.clientHeight,
+    //         html.scrollHeight,
+    //         html.offsetHeight
+    //     );
         
-        // 添加一些边距
-        const finalHeight = Math.min(
-            Math.max(contentHeight + 20, config.minHeight),
-            config.maxHeight
-        );
+    //     // 添加一些边距
+    //     const finalHeight = Math.min(
+    //         Math.max(contentHeight + 20, config.minHeight),
+    //         config.maxHeight
+    //     );
         
-        // 设置iframe高度
-        iframe.style.height = finalHeight + 'px';
+    //     // 设置iframe高度
+    //     iframe.style.height = finalHeight + 'px';
         
-        console.log(`iframe高度已调整为: ${finalHeight}px`);
+    //     console.log(`iframe高度已调整为: ${finalHeight}px`);
         
-        // 如果内容高度超过最大高度，显示滚动条
-        if (contentHeight > config.maxHeight - 20) {
-            iframe.style.overflow = 'auto';
-            console.warn('内容高度超过最大限制，显示滚动条');
-        }
+    //     // 如果内容高度超过最大高度，显示滚动条
+    //     if (contentHeight > config.maxHeight - 20) {
+    //         iframe.style.overflow = 'auto';
+    //         console.warn('内容高度超过最大限制，显示滚动条');
+    //     }
         
-    } catch (error) {
-        console.error('adjustIframeHeight: 调整高度失败', error);
-        // 设置默认高度
-        iframe.style.height = config.minHeight + 'px';
-    }
+    // } catch (error) {
+    //     console.error('adjustIframeHeight: 调整高度失败', error);
+    //     // 设置默认高度
+    //     iframe.style.height = config.minHeight + 'px';
+    // }
 }

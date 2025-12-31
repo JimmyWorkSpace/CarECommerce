@@ -40,6 +40,8 @@
     <script src="/js/axios.min.js"></script>
     <!-- jQuery -->
     <script src="/js/jquery.min.js"></script>
+    <!-- iFrameResize -->
+    <script src="/assets/iframe-resizer/iframe-resizer.parent.js"></script>
     <!-- Common JavaScript -->
     <script src="/js/common.js"></script>
     <!-- Bootstrap JS -->
@@ -117,6 +119,28 @@
                 });
             }
         });
+            window.doFrameResize = function(frameId, htmlContent) {
+                const iframe = document.getElementById(frameId);
+                
+                // 使用loadHtmlToIframe方法加载内容并自动调整高度
+                if (typeof window.loadHtmlToIframe === 'function') {
+                    window.loadHtmlToIframe(iframe, htmlContent, {
+                        minHeight: 200,
+                        maxHeight: Infinity,
+                        adjustDelay: 150,
+                        removeScrollbars: true
+                    });
+                } else {
+                    console.error('loadHtmlToIframe方法未找到，请确保common.js已加载');
+                    // 降级方案：直接设置内容
+                    iframe.srcdoc = htmlContent;
+                }
+
+                iframeResize({
+                    license: "GPLv3",
+                    log: true      // 开启调试日志
+                }, '#' + frameId);
+            }
     </script>
 </head>
 <body>
@@ -289,6 +313,28 @@
 
         
         <script>
+            window.doFrameResize = function(frameId, htmlContent) {
+                const iframe = document.getElementById(frameId);
+                
+                // 使用loadHtmlToIframe方法加载内容并自动调整高度
+                if (typeof window.loadHtmlToIframe === 'function') {
+                    window.loadHtmlToIframe(iframe, htmlContent, {
+                        minHeight: 200,
+                        maxHeight: Infinity,
+                        adjustDelay: 150,
+                        removeScrollbars: true
+                    });
+                } else {
+                    console.error('loadHtmlToIframe方法未找到，请确保common.js已加载');
+                    // 降级方案：直接设置内容
+                    iframe.srcdoc = htmlContent;
+                }
+
+                iframeResize({
+                    license: "GPLv3",
+                    log: true      // 开启调试日志
+                }, '#' + frameId);
+            }
             // 通用未登录处理函数
             window.handleUnauthorized = function(response) {
                 if (response && response.data && response.data.message) {
