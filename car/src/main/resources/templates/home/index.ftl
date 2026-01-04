@@ -49,9 +49,54 @@
 
 .ad-card {
     position: relative;
-    overflow: visible;
+    overflow: hidden;
     padding-top: 60%; /* 5:3 Aspect Ratio (高度/宽度 = 3/5 = 0.6) */
     height: auto;
+}
+
+.ad-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.ad-link .ad-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    object-position: center;
+}
+
+.ad-card > div:not(.ad-link) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ad-card > div:not(.ad-link) .ad-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    object-position: center;
+}
+
+.ad-title-overlay,
+.ad-title-bottom {
+    position: absolute;
+    z-index: 1;
 }
 
 .feature-card {
@@ -269,15 +314,15 @@
                      :class="getAdColumnClass(advertisements.length)" 
                      v-for="(ad, index) in advertisements.slice(0, 2)" :key="ad.id">
                     <div class="ad-card" :data-ad-id="ad.id">
-                        <!-- 連結類型广告 -->
+                        <!-- 連結類型广告 - 只有 isLink=1 时才能点击跳转 -->
                         <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link">
                             <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
                                  @error="handleImageError($event, ad.title)">
                             <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
                             <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
                         </a>
-                        <!-- 內容類型广告 -->
-                        <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                        <!-- 非連結類型广告 - 只显示图片，不能点击 -->
+                        <div v-else>
                             <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
                                  @error="handleImageError($event, ad.title)">
                             <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>

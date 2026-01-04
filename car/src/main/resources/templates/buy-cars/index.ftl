@@ -180,15 +180,15 @@
                 <div class="cars-ads-sidebar">
                     <div v-for="(ad, index) in advertisements.slice(0, 2)" :key="ad.id" class="mb-3">
                         <div class="ad-card" :data-ad-id="ad.id">
-                            <!-- 連結類型广告 -->
+                            <!-- 連結類型广告 - 只有 isLink=1 时才能点击跳转 -->
                             <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link">
                                 <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
                                      @error="handleAdImageError($event, ad.title)">
                                 <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
                                 <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
                             </a>
-                            <!-- 內容類型广告 -->
-                            <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                            <!-- 非連結類型广告 - 只显示图片，不能点击 -->
+                            <div v-else>
                                 <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
                                      @error="handleAdImageError($event, ad.title)">
                                 <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
@@ -222,15 +222,15 @@
                 <div class="cars-ads-mobile">
                     <div v-for="(ad, index) in advertisements.slice(0, 2)" :key="ad.id" class="mb-3">
                         <div class="ad-card" :data-ad-id="ad.id">
-                            <!-- 連結類型广告 -->
+                            <!-- 連結類型广告 - 只有 isLink=1 时才能点击跳转 -->
                             <a v-if="ad.isLink === 1" :href="ad.linkUrl" class="ad-link">
                                 <img :src="ad.imageUrl" :alt="ad.title" class="ad-image" 
                                      @error="handleAdImageError($event, ad.title)">
                                 <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>
                                 <div v-if="ad.title" class="ad-title-bottom" v-text="ad.title"></div>
                             </a>
-                            <!-- 內容類型广告 -->
-                            <div v-else class="ad-content-link" @click="showAdContent(ad.id, ad.title, ad.content)">
+                            <!-- 非連結類型广告 - 只显示图片，不能点击 -->
+                            <div v-else>
                                 <img :src="ad.imageUrl" :alt="ad.title" class="ad-image"
                                      @error="handleAdImageError($event, ad.title)">
                                 <div v-if="ad.title" class="ad-title-overlay" style="display: none;" v-text="ad.title"></div>

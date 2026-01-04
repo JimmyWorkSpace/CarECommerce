@@ -45,9 +45,15 @@
       v-loading="loading" 
       :data="advertisementList" 
       row-key="id">
-      <el-table-column label="圖片" align="center" prop="imageUrl" width="200">
+      <el-table-column 
+        v-if="hasAdvertisementType"
+        label="圖片" 
+        align="center" 
+        prop="imageUrl" 
+        width="200">
         <template slot-scope="scope">
           <el-image 
+            v-if="scope.row.advType === 0"
             style="width: 100px; height: 60px"
             :src="scope.row.imageUrl"
             fit="cover"
@@ -56,9 +62,27 @@
               <i class="el-icon-picture-outline"></i>
             </div>
           </el-image>
+          <span v-else>-</span>
         </template>
       </el-table-column>
-      <el-table-column label="標題" align="center" prop="title" width="150" :show-overflow-tooltip="true" />
+      <el-table-column 
+        v-if="hasAdvertisementType"
+        label="標題" 
+        align="center" 
+        prop="title" 
+        width="150" 
+        :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <span v-if="scope.row.advType === 0">{{ scope.row.title }}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="內容" align="left" prop="titleHtml" width="300">
+        <template slot-scope="scope">
+          <div v-if="scope.row.advType !== 0 && scope.row.titleHtml" class="content-text">{{ extractText(scope.row.titleHtml) }}</div>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column label="類型" align="center" prop="advType" width="100">
         <template slot-scope="scope">
           <el-tag :type="scope.row.advType === 0 ? 'primary' : 'success'">
@@ -72,12 +96,6 @@
         </template>
       </el-table-column>
       <el-table-column label="跳轉地址" align="center" prop="linkUrl" :show-overflow-tooltip="true" />
-      <el-table-column label="排序" align="center" prop="showOrder" width="80" />
-      <el-table-column label="建立時間" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
           <el-button
@@ -125,8 +143,15 @@
     <!-- 添加或修改廣告對話框 -->
     <el-dialog :title="title" :visible.sync="open" width="80%" append-to-body :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="標題類型" prop="titleType">
-          <el-radio-group v-model="form.titleType" @change="handleTitleTypeChange">
+        <el-form-item label="類型" prop="advType">
+          <el-radio-group v-model="form.advType" @change="handleAdvTypeChange">
+            <el-radio :label="0">廣告</el-radio>
+            <el-radio :label="1">網站介紹</el-radio>
+            <el-radio :label="2">詳情頁網站介紹</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="標題類型" prop="titleType" style="display: none;">
+          <el-radio-group v-model="form.titleType" @change="handleTitleTypeChange" :disabled="form.advType !== 0">
             <el-radio :label="0">圖片標題</el-radio>
             <el-radio :label="1">富文本標題</el-radio>
           </el-radio-group>
@@ -160,26 +185,19 @@
             <quill-editor v-model="form.titleHtml" :min-height="400"/>
           </el-form-item>
         </template>
-        <el-form-item label="類型" prop="advType">
-          <el-radio-group v-model="form.advType">
-            <el-radio :label="0">廣告</el-radio>
-            <el-radio :label="1">網站介紹</el-radio>
-            <el-radio :label="2">詳情頁網站介紹</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="是否跳轉" prop="isLink">
-          <el-radio-group v-model="form.isLink" @change="handleIsLinkChange">
-            <el-radio :label="0">否</el-radio>
-            <el-radio :label="1">是</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="跳轉地址" prop="linkUrl" v-if="form.isLink === 1">
-          <el-input v-model="form.linkUrl" placeholder="請輸入跳轉地址" />
-        </el-form-item>
-        <el-form-item label="顯示內容" prop="content" v-if="form.isLink === 0">
-          <quill-editor v-model="form.content" :min-height="400"/>
-        </el-form-item>
-        <el-form-item label="是否刪除" prop="delFlag">
+        <!-- 只有廣告類型時才顯示是否跳轉 -->
+        <template v-if="form.advType === 0">
+          <el-form-item label="是否跳轉" prop="isLink">
+            <el-radio-group v-model="form.isLink" @change="handleIsLinkChange">
+              <el-radio :label="0">否</el-radio>
+              <el-radio :label="1">是</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="跳轉地址" prop="linkUrl" v-if="form.isLink === 1">
+            <el-input v-model="form.linkUrl" placeholder="請輸入跳轉地址" />
+          </el-form-item>
+        </template>
+        <el-form-item label="是否刪除" prop="delFlag" style="display: none;">
           <el-radio-group v-model="form.delFlag">
             <el-radio :label="0">否</el-radio>
             <el-radio :label="1">是</el-radio>
@@ -247,6 +265,12 @@ export default {
       }
     };
   },
+  computed: {
+    // 检查是否有广告类型的数据
+    hasAdvertisementType() {
+      return this.advertisementList.some(item => item.advType === 0);
+    }
+  },
   created() {
     this.getList();
   },
@@ -269,7 +293,7 @@ export default {
     reset() {
       this.form = {
         id: null,
-        titleType: 0,
+        titleType: 0, // 广告默认为图片标题
         titleHtml: null,
         imageUrl: null,
         linkUrl: null,
@@ -309,6 +333,16 @@ export default {
       const id = row.id || this.ids
       getAdvertisement(id).then(response => {
         this.form = response.data;
+        // 當類型為廣告時，如果沒有設置標題類型，默認為圖片標題；否則固定為富文本標題
+        if (this.form.advType === 0) {
+          // 廣告類型，如果沒有設置標題類型，默認為圖片標題
+          if (this.form.titleType === null || this.form.titleType === undefined) {
+            this.form.titleType = 0;
+          }
+        } else {
+          // 非廣告類型，固定為富文本標題
+          this.form.titleType = 1;
+        }
         this.open = true;
         this.title = "修改廣告";
       });
@@ -500,10 +534,7 @@ export default {
     },
     /** 是否跳轉變化處理 */
     handleIsLinkChange(value) {
-      if (value === 1) {
-        // 選擇跳轉時，清空內容
-        this.form.content = null;
-      } else {
+      if (value === 0) {
         // 選擇不跳轉時，清空跳轉地址
         this.form.linkUrl = null;
       }
@@ -512,10 +543,39 @@ export default {
     handleTitleTypeChange(value) {
       // 保留所有內容，不進行清空操作
       // 用戶可以在不同類型之間切換而不會丟失已輸入的信息
+    },
+    /** 類型變化處理 */
+    handleAdvTypeChange(value) {
+      // 當類型為廣告時，默認為圖片標題；否則默認為富文本標題
+      if (value === 0) {
+        // 廣告類型，默認為圖片標題
+        this.form.titleType = 0;
+      } else {
+        // 非廣告類型，固定為富文本標題
+        this.form.titleType = 1;
+      }
+    },
+    /** 從HTML中提取純文本 */
+    extractText(html) {
+      if (!html) return '';
+      // 創建一個臨時div元素來解析HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      // 獲取純文本內容
+      return tempDiv.textContent || tempDiv.innerText || '';
     }
   }
 };
 </script>
 
 <style scoped>
+.content-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+  word-break: break-word;
+}
 </style> 
