@@ -63,26 +63,6 @@
             默認：560px（16:9 比例）
           </div>
         </el-form-item>
-        <el-form-item label="高度">
-          <el-row :gutter="10">
-            <el-col :span="10">
-              <el-input
-                v-model="youtubeHeight"
-                placeholder="例如：315 或 56.25"
-                type="number"
-              />
-            </el-col>
-            <el-col :span="6">
-              <el-select v-model="youtubeHeightUnit" style="width: 100%">
-                <el-option label="px" value="px"></el-option>
-                <el-option label="%" value="%"></el-option>
-              </el-select>
-            </el-col>
-          </el-row>
-          <div style="margin-top: 5px; color: #909399; font-size: 12px;">
-            默認：315px 或 56.25%（16:9 比例，當寬度為 % 時建議使用 %）
-          </div>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="youtubeDialogVisible = false">取 消</el-button>
@@ -166,9 +146,7 @@ export default {
       youtubeDialogVisible: false,
       youtubeUrl: "",
       youtubeWidth: "560",
-      youtubeWidthUnit: "px",
-      youtubeHeight: "315",
-      youtubeHeightUnit: "px"
+      youtubeWidthUnit: "px"
     };
   },
   computed: {
@@ -427,8 +405,10 @@ export default {
               containerStyle += 'width: ' + widthStr + '; min-width: 320px;';
             }
             
-            // 设置高度
-            if (heightUnit === '%') {
+            // 设置高度 - 如果高度为 auto，则使用 aspect-ratio 保持 16:9 比例
+            if (heightStr === 'auto' || heightUnit === 'auto') {
+              containerStyle += 'height: auto; aspect-ratio: 16 / 9;';
+            } else if (heightUnit === '%') {
               containerStyle += 'height: 0; padding-bottom: ' + heightStr + ';';
             } else {
               containerStyle += 'height: ' + heightStr + ';';
@@ -448,9 +428,15 @@ export default {
             iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block;';
             
             const widthNum = typeof width === 'string' ? parseFloat(width) : width;
-            const heightNum = typeof height === 'string' ? parseFloat(height) : height;
-            iframe.width = widthNum || 560;
-            iframe.height = heightNum || 315;
+            // 如果高度为 auto，iframe 高度也设置为 auto（通过 CSS 控制）
+            if (heightStr === 'auto' || heightUnit === 'auto') {
+              iframe.width = widthNum || 560;
+              iframe.height = 'auto';
+            } else {
+              const heightNum = typeof height === 'string' ? parseFloat(height) : height;
+              iframe.width = widthNum || 560;
+              iframe.height = heightNum || 315;
+            }
             iframe.loading = 'lazy';
             
             videoContainer.appendChild(iframe);
@@ -709,8 +695,6 @@ export default {
       this.youtubeUrl = '';
       this.youtubeWidth = '560';
       this.youtubeWidthUnit = 'px';
-      this.youtubeHeight = '315';
-      this.youtubeHeightUnit = 'px';
       this.youtubeDialogVisible = true;
     },
     // 从 YouTube URL 中提取视频 ID
@@ -756,18 +740,8 @@ export default {
       const widthUnit = this.youtubeWidthUnit || 'px';
       const widthValue = width + widthUnit;
       
-      // 验证并处理高度
-      let height = this.youtubeHeight ? this.youtubeHeight.trim() : '315';
-      if (!height || isNaN(parseFloat(height)) || parseFloat(height) <= 0) {
-        // 如果宽度是 px，根据 16:9 比例计算高度；如果是 %，使用 56.25%
-        if (widthUnit === 'px') {
-          height = String(Math.round(parseFloat(width) * 9 / 16));
-        } else {
-          height = '56.25';
-        }
-      }
-      const heightUnit = this.youtubeHeightUnit || 'px';
-      const heightValue = height + heightUnit;
+      // 高度自动设置为 auto
+      const heightValue = 'auto';
       
       // 插入到编辑器
       if (this.$refs.editorFrame && this.$refs.editorFrame.contentWindow) {
@@ -777,7 +751,7 @@ export default {
           width: widthValue,
           height: heightValue,
           widthUnit: widthUnit,
-          heightUnit: heightUnit
+          heightUnit: 'auto'
         }, '*');
         this.$message.success('YouTube 視頻已插入');
       }

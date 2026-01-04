@@ -178,9 +178,6 @@
             padding: 15px;
         }
         
-        #richContentIframe {
-            margin: 0 -15px;
-        }
     }
 </style>
 
