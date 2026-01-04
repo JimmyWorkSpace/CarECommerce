@@ -69,6 +69,61 @@
         <el-button type="primary" @click="insertYouTubeVideo">確 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 图片设置对话框 -->
+    <el-dialog
+      title="插入圖片"
+      :visible.sync="imageDialogVisible"
+      width="500px"
+      append-to-body
+    >
+      <el-form>
+        <el-form-item label="上傳圖片">
+          <el-upload
+            :action="uploadUrl"
+            :before-upload="handleBeforeUpload"
+            :on-success="handleImageUploadSuccess"
+            :on-error="handleUploadError"
+            name="file"
+            :show-file-list="false"
+            :headers="headers"
+            :data="uploadData"
+          >
+            <el-button size="small" type="primary">點擊上傳</el-button>
+            <div slot="tip" class="el-upload__tip" style="margin-top: 7px; color: #909399; font-size: 12px;">
+              只能上傳jpg/png文件，且不超過{{fileSize}}MB
+            </div>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="圖片預覽" v-if="imageUrl">
+          <img :src="imageUrl" style="max-width: 100%; max-height: 200px; display: block; margin-top: 10px;" />
+        </el-form-item>
+        <el-form-item label="寬度">
+          <el-row :gutter="10">
+            <el-col :span="10">
+              <el-input
+                v-model="imageWidth"
+                placeholder="例如：560 或 100"
+                type="number"
+              />
+            </el-col>
+            <el-col :span="6">
+              <el-select v-model="imageWidthUnit" style="width: 100%">
+                <el-option label="px" value="px"></el-option>
+                <el-option label="%" value="%"></el-option>
+              </el-select>
+            </el-col>
+          </el-row>
+          <div style="margin-top: 5px; color: #909399; font-size: 12px;">
+            高度將自動設置為 auto
+          </div>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="imageDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="insertImage" :disabled="!imageUrl">確 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -146,7 +201,13 @@ export default {
       youtubeDialogVisible: false,
       youtubeUrl: "",
       youtubeWidth: "560",
-      youtubeWidthUnit: "px"
+      youtubeWidthUnit: "px",
+      // 图片设置对话框相关
+      imageDialogVisible: false,
+      imageUrl: "",
+      imageWidth: "560",
+      imageWidthUnit: "px",
+      pendingImageUrl: null // 存储待插入的图片URL
     };
   },
   computed: {
@@ -542,9 +603,9 @@ export default {
        // 自定义图片上传处理器
        const quillToolbar = quillInstance.getModule('toolbar');
        quillToolbar.addHandler('image', function() {
-         // 通知父窗口触发图片上传
+         // 通知父窗口显示图片设置对话框
          window.parent.postMessage({
-           type: 'trigger-image-upload'
+           type: 'show-image-dialog'
          }, '*');
        });
        
@@ -610,7 +671,39 @@ export default {
          } else if (event.data.type === 'insert-image') {
            // 插入图片
            const length = quillInstance.getSelection(true).index;
-           quillInstance.insertEmbed(length, 'image', event.data.url);
+           const imageUrl = event.data.url;
+           
+           // 先插入图片
+           quillInstance.insertEmbed(length, 'image', imageUrl);
+           
+           // 使用 setTimeout 确保图片已插入到 DOM 中
+           setTimeout(function() {
+             // 查找刚插入的图片并设置样式
+             const editorElement = document.querySelector('.ql-editor');
+             if (editorElement) {
+               const images = editorElement.querySelectorAll('img');
+               if (images.length > 0) {
+                 // 从后往前查找，找到匹配的图片
+                 for (let i = images.length - 1; i >= 0; i--) {
+                   const img = images[i];
+                   const imgSrc = img.src || img.getAttribute('src') || '';
+                   // 检查是否是刚插入的图片（通过 src 匹配）
+                   if (imgSrc === imageUrl || imgSrc.includes(imageUrl) || imageUrl.includes(imgSrc.split('/').pop())) {
+                     // 只设置 width、height 和 max-width
+                     const widthValue = event.data.width || '560px';
+                     img.style.width = widthValue;
+                     img.style.height = 'auto';
+                     img.style.maxWidth = '100%';
+                     // 设置属性以确保样式持久化
+                     const styleStr = 'width: ' + widthValue + '; height: auto; max-width: 100%;';
+                     img.setAttribute('style', styleStr);
+                     break;
+                   }
+                 }
+               }
+             }
+           }, 50);
+           
            quillInstance.setSelection(length + 1);
          } else if (event.data.type === 'insert-youtube') {
            // 插入YouTube视频
@@ -680,14 +773,12 @@ export default {
         setTimeout(() => {
           this.isUpdating = false;
         }, 50);
-      } else if (type === 'trigger-image-upload') {
-        // 触发图片上传
-        if (this.type === 'url' && this.$refs.upload) {
-          this.$refs.upload.$children[0].$refs.input.click();
-        }
       } else if (type === 'show-youtube-dialog') {
         // 显示YouTube对话框
         this.showYouTubeDialog();
+      } else if (type === 'show-image-dialog') {
+        // 显示图片设置对话框
+        this.showImageDialog();
       }
     },
     // 显示 YouTube 输入对话框
@@ -771,22 +862,75 @@ export default {
       }
       return true;
     },
-    // 上传成功回调
+    // 上传成功回调（保留用于其他可能的场景）
     handleUploadSuccess(res, file) {
       // 如果上传成功
       if (res.code == 200) {
         // 获取图片URL
         const imageUrl = res.url || (process.env.VUE_APP_BASE_API + res.fileName);
-        // 通知iframe插入图片
-        if (this.$refs.editorFrame && this.$refs.editorFrame.contentWindow) {
-          this.$refs.editorFrame.contentWindow.postMessage({
-            type: 'insert-image',
-            url: imageUrl
-          }, '*');
-        }
+        // 显示图片设置对话框
+        this.showImageDialog();
+        this.pendingImageUrl = imageUrl;
+        this.imageUrl = imageUrl;
       } else {
         this.$message.error(res.msg || "圖片插入失敗");
       }
+    },
+    // 显示图片设置对话框
+    showImageDialog() {
+      this.pendingImageUrl = null;
+      this.imageUrl = '';
+      this.imageWidth = '560';
+      this.imageWidthUnit = 'px';
+      this.imageDialogVisible = true;
+    },
+    // 图片上传成功回调（在对话框中）
+    handleImageUploadSuccess(res, file) {
+      // 如果上传成功
+      if (res.code == 200) {
+        // 获取图片URL
+        const imageUrl = res.url || (process.env.VUE_APP_BASE_API + res.fileName);
+        this.pendingImageUrl = imageUrl;
+        this.imageUrl = imageUrl;
+        this.$message.success('圖片上傳成功');
+      } else {
+        this.$message.error(res.msg || "圖片上傳失敗");
+      }
+    },
+    // 确认插入图片
+    insertImage() {
+      if (!this.pendingImageUrl) {
+        this.$message.warning('請先上傳圖片');
+        return;
+      }
+
+      // 验证并处理宽度
+      let width = this.imageWidth ? this.imageWidth.trim() : '560';
+      if (!width || isNaN(parseFloat(width)) || parseFloat(width) <= 0) {
+        width = '560';
+      }
+      const widthUnit = this.imageWidthUnit || 'px';
+      const widthValue = width + widthUnit;
+
+      // 高度自动设置为 auto
+      const heightValue = 'auto';
+
+      // 插入到编辑器
+      if (this.$refs.editorFrame && this.$refs.editorFrame.contentWindow) {
+        this.$refs.editorFrame.contentWindow.postMessage({
+          type: 'insert-image',
+          url: this.pendingImageUrl,
+          width: widthValue,
+          height: heightValue,
+          widthUnit: widthUnit,
+          heightUnit: 'auto'
+        }, '*');
+        this.$message.success('圖片已插入');
+      }
+
+      this.imageDialogVisible = false;
+      this.pendingImageUrl = null;
+      this.imageUrl = '';
     },
     // 上传失败回调
     handleUploadError() {
