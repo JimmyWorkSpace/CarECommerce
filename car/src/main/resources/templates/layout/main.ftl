@@ -5,7 +5,7 @@
 
     <title>${title}</title>
 
-    <meta name="title" content="${ogDescription}" />
+    <meta name="title" content="${ogTitle}" />
     <meta name="description" content="${ogDescription}" />
     <meta name="keywords" content="${ogDescription}" />
 
@@ -278,26 +278,17 @@
                                 <label for="loginPhoneNumber" class="form-label">
                                     <i class="bi bi-phone me-2"></i>手機號碼
                                 </label>
-                                <div class="mb-2" style="font-size: 0.95rem; color: #5ACFC9; font-weight: 500;">
-                                    <i class="bi bi-info-circle me-1"></i>未註冊用戶將以此手機號註冊
-                                </div>
                                 <div class="form-text">必須為10碼數字，以09開頭</div>
                                 <input type="tel" class="form-control" id="loginPhoneNumber" 
                                        placeholder="請輸入手機號碼（09開頭）" required maxlength="10">
                             </div>
                             
                             <div class="mb-3">
-                                <label for="loginSmsCode" class="form-label">
-                                    <i class="bi bi-shield-check me-2"></i>短信驗證碼
+                                <label for="loginPassword" class="form-label">
+                                    <i class="bi bi-lock me-2"></i>密碼
                                 </label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="loginSmsCode" 
-                                           placeholder="請輸入驗證碼" required maxlength="6">
-                                    <button type="button" class="btn btn-outline-primary" id="loginSendSmsBtn">
-                                        <span id="loginSmsBtnText">發送驗證碼</span>
-                                    </button>
-                                </div>
-                                <div class="form-text">驗證碼將發送到您的手機，有效期5分鐘</div>
+                                <input type="password" class="form-control" id="loginPassword" 
+                                       placeholder="請輸入密碼" required>
                             </div>
                         </form>
                     </div>
@@ -536,9 +527,7 @@
             // 通用登录管理器
             window.loginManager = {
                 loginPhoneNumber: '',
-                loginSmsCode: '',
-                loginCountdown: 0,
-                loginCountdownTimer: null,
+                loginPassword: '',
                 loginSubmitting: false,
                 pendingAction: null,
                 
@@ -556,18 +545,6 @@
                     this.pendingAction = pendingAction || null;
                     const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
                     loginModal.show();
-                    
-                    // 弹框显示后，检查是否有已输入的手机号，如果有则检查剩余等待时间
-                    const loginModalElement = document.getElementById('loginModal');
-                    if (loginModalElement) {
-                        loginModalElement.addEventListener('shown.bs.modal', () => {
-                            const phoneInput = document.getElementById('loginPhoneNumber');
-                            if (phoneInput && phoneInput.value && phoneInput.value.length === 10) {
-                                this.loginPhoneNumber = phoneInput.value;
-                                this.checkLoginRemainingTime(phoneInput.value);
-                            }
-                        }, { once: true });
-                    }
                 },
                 
                 // 初始化登录弹窗
@@ -586,31 +563,14 @@
                             }
                             self.loginPhoneNumber = value;
                             e.target.value = value;
-                            // 当手机号输入完整时，检查剩余等待时间
-                            if (value.length === 10) {
-                                self.checkLoginRemainingTime(value);
-                            }
                         });
                     }
                     
-                    // 验证码输入限制
-                    const codeInput = document.getElementById('loginSmsCode');
-                    if (codeInput) {
-                        codeInput.addEventListener('input', function(e) {
-                            let value = e.target.value.replace(/\D/g, '');
-                            if (value.length > 6) {
-                                value = value.substring(0, 6);
-                            }
-                            self.loginSmsCode = value;
-                            e.target.value = value;
-                        });
-                    }
-                    
-                    // 发送验证码按钮
-                    const sendSmsBtn = document.getElementById('loginSendSmsBtn');
-                    if (sendSmsBtn) {
-                        sendSmsBtn.addEventListener('click', function() {
-                            self.sendLoginSms();
+                    // 密码输入
+                    const passwordInput = document.getElementById('loginPassword');
+                    if (passwordInput) {
+                        passwordInput.addEventListener('input', function(e) {
+                            self.loginPassword = e.target.value;
                         });
                     }
                     
@@ -631,69 +591,6 @@
                     }
                 },
                 
-                // 检查剩余等待时间
-                checkLoginRemainingTime: async function(phone) {
-                    if (!phone || phone.trim().length !== 10) {
-                        return;
-                    }
-                    try {
-                        const res = await axios.post('/api/sms/check-remaining-time', { phoneNumber: phone });
-                        const data = res.data;
-                        if (data.success && data.remainingTime > 0) {
-                            // 如果有剩余等待时间，自动开始倒计时
-                            this.loginCountdown = data.remainingTime;
-                            this.startLoginCountdown();
-                        }
-                    } catch (err) {
-                        console.error('检查剩余等待时间失败:', err);
-                    }
-                },
-                
-                // 发送登录验证码
-                sendLoginSms: async function() {
-                    const phone = this.loginPhoneNumber.trim();
-                    
-                    if (!phone) {
-                        this.showLoginError('請輸入手機號碼');
-                        return;
-                    }
-                    
-                    // 验证手机号格式（台湾手机号：10码，以09开头）
-                    if (phone.length !== 10) {
-                        this.showLoginError('手機號長度必須為10碼');
-                        return;
-                    }
-                    if (!phone.startsWith('09')) {
-                        this.showLoginError('手機號必須以09開頭');
-                        return;
-                    }
-                    if (!/^09\d{8}$/.test(phone)) {
-                        this.showLoginError('請輸入正確的手機號碼格式（10碼數字，以09開頭）');
-                        return;
-                    }
-                    
-                    try {
-                        const res = await axios.post('/api/sms/send', { phoneNumber: phone });
-                        const data = res.data;
-                        if (data.success) {
-                            this.loginCountdown = 30; // 发送成功后设置为30秒倒计时
-                            this.startLoginCountdown();
-                            this.hideLoginError();
-                            this.showToast('驗證碼已發送，請查看手機簡訊，也留意垃圾簡訊內容', 'success');
-                        } else {
-                            if (data.remainingTime) {
-                                this.showLoginError('請等待 ' + data.remainingTime + ' 秒後再發送驗證碼');
-                                this.loginCountdown = data.remainingTime;
-                                this.startLoginCountdown();
-                            } else {
-                                this.showLoginError(data.message || '發送失敗，請稍後重試');
-                            }
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        this.showLoginError('發送失敗，請稍後重試');
-                    }
-                },
                 
                 // 显示Toast提示
                 showToast: function(message, type) {
@@ -753,39 +650,6 @@
                     });
                 },
                 
-                // 开始倒计时
-                startLoginCountdown: function(initialValue) {
-                    // 如果传入了初始值，使用它；否则使用当前的loginCountdown值
-                    if (initialValue !== undefined) {
-                        this.loginCountdown = initialValue;
-                    }
-                    const sendSmsBtn = document.getElementById('loginSendSmsBtn');
-                    const btnText = document.getElementById('loginSmsBtnText');
-                    
-                    if (this.loginCountdownTimer) {
-                        clearInterval(this.loginCountdownTimer);
-                    }
-                    
-                    if (this.loginCountdown <= 0) {
-                        return;
-                    }
-                    
-                    this.loginCountdownTimer = setInterval(() => {
-                        this.loginCountdown--;
-                        if (btnText) {
-                            btnText.textContent = this.loginCountdown > 0 ? this.loginCountdown + '秒後重發' : '發送驗證碼';
-                        }
-                        if (sendSmsBtn) {
-                            sendSmsBtn.disabled = this.loginCountdown > 0;
-                        }
-                        
-                        if (this.loginCountdown <= 0) {
-                            clearInterval(this.loginCountdownTimer);
-                            this.loginCountdownTimer = null;
-                            this.loginCountdown = 0;
-                        }
-                    }, 1000);
-                },
                 
                 // 显示登录错误
                 showLoginError: function(message) {
@@ -808,15 +672,21 @@
                 // 提交登录
                 submitLoginModal: async function() {
                     const phone = this.loginPhoneNumber.trim();
-                    const code = this.loginSmsCode.trim();
+                    const password = this.loginPassword.trim();
                     
                     if (!phone) {
                         this.showLoginError('請輸入手機號碼');
                         return;
                     }
                     
-                    if (!code || !/^\d{6}$/.test(code)) {
-                        this.showLoginError('請輸入6位數字驗證碼');
+                    // 验证手机号格式（台湾手机号：10码，以09开头）
+                    if (!/^09\d{8}$/.test(phone)) {
+                        this.showLoginError('請輸入正確的手機號碼格式（10碼數字，以09開頭）');
+                        return;
+                    }
+                    
+                    if (!password) {
+                        this.showLoginError('請輸入密碼');
                         return;
                     }
                     
@@ -846,11 +716,11 @@
                     phoneInput.value = phone;
                     form.appendChild(phoneInput);
                     
-                    const codeInput = document.createElement('input');
-                    codeInput.type = 'hidden';
-                    codeInput.name = 'smsCode';
-                    codeInput.value = code;
-                    form.appendChild(codeInput);
+                    const passwordInput = document.createElement('input');
+                    passwordInput.type = 'hidden';
+                    passwordInput.name = 'password';
+                    passwordInput.value = password;
+                    form.appendChild(passwordInput);
                     
                     // 添加当前页面URL作为返回地址
                     const returnUrlInput = document.createElement('input');
@@ -866,30 +736,20 @@
                 // 重置登录表单
                 resetLoginForm: function() {
                     this.loginPhoneNumber = '';
-                    this.loginSmsCode = '';
+                    this.loginPassword = '';
                     this.loginSubmitting = false;
                     this.hideLoginError();
                     
                     const phoneInput = document.getElementById('loginPhoneNumber');
-                    const codeInput = document.getElementById('loginSmsCode');
+                    const passwordInput = document.getElementById('loginPassword');
                     const submitBtn = document.getElementById('loginSubmitBtn');
-                    const sendSmsBtn = document.getElementById('loginSendSmsBtn');
-                    const btnText = document.getElementById('loginSmsBtnText');
                     
                     if (phoneInput) phoneInput.value = '';
-                    if (codeInput) codeInput.value = '';
+                    if (passwordInput) passwordInput.value = '';
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>登錄';
                     }
-                    if (sendSmsBtn) sendSmsBtn.disabled = false;
-                    if (btnText) btnText.textContent = '發送驗證碼';
-                    
-                    if (this.loginCountdownTimer) {
-                        clearInterval(this.loginCountdownTimer);
-                        this.loginCountdownTimer = null;
-                    }
-                    this.loginCountdown = 0;
                 }
             };
             

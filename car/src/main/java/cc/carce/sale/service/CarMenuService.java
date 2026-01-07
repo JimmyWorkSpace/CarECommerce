@@ -87,4 +87,19 @@ public class CarMenuService {
     public CarMenuEntity getMenuById(Long id) {
         return carMenuMapper.selectByPrimaryKey(id);
     }
+    
+    /**
+     * 根据linkUrl获取菜单项
+     * @param linkUrl 链接URL
+     * @return 菜单实体，如果不存在返回null
+     */
+    public CarMenuEntity getMenuByLinkUrl(String linkUrl) {
+        Example example = new Example(CarMenuEntity.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("linkUrl", linkUrl);
+        criteria.andEqualTo("isShow", 1);
+        criteria.andEqualTo("delFlag", 0);
+        List<CarMenuEntity> menus = carMenuMapper.selectByExample(example);
+        return menus != null && !menus.isEmpty() ? menus.get(0) : null;
+    }
 }

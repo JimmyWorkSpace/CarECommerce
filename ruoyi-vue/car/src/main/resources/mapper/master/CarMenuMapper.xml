@@ -15,11 +15,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="linkUrl"    column="linkUrl"    />
         <result property="linkType"    column="linkType"    />
         <result property="content"    column="content"    />
+        <result property="ogTitle"    column="ogTitle"    />
+        <result property="ogImage"    column="ogImage"    />
+        <result property="ogDesp"    column="ogDesp"    />
         <result property="parentId"    column="parentId"    />
     </resultMap>
 
     <sql id="selectCarMenuVo">
-        select id, title, showOrder, delFlag, createTime, isShow, canDel, linkUrl, linkType, content, parentId from car_menu
+        select id, title, showOrder, delFlag, createTime, isShow, canDel, linkUrl, linkType, content, ogTitle, ogImage, ogDesp, parentId from car_menu
     </sql>
 
     <select id="selectCarMenuList" parameterType="com.ruoyi.car.domain.CarMenuEntity" resultMap="CarMenuResult">
@@ -34,6 +37,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null  and linkUrl != ''"> and linkUrl = #{linkUrl}</if>
             <if test="linkType != null "> and linkType = #{linkType}</if>
             <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="ogTitle != null  and ogTitle != ''"> and ogTitle like concat('%', #{ogTitle}, '%')</if>
+            <if test="ogImage != null  and ogImage != ''"> and ogImage = #{ogImage}</if>
+            <if test="ogDesp != null  and ogDesp != ''"> and ogDesp like concat('%', #{ogDesp}, '%')</if>
             <if test="parentId != null "> and parentId = #{parentId}</if>
         </where>
         order by showOrder asc, createTime desc
@@ -66,6 +72,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null">linkUrl,</if>
             <if test="linkType != null">linkType,</if>
             <if test="content != null">content,</if>
+            <if test="ogTitle != null">ogTitle,</if>
+            <if test="ogImage != null">ogImage,</if>
+            <if test="ogDesp != null">ogDesp,</if>
             <if test="parentId != null">parentId,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -78,6 +87,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null">#{linkUrl},</if>
             <if test="linkType != null">#{linkType},</if>
             <if test="content != null">#{content},</if>
+            <if test="ogTitle != null">#{ogTitle},</if>
+            <if test="ogImage != null">#{ogImage},</if>
+            <if test="ogDesp != null">#{ogDesp},</if>
             <if test="parentId != null">#{parentId},</if>
          </trim>
     </insert>
@@ -94,6 +106,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="linkUrl != null">linkUrl = #{linkUrl},</if>
             <if test="linkType != null">linkType = #{linkType},</if>
             <if test="content != null">content = #{content},</if>
+            <if test="ogTitle != null">ogTitle = #{ogTitle},</if>
+            <if test="ogImage != null">ogImage = #{ogImage},</if>
+            <if test="ogDesp != null">ogDesp = #{ogDesp},</if>
             <!-- 使用 choose 来处理 parentId，包括 null 值的情况 -->
             <!-- 由于前端总是会传递 parentId 字段（要么是 null，要么是数字），所以这里总是更新 -->
             <choose>

@@ -111,7 +111,6 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-if="scope.row.canDel === 1"
           >修改</el-button>
           <el-button
             size="mini"
@@ -128,7 +127,7 @@
     <!-- 添加或修改選單維護對話框 -->
     <el-dialog :title="title" :visible.sync="open" width="70%" append-to-body :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="父菜單" prop="parentId">
+        <el-form-item label="父菜單" prop="parentId" v-if="form.canDel !== 0">
           <el-select v-model="form.parentId" placeholder="請選擇父菜單（不選則為頂級菜單）" clearable style="width: 100%">
             <el-option label="無（頂級菜單）" :value="null" />
             <el-option
@@ -139,29 +138,51 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="選單名稱" prop="title">
+        <el-form-item label="選單名稱" prop="title" v-if="form.canDel !== 0">
           <el-input v-model="form.title" placeholder="請輸入選單名稱" />
         </el-form-item>
-        <el-form-item label="顯示順序" prop="showOrder" v-if="form.id != null">
+        <el-form-item label="顯示順序" prop="showOrder" v-if="form.id != null && form.canDel !== 0">
           <el-input-number v-model="form.showOrder" :min="0" :max="999" placeholder="請輸入顯示順序" />
         </el-form-item>
-        <el-form-item label="是否顯示" prop="isShow">
+        <el-form-item label="是否顯示" prop="isShow" v-if="form.canDel !== 0">
           <el-radio-group v-model="form.isShow">
             <el-radio :label="1">顯示</el-radio>
             <el-radio :label="0">隱藏</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="選單類型" prop="linkType">
+        <el-form-item label="選單類型" prop="linkType" v-if="form.canDel !== 0">
           <el-radio-group v-model="form.linkType" @change="handleLinkTypeChange">
             <el-radio :label="0">鏈接</el-radio>
             <el-radio :label="1">富文本</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="鏈接地址" prop="linkUrl" v-if="form.linkType === 0">
+        <el-form-item label="鏈接地址" prop="linkUrl" v-if="form.linkType === 0 && form.canDel !== 0">
           <el-input v-model="form.linkUrl" type="textarea" placeholder="請輸入鏈接地址" />
         </el-form-item>
-        <el-form-item label="富文本內容" prop="content" v-if="form.linkType === 1">
+        <el-form-item label="富文本內容" prop="content" v-if="form.linkType === 1 && form.canDel !== 0">
           <quill-editor v-model="form.content" :min-height="400"/>
+        </el-form-item>
+        <el-form-item label="OG標題" prop="ogTitle">
+          <el-input v-model="form.ogTitle" placeholder="請輸入OG標題" />
+        </el-form-item>
+        <el-form-item label="OG圖片" prop="ogImage">
+          <el-upload
+            :action="uploadImageUrl"
+            :headers="uploadHeaders"
+            :data="uploadData"
+            :file-list="ogImageList"
+            :on-success="handleImageUploadSuccess"
+            :before-upload="handleBeforeImageUpload"
+            :on-remove="handleRemoveImage"
+            list-type="picture-card"
+            :limit="1"
+            :class="{ 'hide-upload': ogImageList.length >= 1 }"
+          >
+            <i class="el-icon-plus"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="OG描述" prop="ogDesp">
+          <el-input v-model="form.ogDesp" type="textarea" :rows="3" placeholder="請輸入OG描述" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -272,6 +293,7 @@ import { listMenu, getMenu, delMenu, addMenu, updateMenu, updateMenuShowStatus, 
 import { listQuestionAnswer, getQuestionAnswer, delQuestionAnswer, addQuestionAnswer, updateQuestionAnswer, batchUpdateQuestionAnswerOrder } from "@/api/car/questionAnswer";
 import QuillEditor from "@/components/QuillEditor";
 import { html2Text } from "@/utils";
+import { getToken } from "@/utils/auth";
 
 export default {
   name: "Menu",
@@ -323,6 +345,16 @@ export default {
       },
       // 表單參數
       form: {},
+      // 圖片上傳相關
+      uploadImageUrl: process.env.VUE_APP_BASE_API + "/car/upload/image",
+      uploadHeaders: {
+        Authorization: "Bearer " + getToken()
+      },
+      uploadData: {
+        dir: "/img/car_sale/menu"
+      },
+      // OG圖片列表
+      ogImageList: [],
       // 表單校驗
       rules: {
         title: [
@@ -410,8 +442,12 @@ export default {
         linkUrl: null,
         linkType: 0,
         content: null,
+        ogTitle: null,
+        ogImage: null,
+        ogDesp: null,
         parentId: null
       };
+      this.ogImageList = [];
       this.resetForm("form");
     },
     /** 搜索按鈕操作 */
@@ -438,14 +474,45 @@ export default {
       const id = row.id;
       getMenu(id).then(response => {
         this.form = response.data;
+        // 設置OG圖片列表
+        if (this.form.ogImage) {
+          this.ogImageList = [{
+            name: this.form.ogImage,
+            url: this.form.ogImage
+          }];
+        } else {
+          this.ogImageList = [];
+        }
         // 重新加载父菜单列表，确保数据是最新的
         this.getParentMenuList();
         this.open = true;
-        this.title = "修改選單維護";
+        // 如果是不可删除的条目，标题显示为修改OG信息
+        if (this.form.canDel === 0) {
+          this.title = "修改OG信息";
+        } else {
+          this.title = "修改選單維護";
+        }
       });
     },
     /** 提交按鈕 */
     submitForm() {
+      // 如果是不可删除的条目，只验证OG字段
+      if (this.form.canDel === 0 && this.form.id != null) {
+        // 只提交OG相关的三个字段和id
+        const ogData = {
+          id: this.form.id,
+          ogTitle: this.form.ogTitle,
+          ogImage: this.form.ogImage,
+          ogDesp: this.form.ogDesp
+        };
+        updateMenu(ogData).then(response => {
+          this.$modal.msgSuccess("修改成功");
+          this.open = false;
+          this.getList();
+        });
+        return;
+      }
+      
       // 动态设置验证规则
       this.setDynamicRules();
       
@@ -797,6 +864,38 @@ export default {
       if (!html) return '';
       const text = html2Text(html);
       return text.trim();
+    },
+    /** 圖片上傳前檢查 */
+    handleBeforeImageUpload(file) {
+      const isImage = file.type.indexOf('image') !== -1;
+      const isLt10M = file.size / 1024 / 1024 < 10;
+      if (!isImage) {
+        this.$modal.msgError('只能上傳圖片文件！');
+        return false;
+      }
+      if (!isLt10M) {
+        this.$modal.msgError('圖片大小不能超過10MB！');
+        return false;
+      }
+      return true;
+    },
+    /** 圖片上傳成功 */
+    handleImageUploadSuccess(response, file) {
+      if (response.code === 200) {
+        this.form.ogImage = response.url;
+        this.ogImageList = [{
+          name: response.fileName || response.url,
+          url: response.url
+        }];
+        this.$modal.msgSuccess("圖片上傳成功");
+      } else {
+        this.$modal.msgError(response.msg || "圖片上傳失敗");
+      }
+    },
+    /** 刪除圖片 */
+    handleRemoveImage(file, fileList) {
+      this.form.ogImage = null;
+      this.ogImageList = [];
     }
   }
 };
@@ -812,5 +911,16 @@ export default {
   word-break: break-word;
   line-height: 1.5;
   max-height: 3em; /* 2行，每行1.5em */
+}
+
+.og-image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 當已有圖片時隱藏上傳按鈕 */
+::v-deep .hide-upload .el-upload--picture-card {
+  display: none;
 }
 </style>

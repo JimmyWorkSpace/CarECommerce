@@ -147,11 +147,7 @@ export default {
       // 表單參數
       form: {},
       // 表單校驗
-      rules: {
-        value: [
-          { required: true, message: "配置值不能為空", trigger: "blur" }
-        ]
-      }
+      rules: {}
     };
   },
   created() {

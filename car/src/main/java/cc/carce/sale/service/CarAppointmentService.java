@@ -254,9 +254,13 @@ public class CarAppointmentService {
             String detailUrl = webUrl + "/detail/" + appointment.getCarSaleId();
             // 1. 发送短信给客户
             String customerMsg = String.format(
-                    "手機號碼%s的車主,預約%s,觀看車輛資訊 %s",
-                    custPhone, formattedTime, detailUrl
+                    "手機號碼%s的車主,預約%s",
+                    custPhone, formattedTime
             );
+            // String customerMsg = String.format(
+            //         "手機號碼%s的車主,預約%s,觀看車輛資訊 %s",
+            //         custPhone, formattedTime, detailUrl
+            // );
             smsService.sendSms(custPhone, customerMsg);
             log.info("客户预约确认短信发送成功，手机号: {}", custPhone);
             
@@ -278,9 +282,13 @@ public class CarAppointmentService {
             
             // 格式化短信内容：手機號碼XXXXXXXXXX的車主,預約2025-12-14 08:00,觀看車輛資訊 https://carbuy.com.tw/detail/16
             String dealerMsg = String.format(
-                    "手機號碼%s的車主,預約%s,觀看車輛資訊 %s",
-                    custPhone, formattedTime, detailUrl
+                    "手機號碼%s的車主,預約%s",
+                    custPhone, formattedTime
             );
+            // String dealerMsg = String.format(
+            //         "手機號碼%s的車主,預約%s,觀看車輛資訊 %s",
+            //         custPhone, formattedTime, detailUrl
+            // );
             smsService.sendSms(dealerPhone, dealerMsg);
             log.info("管理员预约通知短信发送成功，手机号: {}", dealerPhone);
             

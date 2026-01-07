@@ -379,6 +379,14 @@ body .navbar .navbar-toggler:focus {
     text-decoration: none;
 }
 
+.footer-links span {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    display: inline-block;
+    opacity: 0.6;
+    cursor: default;
+}
+
 .footer-line-buttons {
     display: flex;
     flex-direction: column;
