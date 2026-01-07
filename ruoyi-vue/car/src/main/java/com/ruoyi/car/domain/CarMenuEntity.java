@@ -46,6 +46,15 @@ public class CarMenuEntity {
     @Column(name = "content")
     private String content;
 
+    @Column(name = "ogTitle")
+    private String ogTitle;
+
+    @Column(name = "ogImage")
+    private String ogImage;
+
+    @Column(name = "ogDesp")
+    private String ogDesp;
+
     @Column(name = "parentId")
     private Long parentId;
 

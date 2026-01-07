@@ -229,6 +229,25 @@ public class CarViewController extends BaseController {
             // 设置模板内容
             model.addAttribute("content", "/home/index.ftl");
             
+            // 查找linkUrl为"/"的菜单记录，添加OG信息
+            try {
+                CarMenuEntity homeMenu = carMenuService.getMenuByLinkUrl("/");
+                if (homeMenu != null) {
+                    // 只添加非空的OG信息项
+                    if (homeMenu.getOgTitle() != null && !homeMenu.getOgTitle().isEmpty()) {
+                        model.addAttribute("ogTitle", homeMenu.getOgTitle());
+                    }
+                    if (homeMenu.getOgImage() != null && !homeMenu.getOgImage().isEmpty()) {
+                        model.addAttribute("ogImage", homeMenu.getOgImage());
+                    }
+                    if (homeMenu.getOgDesp() != null && !homeMenu.getOgDesp().isEmpty()) {
+                        model.addAttribute("ogDescription", homeMenu.getOgDesp());
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("获取首页菜单OG信息失败", e);
+            }
+            
         } catch (Exception e) {
             model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
         }
@@ -252,6 +271,26 @@ public class CarViewController extends BaseController {
             addSearchFilterToModel(model);
             
             model.addAttribute("content", "/buy-cars/index.ftl");
+            
+            // 查找linkUrl为"/buy-cars"的菜单记录，添加OG信息
+            try {
+                CarMenuEntity buyCarsMenu = carMenuService.getMenuByLinkUrl("/buy-cars");
+                if (buyCarsMenu != null) {
+                    // 只添加非空的OG信息项
+                    if (buyCarsMenu.getOgTitle() != null && !buyCarsMenu.getOgTitle().isEmpty()) {
+                        model.addAttribute("ogTitle", buyCarsMenu.getOgTitle());
+                    }
+                    if (buyCarsMenu.getOgImage() != null && !buyCarsMenu.getOgImage().isEmpty()) {
+                        model.addAttribute("ogImage", buyCarsMenu.getOgImage());
+                    }
+                    if (buyCarsMenu.getOgDesp() != null && !buyCarsMenu.getOgDesp().isEmpty()) {
+                        model.addAttribute("ogDescription", buyCarsMenu.getOgDesp());
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("获取买车菜单OG信息失败", e);
+            }
+        
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
@@ -275,6 +314,26 @@ public class CarViewController extends BaseController {
             model.addAttribute("title", "商城 - 汽車配件專營店");
             model.addAttribute("CurrencyUnit", CurrencyUnit);
             model.addAttribute("content", "/mall/index.ftl");
+            
+            // 查找linkUrl为"/mall"的菜单记录，添加OG信息
+            try {
+                CarMenuEntity mallMenu = carMenuService.getMenuByLinkUrl("/mall");
+                if (mallMenu != null) {
+                    // 只添加非空的OG信息项
+                    if (mallMenu.getOgTitle() != null && !mallMenu.getOgTitle().isEmpty()) {
+                        model.addAttribute("ogTitle", mallMenu.getOgTitle());
+                    }
+                    if (mallMenu.getOgImage() != null && !mallMenu.getOgImage().isEmpty()) {
+                        model.addAttribute("ogImage", mallMenu.getOgImage());
+                    }
+                    if (mallMenu.getOgDesp() != null && !mallMenu.getOgDesp().isEmpty()) {
+                        model.addAttribute("ogDescription", mallMenu.getOgDesp());
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("获取商城菜单OG信息失败", e);
+            }
+        
         } catch (Exception e) {
             model.addAttribute("error", "页面加载失败：" + e.getMessage());
         }
@@ -425,6 +484,21 @@ public class CarViewController extends BaseController {
             model.addAttribute("qaList", qaList);
             model.addAttribute("content", "/rich-content/content-iframe.ftl");
  			// model.addAttribute("content", "/menu/index.ftl");
+            
+            // 获取OG信息，如果有就设置，没有就跳过
+            if (menu.getOgTitle() != null && !menu.getOgTitle().isEmpty()) {
+                model.addAttribute("title", menu.getOgTitle());
+                model.addAttribute("ogTitle", menu.getOgTitle());
+            }
+            
+            if (menu.getOgImage() != null && !menu.getOgImage().isEmpty()) {
+                model.addAttribute("ogImage", menu.getOgImage());
+            }
+            
+            if (menu.getOgDesp() != null && !menu.getOgDesp().isEmpty()) {
+                model.addAttribute("description", menu.getOgDesp());
+                model.addAttribute("ogDescription", menu.getOgDesp());
+            }
             
             
         } catch (Exception e) {

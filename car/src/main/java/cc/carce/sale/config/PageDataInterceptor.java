@@ -105,7 +105,12 @@ public class PageDataInterceptor implements HandlerInterceptor {
                 for (cc.carce.sale.entity.CarConfigEntity config : configs) {
                     // 只添加页脚相关的配置（code以footer_开头）
                     if (config.getCode() != null && config.getCode().startsWith("footer_")) {
-                        footerLinks.put(config.getCode(), config.getValue() != null ? config.getValue() : "#");
+                        // 如果值为null或空字符串或"#"，则设置为空字符串，模板会判断为无效链接
+                        String value = config.getValue();
+                        if (value == null || value.trim().isEmpty() || "#".equals(value.trim())) {
+                            value = "";
+                        }
+                        footerLinks.put(config.getCode(), value);
                     }
                 }
             } catch (Exception e) {
@@ -162,18 +167,40 @@ public class PageDataInterceptor implements HandlerInterceptor {
                 currentUrl += "?" + request.getQueryString();
             }
             
+            // 获取linkUrl为"/"的菜单的OG信息作为默认值
+            String defaultOgTitle = "車勢汽車交易網-最保障消費者的一站式買賣二手車平台";
+            String defaultOgDescription = "車勢汽車交易網-最保障消費者的一站式買賣二手車平台";
+            String defaultOgImage = "https://testcloud.carce.cc/img/car_sale/banner/61a9d426-c81e-4e84-89ec-8ce53b793be4.jpg";
+            
+            try {
+                cc.carce.sale.entity.CarMenuEntity defaultMenu = carMenuService.getMenuByLinkUrl("/");
+                if (defaultMenu != null) {
+                    if (defaultMenu.getOgTitle() != null && !defaultMenu.getOgTitle().isEmpty()) {
+                        defaultOgTitle = defaultMenu.getOgTitle();
+                    }
+                    if (defaultMenu.getOgDesp() != null && !defaultMenu.getOgDesp().isEmpty()) {
+                        defaultOgDescription = defaultMenu.getOgDesp();
+                    }
+                    if (defaultMenu.getOgImage() != null && !defaultMenu.getOgImage().isEmpty()) {
+                        defaultOgImage = defaultMenu.getOgImage();
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("获取默认菜单OG信息失败，使用系统默认值", e);
+            }
+            
             // 添加title变量，如果不存在则使用默认值
             if (!modelAndView.getModel().containsKey("title")) {
-                modelAndView.addObject("title", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
+                modelAndView.addObject("title", defaultOgTitle);
             }
 
             if (!modelAndView.getModel().containsKey("ogTitle")) {
-                modelAndView.addObject("ogTitle", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
+                modelAndView.addObject("ogTitle", defaultOgTitle);
             }
             
             // 添加description变量，如果不存在则使用默认值
             if (!modelAndView.getModel().containsKey("ogDescription")) {
-                modelAndView.addObject("ogDescription", "車勢汽車交易網-最保障消費者的一站式買賣二手車平台");
+                modelAndView.addObject("ogDescription", defaultOgDescription);
             }
             
             // 添加url变量，如果不存在则使用当前请求URL
@@ -183,7 +210,7 @@ public class PageDataInterceptor implements HandlerInterceptor {
             
             // 添加image变量，如果不存在则使用默认图片
             if (!modelAndView.getModel().containsKey("ogImage")) {
-                modelAndView.addObject("ogImage", "https://testcloud.carce.cc/img/car_sale/banner/61a9d426-c81e-4e84-89ec-8ce53b793be4.jpg");
+                modelAndView.addObject("ogImage", defaultOgImage);
             }
             
             log.debug("已添加OG标签相关数据和baseUrl到ModelAndView");
