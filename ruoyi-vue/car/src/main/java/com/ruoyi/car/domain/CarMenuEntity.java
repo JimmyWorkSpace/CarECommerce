@@ -61,4 +61,8 @@ public class CarMenuEntity {
     /** 子菜单 */
     @Transient
     private List<CarMenuEntity> children = new ArrayList<CarMenuEntity>();
+
+    /** 菜单链接（linkType为1时使用） */
+    @Transient
+    private String menuLink;
 }
