@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ruoyi.car.mapper.master.CarMenuMapper;
 import com.ruoyi.car.domain.CarMenuEntity;
@@ -21,6 +22,9 @@ public class CarMenuServiceImpl implements CarMenuService
 {
     @Autowired
     private CarMenuMapper carMenuMapper;
+
+    @Value("${carce.carbuy-prefix}")
+    private String carbuyPrefix;
 
     /**
      * 查詢菜單維護
@@ -177,6 +181,15 @@ public class CarMenuServiceImpl implements CarMenuService
     @Override
     public List<CarMenuEntity> buildMenuTree(List<CarMenuEntity> menus)
     {
+        // 為每個菜單設置鏈接（linkType為1時）
+        for (CarMenuEntity menu : menus)
+        {
+            if (menu.getLinkType() != null && menu.getLinkType() == 1)
+            {
+                menu.setMenuLink(carbuyPrefix + "/menu-content/" + menu.getId());
+            }
+        }
+        
         List<CarMenuEntity> returnList = new ArrayList<CarMenuEntity>();
         List<Long> tempList = new ArrayList<Long>();
         for (CarMenuEntity menu : menus)
@@ -208,11 +221,21 @@ public class CarMenuServiceImpl implements CarMenuService
      */
     private void recursionFn(List<CarMenuEntity> list, CarMenuEntity t)
     {
+        // 為當前節點設置鏈接（linkType為1時）
+        if (t.getLinkType() != null && t.getLinkType() == 1)
+        {
+            t.setMenuLink(carbuyPrefix + "/menu-content/" + t.getId());
+        }
         // 得到子節點列表
         List<CarMenuEntity> childList = getChildList(list, t);
         t.setChildren(childList);
         for (CarMenuEntity tChild : childList)
         {
+            // 為子節點設置鏈接（linkType為1時）
+            if (tChild.getLinkType() != null && tChild.getLinkType() == 1)
+            {
+                tChild.setMenuLink(carbuyPrefix + "/menu-content/" + tChild.getId());
+            }
             if (hasChild(list, tChild))
             {
                 recursionFn(list, tChild);

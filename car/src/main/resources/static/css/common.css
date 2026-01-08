@@ -60,8 +60,8 @@
 
 /* 网站头部导航样式 - 使用更高优先级覆盖Bootstrap */
 body .navbar.navbar-expand-lg.navbar-dark.bg-primary {
-    background-color: #5ACFC9 !important;
-    border-bottom: 2px solid #5ACFC9;
+    background-color: #6BE5DA !important;
+    border-bottom: 2px solid #6BE5DA;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -349,7 +349,7 @@ body .navbar .navbar-toggler:focus {
 }
 
 .footer-title {
-    color: #5ACFC9;
+    color: #6BE5DA;
     font-weight: bold;
     font-size: 1.1rem;
     margin-bottom: 20px;
@@ -367,7 +367,7 @@ body .navbar .navbar-toggler:focus {
 }
 
 .footer-links a {
-    color: #e0e0e0;
+    color: #E9EBED;
     text-decoration: none;
     font-size: 0.95rem;
     transition: color 0.3s ease;
@@ -375,12 +375,12 @@ body .navbar .navbar-toggler:focus {
 }
 
 .footer-links a:hover {
-    color: #5ACFC9;
+    color: #6BE5DA;
     text-decoration: none;
 }
 
 .footer-links span {
-    color: #e0e0e0;
+    color: #E9EBED;
     font-size: 0.95rem;
     display: inline-block;
     opacity: 0.6;
@@ -395,7 +395,7 @@ body .navbar .navbar-toggler:focus {
 
 .line-button {
     display: inline-block;
-    background-color: #00C300;
+    background-color: #6BE5DA;
     color: white;
     text-decoration: none;
     padding: 12px 20px;
@@ -407,11 +407,11 @@ body .navbar .navbar-toggler:focus {
 }
 
 .line-button:hover {
-    background-color: #00A300;
+    background-color: #5ACFC9;
     color: white;
     text-decoration: none;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 195, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(107, 229, 218, 0.3);
 }
 
 /* 页脚响应式设计 */
@@ -611,7 +611,7 @@ body .navbar .navbar-toggler:focus {
 }
 
 .navbar-nav .dropdown-menu {
-    background-color: #5ACFC9;
+    background-color: #6BE5DA;
     border: none;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

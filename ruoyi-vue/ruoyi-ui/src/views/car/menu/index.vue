@@ -109,6 +109,13 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-link"
+            @click="handleShowLink(scope.row)"
+            v-if="scope.row.linkType === 1"
+          >鏈接</el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
           >修改</el-button>
@@ -285,6 +292,29 @@
         </div>
       </el-dialog>
     </el-dialog>
+
+    <!-- 鏈接顯示對話框 -->
+    <el-dialog
+      title="菜單鏈接"
+      :visible.sync="linkDialogVisible"
+      width="600px"
+      append-to-body
+    >
+      <el-form>
+        <el-form-item label="鏈接地址">
+          <el-input
+            v-model="currentLink"
+            readonly
+            type="textarea"
+            :rows="3"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="copyLink">複製鏈接</el-button>
+        <el-button @click="linkDialogVisible = false">關閉</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -336,6 +366,9 @@ export default {
           { required: true, message: "回答不能為空", trigger: "blur" }
         ]
       },
+      // 鏈接相關
+      linkDialogVisible: false,
+      currentLink: "",
       // 查詢參數
       queryParams: {
         pageNum: 1,
@@ -706,6 +739,34 @@ export default {
       this.qaTitle = `問答管理 - ${row.title}`;
       this.qaOpen = true;
       this.getQaList();
+    },
+    /** 顯示鏈接按鈕操作 */
+    handleShowLink(row) {
+      if (row.menuLink) {
+        this.currentLink = row.menuLink;
+        this.linkDialogVisible = true;
+      } else {
+        this.$modal.msgError("鏈接不存在");
+      }
+    },
+    /** 複製鏈接 */
+    copyLink() {
+      if (!this.currentLink) {
+        this.$modal.msgError("鏈接為空");
+        return;
+      }
+      // 創建臨時輸入框
+      const input = document.createElement('input');
+      input.value = this.currentLink;
+      document.body.appendChild(input);
+      input.select();
+      try {
+        document.execCommand('copy');
+        this.$modal.msgSuccess("鏈接已複製到剪貼板");
+      } catch (err) {
+        this.$modal.msgError("複製失敗，請手動複製");
+      }
+      document.body.removeChild(input);
     },
     /** 查詢問答列表 */
     getQaList() {

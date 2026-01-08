@@ -165,23 +165,24 @@
 }
 
 .category-btn {
-    background: white;
-    border: 2px solid #e9ecef;
+    background: #6BE5DA;
+    border: 2px solid #6BE5DA;
     border-radius: 20px;
     padding: 6px 14px;
     font-weight: 500;
-    color: #666;
+    color: white;
     transition: all 0.3s ease;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(107, 229, 218, 0.2);
     font-size: 0.85rem;
 }
 
 .category-btn:hover {
     border-color: #5ACFC9;
-    color: #5ACFC9;
+    background-color: #5ACFC9;
+    color: white;
     transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(90, 207, 201, 0.2);
+    box-shadow: 0 2px 6px rgba(107, 229, 218, 0.3);
 }
 
 .category-btn.active {
@@ -194,16 +195,19 @@
 .category-btn-second {
     font-size: 0.8rem;
     padding: 5px 12px;
-    background: #f8f9fa;
+    background: #6BE5DA;
     border-radius: 18px;
+    color: white;
 }
 
 .category-btn-second:hover {
-    background: white;
+    background: #5ACFC9;
+    color: white;
 }
 
 .category-btn-second.active {
-    background: linear-gradient(135deg, #4AB8B2 0%, #3AA7A1 100%);
+    background: linear-gradient(135deg, #5ACFC9 0%, #4AB8B2 100%);
+    color: white;
 }
 
 .products-grid {
@@ -259,13 +263,15 @@
 
 .product-info {
     padding: 20px;
+    text-align: left;
 }
 
 .product-name {
-    color: #333;
+    color: #3351A5;
     font-weight: 600;
     margin-bottom: 8px;
     font-size: 1.1rem;
+    text-align: left;
 }
 
 .product-description {
@@ -273,6 +279,7 @@
     font-size: 0.9rem;
     margin-bottom: 15px;
     line-height: 1.4;
+    text-align: left;
 }
 
 .product-meta {
@@ -293,6 +300,8 @@
 .product-tags .badge {
     font-size: 0.75rem;
     padding: 5px 10px;
+    background-color: #668CFA !important;
+    color: white;
 }
 
 .tag-clickable {
@@ -301,9 +310,9 @@
 }
 
 .tag-clickable:hover {
-    background-color: #4AB8B2 !important;
+    background-color: #5578E0 !important;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(102, 140, 250, 0.3);
 }
 
 .product-price {
@@ -325,30 +334,30 @@
 }
 
 .price-symbol {
-    color: #5ACFC9;
+    color: #3351A5;
     font-size: 1rem;
     font-weight: 600;
 }
 
 .price-amount {
-    color: #5ACFC9;
+    color: #3351A5;
     font-size: 1.5rem;
     font-weight: 700;
 }
 
 .promotional-label {
-    color: #ff6b6b;
+    color: #3351A5;
     font-size: 1.3rem;
 }
 
 .promotional-symbol {
-    color: #ff6b6b;
+    color: #3351A5;
     font-size: 2.2rem;
     font-weight: 600;
 }
 
 .promotional-amount {
-    color: #ff6b6b;
+    color: #3351A5;
     font-size: 2.2rem;
     font-weight: 700;
 }

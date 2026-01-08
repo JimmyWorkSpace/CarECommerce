@@ -578,6 +578,11 @@
     padding-right: 0;
 }
 
+/* 首页精选好车标题颜色 */
+.cars-section .cars-list-detail-style .car-title {
+    color: #6BE5DA;
+}
+
 .cars-list-detail-style .price {
     text-align: left;
     padding-left: 2px;
@@ -589,6 +594,15 @@
     font-size: 1.3rem;
     font-weight: 540;
     color: #FA9F42;
+}
+
+/* 首页精选好车价格颜色 */
+.cars-section .cars-list-detail-style .price {
+    color: #3551A5;
+}
+
+.cars-section .cars-list-detail-style .price span {
+    color: #3551A5;
 }
 
 .cars-list-detail-style .specs {
@@ -632,8 +646,22 @@
         margin-bottom: 0;
     }
     
+    /* 首页精选好车标题颜色（响应式） */
+    .cars-section .cars-list-detail-style .car-title {
+        color: #6BE5DA;
+    }
+    
     .cars-list-detail-style .price span {
         font-size: 1.2rem;
+    }
+    
+    /* 首页精选好车价格颜色（响应式） */
+    .cars-section .cars-list-detail-style .price {
+        color: #3551A5;
+    }
+    
+    .cars-section .cars-list-detail-style .price span {
+        color: #3551A5;
     }
     
     .cars-list-detail-style .spec-name {
