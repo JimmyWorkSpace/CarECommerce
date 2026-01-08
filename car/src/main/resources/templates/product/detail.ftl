@@ -553,7 +553,7 @@ new Vue({
 }
 
 .product-title {
-    color: #333;
+    color: #3351A5;
     font-size: 2rem;
     font-weight: 600;
     margin-bottom: 15px;
@@ -574,6 +574,8 @@ new Vue({
     font-size: 0.9rem;
     padding: 6px 12px;
     font-weight: 500;
+    background-color: #668CFA !important;
+    color: white;
 }
 
 .tag-clickable {
@@ -582,9 +584,9 @@ new Vue({
 }
 
 .tag-clickable:hover {
-    background-color: #ffc107 !important;
+    background-color: #5578E0 !important;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(102, 140, 250, 0.3);
 }
 
 /* 价格区域样式 - 去掉块样式 */
@@ -611,28 +613,28 @@ new Vue({
 .price-symbol {
     font-size: 1.8rem;
     font-weight: 600;
-    color: #FA9F42;
+    color: #3351A5;
 }
 
 .price-amount {
     font-weight: 700;
-    color: #FA9F42;
+    color: #3351A5;
     font-size: 1.8rem;
 }
 
 .promotional-label {
-    color: #ff6b6b;
+    color: #3351A5;
     font-size: 1.3rem;
 }
 
 .promotional-symbol {
-    color: #ff6b6b;
+    color: #3351A5;
     font-size: 2.2rem;
     font-weight: 600;
 }
 
 .promotional-amount {
-    color: #ff6b6b;
+    color: #3351A5;
     font-size: 2.2rem;
     font-weight: 700;
 }
@@ -711,16 +713,16 @@ new Vue({
 }
 
 .action-buttons .btn-primary {
-    background: linear-gradient(135deg, #FA9F42 0%, #FF8C00 100%);
+    background-color: #3551A5;
     border: none;
     color: white;
-    box-shadow: 0 4px 12px rgba(250, 159, 66, 0.3);
+    box-shadow: 0 4px 12px rgba(53, 81, 165, 0.3);
 }
 
 .action-buttons .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #FF8C00 0%, #FF7F00 100%);
+    background-color: #2A4080;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(250, 159, 66, 0.4);
+    box-shadow: 0 6px 16px rgba(53, 81, 165, 0.4);
 }
 
 .action-buttons .btn-primary:disabled {

@@ -24,7 +24,7 @@
   text-align: left;
   margin: 0px 0px 15px 0px;
   white-space: nowrap;
-  color: #FA9F42;
+  color: #3551A5;
   /* 响应式设计：在小屏幕上改变布局 */
 }
 .car-detail .main-title-container .first-title,
@@ -54,19 +54,19 @@
   }
 }
 .car-detail .car-title {
-  color: #5ACFC9;
+  color: #6BE5DA;
   text-align: left;
   font-weight: 560;
 }
 .car-detail .price {
   text-align: left;
   padding-left: 2px;
-  color: #FA9F42;
+  color: #3551A5;
 }
 .car-detail .price span {
   font-size: 1.8rem;
   font-weight: 540;
-  color: #FA9F42;
+  color: #3551A5;
 }
 .car-detail .main-image {
   position: relative;
@@ -313,63 +313,63 @@
   border: none;
 }
 .car-detail .action-buttons .btn-report {
-  background-color: #6f42c1;
+  background-color: #668FCA;
 }
 .car-detail .action-buttons .btn-report:hover {
-  background-color: #5a32a3;
+  background-color: #5578B0;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
+  box-shadow: 0 4px 12px rgba(102, 143, 202, 0.4);
 }
 .car-detail .action-buttons .btn-appointment {
-  background-color: #5ACFC9;
+  background-color: #3551A5;
   border-radius: 3px;
 }
 .car-detail .action-buttons .btn-appointment:hover {
-  background-color: #4AB8B2;
+  background-color: #2A4080;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(90, 207, 201, 0.4);
+  box-shadow: 0 4px 12px rgba(53, 81, 165, 0.4);
 }
 
 /* LINE按钮样式 */
 .car-detail .action-buttons .btn-line {
-  background-color: #00C300;
+  background-color: #6BE5DA;
   color: white;
   border: none;
   border-radius: 3px;
 }
 
 .car-detail .action-buttons .btn-line:hover {
-  background-color: #00A300;
+  background-color: #5ACFC9;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 195, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(107, 229, 218, 0.4);
 }
 
 /* 电话按钮样式 */
 .car-detail .action-buttons .btn-phone {
-  background-color: #007BFF;
+  background-color: #3551A5;
   color: white;
   border: none;
   border-radius: 3px;
 }
 
 .car-detail .action-buttons .btn-phone:hover {
-  background-color: #0056B3;
+  background-color: #2A4080;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(53, 81, 165, 0.4);
 }
 
 /* 检举按钮样式 */
 .car-detail .action-buttons .btn-report {
-  background-color: #DC3545;
+  background-color: #668FCA;
   color: white;
   border: none;
   border-radius: 3px;
 }
 
 .car-detail .action-buttons .btn-report:hover {
-  background-color: #C82333;
+  background-color: #5578B0;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  box-shadow: 0 4px 12px rgba(102, 143, 202, 0.4);
 }
 .car-detail .action-buttons .btn-primary {
   background-color: #CD001D;

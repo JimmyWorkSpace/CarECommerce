@@ -215,6 +215,9 @@
                                     <li><a class="dropdown-item" href="/my-reports">
                                         <i class="bi bi-flag me-2"></i>我的檢舉
                                     </a></li>
+                                    <li><a class="dropdown-item" href="/register">
+                                        <i class="bi bi-key me-2"></i>修改密碼
+                                    </a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="#" id="logoutBtn">
                                         <i class="bi bi-box-arrow-right me-2"></i>退出登錄
