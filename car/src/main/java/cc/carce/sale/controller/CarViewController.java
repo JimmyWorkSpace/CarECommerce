@@ -29,6 +29,7 @@ import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
 import cc.carce.sale.dto.CarBaseInfoDto;
 import cc.carce.sale.dto.CarDealerInfoDto;
+import cc.carce.sale.dto.ProductDto;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.service.CarOrderInfoService;
@@ -461,10 +462,10 @@ public class CarViewController extends BaseController {
             }
             
             // 检查菜单是否显示
-            if (menu.getIsShow() != 1 || menu.getDelFlag() != 0) {
-                model.addAttribute("error", "菜单不可访问");
-                return "/error/index";
-            }
+            // if (menu.getIsShow() != 1 || menu.getDelFlag() != 0) {
+            //     model.addAttribute("error", "菜单不可访问");
+            //     return "/error/index";
+            // }
             
             // 检查是否为富文本类型
             if (menu.getLinkType() == null || menu.getLinkType() != 1) {
@@ -677,18 +678,18 @@ public class CarViewController extends BaseController {
             }
             
             // 创建商品DTO，映射字段名以匹配前端模板
-            Map<String, Object> productDto = new HashMap<>();
-            productDto.put("id", product.getId());
-            productDto.put("name", product.getProductTitle()); // 商品名称
-            productDto.put("alias", product.getProductDespShort()); // 商品别名/简短描述
-            productDto.put("price", product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L); // 售价
-            productDto.put("marketPrice", product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L); // 市价
-            productDto.put("promotionalPrice", product.getPromotionalPrice() != null ? product.getPromotionalPrice().longValue() : null); // 特惠价
-            productDto.put("memo", product.getProductDesp()); // 商品详细描述
-            productDto.put("tag", product.getProductTags()); // 商品标签
-            productDto.put("amount", product.getAmount()); // 库存数量
-            productDto.put("categoryId", product.getCategoryId()); // 分类ID
-            productDto.put("onSale", product.getOnSale()); // 是否上架
+            ProductDto productDto = new ProductDto();
+            productDto.setId(product.getId());
+            productDto.setName(product.getProductTitle()); // 商品名称
+            productDto.setAlias(product.getProductDespShort()); // 商品别名/简短描述
+            productDto.setPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L); // 售价
+            productDto.setMarketPrice(product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L); // 市价
+            productDto.setPromotionalPrice(product.getPromotionalPrice() != null ? product.getPromotionalPrice().longValue() : null); // 特惠价
+            productDto.setMemo(product.getProductDesp()); // 商品详细描述
+            productDto.setTag(product.getProductTags()); // 商品标签
+            productDto.setAmount(product.getAmount()); // 库存数量
+            productDto.setCategoryId(product.getCategoryId()); // 分类ID
+            productDto.setOnSale(product.getOnSale()); // 是否上架
             
             model.addAttribute("product", productDto);
             model.addAttribute("productJson", JSONUtil.toJsonPrettyStr(productDto));

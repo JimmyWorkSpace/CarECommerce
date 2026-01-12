@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import cc.carce.sale.dto.CarProductListDto;
+import cc.carce.sale.dto.ProductDto;
 import cc.carce.sale.entity.CarProductEntity;
 import cc.carce.sale.entity.CarProductImageEntity;
 import cc.carce.sale.entity.CarProductCategoryEntity;
@@ -45,7 +45,7 @@ public class CarProductService {
     /**
      * 获取已上架的商品列表
      */
-    public List<CarProductListDto> getPublicProducts() {
+    public List<ProductDto> getPublicProducts() {
         try {
             Example example = new Example(CarProductEntity.class);
             example.createCriteria()
@@ -54,10 +54,10 @@ public class CarProductService {
             example.orderBy("id").desc();
             
             List<CarProductEntity> products = carProductMapper.selectByExample(example);
-            List<CarProductListDto> result = new ArrayList<>();
+            List<ProductDto> result = new ArrayList<>();
             
             for (CarProductEntity product : products) {
-                CarProductListDto dto = convertToDto(product);
+                ProductDto dto = convertToDto(product);
                 result.add(dto);
             }
             
@@ -84,7 +84,7 @@ public class CarProductService {
      * 根据分类ID获取商品列表
      * 如果是一级分类，则返回该一级分类及其所有二级分类下的商品
      */
-    public List<CarProductListDto> getProductsByCategoryId(Long categoryId) {
+    public List<ProductDto> getProductsByCategoryId(Long categoryId) {
         try {
             Example example = new Example(CarProductEntity.class);
             Example.Criteria criteria = example.createCriteria()
@@ -114,10 +114,10 @@ public class CarProductService {
             example.orderBy("id").desc();
             
             List<CarProductEntity> products = carProductMapper.selectByExample(example);
-            List<CarProductListDto> result = new ArrayList<>();
+            List<ProductDto> result = new ArrayList<>();
             
             for (CarProductEntity product : products) {
-                CarProductListDto dto = convertToDto(product);
+                ProductDto dto = convertToDto(product);
                 result.add(dto);
             }
             
@@ -221,7 +221,7 @@ public class CarProductService {
      * 根据标签搜索商品
      * 标签在productTags字段中，使用英文逗号分隔
      */
-    public List<CarProductListDto> getProductsByTag(String tag) {
+    public List<ProductDto> getProductsByTag(String tag) {
         try {
             if (tag == null || tag.trim().isEmpty()) {
                 return new ArrayList<>();
@@ -240,7 +240,7 @@ public class CarProductService {
             example.orderBy("id").desc();
             
             List<CarProductEntity> products = carProductMapper.selectByExample(example);
-            List<CarProductListDto> result = new ArrayList<>();
+            List<ProductDto> result = new ArrayList<>();
             
             // 过滤出真正包含该标签的商品（精确匹配）
             String tagToMatch = tag.trim();
@@ -255,7 +255,7 @@ public class CarProductService {
                         }
                     }
                     if (found) {
-                        CarProductListDto dto = convertToDto(product);
+                        ProductDto dto = convertToDto(product);
                         result.add(dto);
                     }
                 }
@@ -271,8 +271,8 @@ public class CarProductService {
     /**
      * 将实体转换为DTO
      */
-    private CarProductListDto convertToDto(CarProductEntity product) {
-        CarProductListDto dto = new CarProductListDto();
+    private ProductDto convertToDto(CarProductEntity product) {
+        ProductDto dto = new ProductDto();
         dto.setId(product.getId());
         dto.setName(product.getProductTitle());
         dto.setAlias(product.getProductDespShort());
