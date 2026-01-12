@@ -89,15 +89,15 @@
                 <div class="price-row" v-if="product.promotionalPrice">
                     <span class="price-label promotional-label">特惠價</span>
                     <span class="price-symbol promotional-symbol">${CurrencyUnit}</span>
-                    <span class="price-amount promotional-amount">{{ formatPrice(product.price) }}</span>
-                    <span v-if="product.originalPrice" class="price-market text-decoration-line-through text-muted ms-2">
-                        售價 ${CurrencyUnit}{{ formatPrice(product.originalPrice) }}
+                    <span class="price-amount promotional-amount">{{ formatPrice(product.promotionalPrice) }}</span>
+                    <span v-if="product.price" class="price-market text-decoration-line-through text-muted ms-2">
+                        售價 ${CurrencyUnit}{{ formatPrice(product.price) }}
                     </span>
                 </div>
                 <div class="price-row" v-if="!product.promotionalPrice">
                     <span class="price-label">售價</span>
                     <span class="price-symbol">${CurrencyUnit}</span>
-                    <span class="price-amount">{{ formatPrice(product.price) }}</span>
+                    <span class="price-amount">{{ formatPrice(product.salePrice) }}</span>
                 </div>
                 <div class="market-price" v-if="product.marketPrice && product.marketPrice > product.price">
                     <span class="price-label text-muted">市價：</span>

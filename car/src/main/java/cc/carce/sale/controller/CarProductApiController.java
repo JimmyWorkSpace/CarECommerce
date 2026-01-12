@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cc.carce.sale.common.R;
-import cc.carce.sale.dto.CarProductListDto;
+import cc.carce.sale.dto.ProductDto;
 import cc.carce.sale.entity.CarProductEntity;
 import cc.carce.sale.entity.CarProductImageEntity;
 import cc.carce.sale.entity.CarProductAttrEntity;
@@ -35,9 +35,9 @@ public class CarProductApiController extends BaseController {
      * 获取所有已上架的商品列表
      */
     @GetMapping("/list")
-    public R<List<CarProductListDto>> getProductsList() {
+    public R<List<ProductDto>> getProductsList() {
         try {
-            List<CarProductListDto> products = carProductService.getPublicProducts();
+            List<ProductDto> products = carProductService.getPublicProducts();
             return R.ok("获取商品列表成功", products);
         } catch (Exception e) {
             log.error("获取商品列表失败", e);
@@ -49,9 +49,9 @@ public class CarProductApiController extends BaseController {
      * 根据分类ID获取商品列表
      */
     @GetMapping("/category")
-    public R<List<CarProductListDto>> getProductsByCategory(@RequestParam(required = false) Long categoryId) {
+    public R<List<ProductDto>> getProductsByCategory(@RequestParam(required = false) Long categoryId) {
         try {
-            List<CarProductListDto> products = carProductService.getProductsByCategoryId(categoryId);
+            List<ProductDto> products = carProductService.getProductsByCategoryId(categoryId);
             return R.ok("获取分类商品成功", products);
         } catch (Exception e) {
             log.error("获取分类商品失败", e);
@@ -63,9 +63,9 @@ public class CarProductApiController extends BaseController {
      * 根据标签搜索商品列表
      */
     @GetMapping("/tag")
-    public R<List<CarProductListDto>> getProductsByTag(@RequestParam(required = false) String tag) {
+    public R<List<ProductDto>> getProductsByTag(@RequestParam(required = false) String tag) {
         try {
-            List<CarProductListDto> products = carProductService.getProductsByTag(tag);
+            List<ProductDto> products = carProductService.getProductsByTag(tag);
             return R.ok("获取标签商品成功", products);
         } catch (Exception e) {
             log.error("获取标签商品失败，标签：{}", tag, e);
