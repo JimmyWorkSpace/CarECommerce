@@ -84,7 +84,7 @@ export const constantRoutes = [
         path: 'profile',
         component: () => import('@/views/system/user/profile/index'),
         name: 'Profile',
-        meta: { title: '个人中心', icon: 'user' }
+        meta: { title: '個人中心', icon: 'user' }
       }
     ]
   }
@@ -116,7 +116,7 @@ export const dynamicRoutes = [
         path: 'user/:roleId(\\d+)',
         component: () => import('@/views/system/role/authUser'),
         name: 'AuthUser',
-        meta: { title: '分配用户', activeMenu: '/system/role' }
+        meta: { title: '分配用戶', activeMenu: '/system/role' }
       }
     ]
   },
@@ -130,7 +130,7 @@ export const dynamicRoutes = [
         path: 'index/:dictId(\\d+)',
         component: () => import('@/views/system/dict/data'),
         name: 'Data',
-        meta: { title: '字典数据', activeMenu: '/system/dict' }
+        meta: { title: '字典數據', activeMenu: '/system/dict' }
       }
     ]
   },
@@ -144,7 +144,7 @@ export const dynamicRoutes = [
         path: 'index',
         component: () => import('@/views/monitor/job/log'),
         name: 'JobLog',
-        meta: { title: '调度日志', activeMenu: '/monitor/job' }
+        meta: { title: '調度日誌', activeMenu: '/monitor/job' }
       }
     ]
   },

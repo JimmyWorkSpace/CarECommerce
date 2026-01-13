@@ -1374,8 +1374,7 @@ try {
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
-    height: auto;
-    min-height: 200px;
+    aspect-ratio: 5 / 3;
     position: relative;
     padding: 0;
     margin-bottom: 1rem;
@@ -1388,8 +1387,7 @@ try {
 
 .mobile-ads-section .ad-image {
     width: 100%;
-    height: auto;
-    min-height: 200px;
+    height: 100%;
     object-fit: cover;
 }
 
@@ -1546,7 +1544,7 @@ try {
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
-    height: 200px;
+    aspect-ratio: 5 / 3;
     position: relative;
     padding: 0;
 }

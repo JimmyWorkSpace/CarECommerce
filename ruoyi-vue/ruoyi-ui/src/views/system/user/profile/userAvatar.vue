@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="user-info-head" @click="editCropper()"><img v-bind:src="options.img" title="点击上传头像" class="img-circle img-lg" /></div>
+    <div class="user-info-head" @click="editCropper()"><img v-bind:src="options.img" title="點擊上傳頭像" class="img-circle img-lg" /></div>
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body @opened="modalOpened"  @close="closeDialog">
       <el-row>
         <el-col :xs="24" :md="12" :style="{height: '350px'}">
@@ -27,7 +27,7 @@
         <el-col :lg="2" :md="2">
           <el-upload action="#" :http-request="requestUpload" :show-file-list="false" :before-upload="beforeUpload">
             <el-button size="small">
-              选择
+              選擇
               <i class="el-icon-upload el-icon--right"></i>
             </el-button>
           </el-upload>
@@ -71,7 +71,7 @@ export default {
       // 是否显示cropper
       visible: false,
       // 弹出层標題
-      title: "修改头像",
+      title: "修改頭像",
       options: {
         img: store.getters.avatar, //裁剪圖片的地址
         autoCrop: true, // 是否默认生成截图框
@@ -110,7 +110,7 @@ export default {
     // 上传预处理
     beforeUpload(file) {
       if (file.type.indexOf("image/") == -1) {
-        this.$modal.msgError("文件格式错误，请上传圖片類型,如：JPG，PNG后缀的文件。");
+        this.$modal.msgError("文件格式錯誤，請上傳圖片類型,如：JPG，PNG後綴的文件。");
       } else {
         const reader = new FileReader();
         reader.readAsDataURL(file);
