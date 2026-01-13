@@ -294,6 +294,12 @@
                                        placeholder="請輸入密碼" required>
                             </div>
                         </form>
+                        
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <a href="/register" class="text-decoration-none">立即註冊/忘記密碼</a>
+                            </small>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
