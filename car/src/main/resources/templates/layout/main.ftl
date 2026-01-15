@@ -60,14 +60,15 @@
                 }
             });
             
-            // 手机版下拉菜单点击处理
-            if (window.innerWidth <= 991.98) {
-                const dropdownToggles = document.querySelectorAll('.navbar-nav .dropdown-toggle');
-                dropdownToggles.forEach(toggle => {
-                    toggle.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
+            // 所有有子菜单的主菜单点击处理（PC和移动端都适用）
+            const dropdownToggles = document.querySelectorAll('.navbar-nav .dropdown-toggle');
+            dropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 如果是移动端，使用自定义处理
+                    if (window.innerWidth <= 991.98) {
                         const dropdown = this.closest('.dropdown');
                         const isOpen = dropdown.classList.contains('show');
                         
@@ -98,10 +99,13 @@
                             }
                             this.setAttribute('aria-expanded', 'true');
                         }
-                    });
+                    }
+                    // PC端由Bootstrap的data-bs-toggle="dropdown"处理，但确保不跳转
                 });
-                
-                // 点击其他地方时关闭下拉菜单
+            });
+            
+            // 点击其他地方时关闭下拉菜单（移动端）
+            if (window.innerWidth <= 991.98) {
                 document.addEventListener('click', function(e) {
                     if (!e.target.closest('.dropdown')) {
                         document.querySelectorAll('.navbar-nav .dropdown').forEach(dropdown => {
@@ -163,7 +167,7 @@
                                 <#if menu.children?? && menu.children?has_content>
                                     <!-- 有子菜单的主菜单，显示下拉菜单 -->
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <a class="nav-link dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.preventDefault();">
                                             ${menu.title!''}
                                         </a>
                                         <ul class="dropdown-menu">
