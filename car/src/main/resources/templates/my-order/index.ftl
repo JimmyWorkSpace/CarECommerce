@@ -6,16 +6,16 @@
             <div class="col-12">
                 <h2 class="page-title">
                     <i class="bi bi-list-ul me-3"></i>
-                    我的订单
+                    我的訂單
                 </h2>
                 
-                <!-- 订单列表 -->
+                <!-- 訂單列表 -->
                 <div v-if="orders && orders.length > 0">
                     <div v-for="order in orders" :key="order.id" class="card item-card">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">
-                                    <i class="bi bi-receipt me-2"></i>订单号：{{ order.orderNo }}
+                                    <i class="bi bi-receipt me-2"></i>訂單號：{{ order.orderNo }}
                                 </h5>
                                 <span :class="getStatusClass(order.orderStatus)" class="status-badge">
                                     {{ getStatusText(order.orderStatus) }}
@@ -25,11 +25,11 @@
                         <div class="card-body">
                             <div class="item-info">
                                 <div class="info-row">
-                                    <span class="info-label">订单金额：</span>
+                                    <span class="info-label">訂單金額：</span>
                                     <span class="info-value amount">${CurrencyUnit} {{ order.totalPrice }}</span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label">下单时间：</span>
+                                    <span class="info-label">下單時間：</span>
                                     <span class="info-value">{{ formatDate(order.createTime) }}</span>
                                 </div>
                                 <div class="info-row">
@@ -37,31 +37,31 @@
                                     <span class="info-value">{{ order.receiverName || '-' }}</span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label">联系电话：</span>
+                                    <span class="info-label">聯繫電話：</span>
                                     <span class="info-value">{{ order.receiverMobile || '-' }}</span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label">收货地址：</span>
+                                    <span class="info-label">收貨地址：</span>
                                     <span class="info-value">{{ order.receiverAddress || '-' }}</span>
                                 </div>
                                 
-                                <!-- 物流状态显示（仅已支付订单显示） -->
+                                <!-- 物流狀態顯示（僅已支付訂單顯示） -->
                                 <div v-if="order.orderStatus === 2" class="info-row">
-                                    <span class="info-label">物流状态：</span>
+                                    <span class="info-label">物流狀態：</span>
                                     <span class="info-value logistics-status" :class="getLogisticsStatusClass(order)">
                                         <i class="bi bi-truck me-1"></i>{{ getLogisticsStatusText(order) }}
                                     </span>
                                 </div>
                             </div>
                             
-                            <!-- 订单详情（已弃用，现在跳转到详情页面） -->
+                            <!-- 訂單詳情（已棄用，現在跳轉到詳情頁面） -->
                             <div class="order-details" :id="'order-details-' + order.id" style="display: none;">
-                                <h6 class="mb-3">订单商品：</h6>
+                                <h6 class="mb-3">訂單商品：</h6>
                                 <div v-for="detail in getOrderDetails(order.id)" :key="detail.id" class="order-detail-item">
                                     <div class="detail-item-info">
                                         <div class="detail-item-name">{{ detail.productName }}</div>
                                         <div class="detail-item-details">
-                                            数量: {{ detail.productAmount }} × ${CurrencyUnit} {{ detail.productPrice }}
+                                            數量: {{ detail.productAmount }} × ${CurrencyUnit} {{ detail.productPrice }}
                                         </div>
                                     </div>
                                     <div class="detail-item-price">
@@ -70,11 +70,11 @@
                                 </div>
                             </div>
                             
-                            <!-- 订单操作 -->
+                            <!-- 訂單操作 -->
                             <div class="item-actions">
                                 <button type="button" class="btn btn-outline-primary btn-sm" 
                                         @click="viewOrderDetail(order.id)">
-                                    <i class="bi bi-eye me-1"></i>查看详情
+                                    <i class="bi bi-eye me-1"></i>查看詳情
                                 </button>
                                 
                                 <button v-if="order.orderStatus === 0" type="button" 
@@ -86,18 +86,18 @@
                                 <button v-if="order.orderStatus === 0" type="button" 
                                         class="btn btn-outline-danger btn-sm" 
                                         @click="cancelOrder(order.id)">
-                                    <i class="bi bi-x-circle me-1"></i>取消订单
+                                    <i class="bi bi-x-circle me-1"></i>取消訂單
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- 空状态 -->
+                <!-- 空狀態 -->
                 <div v-else class="empty-state">
                     <i class="bi bi-inbox"></i>
-                    <h4>暂无订单</h4>
-                    <p>您还没有任何订单</p>
+                    <h4>暫無訂單</h4>
+                    <p>您還沒有任何訂單</p>
                 </div>
             </div>
         </div>
@@ -117,30 +117,30 @@
                 originalOrderStatuses: {}
             },
             mounted() {
-                console.log('我的订单页面已加载');
+                console.log('我的訂單頁面已加載');
                 this.initializeOrderStatusTracking();
             },
             beforeDestroy() {
                 this.stopStatusCheck();
             },
             methods: {
-                // 获取订单状态文本
+                // 獲取訂單狀態文本
                 getStatusText(status) {
                     const statusMap = {
                         0: '未支付',
                         1: '支付中',
                         2: '已支付',
                         3: '已取消',
-                        4: '支付失败',
-                        5: '已发货',
+                        4: '支付失敗',
+                        5: '已發貨',
                         6: '已完成',
-                        7: '退货中',
-                        8: '已退货'
+                        7: '退貨中',
+                        8: '已退貨'
                     };
-                    return statusMap[status] || '未知状态';
+                    return statusMap[status] || '未知狀態';
                 },
                 
-                // 获取订单状态样式类
+                // 獲取訂單狀態樣式類
                 getStatusClass(status) {
                     const classMap = {
                         0: 'status-unpaid',
@@ -156,14 +156,14 @@
                     return classMap[status] || 'status-unpaid';
                 },
                 
-                // 获取物流状态文本
+                // 獲取物流狀態文本
                 getLogisticsStatusText(order) {
                     try {
-                        // 安全地获取属性值
+                        // 安全地獲取屬性值
                         const statusCode = order && order.logicStatusCode ? order.logicStatusCode : null;
                         const msg = order && order.logicMsg ? order.logicMsg : null;
                         
-                        // 如果有物流状态码，根据状态码显示
+                        // 如果有物流狀態碼，根據狀態碼顯示
                         if (statusCode && statusCode !== null && statusCode !== '') {
                             const statusMap = {
                                 '300': '訂單建立',
@@ -177,30 +177,30 @@
                                 '308': '配送異常',
                                 '309': '已取消'
                             };
-                            return statusMap[statusCode] || '未知状态(' + statusCode + ')';
+                            return statusMap[statusCode] || '未知狀態(' + statusCode + ')';
                         }
-                        // 如果没有状态码但有物流消息，显示物流消息
+                        // 如果沒有狀態碼但有物流消息，顯示物流消息
                         else if (msg && msg !== null && msg !== '') {
                             return msg;
                         }
-                        // 都没有则显示默认状态
+                        // 都沒有則顯示默認狀態
                         else {
                             return '物流信息待更新';
                         }
                     } catch (error) {
-                        console.error('获取物流状态文本时出错:', error);
+                        console.error('獲取物流狀態文本時出錯:', error);
                         return '物流信息待更新';
                     }
                 },
                 
-                // 获取物流状态样式类
+                // 獲取物流狀態樣式類
                 getLogisticsStatusClass(order) {
                     try {
-                        // 安全地获取属性值
+                        // 安全地獲取屬性值
                         const statusCode = order && order.logicStatusCode ? order.logicStatusCode : null;
                         const msg = order && order.logicMsg ? order.logicMsg : null;
                         
-                        // 如果有物流状态码，根据状态码设置样式
+                        // 如果有物流狀態碼，根據狀態碼設置樣式
                         if (statusCode && statusCode !== null && statusCode !== '') {
                             const classMap = {
                                 '300': 'logistics-created',
@@ -216,16 +216,16 @@
                             };
                             return classMap[statusCode] || 'logistics-unknown';
                         }
-                        // 如果有物流消息，可能是错误信息
+                        // 如果有物流消息，可能是錯誤信息
                         else if (msg && msg !== null && msg !== '') {
                             return 'logistics-message';
                         }
-                        // 默认状态
+                        // 默認狀態
                         else {
                             return 'logistics-default';
                         }
                     } catch (error) {
-                        console.error('获取物流状态样式类时出错:', error);
+                        console.error('獲取物流狀態樣式類時出錯:', error);
                         return 'logistics-default';
                     }
                 },
@@ -237,75 +237,75 @@
                     return date.toLocaleString('zh-CN');
                 },
                 
-                // 查看订单详情页面
+                // 查看訂單詳情頁面
                 viewOrderDetail(orderId) {
-                    // 跳转到订单详情页面
+                    // 跳轉到訂單詳情頁面
                     window.location.href = '/my-order/detail-page?orderId=' + orderId;
                 },
                 
-                // 加载订单详情
+                // 加載訂單詳情
                 loadOrderDetails(orderId) {
                     axios.get('/my-order/detail?orderId=' + orderId)
                         .then(response => {
                             if (response.data.code === 1) {
                                 this.$set(this.orderDetails, orderId, response.data.data);
                             } else {
-                                this.showError(response.data.msg || '获取订单详情失败');
+                                this.showError(response.data.msg || '獲取訂單詳情失敗');
                             }
                         })
                         .catch(error => {
-                            console.error('获取订单详情失败:', error);
-                            this.showError('获取订单详情失败，请稍后重试');
+                            console.error('獲取訂單詳情失敗:', error);
+                            this.showError('獲取訂單詳情失敗，請稍後重試');
                         });
                 },
                 
-                // 获取订单详情
+                // 獲取訂單詳情
                 getOrderDetails(orderId) {
                     return this.orderDetails[orderId] || [];
                 },
                 
-                // 重新支付订单
+                // 重新支付訂單
                 repayOrder(orderId) {
-                    if (confirm('确定要重新支付这个订单吗？')) {
+                    if (confirm('確定要重新支付這個訂單嗎？')) {
                         axios.post('/my-order/repay/' + orderId)
                             .then(response => {
                                 if (response.data.code === 1) {
-                                    // 跳转到支付页面
+                                    // 跳轉到支付頁面
                                     window.location.href = response.data.data;
                                 } else {
-                                    this.showError(response.data.msg || '重新支付失败');
+                                    this.showError(response.data.msg || '重新支付失敗');
                                 }
                             })
                             .catch(error => {
-                                console.error('重新支付失败:', error);
-                                this.showError('重新支付失败，请稍后重试');
+                                console.error('重新支付失敗:', error);
+                                this.showError('重新支付失敗，請稍後重試');
                             });
                     }
                 },
                 
-                // 取消订单
+                // 取消訂單
                 cancelOrder(orderId) {
-                    if (confirm('确定要取消这个订单吗？取消后商品将放回购物车。')) {
+                    if (confirm('確定要取消這個訂單嗎？取消後商品將放回購物車。')) {
                         axios.post('/my-order/cancel/' + orderId)
                             .then(response => {
                                 if (response.data.code === 1) {
-                                    this.showSuccess(response.data.msg || '订单取消成功');
-                                    // 刷新页面
+                                    this.showSuccess(response.data.msg || '訂單取消成功');
+                                    // 刷新頁面
                                     setTimeout(() => {
                                         window.location.reload();
                                     }, 1500);
                                 } else {
-                                    this.showError(response.data.msg || '取消订单失败');
+                                    this.showError(response.data.msg || '取消訂單失敗');
                                 }
                             })
                             .catch(error => {
-                                console.error('取消订单失败:', error);
-                                this.showError('取消订单失败，请稍后重试');
+                                console.error('取消訂單失敗:', error);
+                                this.showError('取消訂單失敗，請稍後重試');
                             });
                     }
                 },
                 
-                // 显示错误信息
+                // 顯示錯誤信息
                 showError(message) {
                     this.errorMessage = message;
                     this.successMessage = '';
@@ -314,7 +314,7 @@
                     }, 5000);
                 },
                 
-                // 显示成功信息
+                // 顯示成功信息
                 showSuccess(message) {
                     this.successMessage = message;
                     this.errorMessage = '';
@@ -323,7 +323,7 @@
                     }, 5000);
                 },
                 
-                // 初始化订单状态跟踪
+                // 初始化訂單狀態跟蹤
                 initializeOrderStatusTracking() {
                     this.originalOrderStatuses = {};
                     this.orders.forEach(order => {
