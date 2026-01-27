@@ -83,6 +83,12 @@ public class CarProductEntity {
      */
     @Column(name = "promotionalPrice")
     private java.math.BigDecimal promotionalPrice;
+
+    /**
+     * 是否推荐 1 是 / 0 否
+     */
+    @Column(name = "is_recommended")
+    private Integer isRecommended;
 }
 
 

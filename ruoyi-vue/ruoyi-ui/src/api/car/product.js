@@ -80,3 +80,14 @@ export function saveProductAttrs(productId, attrText) {
   })
 }
 
+// 更新商品推薦狀態
+export function updateRecommended(id, isRecommended) {
+  return request({
+    url: '/car/product/updateRecommended/' + id,
+    method: 'put',
+    params: {
+      isRecommended: isRecommended
+    }
+  })
+}
+

@@ -43,6 +43,33 @@ public class CarProductService {
     private String imagePrefix;
     
     /**
+     * 获取推荐商品列表（is_recommended = 1）
+     */
+    public List<ProductDto> getRecommendedProducts() {
+        try {
+            Example example = new Example(CarProductEntity.class);
+            example.createCriteria()
+                .andEqualTo("onSale", 1)
+                .andEqualTo("delFlag", 0)
+                .andEqualTo("isRecommended", 1);
+            example.orderBy("id").desc();
+            
+            List<CarProductEntity> products = carProductMapper.selectByExample(example);
+            List<ProductDto> result = new ArrayList<>();
+            
+            for (CarProductEntity product : products) {
+                ProductDto dto = convertToDto(product);
+                result.add(dto);
+            }
+            
+            return result;
+        } catch (Exception e) {
+            log.error("获取推荐商品列表失败", e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
      * 获取已上架的商品列表
      */
     public List<ProductDto> getPublicProducts() {
@@ -330,6 +357,9 @@ public class CarProductService {
         
         // 设置描述
         dto.setDescription(product.getProductDespShort());
+        
+        // 设置是否推荐
+        dto.setIsRecommended(product.getIsRecommended());
         
         return dto;
     }

@@ -28,6 +28,12 @@
           <el-option label="未上架" :value="0" />
         </el-select>
       </el-form-item>
+      <el-form-item label="是否推薦" prop="isRecommended">
+        <el-select v-model="queryParams.isRecommended" placeholder="請選擇是否推薦" clearable size="small">
+          <el-option label="是" :value="1" />
+          <el-option label="否" :value="0" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜尋</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重設</el-button>
@@ -105,6 +111,16 @@
           <el-tag :type="scope.row.onSale === 1 ? 'success' : 'info'">
             {{ scope.row.onSale === 1 ? '已上架' : '未上架' }}
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否推薦" align="center" prop="isRecommended" width="100">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.isRecommended"
+            :active-value="1"
+            :inactive-value="0"
+            @change="handleRecommendedChange(scope.row)"
+          />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
@@ -196,6 +212,16 @@
           </el-col>
         </el-row>
         <el-row>
+          <el-col :span="12">
+            <el-form-item label="是否推薦" prop="isRecommended">
+              <el-radio-group v-model="form.isRecommended">
+                <el-radio :label="1">是</el-radio>
+                <el-radio :label="0">否</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="24">
             <el-form-item label="標籤" prop="productTags">
               <el-input v-model="form.productTags" placeholder="請輸入標籤，多個標籤用逗號分隔" />
@@ -256,7 +282,7 @@
 </template>
 
 <script>
-import { listProduct, getProduct, delProduct, addProduct, updateProduct, uploadProductImages, deleteProductImage, saveProductAttrs } from "@/api/car/product";
+import { listProduct, getProduct, delProduct, addProduct, updateProduct, uploadProductImages, deleteProductImage, saveProductAttrs, updateRecommended } from "@/api/car/product";
 import { treeselect } from "@/api/car/productCategory";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -293,7 +319,8 @@ export default {
         pageSize: 10,
         productTitle: null,
         categoryId: null,
-        onSale: null
+        onSale: null,
+        isRecommended: null
       },
       // 表單參數
       form: {},
@@ -384,6 +411,7 @@ export default {
         amount: 0,
         categoryId: null,
         onSale: 0,
+        isRecommended: 0,
         delFlag: 0
       };
       this.imageList = [];
@@ -542,6 +570,16 @@ export default {
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+    /** 推薦狀態切換 */
+    handleRecommendedChange(row) {
+      updateRecommended(row.id, row.isRecommended).then(() => {
+        this.$modal.msgSuccess("更新成功");
+      }).catch(() => {
+        // 更新失敗，恢復原值
+        row.isRecommended = row.isRecommended === 1 ? 0 : 1;
+        this.$modal.msgError("更新失敗");
+      });
     }
   }
 };

@@ -108,4 +108,9 @@ public class ProductDto {
      * 是否上架
      */
     private Integer onSale;
+    
+    /**
+     * 是否推荐 1 是 / 0 否
+     */
+    private Integer isRecommended;
 }

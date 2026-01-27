@@ -125,6 +125,9 @@ public class CarProductServiceImpl implements ICarProductService
         if (StringUtils.isNotNull(carProduct.getOnSale())) {
             criteria.andEqualTo("onSale", carProduct.getOnSale());
         }
+        if (StringUtils.isNotNull(carProduct.getIsRecommended())) {
+            criteria.andEqualTo("isRecommended", carProduct.getIsRecommended());
+        }
         
         // 按ID倒序
         example.orderBy("id").desc();
@@ -214,6 +217,9 @@ public class CarProductServiceImpl implements ICarProductService
         }
         if (carProduct.getAmount() == null) {
             carProduct.setAmount(0);
+        }
+        if (carProduct.getIsRecommended() == null) {
+            carProduct.setIsRecommended(0);
         }
         return carProductMapper.insertSelective(carProduct);
     }

@@ -46,6 +46,20 @@ public class CarProductApiController extends BaseController {
     }
 
     /**
+     * 获取推荐商品列表
+     */
+    @GetMapping("/recommended")
+    public R<List<ProductDto>> getRecommendedProducts() {
+        try {
+            List<ProductDto> products = carProductService.getRecommendedProducts();
+            return R.ok("获取推荐商品列表成功", products);
+        } catch (Exception e) {
+            log.error("获取推荐商品列表失败", e);
+            return R.fail("获取推荐商品列表失败：" + e.getMessage(), null);
+        }
+    }
+
+    /**
      * 根据分类ID获取商品列表
      */
     @GetMapping("/category")

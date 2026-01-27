@@ -160,5 +160,19 @@ public class CarProductController extends BaseController
         int count = carProductService.saveProductAttrs(productId, attrText);
         return AjaxResult.success("屬性保存成功，共保存 " + count + " 條屬性");
     }
+
+    /**
+     * 更新商品推薦狀態
+     */
+    @PreAuthorize("@ss.hasPermi('car:product:edit')")
+    @Log(title = "商品推薦狀態", businessType = BusinessType.UPDATE)
+    @PutMapping("/updateRecommended/{id}")
+    public AjaxResult updateRecommended(@PathVariable("id") Long id, @RequestParam("isRecommended") Integer isRecommended)
+    {
+        CarProductEntity product = new CarProductEntity();
+        product.setId(id);
+        product.setIsRecommended(isRecommended);
+        return toAjax(carProductService.updateCarProduct(product));
+    }
 }
 
