@@ -1,5 +1,102 @@
+<!-- 引入 Swiper CSS -->
+<link href="/assets/swiper/css/swiper.min.css" rel="stylesheet">
+<script src="/assets/swiper/js/swiper.min.js"></script>
+<link href="/css/home.css" rel="stylesheet">
+
 <!-- 商城頁面 -->
-<div class="mall-container" id="app">
+<div class="mall-page" id="app">
+    <!-- 第一行：輪播圖 -->
+    <div class="hero-section">
+        <div class="swiper hero-swiper">
+            <div class="swiper-wrapper">
+                <!-- 使用 Vue.js 動態展示輪播圖數據 -->
+                <div class="swiper-slide" v-for="(banner, index) in banners" :key="banner.id">
+                    <!-- 連結類型輪播圖 -->
+                    <a v-if="banner.isLink && banner.linkUrl" :href="banner.linkUrl" class="hero-slide-link">
+                        <img :src="banner.imageUrl" :alt="banner.title || '輪播圖' + (index + 1)" class="hero-image">
+                        <div class="hero-content" v-if="banner.title">
+                            <h2 class="hero-title" v-text="banner.title"></h2>
+                            <p class="hero-subtitle" v-if="banner.subtitle" v-text="banner.subtitle"></p>
+                            <span class="hero-btn">了解更多</span>
+                        </div>
+                    </a>
+                    <!-- 非連結類型輪播圖 -->
+                    <template v-else>
+                        <img :src="banner.imageUrl" :alt="banner.title || '輪播圖' + (index + 1)" class="hero-image">
+                        <div class="hero-content" v-if="banner.title">
+                            <h2 class="hero-title" v-text="banner.title"></h2>
+                            <p class="hero-subtitle" v-if="banner.subtitle" v-text="banner.subtitle"></p>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- 當沒有輪播圖數據時顯示默認內容 -->
+                <div class="swiper-slide" v-if="!banners || banners.length === 0">
+                    <img src="/img/default-hero.jpg" alt="默認輪播圖" class="hero-image">
+                    <div class="hero-content">
+                        <h2 class="hero-title">歡迎來到線上購物</h2>
+                        <p class="hero-subtitle">發現更多優質商品</p>
+                    </div>
+                </div>
+            </div>
+            <!-- 分页器 -->
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- 商品區域 -->
+    <div class="mall-container">
+    <!-- 精选商品区块 -->
+    <div v-if="recommendedProducts && recommendedProducts.length > 0" class="recommended-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                精選商品
+            </h3>
+        </div>
+        <div class="products-grid">
+            <div v-for="product in recommendedProducts" 
+                 :key="product.id" 
+                 class="product-card" 
+                 :data-category="product.category || 'other'">
+                <a :href="'/product/' + product.id" class="product-card-link">
+                    <div class="product-image">
+                        <img :src="product.image" :alt="product.name" @error="handleImageError">
+                    </div>
+                    <div class="product-info">
+                        <h5 class="product-name">{{ product.name }}</h5>
+                        <p class="product-description">{{ product.description }}</p>
+                        <div class="product-meta">
+                            <span v-if="product.brand" class="badge bg-secondary me-2">{{ product.brand }}</span>
+                            <span v-if="product.model" class="badge bg-info me-2">{{ product.model }}</span>
+                            <span v-if="product.source" class="badge bg-warning me-2">{{ product.source }}</span>
+                        </div>
+                        <div class="product-tags" v-if="product.productTags">
+                            <span v-for="tag in getProductTags(product.productTags)" 
+                                  :key="tag" 
+                                  class="badge bg-primary me-1 mb-1 tag-clickable"
+                                  @click.stop.prevent="searchByTag(tag, $event)">
+                                {{ tag }}
+                            </span>
+                        </div>
+                        <div class="product-price">
+                            <div class="price-row">
+                                <span v-if="product.promotionalPrice" class="price-label promotional-label">特惠價</span>
+                                <span v-if="product.promotionalPrice" class="price-symbol promotional-symbol">${CurrencyUnit}</span>
+                                <span v-if="product.promotionalPrice" class="price-amount promotional-amount">{{ formatPrice(product.price) }}</span>
+                                <span v-if="product.originalPrice" class="price-market text-decoration-line-through text-muted ms-2">
+                                    售價 ${CurrencyUnit}{{ formatPrice(product.originalPrice) }}
+                                </span>
+                                <span v-if="!product.promotionalPrice" class="price-label">售價</span>
+                                <span v-if="!product.promotionalPrice" class="price-symbol">${CurrencyUnit}</span>
+                                <span v-if="!product.promotionalPrice" class="price-amount">{{ formatPrice(product.price) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
     <!-- 商品分類過濾 -->
     <div class="filter-section">
         <!-- 一級分類 -->
@@ -133,13 +230,43 @@
             </ul>
         </nav>
     </div>
+    </div>
 </div>
 
 <style>
+/* 商城页面整体布局 */
+.mall-page {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+}
+
 .mall-container {
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
     padding: 20px;
+}
+
+/* 轮播图样式覆盖 - 去掉底部margin */
+.hero-section {
+    margin-bottom: 0 !important;
+}
+
+/* 精选商品区块样式 */
+.recommended-section {
+    margin-bottom: 40px;
+    padding: 30px 0;
+}
+
+.section-header {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.section-title {
+    color: #3351A5;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 0;
 }
 
 .filter-section {
@@ -472,7 +599,12 @@ new Vue({
         firstLevelCategories: [],
         secondLevelCategories: [],
         selectedFirstCategory: '',
-        selectedSecondCategory: ''
+        selectedSecondCategory: '',
+        // 轮播图相关
+        banners: [],
+        heroSwiper: null,
+        // 推荐商品
+        recommendedProducts: []
     },
     computed: {
         visiblePages() {
@@ -489,6 +621,8 @@ new Vue({
     mounted() {
         this.loadCategoryTree();
         this.loadProducts();
+        this.getBanner();
+        this.loadRecommendedProducts();
         
         // 检查URL参数中是否有标签搜索
         const urlParams = new URLSearchParams(window.location.search);
@@ -748,6 +882,76 @@ new Vue({
             }
             // 同时触发自定义事件
             window.dispatchEvent(new CustomEvent('cartUpdated'));
+        },
+        
+        // 获取推荐商品
+        async loadRecommendedProducts() {
+            try {
+                const response = await axios.get('/api/products/recommended');
+                if (response.data.success) {
+                    this.recommendedProducts = response.data.data || [];
+                } else {
+                    console.error('載入推薦商品失敗:', response.data.message);
+                    this.recommendedProducts = [];
+                }
+            } catch (error) {
+                console.error('載入推薦商品失敗:', error);
+                this.recommendedProducts = [];
+            }
+        },
+        
+        // 获取轮播图数据
+        getBanner() {
+            let _this = this;
+            $.ajax({
+                url: '/api/banner/list',
+                method: 'GET',
+                success: (data) => {
+                    _this.banners = data.data;
+                    // 数据加载完成后重新初始化 Swiper
+                    _this.$nextTick(() => {
+                        _this.initHeroSlider();
+                    });
+                },
+                error: (error) => {
+                    console.log(error);
+                    // 加载失败时也初始化 Swiper，顯示默認内容
+                    _this.$nextTick(() => {
+                        _this.initHeroSlider();
+                    });
+                }
+            });
+        },
+        
+        // 初始化轮播图
+        initHeroSlider() {
+            // 銷毀之前的 Swiper 實例（如果存在）
+            if (this.heroSwiper) {
+                this.heroSwiper.destroy(true, true);
+            }
+            
+            // 初始化Swiper輪播圖
+            this.heroSwiper = new Swiper('.hero-swiper', {
+                // 循環模式
+                loop: true,
+                // 自動播放
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                // 淡入淡出效果
+                effect: 'fade',
+                fadeEffect: {
+                    crossFade: true
+                },
+                // 分頁器
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                // 速度
+                speed: 500,
+            });
         }
     }
 });

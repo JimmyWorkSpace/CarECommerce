@@ -690,6 +690,7 @@ public class CarViewController extends BaseController {
             productDto.setAmount(product.getAmount()); // 库存数量
             productDto.setCategoryId(product.getCategoryId()); // 分类ID
             productDto.setOnSale(product.getOnSale()); // 是否上架
+            productDto.setIsRecommended(product.getIsRecommended()); // 是否推荐
             
             model.addAttribute("product", productDto);
             model.addAttribute("productJson", JSONUtil.toJsonPrettyStr(productDto));

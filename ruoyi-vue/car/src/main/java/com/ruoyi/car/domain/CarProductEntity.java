@@ -70,6 +70,10 @@ public class CarProductEntity
     @Column(name = "promotionalPrice", columnDefinition = "DECIMAL(10,2) DEFAULT NULL COMMENT '特惠價'")
     private BigDecimal promotionalPrice;
 
+    /** 是否推薦 1 是 0 否 */
+    @Column(name = "is_recommended", nullable = false, columnDefinition = "INT(11) NOT NULL DEFAULT '0' COMMENT '是否推薦 1 是 0 否'")
+    private Integer isRecommended;
+
     /** 商品圖片列表（臨時字段） */
     @Transient
     private List<CarProductImageEntity> images;
