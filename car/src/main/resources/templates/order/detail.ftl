@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-12">
                 
-                <!-- 订单详情 -->
+                <!-- 訂單詳情 -->
                 <div v-if="order" class="card item-card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
@@ -18,7 +18,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <!-- 订单基本信息 -->
+                        <!-- 訂單基本信息 -->
                         <div class="item-info">
                             <div class="info-row">
                                 <span class="info-label">訂單金額：</span>
@@ -83,7 +83,7 @@
                             </div>
                         </div>
                         
-                        <!-- 订单商品详情 -->
+                        <!-- 訂單商品詳情 -->
                         <div class="mt-4">
                             <h6 class="mb-3 text-start fw-bold text-primary border-bottom pb-2">
                                 <i class="bi bi-box-seam-fill me-2"></i>商品詳情
@@ -121,10 +121,10 @@
                                         @click="loadLogisticsInfo" :disabled="isLoadingLogistics">
                                     <i class="bi bi-arrow-clockwise me-1"></i>刷新
                                 </button>
-                                <span class="badge bg-secondary ms-2" v-if="isLoadingLogistics">加载中...</span>
+                                <span class="badge bg-secondary ms-2" v-if="isLoadingLogistics">加載中...</span>
                             </h6>
                             
-                            <!-- 物流详细信息 -->
+                            <!-- 物流詳細信息 -->
                             <div class="item-info bg-light rounded p-3">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -272,7 +272,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- 简单物流信息（当没有详细物流信息时显示） -->
+                                <!-- 簡單物流信息（當沒有詳細物流信息時顯示） -->
                             <div class="item-info bg-light rounded p-3" v-else-if="order.logicNumber && !logisticsInfo">
                                 <div class="info-row">
                                     <span class="info-label fw-semibold text-muted">
@@ -290,14 +290,14 @@
                                 </div>
                             </div>
                             
-                            <!-- 无物流信息时的提示 -->
+                            <!-- 無物流信息時的提示 -->
                             <div class="alert alert-info" v-if="!order.logicNumber && order.orderStatus >= 5">
                                 <i class="bi bi-info-circle me-2"></i>
-                                订单已发货，但暂无物流信息，请稍后刷新或联系客服。
+                                訂單已發貨，但暫無物流信息，請稍後刷新或聯繫客服。
                             </div>
                         </div>
                         
-                        <!-- 绿界支付信息 -->
+                        <!-- 綠界支付信息 -->
                         <div class="mt-4">
                             <h6 class="mb-3 text-start fw-bold text-primary border-bottom pb-2">
                                 <i class="bi bi-credit-card-fill me-2"></i>綠界支付資訊
@@ -305,10 +305,10 @@
                                         @click="loadECPayInfo" :disabled="isLoadingECPay">
                                     <i class="bi bi-arrow-clockwise me-1"></i>刷新
                                 </button>
-                                <span class="badge bg-secondary ms-2" v-if="isLoadingECPay">加载中...</span>
+                                <span class="badge bg-secondary ms-2" v-if="isLoadingECPay">加載中...</span>
                             </h6>
                             
-                            <!-- 调试信息 -->
+                            <!-- 調試信息 -->
                             <div class="item-info bg-light rounded p-3" v-if="ecpayInfo">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -368,14 +368,14 @@
                                 </div>
                             </div>
                             
-                            <!-- 无数据时的提示 -->
+                            <!-- 無數據時的提示 -->
                             <div class="alert alert-warning" v-if="!ecpayInfo && !isLoadingECPay">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                暂无绿界支付信息，请点击刷新按钮获取最新信息。
+                                暫無綠界支付信息，請點擊刷新按鈕獲取最新信息。
                             </div>
                         </div>
                         
-                        <!-- 订单操作 -->
+                        <!-- 訂單操作 -->
                         <div class="mt-4">
                             <div class="item-actions">
                                 <button v-if="order.orderStatus === 0" type="button" 
@@ -395,20 +395,20 @@
                     </div>
                 </div>
                 
-                <!-- 加载状态 -->
+                <!-- 加載狀態 -->
                 <div v-else-if="isLoading" class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">加载中...</span>
+                        <span class="visually-hidden">加載中...</span>
                     </div>
-                    <p class="mt-3">正在加载订单详情...</p>
+                    <p class="mt-3">正在加載訂單詳情...</p>
                 </div>
                 
-                <!-- 错误状态 -->
+                <!-- 錯誤狀態 -->
                 <div v-else class="empty-state">
                     <i class="bi bi-exclamation-triangle"></i>
-                    <h4>订单不存在</h4>
-                    <p>您访问的订单不存在或已被删除</p>
-                    <a href="/my-order" class="btn btn-primary">返回订单列表</a>
+                    <h4>訂單不存在</h4>
+                    <p>您訪問的訂單不存在或已被刪除</p>
+                    <a href="/my-order" class="btn btn-primary">返回訂單列表</a>
                 </div>
             </div>
         </div>
@@ -433,14 +433,14 @@
             originalOrderStatus: null
         },
         mounted() {
-            console.log('订单详情页面已加载');
+            console.log('訂單詳情頁面已加載');
             this.loadOrderDetail();
         },
         beforeDestroy() {
             this.stopStatusCheck();
         },
         methods: {
-            // 获取订单状态文本
+            // 獲取訂單狀態文本
             getStatusText(status) {
                 const statusMap = {
                     0: '未支付',
@@ -456,7 +456,7 @@
                 return statusMap[status] || '未知狀態';
             },
             
-            // 获取订单状态样式类
+            // 獲取訂單狀態樣式類
             getStatusClass(status) {
                 const classMap = {
                     0: 'status-unpaid',
@@ -472,7 +472,7 @@
                 return classMap[status] || 'status-unpaid';
             },
             
-            // 获取订单类型文本
+            // 獲取訂單類型文本
             getOrderTypeText(orderType) {
                 const typeMap = {
                     1: '宅配到府',
@@ -488,12 +488,12 @@
                 return date.toLocaleString('zh-CN');
             },
             
-            // 加载订单详情
+            // 加載訂單詳情
             loadOrderDetail() {
                 this.isLoading = true;
                 this.clearMessages();
                 
-                // 从URL获取订单ID
+                // 從URL獲取訂單ID
                 const urlParams = new URLSearchParams(window.location.search);
                 const orderId = urlParams.get('orderId');
                 
@@ -503,16 +503,16 @@
                     return;
                 }
                 
-                // 加载订单基本信息
+                // 加載訂單基本信息
                 axios.get('/my-order/order-info?orderId=' + orderId)
                     .then(response => {
                         if (response.data.code === 1) {
                             this.order = response.data.data;
                             this.originalOrderStatus = this.order.orderStatus;
                             this.loadOrderDetails(orderId);
-                            this.loadECPayInfo(); // 加载绿界支付信息
-                            this.loadLogisticsInfo(); // 加载物流信息
-                            // 重新启动状态检查
+                            this.loadECPayInfo(); // 加載綠界支付信息
+                            this.loadLogisticsInfo(); // 加載物流信息
+                            // 重新啟動狀態檢查
                             //this.stopStatusCheck();
                             //this.startStatusCheck();
                         } else {
@@ -520,7 +520,7 @@
                         }
                     })
                     .catch(error => {
-                        console.error('获取订单信息失败:', error);
+                        console.error('獲取訂單信息失敗:', error);
                         this.showError('獲取訂單資訊失敗，請稍後重試');
                     })
                     .finally(() => {
@@ -528,7 +528,7 @@
                     });
             },
             
-            // 加载订单商品详情
+            // 加載訂單商品詳情
             loadOrderDetails(orderId) {
                 axios.get('/my-order/detail?orderId=' + orderId)
                     .then(response => {
@@ -543,77 +543,77 @@
                     });
             },
             
-            // 加载绿界支付信息
+            // 加載綠界支付信息
             loadECPayInfo() {
                 let _this = this;
                 const urlParams = new URLSearchParams(window.location.search);
                 const orderId = urlParams.get('orderId');
                 
                 if (!orderId) {
-                    console.warn('订单ID为空，无法加载绿界支付信息');
+                    console.warn('訂單ID為空，無法加載綠界支付信息');
                     return;
                 }
                 
-                console.log('开始加载绿界支付信息，订单ID:', orderId);
+                console.log('開始加載綠界支付信息，訂單ID:', orderId);
                 this.isLoadingECPay = true;
-                this.ecpayInfo = null; // 清空之前的数据
+                this.ecpayInfo = null; // 清空之前的數據
                 axios.get('/my-order/ecpay-info?orderId=' + orderId)
                     .then(response => {
-                        console.log('绿界支付信息API响应:', response.data);
+                        console.log('綠界支付信息API響應:', response.data);
                         if (response.data && response.data.code === 1) {
                             _this.ecpayInfo = response.data.data;
-                            console.log('绿界支付信息设置成功:', this.ecpayInfo);
-                            console.log('ecpayInfo类型:', typeof this.ecpayInfo);
-                            console.log('ecpayInfo是否为null:', this.ecpayInfo === null);
-                            console.log('ecpayInfo是否为undefined:', this.ecpayInfo === undefined);
+                            console.log('綠界支付信息設置成功:', this.ecpayInfo);
+                            console.log('ecpayInfo類型:', typeof this.ecpayInfo);
+                            console.log('ecpayInfo是否為null:', this.ecpayInfo === null);
+                            console.log('ecpayInfo是否為undefined:', this.ecpayInfo === undefined);
                         } else {
-                            console.warn('获取绿界支付信息失败:', response.data ? response.data.msg : '未知错误');
+                            console.warn('獲取綠界支付信息失敗:', response.data ? response.data.msg : '未知錯誤');
                             _this.ecpayInfo = null;
                         }
                     })
                     .catch(error => {
-                        console.error('获取绿界支付信息失败:', error);
+                        console.error('獲取綠界支付信息失敗:', error);
                         _this.ecpayInfo = null;
                     })
                     .finally(() => {
                         this.isLoadingECPay = false;
-                        console.log('绿界支付信息加载完成，最终状态:', this.ecpayInfo);
+                        console.log('綠界支付信息加載完成，最終狀態:', this.ecpayInfo);
                     });
             },
             
-            // 加载物流信息
+            // 加載物流信息
             loadLogisticsInfo() {
                 let _this = this;
                 if (!this.order || !this.order.orderNo) {
-                    console.warn('订单号为空，无法加载物流信息');
+                    console.warn('訂單號為空，無法加載物流信息');
                     return;
                 }
                 
-                console.log('开始加载物流信息，订单号:', this.order.orderNo);
+                console.log('開始加載物流信息，訂單號:', this.order.orderNo);
                 this.isLoadingLogistics = true;
-                this.logisticsInfo = {}; // 清空之前的数据
+                this.logisticsInfo = {}; // 清空之前的數據
                 
                 axios.get('/api/logistics/query?orderNo=' + this.order.orderNo)
                     .then(response => {
-                        console.log('物流信息API响应:', response.data);
+                        console.log('物流信息API響應:', response.data);
                         if (response.data && response.data.code === 1) {
                             _this.logisticsInfo = response.data.data;
-                            console.log('物流信息设置成功:', _this.logisticsInfo);
+                            console.log('物流信息設置成功:', _this.logisticsInfo);
                         } else {
                             _this.logisticsInfo = {};
                         }
                     })
                     .catch(error => {
-                        console.error('获取物流信息失败:', error);
+                        console.error('獲取物流信息失敗:', error);
                         this.logisticsInfo = {};
                     })
                     .finally(() => {
                         this.isLoadingLogistics = false;
-                        console.log('物流信息加载完成，最终状态:', this.logisticsInfo);
+                        console.log('物流信息加載完成，最終狀態:', this.logisticsInfo);
                     });
             },
             
-            // 获取物流状态文本
+            // 獲取物流狀態文本
             getLogisticsStatusText(status) {
                 const statusMap = {
                     '300': '訂單建立',
@@ -630,7 +630,7 @@
                 return statusMap[status] || '未知狀態';
             },
             
-            // 获取物流状态样式类
+            // 獲取物流狀態樣式類
             getLogisticsStatusClass(status) {
                 const classMap = {
                     '300': 'text-info',
@@ -647,40 +647,40 @@
                 return classMap[status] || 'text-muted';
             },
             
-            // 获取物流类型文本
+            // 獲取物流類型文本
             getLogisticsTypeText(type) {
                 const typeMap = {
-                    // 宅配类型
+                    // 宅配類型
                     'HOME_TCAT': '宅配-黑貓宅急便',
                     'HOME_ECAN': '宅配-宅配通',
                     'HOME_FAMI': '宅配-全家宅配通',
                     'HOME_POST': '宅配-中華郵政',
-                    // 超商类型
+                    // 超商類型
                     'CVS_FAMI': '超商-全家',
                     'CVS_OK': '超商-OK超商',
                     'CVS_HILIFE': '超商-萊爾富',
                     'CVS_IBON': '超商-7-11',
                     'CVS_UNIMART': '超商-統一超商',
-                    // 其他类型
+                    // 其他類型
                     'HOME': '宅配',
                     'CVS': '超商'
                 };
                 return typeMap[type] || type || '未知類型';
             },
             
-            // 判断是否为宅配类型
+            // 判斷是否為宅配類型
             isHomeDelivery(type) {
                 if (!type) return false;
                 return type.startsWith('HOME') || type === 'HOME';
             },
             
-            // 判断是否为超商类型
+            // 判斷是否為超商類型
             isConvenienceStore(type) {
                 if (!type) return false;
                 return type.startsWith('CVS') || type === 'CVS';
             },
             
-            // 获取绿界支付状态文本
+            // 獲取綠界支付狀態文本
             getECPayStatusText(status) {
                 const statusMap = {
                     '0': '未付款',
@@ -691,7 +691,7 @@
                 return statusMap[status] || '未知狀態';
             },
             
-            // 获取绿界支付状态样式类
+            // 獲取綠界支付狀態樣式類
             getECPayStatusClass(status) {
                 const classMap = {
                     '0': 'text-warning',
@@ -702,33 +702,33 @@
                 return classMap[status] || 'text-muted';
             },
             
-            // 重新支付订单
+            // 重新支付訂單
             repayOrder(orderId) {
                 if (confirm('確定要重新支付這個訂單嗎？')) {
                     axios.post('/my-order/repay/' + orderId)
                         .then(response => {
                             if (response.data.code === 1) {
-                                // 跳转到支付页面
+                                // 跳轉到支付頁面
                                 window.location.href = response.data.data;
                             } else {
                                 this.showError(response.data.msg || '重新支付失敗');
                             }
                         })
                         .catch(error => {
-                            console.error('重新支付失败:', error);
+                            console.error('重新支付失敗:', error);
                             this.showError('重新支付失敗，請稍後重試');
                         });
                 }
             },
             
-            // 取消订单
+            // 取消訂單
             cancelOrder(orderId) {
                 if (confirm('確定要取消這個訂單嗎？取消後商品將放回購物車。')) {
                     axios.post('/my-order/cancel/' + orderId)
                         .then(response => {
                             if (response.data.code === 1) {
                                 this.showSuccess(response.data.msg || '訂單取消成功');
-                                // 刷新订单状态
+                                // 刷新訂單狀態
                                 setTimeout(() => {
                                     this.loadOrderDetail();
                                 }, 1500);
@@ -737,31 +737,31 @@
                             }
                         })
                         .catch(error => {
-                            console.error('取消订单失败:', error);
+                            console.error('取消訂單失敗:', error);
                             this.showError('取消訂單失敗，請稍後重試');
                         });
                 }
             },
             
-            // 刷新订单状态
+            // 刷新訂單狀態
             refreshOrder() {
                 this.stopStatusCheck();
                 this.loadOrderDetail();
                 this.showSuccess('訂單狀態已刷新');
             },
             
-            // 开始状态检查
+            // 開始狀態檢查
             startStatusCheck() {
-                // 只有未支付或支付中的订单才需要检查状态
+                // 只有未支付或支付中的訂單才需要檢查狀態
                 if (this.order && (this.order.orderStatus === 0 || this.order.orderStatus === 1)) {
                     console.log('開始定時檢查訂單狀態');
                     this.statusCheckInterval = setInterval(() => {
                         this.checkOrderStatus();
-                    }, 20000); // 每20秒检查一次
+                    }, 20000); // 每20秒檢查一次
                 }
             },
             
-            // 停止状态检查
+            // 停止狀態檢查
             stopStatusCheck() {
                 if (this.statusCheckInterval) {
                     clearInterval(this.statusCheckInterval);
@@ -770,7 +770,7 @@
                 }
             },
             
-            // 检查订单状态
+            // 檢查訂單狀態
             checkOrderStatus() {
                 if (!this.order || !this.order.orderNo) {
                     console.log('訂單資訊不完整，無法檢查狀態');
@@ -779,7 +779,7 @@
                 
                 console.log('從綠界API檢查訂單狀態:', this.order.orderNo);
                 
-                // 从绿界API查询订单状态
+                // 從綠界API查詢訂單狀態
                 axios.post('/ecpay/refresh-status/' + this.order.orderNo)
                 .then(response => {
                     if (response.data && response.data.code === 200) {
@@ -791,13 +791,13 @@
                         console.log('訂單狀態是否更新:', updated);
                         
                         if (newOrderInfo) {
-                            // 如果订单状态发生变化，更新页面数据
+                            // 如果訂單狀態發生變化，更新頁面數據
                             if (newOrderInfo.orderStatus !== this.originalOrderStatus) {
                                 console.log('訂單狀態發生變化，從', this.originalOrderStatus, '變為', newOrderInfo.orderStatus);
                                 this.order = newOrderInfo;
                                 this.originalOrderStatus = newOrderInfo.orderStatus;
                                 
-                                // 如果订单已支付、已取消或已失败，停止状态检查
+                                // 如果訂單已支付、已取消或已失敗，停止狀態檢查
                                 if (newOrderInfo.orderStatus === 2) {
                                     this.stopStatusCheck();
                                     this.showSuccess('訂單狀態已更新為已支付！');
@@ -815,7 +815,7 @@
                 });
             },
             
-            // 显示错误信息
+            // 顯示錯誤信息
             showError(message) {
                 this.errorMessage = message;
                 this.successMessage = '';
@@ -824,7 +824,7 @@
                 }, 5000);
             },
             
-            // 显示成功信息
+            // 顯示成功信息
             showSuccess(message) {
                 this.successMessage = message;
                 this.errorMessage = '';
@@ -839,7 +839,7 @@
                 this.successMessage = '';
             },
             
-            // 获取完整的收件人地址
+            // 獲取完整的收件人地址
             getFullReceiverAddress() {
                 if (!this.order) return '-';
                 
