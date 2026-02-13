@@ -1,13 +1,11 @@
 <template>
   <div class="app-container">
-    <el-form style="display: none;" :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="跳轉地址" prop="linkUrl">
-        <el-input
-          v-model="queryParams.linkUrl"
-          placeholder="請輸入跳轉地址"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+    <el-form style="display: none;" :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="88px">
+      <el-form-item label="輪播圖位置" prop="bannerType">
+        <el-select v-model="queryParams.bannerType" placeholder="請選擇輪播圖位置" clearable>
+          <el-option label="首頁輪播" :value="1" />
+          <el-option label="商品頁輪播" :value="2" />
+        </el-select>
       </el-form-item>
       <el-form-item label="是否跳轉" prop="isLink">
         <el-select v-model="queryParams.isLink" placeholder="請選擇是否跳轉" clearable>
@@ -54,6 +52,13 @@
               <i class="el-icon-picture-outline"></i>
             </div>
           </el-image>
+        </template>
+      </el-table-column>
+      <el-table-column label="輪播圖位置" align="center" prop="bannerType" width="120">
+        <template slot-scope="scope">
+          <span v-if="scope.row.bannerType === 1 || scope.row.bannerType === '1'">首頁輪播</span>
+          <span v-else-if="scope.row.bannerType === 2 || scope.row.bannerType === '2'">商品頁輪播</span>
+          <span v-else>-</span>
         </template>
       </el-table-column>
       <el-table-column label="是否跳轉" align="center" prop="isLink" width="100">
@@ -144,6 +149,12 @@
         <el-form-item v-if="form.isLink === 1" label="跳轉地址" prop="linkUrl">
           <el-input v-model="form.linkUrl" placeholder="請輸入跳轉地址" />
         </el-form-item>
+        <el-form-item label="輪播圖位置" prop="bannerType">
+          <el-select v-model="form.bannerType" placeholder="請選擇輪播圖位置" clearable style="width: 100%">
+            <el-option label="首頁輪播" :value="1" />
+            <el-option label="商品頁輪播" :value="2" />
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">確 定</el-button>
@@ -183,7 +194,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        linkUrl: null,
+        bannerType: null,
         isLink: null
       },
       // 表單參數
@@ -232,7 +243,8 @@ export default {
         imageUrl: null,
         linkUrl: null,
         isLink: 0,
-        delFlag: 0
+        delFlag: 0,
+        bannerType: null
       };
       this.resetForm("form");
     },
@@ -275,6 +287,12 @@ export default {
           this.form.delFlag = parseInt(this.form.delFlag);
         } else {
           this.form.delFlag = 0;
+        }
+        // bannerType 確保為數字
+        if (this.form.bannerType !== null && this.form.bannerType !== undefined) {
+          this.form.bannerType = parseInt(this.form.bannerType);
+        } else {
+          this.form.bannerType = null;
         }
         // 不再在修改时清空 linkUrl，保留数据库中的值
         // 如果 isLink 为 0，linkUrl 可能已经有值，但提交时会根据 isLink 清空

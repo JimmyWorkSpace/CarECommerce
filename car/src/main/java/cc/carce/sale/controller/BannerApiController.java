@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cc.carce.sale.common.R;
-import cc.carce.sale.entity.CarAdvertisementEntity;
 import cc.carce.sale.entity.CarBannerEntity;
-import cc.carce.sale.service.CarAdvertisementService;
 import cc.carce.sale.service.CarBannerService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,8 +21,15 @@ public class BannerApiController {
 	@Resource
 	private CarBannerService carBannerService;
 	
+	/** 首页轮播图列表（bannerType=1） */
 	@GetMapping("list")
 	public R<List<CarBannerEntity>> list() {
 		return R.ok(carBannerService.getHomeBanners());
+	}
+
+	/** 商城页轮播图列表（bannerType=2） */
+	@GetMapping("mall/list")
+	public R<List<CarBannerEntity>> mallList() {
+		return R.ok(carBannerService.getMallBanners());
 	}
 }

@@ -33,4 +33,8 @@ public class CarBannerEntity {
 
     @Column(name = "createTime")
     private Date createTime;
+
+    /** 轮播图类型 1 首页轮播 2 商品页轮播 */
+    @Column(name = "bannerType")
+    private Integer bannerType;
 } 

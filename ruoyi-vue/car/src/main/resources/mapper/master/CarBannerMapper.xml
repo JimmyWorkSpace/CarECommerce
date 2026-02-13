@@ -12,17 +12,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="showOrder"     column="showOrder"   />
         <result property="delFlag"       column="delFlag"     />
         <result property="createTime"    column="createTime"  />
+        <result property="bannerType"    column="bannerType"  />
     </resultMap>
     
     <sql id="selectCarBannerVo">
-        select id, imageUrl, linkUrl, isLink, showOrder, delFlag, createTime 
+        select id, imageUrl, linkUrl, isLink, showOrder, delFlag, createTime, bannerType 
         from car_banner
     </sql>
     
-    <select id="selectAllOrderByShowOrder" resultMap="CarBannerResult">
-        select id, imageUrl, linkUrl, isLink, COALESCE(showOrder, 0) as showOrder, delFlag, createTime 
+    <select id="selectAllOrderByShowOrder" resultType="com.ruoyi.car.domain.CarBannerEntity">
+        select id, imageUrl, linkUrl, isLink, COALESCE(showOrder, 0) as showOrder, delFlag, createTime, bannerType 
         from car_banner
-        where delFlag = 0 or delFlag is null
+        where (delFlag = 0 or delFlag is null)
+        <if test="bannerType != null">
+            and bannerType = #{bannerType}
+        </if>
         order by COALESCE(showOrder, 0) asc, createTime desc
     </select>
     

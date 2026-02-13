@@ -44,7 +44,7 @@ public class CarBannerController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(CarBannerEntity carBanner) {
         startPage();
-        List<CarBannerEntity> list = carBannerService.selectAllBanners();
+        List<CarBannerEntity> list = carBannerService.selectAllBanners(carBanner);
         return getDataTable(list);
     }
 
@@ -55,7 +55,7 @@ public class CarBannerController extends BaseController {
     @Log(title = "輪播圖", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CarBannerEntity carBanner) {
-        List<CarBannerEntity> list = carBannerService.selectAllBanners();
+        List<CarBannerEntity> list = carBannerService.selectAllBanners(carBanner);
         ExcelUtil<CarBannerEntity> util = new ExcelUtil<CarBannerEntity>(CarBannerEntity.class);
         util.exportExcel(response, list, "輪播圖資料");
     }

@@ -10,9 +10,10 @@ import tk.mybatis.mapper.common.Mapper;
 
 public interface CarBannerMapper extends Mapper<CarBannerEntity> {
 	/**
-     * 查询所有轮播图（按排序字段排序）
+     * 查詢輪播圖列表（按排序欄位排序，可選按輪播圖類型篩選）
+     * @param bannerType 輪播圖類型，可為 null 表示不過濾
      */
-    List<CarBannerEntity> selectAllOrderByShowOrder();
+    List<CarBannerEntity> selectAllOrderByShowOrder(@Param("bannerType") Integer bannerType);
     
     /**
      * 批量更新排序

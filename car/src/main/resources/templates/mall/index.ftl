@@ -904,7 +904,7 @@ new Vue({
         getBanner() {
             let _this = this;
             $.ajax({
-                url: '/api/banner/list',
+                url: '/api/banner/mall/list',
                 method: 'GET',
                 success: (data) => {
                     _this.banners = data.data;
