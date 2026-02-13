@@ -21,8 +21,9 @@ public class CarBannerServiceImpl implements CarBannerService {
     private CarBannerMapper carBannerMapper;
 
     @Override
-    public List<CarBannerEntity> selectAllBanners() {
-        List<CarBannerEntity> banners = carBannerMapper.selectAllOrderByShowOrder();
+    public List<CarBannerEntity> selectAllBanners(CarBannerEntity query) {
+        Integer bannerType = (query != null) ? query.getBannerType() : null;
+        List<CarBannerEntity> banners = carBannerMapper.selectAllOrderByShowOrder(bannerType);
         // 确保所有记录的showOrder不为null
         for (CarBannerEntity banner : banners) {
             if (banner.getShowOrder() == null) {

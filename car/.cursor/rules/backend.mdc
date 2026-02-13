@@ -1,0 +1,7 @@
+---
+description: 
+alwaysApply: true
+---
+
+使用tkmybatis作为orm框架
+bean使用@Data、@Table注解

@@ -15,16 +15,39 @@ public class CarBannerService {
     @Resource
     private CarBannerMapper carBannerMapper;
 
+    /** 轮播图类型：首页轮播 */
+    public static final int BANNER_TYPE_HOME = 1;
+    /** 轮播图类型：商品页/商城页轮播 */
+    public static final int BANNER_TYPE_MALL = 2;
+
     /**
-     * 获取首页banner列表
+     * 获取首页轮播图列表（bannerType=1）
      * 只返回未删除且按排序字段排序的banner
      * @return banner列表
      */
     public List<CarBannerEntity> getHomeBanners() {
+        return getBannersByType(BANNER_TYPE_HOME);
+    }
+
+    /**
+     * 获取商城页轮播图列表（bannerType=2）
+     * @return banner列表
+     */
+    public List<CarBannerEntity> getMallBanners() {
+        return getBannersByType(BANNER_TYPE_MALL);
+    }
+
+    /**
+     * 按轮播图类型获取banner列表
+     * @param bannerType 1 首页轮播 2 商品页轮播
+     * @return banner列表
+     */
+    public List<CarBannerEntity> getBannersByType(Integer bannerType) {
         Example example = new Example(CarBannerEntity.class);
         example.createCriteria()
-                .andEqualTo("delFlag", false);
-        example.orderBy("showOrder").asc();    // 按排序字段升序排列
+                .andEqualTo("delFlag", false)
+                .andEqualTo("bannerType", bannerType);
+        example.orderBy("showOrder").asc();
         return carBannerMapper.selectByExample(example);
     }
 

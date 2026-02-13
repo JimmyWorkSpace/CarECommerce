@@ -6,9 +6,10 @@ import java.util.List;
 public interface CarBannerService {
     
     /**
-     * 查询所有轮播图
+     * 查詢輪播圖列表（可選按輪播圖類型篩選）
+     * @param query 查詢條件，可為 null 或僅設 bannerType 篩選
      */
-    List<CarBannerEntity> selectAllBanners();
+    List<CarBannerEntity> selectAllBanners(CarBannerEntity query);
     
     /**
      * 根据ID查询轮播图
