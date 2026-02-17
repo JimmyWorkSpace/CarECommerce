@@ -152,7 +152,7 @@
     />
 
     <!-- 添加或修改商品對話框 -->
-    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="80%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="12">
@@ -180,28 +180,51 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="8">
-            <el-form-item label="供價" prop="supplyPrice">
-              <el-input-number v-model="form.supplyPrice" :precision="0" :min="0" :step="1" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="售價" prop="salePrice">
-              <el-input-number v-model="form.salePrice" :precision="0" :min="0" :step="1" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="特惠價" prop="promotionalPrice">
-              <el-input-number v-model="form.promotionalPrice" :precision="0" :min="0" :step="1" style="width: 100%" />
+          <el-col :span="24">
+            <el-form-item label="價格版本">
+              <span class="form-tip">可為同一商品設定多個價格版本（如黑色100元、白色120元），結算時依選擇的版本計價。</span>
+              <el-table :data="priceList" border size="small" style="margin-top: 8px;">
+                <el-table-column label="名稱" min-width="120">
+                  <template slot-scope="scope">
+                    <el-input v-model="scope.row.versionName" placeholder="如：黑色、白色" size="mini" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="供價" min-width="100">
+                  <template slot-scope="scope">
+                    <el-input-number v-model="scope.row.supplyPrice" :min="0" :precision="2" size="mini" style="width: 100%" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="售價" min-width="120">
+                  <template slot-scope="scope">
+                    <el-input-number v-model="scope.row.salePrice" :min="0" :precision="2" size="mini" style="width: 100%" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="特惠價" min-width="100">
+                  <template slot-scope="scope">
+                    <el-input-number v-model="scope.row.promotionalPrice" :min="0" :precision="2" size="mini" style="width: 100%" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="數量" min-width="120">
+                  <template slot-scope="scope">
+                    <el-input-number v-model="scope.row.amount" :min="0" size="mini" style="width: 100%" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="上架" min-width="80" align="center">
+                  <template slot-scope="scope">
+                    <el-switch v-model="scope.row.onSale" :active-value="1" :inactive-value="0" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" min-width="80" align="center">
+                  <template slot-scope="scope">
+                    <el-button type="text" size="mini" icon="el-icon-delete" @click="removePriceRow(scope.$index)">刪除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <el-button size="mini" type="primary" plain icon="el-icon-plus" style="margin-top: 8px;" @click="addPriceRow">新增價格版本</el-button>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
-            <el-form-item label="數量" prop="amount">
-              <el-input-number v-model="form.amount" :min="0" style="width: 100%" />
-            </el-form-item>
-          </el-col>
           <el-col :span="12">
             <el-form-item label="上架狀態" prop="onSale">
               <el-radio-group v-model="form.onSale">
@@ -282,7 +305,7 @@
 </template>
 
 <script>
-import { listProduct, getProduct, delProduct, addProduct, updateProduct, uploadProductImages, deleteProductImage, saveProductAttrs, updateRecommended } from "@/api/car/product";
+import { listProduct, getProduct, delProduct, addProduct, updateProduct, uploadProductImages, deleteProductImage, saveProductAttrs, saveProductPrices, updateRecommended } from "@/api/car/product";
 import { treeselect } from "@/api/car/productCategory";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -328,9 +351,6 @@ export default {
       rules: {
         productTitle: [
           { required: true, message: "商品標題不能為空", trigger: "blur" }
-        ],
-        amount: [
-          { required: true, message: "數量不能為空", trigger: "blur" }
         ]
       },
       // 圖片上傳相關
@@ -342,7 +362,9 @@ export default {
       dialogVisible: false,
       dialogImageUrl: "",
       // 屬性文本
-      attrText: ""
+      attrText: "",
+      // 價格版本列表（用於表單編輯）
+      priceList: []
     };
   },
   created() {
@@ -416,6 +438,7 @@ export default {
       };
       this.imageList = [];
       this.attrText = "";
+      this.priceList = [];
       this.resetForm("form");
     },
     /** 搜索按鈕操作 */
@@ -460,6 +483,22 @@ export default {
         if (this.form.attrs && this.form.attrs.length > 0) {
           this.attrText = this.form.attrs.map(attr => `${attr.attrName}:${attr.attrValue}`).join('\n');
         }
+        // 處理價格版本（拷貝一份用於編輯，避免直接改 id）
+        if (this.form.prices && this.form.prices.length > 0) {
+          this.priceList = this.form.prices.map(p => ({
+            id: p.id,
+            productId: p.productId,
+            versionName: p.versionName,
+            supplyPrice: p.supplyPrice,
+            salePrice: p.salePrice,
+            promotionalPrice: p.promotionalPrice,
+            amount: p.amount != null ? p.amount : 0,
+            onSale: p.onSale != null ? p.onSale : 0,
+            delFlag: 0
+          }));
+        } else {
+          this.priceList = [];
+        }
         this.open = true;
         this.title = "修改商品";
       });
@@ -472,9 +511,21 @@ export default {
             updateProduct(this.form).then(response => {
               // 保存商品屬性
               if (this.form.id && this.attrText !== undefined) {
-                saveProductAttrs(this.form.id, this.attrText).catch(() => {
-                  // 屬性保存失敗不影響主流程
-                });
+                saveProductAttrs(this.form.id, this.attrText).catch(() => {});
+              }
+              // 保存價格版本（提交時會覆蓋後端該商品下所有價格版本）
+              if (this.form.id && this.priceList && this.priceList.length > 0) {
+                const toSave = this.priceList.map(p => ({
+                  versionName: p.versionName,
+                  supplyPrice: p.supplyPrice,
+                  salePrice: p.salePrice,
+                  promotionalPrice: p.promotionalPrice,
+                  amount: p.amount != null ? p.amount : 0,
+                  onSale: p.onSale != null ? p.onSale : 0
+                }));
+                saveProductPrices(this.form.id, toSave).catch(() => {});
+              } else if (this.form.id && (!this.priceList || this.priceList.length === 0)) {
+                saveProductPrices(this.form.id, []).catch(() => {});
               }
               this.$modal.msgSuccess("修改成功");
               this.open = false;
@@ -576,10 +627,24 @@ export default {
       updateRecommended(row.id, row.isRecommended).then(() => {
         this.$modal.msgSuccess("更新成功");
       }).catch(() => {
-        // 更新失敗，恢復原值
         row.isRecommended = row.isRecommended === 1 ? 0 : 1;
         this.$modal.msgError("更新失敗");
       });
+    },
+    /** 新增一筆價格版本 */
+    addPriceRow() {
+      this.priceList.push({
+        versionName: "",
+        supplyPrice: null,
+        salePrice: null,
+        promotionalPrice: null,
+        amount: 0,
+        onSale: 1
+      });
+    },
+    /** 刪除一筆價格版本 */
+    removePriceRow(index) {
+      this.priceList.splice(index, 1);
     }
   }
 };
@@ -594,6 +659,13 @@ export default {
 .treeselect-small ::v-deep .vue-treeselect__placeholder,
 .treeselect-small ::v-deep .vue-treeselect__single-value {
   line-height: 32px;
+}
+
+.form-tip {
+  color: #909399;
+  font-size: 12px;
+  display: block;
+  margin-bottom: 4px;
 }
 </style>
 

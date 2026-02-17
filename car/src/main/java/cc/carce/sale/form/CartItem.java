@@ -32,6 +32,11 @@ public class CartItem {
      * 产品价格
      */
     private Double productPrice;
+
+    /**
+     * 价格版本ID（关联 car_product_price.id）
+     */
+    private Long priceId;
     
     /**
      * 小计金额

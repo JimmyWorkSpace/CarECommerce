@@ -82,6 +82,10 @@ public class CarProductEntity
     @Transient
     private List<CarProductAttrEntity> attrs;
 
+    /** 商品價格版本列表（臨時字段，如黑色100元、白色120元） */
+    @Transient
+    private List<CarProductPriceEntity> prices;
+
     /** 分類名稱（臨時字段） */
     @Transient
     private String categoryName;

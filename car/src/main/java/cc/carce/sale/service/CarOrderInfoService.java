@@ -50,6 +50,7 @@ public class CarOrderInfoService {
             orderInfo.setShowOrder(0);
             orderInfo.setOrderStatus(CarOrderInfoEntity.OrderStatus.UNPAID.getCode());
             orderInfo.setOrderType(1); // 默认宅配到府
+            orderInfo.setOrderBizType(1); // 默认普通商品订单
             orderInfo.setReceiverName(form.getReceiverName());
             orderInfo.setReceiverMobile(form.getReceiverMobile());
             orderInfo.setReceiverAddress(form.getReceiverAddress());

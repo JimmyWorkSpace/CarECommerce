@@ -17,6 +17,7 @@ import cc.carce.sale.entity.CarProductEntity;
 import cc.carce.sale.entity.CarProductImageEntity;
 import cc.carce.sale.entity.CarProductAttrEntity;
 import cc.carce.sale.entity.CarProductCategoryEntity;
+import cc.carce.sale.entity.CarProductPriceEntity;
 import cc.carce.sale.service.CarProductService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -130,6 +131,20 @@ public class CarProductApiController extends BaseController {
         } catch (Exception e) {
             log.error("获取商品属性失败，商品ID：{}", id, e);
             return R.fail("获取商品属性失败：" + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * 获取商品价格版本列表（多价格如黑色/白色等）
+     */
+    @GetMapping("/{id}/prices")
+    public R<List<CarProductPriceEntity>> getProductPrices(@PathVariable Long id) {
+        try {
+            List<CarProductPriceEntity> prices = carProductService.getProductPrices(id);
+            return R.ok("获取价格版本成功", prices);
+        } catch (Exception e) {
+            log.error("获取价格版本失败，商品ID：{}", id, e);
+            return R.fail("获取价格版本失败：" + e.getMessage(), null);
         }
     }
 

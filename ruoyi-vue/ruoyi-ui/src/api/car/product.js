@@ -91,3 +91,13 @@ export function updateRecommended(id, isRecommended) {
   })
 }
 
+// 保存商品價格版本（多價格，如黑色100元、白色120元）
+export function saveProductPrices(productId, prices) {
+  return request({
+    url: '/car/product/savePrices',
+    method: 'post',
+    params: { productId },
+    data: prices || []
+  })
+}
+

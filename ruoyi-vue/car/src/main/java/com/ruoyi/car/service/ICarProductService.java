@@ -4,6 +4,7 @@ import java.util.List;
 import com.ruoyi.car.domain.CarProductEntity;
 import com.ruoyi.car.domain.CarProductImageEntity;
 import com.ruoyi.car.domain.CarProductAttrEntity;
+import com.ruoyi.car.domain.CarProductPriceEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -111,5 +112,22 @@ public interface ICarProductService
      * @return 結果
      */
     public int deleteProductAttrs(Long productId);
+
+    /**
+     * 查詢商品價格版本列表
+     *
+     * @param productId 商品ID
+     * @return 價格版本列表
+     */
+    public List<CarProductPriceEntity> selectProductPriceList(Long productId);
+
+    /**
+     * 保存商品價格版本（覆蓋該商品下所有價格版本）
+     *
+     * @param productId 商品ID
+     * @param prices 價格版本列表
+     * @return 保存的條數
+     */
+    public int saveProductPrices(Long productId, List<CarProductPriceEntity> prices);
 }
 

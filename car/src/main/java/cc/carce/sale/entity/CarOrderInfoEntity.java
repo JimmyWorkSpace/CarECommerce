@@ -156,6 +156,18 @@ public class CarOrderInfoEntity {
     private String logicMsgJson;
 
     /**
+     * 价格版本ID（关联 car_product_price.id，订单所选价格版本）
+     */
+    @Column(name = "priceId", columnDefinition = "BIGINT(20) COMMENT '价格版本'")
+    private Long priceId;
+
+    /**
+     * 订单业务类型 1 普通商品订单 2 卡券订单，默认 1
+     */
+    @Column(name = "orderBizType", columnDefinition = "INT(11) DEFAULT 1 COMMENT '订单业务类型 1 普通商品订单 2 卡券订单'")
+    private Integer orderBizType = 1;
+
+    /**
      * 订单类型枚举
      */
     public enum OrderType {

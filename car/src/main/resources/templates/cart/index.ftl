@@ -69,6 +69,9 @@
                                         {{ tag }}
                                     </span>
                                 </div>
+                                <div class="cart-item-price-version text-muted small mt-1 text-start" v-if="item.priceVersionName">
+                                    已選：{{ item.priceVersionName }}
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="quantity-controls">
@@ -211,6 +214,10 @@
 .cart-item-tags .badge {
     font-size: 0.75rem;
     padding: 5px 10px;
+}
+
+.cart-item-price-version {
+    text-align: left;
 }
 
 .cart-item-price {
@@ -631,6 +638,7 @@ new Vue({
                         productName: item.productName,
                         productAmount: item.productAmount,
                         productPrice: item.productPrice,
+                        priceId: item.priceId || null,
                         subtotal: item.subtotal
                     })),
                     totalAmount: this.selectedTotalPrice,

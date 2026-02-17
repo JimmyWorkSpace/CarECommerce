@@ -13,10 +13,12 @@ import cc.carce.sale.entity.CarProductEntity;
 import cc.carce.sale.entity.CarProductImageEntity;
 import cc.carce.sale.entity.CarProductCategoryEntity;
 import cc.carce.sale.entity.CarProductAttrEntity;
+import cc.carce.sale.entity.CarProductPriceEntity;
 import cc.carce.sale.mapper.manager.CarProductMapper;
 import cc.carce.sale.mapper.manager.CarProductImageMapper;
 import cc.carce.sale.mapper.manager.CarProductCategoryMapper;
 import cc.carce.sale.mapper.manager.CarProductAttrMapper;
+import cc.carce.sale.mapper.manager.CarProductPriceMapper;
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Example;
 
@@ -38,6 +40,9 @@ public class CarProductService {
     
     @Resource
     private CarProductAttrMapper carProductAttrMapper;
+
+    @Resource
+    private CarProductPriceMapper carProductPriceMapper;
     
     @Value("${carce.prefix:}")
     private String imagePrefix;
@@ -190,6 +195,79 @@ public class CarProductService {
             return new ArrayList<>();
         }
     }
+
+    /**
+     * 根据商品ID获取上架的价格版本列表（用于详情页多价格选择）
+     */
+    public List<CarProductPriceEntity> getProductPrices(Long productId) {
+        try {
+            Example example = new Example(CarProductPriceEntity.class);
+            example.createCriteria()
+                .andEqualTo("productId", productId)
+                .andEqualTo("onSale", 1)
+                .andEqualTo("delFlag", 0);
+            example.orderBy("id").asc();
+            return carProductPriceMapper.selectByExample(example);
+        } catch (Exception e) {
+            log.error("获取商品价格版本失败，商品ID：{}", productId, e);
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 获取商品第一条价格版本（用于列表页展示价格），无则返回 null
+     */
+    public CarProductPriceEntity getFirstProductPrice(Long productId) {
+        List<CarProductPriceEntity> list = getProductPrices(productId);
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
+    }
+
+    /**
+     * 根据价格版本ID获取价格信息
+     */
+    public CarProductPriceEntity getProductPriceById(Long priceId) {
+        if (priceId == null) return null;
+        try {
+            return carProductPriceMapper.selectByPrimaryKey(priceId);
+        } catch (Exception e) {
+            log.error("查询价格版本失败，priceId：{}", priceId, e);
+            return null;
+        }
+    }
+
+    /**
+     * 扣减商品主表库存（无价格版本时使用）
+     */
+    public boolean deductProductAmount(Long productId, int quantity) {
+        if (productId == null || quantity <= 0) return false;
+        try {
+            CarProductEntity product = carProductMapper.selectByPrimaryKey(productId);
+            if (product == null || product.getAmount() == null) return false;
+            int after = Math.max(0, product.getAmount() - quantity);
+            product.setAmount(after);
+            return carProductMapper.updateByPrimaryKeySelective(product) > 0;
+        } catch (Exception e) {
+            log.error("扣减商品库存失败，productId：{}", productId, e);
+            return false;
+        }
+    }
+
+    /**
+     * 扣减价格版本库存（有价格版本时使用，扣减 car_product_price.amount）
+     */
+    public boolean deductProductPriceAmount(Long priceId, int quantity) {
+        if (priceId == null || quantity <= 0) return false;
+        try {
+            CarProductPriceEntity price = carProductPriceMapper.selectByPrimaryKey(priceId);
+            if (price == null || price.getAmount() == null) return false;
+            int after = Math.max(0, price.getAmount() - quantity);
+            price.setAmount(after);
+            return carProductPriceMapper.updateByPrimaryKeySelective(price) > 0;
+        } catch (Exception e) {
+            log.error("扣减价格版本库存失败，priceId：{}", priceId, e);
+            return false;
+        }
+    }
     
     /**
      * 获取所有分类列表
@@ -304,17 +382,29 @@ public class CarProductService {
         dto.setName(product.getProductTitle());
         dto.setAlias(product.getProductDespShort());
         dto.setModel(null); // 新表没有model字段
-        // 优先使用特惠价，如果特惠价为null则使用销售价
-        if (product.getPromotionalPrice() != null) {
-            dto.setPrice(product.getPromotionalPrice().longValue());
-            // 如果有特惠价，保存原价（salePrice）用于显示
-            dto.setOriginalPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : null);
+        // 列表页价格：优先用 car_product_price 第一条，无则用商品主表
+        CarProductPriceEntity firstPrice = getFirstProductPrice(product.getId());
+        if (firstPrice != null) {
+            if (firstPrice.getPromotionalPrice() != null) {
+                dto.setPrice(firstPrice.getPromotionalPrice().longValue());
+                dto.setOriginalPrice(firstPrice.getSalePrice() != null ? firstPrice.getSalePrice().longValue() : null);
+            } else {
+                dto.setPrice(firstPrice.getSalePrice() != null ? firstPrice.getSalePrice().longValue() : 0L);
+                dto.setOriginalPrice(null);
+            }
+            dto.setMarketPrice(firstPrice.getSupplyPrice() != null ? firstPrice.getSupplyPrice().longValue() : 0L);
+            dto.setPromotionalPrice(firstPrice.getPromotionalPrice() != null ? firstPrice.getPromotionalPrice().longValue() : null);
         } else {
-            dto.setPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
-            dto.setOriginalPrice(null);
+            if (product.getPromotionalPrice() != null) {
+                dto.setPrice(product.getPromotionalPrice().longValue());
+                dto.setOriginalPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : null);
+            } else {
+                dto.setPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
+                dto.setOriginalPrice(null);
+            }
+            dto.setMarketPrice(product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L);
+            dto.setPromotionalPrice(product.getPromotionalPrice() != null ? product.getPromotionalPrice().longValue() : null);
         }
-        dto.setMarketPrice(product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L);
-        dto.setPromotionalPrice(product.getPromotionalPrice() != null ? product.getPromotionalPrice().longValue() : null);
         dto.setBrand(null); // 新表没有brand字段
         dto.setTag(product.getProductTags());
         dto.setSource(null); // 新表没有source字段

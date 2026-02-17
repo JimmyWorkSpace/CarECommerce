@@ -22,6 +22,7 @@ import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarProductEntity;
+import cc.carce.sale.entity.CarProductPriceEntity;
 import cc.carce.sale.form.CartItem;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
@@ -121,14 +122,24 @@ public class ECPayService {
                 log.info("支付订单状态更新成功，商户订单号: {}, 状态: {}", 
                         merchantTradeNo, paymentStatus.getDescription());
                 
-                // 更新业务订单状态为已支付
+                // 更新业务订单状态为已支付，并扣减库存
                 try {
-                    // 根据支付订单中的业务订单号查找业务订单
                     if (paymentOrder.getMerchantTradeNo() != null) {
                         CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(paymentOrder.getMerchantTradeNo());
                         if (orderInfo != null) {
                             carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAID.getCode());
                             log.info("业务订单状态更新为已支付，订单号: {}", orderInfo.getOrderNo());
+                            // 扣减库存：有 priceId 扣减 car_product_price，否则扣减 car_product
+                            java.util.List<CarOrderDetailEntity> details = carOrderDetailService.getOrderDetailsByOrderId(orderInfo.getId());
+                            if (details != null) {
+                                for (CarOrderDetailEntity d : details) {
+                                    if (d.getPriceId() != null) {
+                                        carProductService.deductProductPriceAmount(d.getPriceId(), d.getProductAmount() != null ? d.getProductAmount() : 0);
+                                    } else {
+                                        carProductService.deductProductAmount(d.getProductId(), d.getProductAmount() != null ? d.getProductAmount() : 0);
+                                    }
+                                }
+                            }
                         } else {
                             log.warn("未找到对应的业务订单，订单号: {}", paymentOrder.getMerchantTradeNo());
                         }
@@ -136,13 +147,8 @@ public class ECPayService {
                         log.warn("支付订单中未保存业务订单号，商户订单号: {}", merchantTradeNo);
                     }
                 } catch (Exception e) {
-                    log.error("更新业务订单状态失败，商户订单号: {}", merchantTradeNo, e);
+                    log.error("更新业务订单状态或扣减库存失败，商户订单号: {}", merchantTradeNo, e);
                 }
-                
-                // 这里可以添加其他业务逻辑，比如：
-                // 1. 更新商品库存
-                // 2. 发送支付成功通知
-                // 3. 记录支付日志
                 
                 return "1|OK";
             } else {
@@ -323,37 +329,56 @@ public class ECPayService {
                 }
             }
             
-            // 解析购物车数据并重新计算金额
+            // 解析购物车数据并重新计算金额（按所选价格版本计价）
             List<CarOrderDetailEntity> orderDetails = new ArrayList<>();
             int totalAmount = 0;
+            Long firstPriceId = null;
             if (form.getCartData() != null && !form.getCartData().isEmpty()) {
                 try {
                     for (CartItem cartItem : form.getCartData()) {
                         Long productId = cartItem.getProductId();
                         Integer productAmount = cartItem.getProductAmount();
-                        
-                        // 从car_product表查询商品信息
+                        Long priceId = cartItem.getPriceId();
+
                         CarProductEntity product = carProductService.getProductById(productId);
                         if (product == null) {
                             log.error("商品不存在，商品ID：{}", productId);
                             return R.fail("商品不存在，商品ID：" + productId, null);
                         }
-                        
-                        // 优先使用特惠价，如果特惠价为null则使用销售价
-                        int productPrice = 0;
-                        if (product.getPromotionalPrice() != null) {
-                            productPrice = product.getPromotionalPrice().intValue();
-                        } else if (product.getSalePrice() != null) {
-                            productPrice = product.getSalePrice().intValue();
+
+                        int productPrice;
+                        if (priceId != null) {
+                            CarProductPriceEntity priceEntity = carProductService.getProductPriceById(priceId);
+                            if (priceEntity == null || !priceEntity.getProductId().equals(productId)) {
+                                log.error("价格版本不存在或不属于该商品，priceId：{}", priceId);
+                                return R.fail("價格版本無效，請重新下單", null);
+                            }
+                            if (priceEntity.getPromotionalPrice() != null) {
+                                productPrice = priceEntity.getPromotionalPrice().intValue();
+                            } else if (priceEntity.getSalePrice() != null) {
+                                productPrice = priceEntity.getSalePrice().intValue();
+                            } else {
+                                productPrice = 0;
+                            }
+                            if (firstPriceId == null) firstPriceId = priceId;
+                        } else {
+                            if (product.getPromotionalPrice() != null) {
+                                productPrice = product.getPromotionalPrice().intValue();
+                            } else if (product.getSalePrice() != null) {
+                                productPrice = product.getSalePrice().intValue();
+                            } else {
+                                productPrice = 0;
+                            }
                         }
                         int itemTotal = productPrice * productAmount;
                         totalAmount += itemTotal;
-                        
+
                         CarOrderDetailEntity detail = new CarOrderDetailEntity();
                         detail.setProductId(productId);
                         detail.setProductName(cartItem.getProductName());
                         detail.setProductAmount(productAmount);
                         detail.setProductPrice(productPrice);
+                        if (priceId != null) detail.setPriceId(priceId);
                         orderDetails.add(detail);
                     }
                 } catch (Exception e) {
@@ -361,32 +386,31 @@ public class ECPayService {
                     return R.fail("購物車數據處理失敗", null);
                 }
             }
-            
-            // 使用重新计算的金额
+
             finalAmount = totalAmount;
-            
-            // 创建或使用现有业务订单
+
             CarOrderInfoEntity orderInfo;
             if (existingOrder != null) {
-                // 重新支付，使用现有订单
                 orderInfo = existingOrder;
                 log.info("使用现有订单进行重新支付，订单ID: {}", orderInfo.getId());
             } else {
-                // 新订单，创建业务订单
                 orderInfo = carOrderInfoService.createOrder(
                     userId, merchantTradeNo, form, orderDetails);
-                
+
                 if (orderInfo == null) {
                     log.error("创建业务订单失败，用户ID: {}", userId);
                     return R.fail("創建訂單失敗", null);
                 }
-                
-                // 设置订单类型和超商信息
+
+                if (firstPriceId != null) {
+                    orderInfo.setPriceId(firstPriceId);
+                }
+                orderInfo.setOrderBizType(1);
+
                 if (form.getOrderType() != null) {
                     orderInfo.setOrderType(form.getOrderType());
                 }
-                
-                // 如果是超商取货，设置超商信息
+
                 if (form.getOrderType() != null && form.getOrderType() == 2) {
                     orderInfo.setCvsStoreID(form.getCvsStoreID());
                     orderInfo.setCvsStoreName(form.getCvsStoreName());
@@ -394,17 +418,18 @@ public class ECPayService {
                     orderInfo.setCvsTelephone(form.getCvsTelephone());
                     orderInfo.setCvsOutSide(form.getCvsOutSide());
                 }
-                
-                // 更新订单信息到数据库
+
                 carOrderInfoService.updateOrder(orderInfo);
             }
-            
-            // 删除购物车中已下单的商品（仅在新订单时）
+
+            // 删除购物车中已下单的商品（按购物车项 id 删除，避免误删同商品不同价格版本）
             if (existingOrder == null && form.getCartData() != null && !form.getCartData().isEmpty()) {
                 for (CartItem cartItem : form.getCartData()) {
-                    // 这里需要根据购物车ID删除，但CartItem中没有ID
-                    // 我们需要通过productId和userId来删除购物车商品
-                    carShoppingCartService.removeFromCartByProductId(userId, cartItem.getProductId());
+                    if (cartItem.getId() != null) {
+                        carShoppingCartService.removeFromCart(cartItem.getId());
+                    } else {
+                        carShoppingCartService.removeFromCartByProductId(userId, cartItem.getProductId());
+                    }
                 }
                 log.info("已删除购物车中的商品，用户ID: {}, 订单号: {}", userId, orderInfo.getOrderNo());
             }

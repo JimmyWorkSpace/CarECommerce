@@ -720,6 +720,11 @@ public class CarViewController extends BaseController {
             List<CarProductAttrEntity> productAttrs = carProductService.getProductAttrs(productId);
             model.addAttribute("productAttrs", productAttrs);
             model.addAttribute("productAttrsJson", JSONUtil.toJsonPrettyStr(productAttrs));
+
+            // 获取商品价格版本列表（多价格如黑色/白色）
+            List<cc.carce.sale.entity.CarProductPriceEntity> productPrices = carProductService.getProductPrices(productId);
+            model.addAttribute("productPrices", productPrices);
+            model.addAttribute("productPricesJson", JSONUtil.toJsonPrettyStr(productPrices));
             
             // 设置页面标题和描述
             String title = product.getProductTitle();

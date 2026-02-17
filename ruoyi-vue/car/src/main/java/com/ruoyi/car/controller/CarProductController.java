@@ -21,6 +21,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.car.domain.CarProductEntity;
 import com.ruoyi.car.domain.CarProductImageEntity;
 import com.ruoyi.car.domain.CarProductAttrEntity;
+import com.ruoyi.car.domain.CarProductPriceEntity;
 import com.ruoyi.car.service.ICarProductService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -79,6 +80,9 @@ public class CarProductController extends BaseController
             // 查詢屬性列表
             List<CarProductAttrEntity> attrs = carProductService.selectProductAttrList(id);
             product.setAttrs(attrs);
+            // 查詢價格版本列表
+            List<CarProductPriceEntity> prices = carProductService.selectProductPriceList(id);
+            product.setPrices(prices);
         }
         return AjaxResult.success(product);
     }

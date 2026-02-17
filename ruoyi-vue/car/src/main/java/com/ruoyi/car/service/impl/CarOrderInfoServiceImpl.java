@@ -85,6 +85,10 @@ public class CarOrderInfoServiceImpl implements ICarOrderInfoService
     {
         carOrderInfo.setCreateTime(DateUtils.getNowDate());
         carOrderInfo.setDelFlag(false);
+        // 價格類型默認 1：普通商品訂單
+        if (carOrderInfo.getOrderType() == null) {
+            carOrderInfo.setOrderType(1);
+        }
         return carOrderInfoMapper.insert(carOrderInfo);
     }
 
