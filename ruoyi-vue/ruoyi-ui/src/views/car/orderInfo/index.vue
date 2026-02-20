@@ -103,6 +103,7 @@
       <el-table-column label="收件人" align="center" prop="receiverName" />
       <el-table-column label="收件人電話" align="center" prop="receiverMobile" />
       <el-table-column label="物流單號" align="center" prop="logicNumber" />
+      <el-table-column label="價格版本ID" align="center" prop="priceId" width="100" />
       <el-table-column label="訂單類型" align="center" prop="orderType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.order_type" :value="scope.row.orderType"/>
@@ -204,6 +205,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
+            <el-form-item label="價格版本ID" prop="priceId">
+              <el-input v-model.number="form.priceId" placeholder="所選價格版本 car_product_price.id" type="number" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
             <el-form-item label="訂單類型" prop="orderType">
               <el-select v-model="form.orderType" placeholder="請選擇訂單類型">
                 <el-option
@@ -274,6 +282,7 @@
               <el-descriptions-item label="訂單類型">
                 <dict-tag :options="dict.type.order_type" :value="orderDetail.orderType"/>
               </el-descriptions-item>
+              <el-descriptions-item label="價格版本ID">{{ orderDetail.priceId != null ? orderDetail.priceId : '—' }}</el-descriptions-item>
               <el-descriptions-item label="建立時間">{{ parseTime(orderDetail.createTime) }}</el-descriptions-item>
             </el-descriptions>
           </el-card>

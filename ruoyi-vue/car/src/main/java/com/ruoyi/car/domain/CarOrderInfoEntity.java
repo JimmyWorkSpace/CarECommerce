@@ -2,7 +2,6 @@ package com.ruoyi.car.domain;
 
 import lombok.Data;
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -85,9 +84,15 @@ public class CarOrderInfoEntity {
     private String logicNumber;
 
     /**
-     * 訂單類型 1 宅配到府 2 超商取貨
+     * 價格版本ID（所選商品價格版本，對應 car_product_price.id）
      */
-    @Column(name = "orderType", columnDefinition = "INT(11) DEFAULT 1 COMMENT '訂單類型 1 宅配到府 2 超商取貨'")
+    @Column(name = "priceId", columnDefinition = "BIGINT(20) DEFAULT NULL COMMENT '價格版本'")
+    private Long priceId;
+
+    /**
+     * 訂單類型 1 宅配到府 2 超商取貨；另作價格類型時：1 普通商品訂單 2 卡券訂單，默認 1
+     */
+    @Column(name = "orderType", columnDefinition = "INT(11) DEFAULT 1 COMMENT '訂單類型 1 宅配到府 2 超商取貨；價格類型 1 普通商品訂單 2 卡券訂單'")
     private Integer orderType;
 
     /**

@@ -41,4 +41,10 @@ public class CarShoppingCartEntity {
 
     @Column(name = "showOrder", columnDefinition = "INT(11) COMMENT '显示顺序'")
     private Integer showOrder;
+
+    /**
+     * 价格版本ID（关联 car_product_price.id）
+     */
+    @Column(name = "priceId", columnDefinition = "BIGINT(20) COMMENT '价格版本'")
+    private Long priceId;
 }

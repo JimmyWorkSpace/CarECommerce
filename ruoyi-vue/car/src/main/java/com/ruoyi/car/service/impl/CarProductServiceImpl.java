@@ -18,10 +18,12 @@ import com.ruoyi.car.mapper.master.CarProductMapper;
 import com.ruoyi.car.mapper.master.CarProductImageMapper;
 import com.ruoyi.car.mapper.master.CarProductAttrMapper;
 import com.ruoyi.car.mapper.master.CarProductCategoryMapper;
+import com.ruoyi.car.mapper.master.CarProductPriceMapper;
 import com.ruoyi.car.domain.CarProductEntity;
 import com.ruoyi.car.domain.CarProductImageEntity;
 import com.ruoyi.car.domain.CarProductAttrEntity;
 import com.ruoyi.car.domain.CarProductCategoryEntity;
+import com.ruoyi.car.domain.CarProductPriceEntity;
 import com.ruoyi.car.service.ICarProductService;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.service.FtpService;
@@ -49,6 +51,9 @@ public class CarProductServiceImpl implements ICarProductService
 
     @Resource
     private CarProductCategoryMapper carProductCategoryMapper;
+
+    @Resource
+    private CarProductPriceMapper carProductPriceMapper;
 
     @Resource
     private FtpService ftpService;
@@ -134,13 +139,22 @@ public class CarProductServiceImpl implements ICarProductService
         
         List<CarProductEntity> list = carProductMapper.selectByExample(example);
         
-        // 設置分類名稱
+        // 設置分類名稱，並用價格版本表第一條覆蓋列表顯示的供價/售價/特惠價
         for (CarProductEntity product : list) {
             if (product.getCategoryId() != null) {
                 CarProductCategoryEntity category = carProductCategoryMapper.selectByPrimaryKey(product.getCategoryId());
                 if (category != null) {
                     product.setCategoryName(category.getCategoryName());
                 }
+            }
+            // 商品列表價格顯示 car_product_price 的第一條
+            List<CarProductPriceEntity> prices = selectProductPriceList(product.getId());
+            if (prices != null && !prices.isEmpty()) {
+                CarProductPriceEntity first = prices.get(0);
+                product.setSupplyPrice(first.getSupplyPrice());
+                product.setSalePrice(first.getSalePrice());
+                product.setPromotionalPrice(first.getPromotionalPrice());
+                product.setAmount(first.getAmount());
             }
         }
         
@@ -563,6 +577,61 @@ public class CarProductServiceImpl implements ICarProductService
         for (CarProductAttrEntity attr : attrs) {
             attr.setDelFlag(1);
             count += carProductAttrMapper.updateByPrimaryKeySelective(attr);
+        }
+        return count;
+    }
+
+    /**
+     * 查詢商品價格版本列表
+     *
+     * @param productId 商品ID
+     * @return 價格版本列表
+     */
+    @Override
+    public List<CarProductPriceEntity> selectProductPriceList(Long productId) {
+        if (productId == null) {
+            return new ArrayList<>();
+        }
+        Example example = new Example(CarProductPriceEntity.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("productId", productId);
+        criteria.andNotEqualTo("delFlag", 1);
+        example.orderBy("id").asc();
+        return carProductPriceMapper.selectByExample(example);
+    }
+
+    /**
+     * 保存商品價格版本（先邏輯刪除該商品下所有價格，再插入新列表）
+     *
+     * @param productId 商品ID
+     * @param prices 價格版本列表
+     * @return 保存的條數
+     */
+    @Override
+    @Transactional
+    public int saveProductPrices(Long productId, List<CarProductPriceEntity> prices) {
+        if (productId == null) {
+            return 0;
+        }
+        Example example = new Example(CarProductPriceEntity.class);
+        example.createCriteria().andEqualTo("productId", productId).andNotEqualTo("delFlag", 1);
+        List<CarProductPriceEntity> existing = carProductPriceMapper.selectByExample(example);
+        for (CarProductPriceEntity e : existing) {
+            e.setDelFlag(1);
+            carProductPriceMapper.updateByPrimaryKeySelective(e);
+        }
+        if (prices == null || prices.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        for (CarProductPriceEntity p : prices) {
+            p.setId(null);
+            p.setProductId(productId);
+            if (p.getDelFlag() == null) p.setDelFlag(0);
+            if (p.getOnSale() == null) p.setOnSale(0);
+            if (p.getAmount() == null) p.setAmount(0);
+            carProductPriceMapper.insertSelective(p);
+            count++;
         }
         return count;
     }

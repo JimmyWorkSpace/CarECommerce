@@ -3,5 +3,7 @@ description:
 alwaysApply: true
 ---
 
-使用tkmybatis作为orm框架
-bean使用@Data、@Table注解
+数据库层用tkmybatis，优先采用example的写法。xml文件查询结果优先使用resulttype而不是resultmap
+数据库的字段采用大小写驼峰式，与entity相同
+代码中使用繁体中文，台湾的
+页面的跳转都写在carviewcontroller，以main.ftl为模板文件，具体的页面通过设置content参数包含在main.ftl,参考carviewcontroller中的其它页面的跳转

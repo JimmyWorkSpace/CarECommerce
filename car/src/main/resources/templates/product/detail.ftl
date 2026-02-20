@@ -84,27 +84,56 @@
                 </span>
             </div>
             
-            <!-- 价格 -->
-            <div class="price-section mb-3">
-                <div class="price-row" v-if="product.promotionalPrice">
-                    <span class="price-label promotional-label">特惠價</span>
-                    <span class="price-symbol promotional-symbol">${CurrencyUnit}</span>
-                    <span class="price-amount promotional-amount">{{ formatPrice(product.promotionalPrice) }}</span>
-                    <span v-if="product.price" class="price-market text-decoration-line-through text-muted ms-2">
-                        售價 ${CurrencyUnit}{{ formatPrice(product.price) }}
+            <!-- 价格版本选择（多价格时显示为标签，选中带勾） -->
+            <div v-if="productPrices && productPrices.length > 0" class="price-version-section mb-3">
+                <div class="price-version-label mb-2">
+                    <span class="text-muted">價格版本：</span>
+                </div>
+                <div class="price-version-tags">
+                    <span v-for="pv in productPrices" 
+                          :key="pv.id" 
+                          class="price-version-tag"
+                          :class="{ 'price-version-tag-selected': selectedPriceId === pv.id }"
+                          @click="selectPriceVersion(pv)">
+                        <span class="price-version-tag-name">{{ pv.versionName || ('版本' + pv.id) }}</span>
+                        <span class="price-version-tag-check" v-if="selectedPriceId === pv.id">
+                            <i class="bi bi-check-lg"></i>
+                        </span>
                     </span>
                 </div>
-                <div class="price-row" v-if="!product.promotionalPrice">
-                    <span class="price-label">售價</span>
-                    <span class="price-symbol">${CurrencyUnit}</span>
-                    <span class="price-amount">{{ formatPrice(product.salePrice) }}</span>
-                </div>
-                <div class="market-price" v-if="product.marketPrice && product.marketPrice > product.price">
-                    <span class="price-label text-muted">市價：</span>
-                    <span class="price-symbol text-decoration-line-through text-muted">${CurrencyUnit}</span>
-                    <span class="price-amount text-decoration-line-through text-muted">{{ formatPrice(product.marketPrice) }}</span>
-                    <span class="discount-badge ms-2">省 ${CurrencyUnit}{{ formatPrice(product.marketPrice - product.price) }}</span>
-                </div>
+            </div>
+            <!-- 价格 -->
+            <div class="price-section mb-3">
+                <template v-if="productPrices && productPrices.length > 0 && currentDisplayPrice">
+                    <div class="price-row" v-if="currentDisplayPrice.promotionalPrice">
+                        <span class="price-label promotional-label">特惠價</span>
+                        <span class="price-symbol promotional-symbol">${CurrencyUnit}</span>
+                        <span class="price-amount promotional-amount">{{ formatPrice(currentDisplayPrice.promotionalPrice) }}</span>
+                        <span v-if="currentDisplayPrice.salePrice" class="price-market text-decoration-line-through text-muted ms-2">
+                            售價 ${CurrencyUnit}{{ formatPrice(currentDisplayPrice.salePrice) }}
+                        </span>
+                    </div>
+                    <div class="price-row" v-else>
+                        <span class="price-label">售價</span>
+                        <span class="price-symbol">${CurrencyUnit}</span>
+                        <span class="price-amount">{{ formatPrice(currentDisplayPrice.salePrice || 0) }}</span>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="price-row" v-if="product.promotionalPrice">
+                        <span class="price-label promotional-label">特惠價</span>
+                        <span class="price-symbol promotional-symbol">${CurrencyUnit}</span>
+                        <span class="price-amount promotional-amount">{{ formatPrice(product.promotionalPrice) }}</span>
+                        <span v-if="product.price" class="price-market text-decoration-line-through text-muted ms-2">
+                            售價 ${CurrencyUnit}{{ formatPrice(product.price) }}
+                        </span>
+                    </div>
+                    <div class="price-row" v-if="!product.promotionalPrice">
+                        <span class="price-label">售價</span>
+                        <span class="price-symbol">${CurrencyUnit}</span>
+                        <span class="price-amount">{{ formatPrice(product.salePrice || product.price) }}</span>
+                    </div>
+                </template>
             </div>
             
             <!-- 简要描述 -->
@@ -126,11 +155,11 @@
                     </span>
                     <span class="info-value">{{ product.model }}</span>
                 </div>
-                <div class="info-item" v-if="product.amount !== null && product.amount !== undefined">
+                <div class="info-item" v-if="displayStockNumber !== null && displayStockNumber !== undefined">
                     <span class="info-label">
                         <i class="bi bi-box me-1"></i>庫存：
                     </span>
-                    <span class="info-value">{{ product.amount }} 件</span>
+                    <span class="info-value">{{ displayStockNumber }} 件</span>
                 </div>
             </div>
             
@@ -216,6 +245,7 @@
 const productData = ${productJson};
 const imagesData = ${imagesJson};
 const productAttrsData = ${productAttrsJson![]};
+const productPricesData = ${productPricesJson!"[]"};
 const CurrencyUnit = '${CurrencyUnit}';
 const imagePrefix = '${imagePrefix}';
 
@@ -225,6 +255,8 @@ new Vue({
         product: productData || {},
         images: imagesData || [],
         productAttrs: productAttrsData || [],
+        productPrices: Array.isArray(productPricesData) ? productPricesData : (productPricesData && productPricesData.length ? productPricesData : []),
+        selectedPriceId: null,
         currentImageIndex: 0,
         visibleLightbox: false,
         lightboxIndex: 0,
@@ -240,7 +272,35 @@ new Vue({
         autoPlayTimer: null,
         autoPlayInterval: 5000
     },
+    computed: {
+        currentDisplayPrice() {
+            if (!this.selectedPriceId || !this.productPrices || !this.productPrices.length) return null;
+            var sid = this.selectedPriceId;
+            return this.productPrices.find(function(x) { return x.id === sid; }) || null;
+        },
+        displayPriceNumber() {
+            if (this.currentDisplayPrice) {
+                if (this.currentDisplayPrice.promotionalPrice != null) return Number(this.currentDisplayPrice.promotionalPrice);
+                if (this.currentDisplayPrice.salePrice != null) return Number(this.currentDisplayPrice.salePrice);
+            }
+            if (this.product.promotionalPrice != null) return Number(this.product.promotionalPrice);
+            if (this.product.price != null) return Number(this.product.price);
+            if (this.product.salePrice != null) return Number(this.product.salePrice);
+            return 0;
+        },
+        // 庫存：有價格版本時從 car_product_price.amount 取，否則從商品主表取
+        displayStockNumber() {
+            if (this.currentDisplayPrice && this.currentDisplayPrice.amount != null) {
+                return this.currentDisplayPrice.amount;
+            }
+            if (this.product.amount != null) return this.product.amount;
+            return null;
+        }
+    },
     mounted() {
+        if (this.productPrices && this.productPrices.length > 0 && this.selectedPriceId == null) {
+            this.selectedPriceId = this.productPrices[0].id;
+        }
         this.startAutoPlay();
         
         // 监听登录后待执行的操作
@@ -254,8 +314,8 @@ new Vue({
                         const cartItem = JSON.parse(pendingCartItem);
                         // 检查是否是当前商品
                         if (cartItem.productId === self.product.id) {
+                            if (cartItem.priceId) self.selectedPriceId = cartItem.priceId;
                             sessionStorage.removeItem('pendingAddToCart');
-                            // 延迟执行，确保页面已完全加载
                             setTimeout(() => {
                                 self.addToCart();
                             }, 300);
@@ -446,21 +506,28 @@ new Vue({
             if (!price) return '0';
             return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         },
+        selectPriceVersion(pv) {
+            this.selectedPriceId = pv.id;
+        },
         async addToCart(event) {
             // 阻止事件冒泡和默认行为
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
             }
-            
+
+            var priceToSend = this.displayPriceNumber;
+            var priceIdToSend = this.selectedPriceId || null;
+
             // 检查登录状态，如果未登录则显示登录弹窗
             if (!window.checkLoginAndShowModal('addToCart')) {
                 // 保存商品信息，登录后自动加购
                 sessionStorage.setItem('pendingAddToCart', JSON.stringify({
                     productId: this.product.id,
                     productAmount: 1,
-                    productPrice: this.product.price,
-                    productName: this.product.name
+                    productPrice: priceToSend,
+                    productName: this.product.name,
+                    priceId: priceIdToSend
                 }));
                 return;
             }
@@ -474,9 +541,10 @@ new Vue({
                 const cartItem = {
                     productId: this.product.id,
                     productAmount: 1,
-                    productPrice: this.product.price,
+                    productPrice: priceToSend,
                     productName: this.product.name
                 };
+                if (priceIdToSend) cartItem.priceId = priceIdToSend;
                 
                 const response = await axios.post('/api/shopping-cart/add', cartItem);
                 const data = response.data;
@@ -576,6 +644,50 @@ new Vue({
     font-weight: 500;
     background-color: #668CFA !important;
     color: white;
+}
+
+/* 价格版本标签 */
+.price-version-section {
+    text-align: left;
+}
+.price-version-label {
+    font-size: 0.95rem;
+}
+.price-version-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.price-version-tag {
+    position: relative;
+    display: inline-block;
+    padding: 8px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+.price-version-tag:hover {
+    border-color: #5ACFC9;
+    background: rgba(90, 207, 201, 0.08);
+}
+.price-version-tag-selected {
+    border-color: #5ACFC9;
+    background: rgba(90, 207, 201, 0.15);
+    color: #3351A5;
+}
+.price-version-tag-check {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    font-size: 12px;
+    color: #5ACFC9;
+    line-height: 1;
+}
+.price-version-tag-check i {
+    font-size: 14px;
 }
 
 .tag-clickable {

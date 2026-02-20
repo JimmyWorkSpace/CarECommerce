@@ -79,6 +79,16 @@ public class CarShoppingCartDto {
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 价格版本ID（关联 car_product_price.id）
+     */
+    private Long priceId;
+
+    /**
+     * 价格版本名称（如：黑色、白色）
+     */
+    private String priceVersionName;
     
     /**
      * 计算小计金额

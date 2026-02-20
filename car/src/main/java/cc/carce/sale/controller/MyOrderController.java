@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import cc.carce.sale.common.R;
 import cc.carce.sale.config.AuthInterceptor.UserInfo;
+import cc.carce.sale.dto.CardDetailWithValidityDto;
 import cc.carce.sale.dto.ECPayResultDto;
 import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarShoppingCartEntity;
+import cc.carce.sale.service.CarCardDetailService;
 import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarOrderInfoService;
 import cc.carce.sale.service.CarShoppingCartService;
@@ -50,6 +52,8 @@ public class MyOrderController extends BaseController {
     @Resource
     private ECPayService ecPayService;
 
+    @Resource
+    private CarCardDetailService carCardDetailService;
 
     /**
      * 显示订单详情页面
@@ -146,6 +150,29 @@ public class MyOrderController extends BaseController {
         } catch (Exception e) {
             log.error("获取订单信息异常", e);
             return R.fail("获取订单信息异常: " + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * 獲取訂單的票券明細（券碼），僅卡券訂單且已支付時有數據；含依 cardId 關聯計算的過期時間
+     */
+    @GetMapping("/card-details")
+    @ResponseBody
+    public R<List<CardDetailWithValidityDto>> getOrderCardDetails(@RequestParam Long orderId) {
+        try {
+            if (!isLogin()) {
+                return R.fail("請先登錄", null);
+            }
+            UserInfo user = getSessionUser();
+            CarOrderInfoEntity order = carOrderInfoService.getOrderById(orderId);
+            if (order == null || !order.getUserId().equals(user.getId())) {
+                return R.fail("訂單不存在或無權限訪問", null);
+            }
+            List<CardDetailWithValidityDto> list = carCardDetailService.listByOrderIdWithValidity(orderId);
+            return R.ok("獲取成功", list != null ? list : java.util.Collections.emptyList());
+        } catch (Exception e) {
+            log.error("獲取訂單票券明細異常", e);
+            return R.fail("獲取訂單票券明細異常: " + e.getMessage(), null);
         }
     }
 

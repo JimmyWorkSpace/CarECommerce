@@ -49,6 +49,7 @@ import cc.carce.sale.entity.CarUserEntity;
 import cc.carce.sale.entity.dto.CarConfigContent;
 import cc.carce.sale.entity.CarSalesEntity;
 import cc.carce.sale.entity.CarDealerEntity;
+import cc.carce.sale.entity.CarCardEntity;
 import cc.carce.sale.entity.CarProductEntity;
 import cc.carce.sale.entity.CarProductImageEntity;
 import cc.carce.sale.entity.CarProductAttrEntity;
@@ -72,9 +73,12 @@ import cc.carce.sale.service.CarOrderDetailService;
 import cc.carce.sale.service.CarShoppingCartService;
 import cc.carce.sale.service.CarUserService;
 import cc.carce.sale.service.SmsService;
+import cc.carce.sale.service.CarCardService;
+import cc.carce.sale.service.CarCardDetailService;
 import cc.carce.sale.service.CarProductService;
 import cc.carce.sale.mapper.carcecloud.CarDealerMapper;
 import cc.carce.sale.dto.CarListDto;
+import cc.carce.sale.dto.MyTicketItemDto;
 import cc.carce.sale.service.CarBrandService;
 import cc.carce.sale.service.CarFilterOptionsService;
 import cc.carce.sale.dto.CarSearchFilterDto;
@@ -171,6 +175,12 @@ public class CarViewController extends BaseController {
     
     @Resource
     private CarProductService carProductService;
+
+    @Resource
+    private CarCardService carCardService;
+
+    @Resource
+    private CarCardDetailService carCardDetailService;
     
     /**
      * 首页
@@ -341,6 +351,38 @@ public class CarViewController extends BaseController {
         
         
         
+        return "/layout/main";
+    }
+
+    /**
+     * 票券列表頁（優惠券等，僅列表；後續可加入購物車）
+     */
+    @GetMapping("/card")
+    public String cardListPage(Model model, HttpServletRequest req) {
+        try {
+            Object user = req.getSession().getAttribute("user");
+            model.addAttribute("user", user);
+            model.addAttribute("title", "票券 - 優惠券與方案");
+            model.addAttribute("description", "查看可購買的票券與優惠方案");
+            model.addAttribute("CurrencyUnit", CurrencyUnit);
+            model.addAttribute("content", "/card/index.ftl");
+            try {
+                java.util.List<CarCardEntity> cardList = carCardService.listEnabled();
+                if (cardList == null) cardList = new java.util.ArrayList<>();
+                model.addAttribute("cardList", cardList);
+                model.addAttribute("cardListJson", JSONUtil.toJsonStr(cardList));
+            } catch (Exception e) {
+                log.warn("取得票券列表失敗", e);
+                model.addAttribute("cardList", new java.util.ArrayList<>());
+                model.addAttribute("cardListJson", "[]");
+            }
+            model.addAttribute("ogTitle", "票券 - 優惠券與方案");
+            model.addAttribute("ogDescription", "查看可購買的票券與優惠方案");
+            model.addAttribute("ogImage", "/img/swipper/slide1.jpg");
+        } catch (Exception e) {
+            model.addAttribute("error", "頁面載入失敗：" + e.getMessage());
+            model.addAttribute("content", "/error/index.ftl");
+        }
         return "/layout/main";
     }
     
@@ -720,6 +762,11 @@ public class CarViewController extends BaseController {
             List<CarProductAttrEntity> productAttrs = carProductService.getProductAttrs(productId);
             model.addAttribute("productAttrs", productAttrs);
             model.addAttribute("productAttrsJson", JSONUtil.toJsonPrettyStr(productAttrs));
+
+            // 获取商品价格版本列表（多价格如黑色/白色）
+            List<cc.carce.sale.entity.CarProductPriceEntity> productPrices = carProductService.getProductPrices(productId);
+            model.addAttribute("productPrices", productPrices);
+            model.addAttribute("productPricesJson", JSONUtil.toJsonPrettyStr(productPrices));
             
             // 设置页面标题和描述
             String title = product.getProductTitle();
@@ -1337,6 +1384,30 @@ public class CarViewController extends BaseController {
 		} catch (Exception e) {
 			log.error("显示我的订单页面异常", e);
 			model.addAttribute("error", "页面加载失败：" + e.getMessage());
+			return "/layout/main";
+		}
+	}
+
+	/**
+	 * 我的票券頁面（登入後可查看已購買之票券）
+	 */
+	@GetMapping("/my-tickets/index")
+	public String showMyTicketsPage(Model model, HttpServletRequest request) {
+		try {
+			UserInfo userInfo = getSessionUser();
+			if (userInfo == null) {
+				log.warn("未登入用戶嘗試訪問我的票券頁面");
+				return "redirect:/login?returnUrl=/my-tickets/index";
+			}
+			List<MyTicketItemDto> tickets = carCardDetailService.listMyTicketsByUserId(userInfo.getId());
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("user", userInfo);
+			model.addAttribute("content", "/my-tickets/index.ftl");
+			log.info("用戶訪問我的票券頁面，用戶ID: {}, 票券數量: {}", userInfo.getId(), tickets != null ? tickets.size() : 0);
+			return "/layout/main";
+		} catch (Exception e) {
+			log.error("顯示我的票券頁面異常", e);
+			model.addAttribute("error", "頁面加載失敗：" + e.getMessage());
 			return "/layout/main";
 		}
 	}

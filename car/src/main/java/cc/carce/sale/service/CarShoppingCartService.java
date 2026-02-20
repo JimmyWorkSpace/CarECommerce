@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import cc.carce.sale.dto.CarShoppingCartDto;
 import cc.carce.sale.entity.CarProductEntity;
+import cc.carce.sale.entity.CarProductPriceEntity;
 import cc.carce.sale.entity.CarShoppingCartEntity;
 import cc.carce.sale.mapper.manager.CarShoppingCartMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -57,49 +58,75 @@ public class CarShoppingCartService {
 	}
 	
 	/**
-	 * 添加商品到购物车
+	 * 添加商品到购物车。若传入 priceId 则使用该价格版本的价格；否则使用商品主表价格。
 	 */
 	public boolean addToCart(CarShoppingCartEntity cartItem) {
 		try {
-			// 从数据库重新获取商品信息，确保使用最新的价格
 			CarProductEntity product = carProductService.getProductById(cartItem.getProductId());
 			if (product == null) {
 				log.error("商品不存在，商品ID：{}", cartItem.getProductId());
 				return false;
 			}
-			
-			// 优先使用特惠价，如果特惠价为null则使用销售价
-			int productPrice = 0;
-			if (product.getPromotionalPrice() != null) {
-				productPrice = product.getPromotionalPrice().intValue();
-			} else if (product.getSalePrice() != null) {
-				productPrice = product.getSalePrice().intValue();
+
+			int productPrice;
+			Long priceId = cartItem.getPriceId();
+			if (priceId != null) {
+				CarProductPriceEntity priceEntity = carProductService.getProductPriceById(priceId);
+				if (priceEntity == null || !priceEntity.getProductId().equals(cartItem.getProductId())) {
+					log.error("价格版本不存在或不属于该商品，priceId：{}", priceId);
+					return false;
+				}
+				if (priceEntity.getOnSale() == null || priceEntity.getOnSale() != 1) {
+					log.error("该价格版本未上架，priceId：{}", priceId);
+					return false;
+				}
+				// 优先特惠价，否则售价
+				if (priceEntity.getPromotionalPrice() != null) {
+					productPrice = priceEntity.getPromotionalPrice().intValue();
+				} else if (priceEntity.getSalePrice() != null) {
+					productPrice = priceEntity.getSalePrice().intValue();
+				} else {
+					productPrice = 0;
+				}
+				cartItem.setPriceId(priceId);
+			} else {
+				// 无价格版本：使用商品主表价格
+				if (product.getPromotionalPrice() != null) {
+					productPrice = product.getPromotionalPrice().intValue();
+				} else if (product.getSalePrice() != null) {
+					productPrice = product.getSalePrice().intValue();
+				} else {
+					productPrice = 0;
+				}
 			}
 			cartItem.setProductPrice(productPrice);
-			
-			// 如果商品名称为空，使用商品标题
+
 			if (cartItem.getProductName() == null || cartItem.getProductName().trim().isEmpty()) {
 				cartItem.setProductName(product.getProductTitle());
 			}
-			
-			// 检查是否已存在相同商品
+
+			// 相同用户+商品+价格版本视为同一项（无 priceId 时仅按 productId 匹配以兼容旧数据）
 			CarShoppingCartEntity query = new CarShoppingCartEntity();
 			query.setUserId(cartItem.getUserId());
 			query.setProductId(cartItem.getProductId());
 			query.setDelFlag(false);
-			
-			List<CarShoppingCartEntity> existing = carShoppingCartMapper.select(query);
-			if (!existing.isEmpty()) {
-				// 更新数量，同时更新价格（以防价格变化）
-				CarShoppingCartEntity existingItem = existing.get(0);
-				existingItem.setProductAmount(existingItem.getProductAmount() + cartItem.getProductAmount());
-				existingItem.setProductPrice(productPrice); // 更新为最新价格
-				return carShoppingCartMapper.updateByPrimaryKey(existingItem) > 0;
-			} else {
-				// 新增
-				cartItem.setDelFlag(false);
-				return carShoppingCartMapper.insert(cartItem) > 0;
+			List<CarShoppingCartEntity> existingList = carShoppingCartMapper.select(query);
+			CarShoppingCartEntity existingItem = null;
+			for (CarShoppingCartEntity e : existingList) {
+				boolean samePrice = (priceId == null && e.getPriceId() == null)
+					|| (priceId != null && priceId.equals(e.getPriceId()));
+				if (samePrice) {
+					existingItem = e;
+					break;
+				}
 			}
+			if (existingItem != null) {
+				existingItem.setProductAmount(existingItem.getProductAmount() + cartItem.getProductAmount());
+				existingItem.setProductPrice(productPrice);
+				return carShoppingCartMapper.updateByPrimaryKey(existingItem) > 0;
+			}
+			cartItem.setDelFlag(false);
+			return carShoppingCartMapper.insert(cartItem) > 0;
 		} catch (Exception e) {
 			log.error("添加购物车失败", e);
 			return false;
@@ -200,19 +227,30 @@ public class CarShoppingCartService {
 		dto.setProductAmount(entity.getProductAmount());
 		dto.setProductName(entity.getProductName());
 		dto.setCreateTime(entity.getCreateTime());
-		
-		// 查询商品详细信息
+		dto.setPriceId(entity.getPriceId());
+		// 加购时已写入单价，直接使用
+		dto.setProductPrice(entity.getProductPrice() != null ? entity.getProductPrice().longValue() : 0L);
+
+		if (entity.getPriceId() != null) {
+			CarProductPriceEntity priceEntity = carProductService.getProductPriceById(entity.getPriceId());
+			if (priceEntity != null) {
+				dto.setPriceVersionName(priceEntity.getVersionName());
+			}
+		}
+
 		CarProductEntity product = carProductService.getProductById(entity.getProductId());
 		if (product != null) {
-			dto.setSource(null); // 新表没有source字段
+			dto.setSource(null);
 			dto.setAlias(product.getProductDespShort());
-			dto.setModel(null); // 新表没有model字段
+			dto.setModel(null);
 			dto.setMarketPrice(product.getSupplyPrice() != null ? product.getSupplyPrice().longValue() : 0L);
-			// 优先使用特惠价，如果特惠价为null则使用销售价
-			if (product.getPromotionalPrice() != null) {
-				dto.setProductPrice(product.getPromotionalPrice().longValue());
-			} else {
-				dto.setProductPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
+			// 若未通过价格版本设置过价格，则用商品主表价格回填
+			if (dto.getProductPrice() == null || dto.getProductPrice() == 0L) {
+				if (product.getPromotionalPrice() != null) {
+					dto.setProductPrice(product.getPromotionalPrice().longValue());
+				} else {
+					dto.setProductPrice(product.getSalePrice() != null ? product.getSalePrice().longValue() : 0L);
+				}
 			}
 			dto.setBrand(null); // 新表没有brand字段
 			dto.setTag(product.getProductTags());

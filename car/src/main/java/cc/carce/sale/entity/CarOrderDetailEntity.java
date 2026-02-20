@@ -2,7 +2,6 @@ package cc.carce.sale.entity;
 
 import lombok.Data;
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -71,4 +70,16 @@ public class CarOrderDetailEntity {
      */
     @Column(name = "totalPrice", columnDefinition = "INT(11) COMMENT '总价。冗余，单价乘以数量'")
     private Integer totalPrice;
+
+    /**
+     * 价格版本ID（关联 car_product_price.id），有则扣减该版本库存
+     */
+    @Column(name = "priceId", columnDefinition = "BIGINT(20) COMMENT '价格版本ID'")
+    private Long priceId;
+
+    /**
+     * 票券方案ID（卡券訂單時使用，關聯 car_card.id）
+     */
+    @Column(name = "cardId", columnDefinition = "BIGINT(20) COMMENT '票券方案ID'")
+    private Long cardId;
 }

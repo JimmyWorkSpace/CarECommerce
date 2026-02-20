@@ -19,6 +19,7 @@ import cc.carce.sale.dto.ECPayResultDto;
 import cc.carce.sale.dto.ECPayReturnResultDto;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
+import cc.carce.sale.form.CreateCardPaymentForm;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.service.ECPayService;
 import cn.hutool.json.JSONObject;
@@ -115,6 +116,23 @@ public class ECPayController extends BaseController{
         } catch (Exception e) {
             log.error("创建支付订单异常", e);
             return R.fail("創建支付訂單異常: " + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * 建立卡券支付訂單（對接金流，不需地址）
+     */
+    @PostMapping("/card/create")
+    public R<Map<String, String>> createCardPayment(@RequestBody CreateCardPaymentForm form) {
+        try {
+            if (!isLogin()) {
+                return R.fail("請先登錄", null);
+            }
+            UserInfo user = getSessionUser();
+            return ecPayService.createCardPaymentOrder(user.getId(), form);
+        } catch (Exception e) {
+            log.error("創建卡券支付訂單異常", e);
+            return R.fail("創建卡券支付訂單異常: " + e.getMessage(), null);
         }
     }
     

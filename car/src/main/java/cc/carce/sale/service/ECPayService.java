@@ -18,11 +18,15 @@ import cc.carce.sale.common.R;
 import cc.carce.sale.config.ECPayConfig;
 import cc.carce.sale.dto.ECPayResultDto;
 import cc.carce.sale.dto.ECPayReturnResultDto;
+import cc.carce.sale.entity.CarCardEntity;
 import cc.carce.sale.entity.CarOrderDetailEntity;
 import cc.carce.sale.entity.CarOrderInfoEntity;
 import cc.carce.sale.entity.CarPaymentOrderEntity;
 import cc.carce.sale.entity.CarProductEntity;
+import cc.carce.sale.entity.CarProductPriceEntity;
+import cc.carce.sale.form.CardItem;
 import cc.carce.sale.form.CartItem;
+import cc.carce.sale.form.CreateCardPaymentForm;
 import cc.carce.sale.form.CreatePaymentForm;
 import cc.carce.sale.mapper.manager.CarPaymentOrderMapper;
 import cn.hutool.core.util.StrUtil;
@@ -61,6 +65,12 @@ public class ECPayService {
 
     @Resource
     private LogisticsService logisticsService;
+
+    @Resource
+    private CarCardService carCardService;
+
+    @Resource
+    private CarCardDetailService carCardDetailService;
     
     /**
      * 处理绿界支付回调
@@ -121,28 +131,39 @@ public class ECPayService {
                 log.info("支付订单状态更新成功，商户订单号: {}, 状态: {}", 
                         merchantTradeNo, paymentStatus.getDescription());
                 
-                // 更新业务订单状态为已支付
+                // 更新業務訂單狀態為已支付；卡券訂單產生票券明細，一般訂單扣減庫存
                 try {
-                    // 根据支付订单中的业务订单号查找业务订单
                     if (paymentOrder.getMerchantTradeNo() != null) {
                         CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(paymentOrder.getMerchantTradeNo());
                         if (orderInfo != null) {
                             carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAID.getCode());
-                            log.info("业务订单状态更新为已支付，订单号: {}", orderInfo.getOrderNo());
+                            log.info("業務訂單狀態更新為已支付，訂單號: {}", orderInfo.getOrderNo());
+                            if (orderInfo.getOrderBizType() != null && orderInfo.getOrderBizType() == 2) {
+                                // 卡券訂單：產生票券明細與唯一碼
+                                carCardDetailService.createDetailsForCardOrder(orderInfo.getId());
+                            } else {
+                                // 一般訂單：扣減庫存
+                                java.util.List<CarOrderDetailEntity> details = carOrderDetailService.getOrderDetailsByOrderId(orderInfo.getId());
+                                if (details != null) {
+                                    for (CarOrderDetailEntity d : details) {
+                                        if (d.getCardId() != null) continue;
+                                        if (d.getPriceId() != null) {
+                                            carProductService.deductProductPriceAmount(d.getPriceId(), d.getProductAmount() != null ? d.getProductAmount() : 0);
+                                        } else if (d.getProductId() != null) {
+                                            carProductService.deductProductAmount(d.getProductId(), d.getProductAmount() != null ? d.getProductAmount() : 0);
+                                        }
+                                    }
+                                }
+                            }
                         } else {
-                            log.warn("未找到对应的业务订单，订单号: {}", paymentOrder.getMerchantTradeNo());
+                            log.warn("未找到對應的業務訂單，訂單號: {}", paymentOrder.getMerchantTradeNo());
                         }
                     } else {
-                        log.warn("支付订单中未保存业务订单号，商户订单号: {}", merchantTradeNo);
+                        log.warn("支付訂單中未保存業務訂單號，商戶訂單號: {}", merchantTradeNo);
                     }
                 } catch (Exception e) {
-                    log.error("更新业务订单状态失败，商户订单号: {}", merchantTradeNo, e);
+                    log.error("更新業務訂單狀態或產生票券明細/扣減庫存失敗，商戶訂單號: {}", merchantTradeNo, e);
                 }
-                
-                // 这里可以添加其他业务逻辑，比如：
-                // 1. 更新商品库存
-                // 2. 发送支付成功通知
-                // 3. 记录支付日志
                 
                 return "1|OK";
             } else {
@@ -323,37 +344,56 @@ public class ECPayService {
                 }
             }
             
-            // 解析购物车数据并重新计算金额
+            // 解析购物车数据并重新计算金额（按所选价格版本计价）
             List<CarOrderDetailEntity> orderDetails = new ArrayList<>();
             int totalAmount = 0;
+            Long firstPriceId = null;
             if (form.getCartData() != null && !form.getCartData().isEmpty()) {
                 try {
                     for (CartItem cartItem : form.getCartData()) {
                         Long productId = cartItem.getProductId();
                         Integer productAmount = cartItem.getProductAmount();
-                        
-                        // 从car_product表查询商品信息
+                        Long priceId = cartItem.getPriceId();
+
                         CarProductEntity product = carProductService.getProductById(productId);
                         if (product == null) {
                             log.error("商品不存在，商品ID：{}", productId);
                             return R.fail("商品不存在，商品ID：" + productId, null);
                         }
-                        
-                        // 优先使用特惠价，如果特惠价为null则使用销售价
-                        int productPrice = 0;
-                        if (product.getPromotionalPrice() != null) {
-                            productPrice = product.getPromotionalPrice().intValue();
-                        } else if (product.getSalePrice() != null) {
-                            productPrice = product.getSalePrice().intValue();
+
+                        int productPrice;
+                        if (priceId != null) {
+                            CarProductPriceEntity priceEntity = carProductService.getProductPriceById(priceId);
+                            if (priceEntity == null || !priceEntity.getProductId().equals(productId)) {
+                                log.error("价格版本不存在或不属于该商品，priceId：{}", priceId);
+                                return R.fail("價格版本無效，請重新下單", null);
+                            }
+                            if (priceEntity.getPromotionalPrice() != null) {
+                                productPrice = priceEntity.getPromotionalPrice().intValue();
+                            } else if (priceEntity.getSalePrice() != null) {
+                                productPrice = priceEntity.getSalePrice().intValue();
+                            } else {
+                                productPrice = 0;
+                            }
+                            if (firstPriceId == null) firstPriceId = priceId;
+                        } else {
+                            if (product.getPromotionalPrice() != null) {
+                                productPrice = product.getPromotionalPrice().intValue();
+                            } else if (product.getSalePrice() != null) {
+                                productPrice = product.getSalePrice().intValue();
+                            } else {
+                                productPrice = 0;
+                            }
                         }
                         int itemTotal = productPrice * productAmount;
                         totalAmount += itemTotal;
-                        
+
                         CarOrderDetailEntity detail = new CarOrderDetailEntity();
                         detail.setProductId(productId);
                         detail.setProductName(cartItem.getProductName());
                         detail.setProductAmount(productAmount);
                         detail.setProductPrice(productPrice);
+                        if (priceId != null) detail.setPriceId(priceId);
                         orderDetails.add(detail);
                     }
                 } catch (Exception e) {
@@ -361,32 +401,31 @@ public class ECPayService {
                     return R.fail("購物車數據處理失敗", null);
                 }
             }
-            
-            // 使用重新计算的金额
+
             finalAmount = totalAmount;
-            
-            // 创建或使用现有业务订单
+
             CarOrderInfoEntity orderInfo;
             if (existingOrder != null) {
-                // 重新支付，使用现有订单
                 orderInfo = existingOrder;
                 log.info("使用现有订单进行重新支付，订单ID: {}", orderInfo.getId());
             } else {
-                // 新订单，创建业务订单
                 orderInfo = carOrderInfoService.createOrder(
                     userId, merchantTradeNo, form, orderDetails);
-                
+
                 if (orderInfo == null) {
                     log.error("创建业务订单失败，用户ID: {}", userId);
                     return R.fail("創建訂單失敗", null);
                 }
-                
-                // 设置订单类型和超商信息
+
+                if (firstPriceId != null) {
+                    orderInfo.setPriceId(firstPriceId);
+                }
+                orderInfo.setOrderBizType(1);
+
                 if (form.getOrderType() != null) {
                     orderInfo.setOrderType(form.getOrderType());
                 }
-                
-                // 如果是超商取货，设置超商信息
+
                 if (form.getOrderType() != null && form.getOrderType() == 2) {
                     orderInfo.setCvsStoreID(form.getCvsStoreID());
                     orderInfo.setCvsStoreName(form.getCvsStoreName());
@@ -394,17 +433,18 @@ public class ECPayService {
                     orderInfo.setCvsTelephone(form.getCvsTelephone());
                     orderInfo.setCvsOutSide(form.getCvsOutSide());
                 }
-                
-                // 更新订单信息到数据库
+
                 carOrderInfoService.updateOrder(orderInfo);
             }
-            
-            // 删除购物车中已下单的商品（仅在新订单时）
+
+            // 删除购物车中已下单的商品（按购物车项 id 删除，避免误删同商品不同价格版本）
             if (existingOrder == null && form.getCartData() != null && !form.getCartData().isEmpty()) {
                 for (CartItem cartItem : form.getCartData()) {
-                    // 这里需要根据购物车ID删除，但CartItem中没有ID
-                    // 我们需要通过productId和userId来删除购物车商品
-                    carShoppingCartService.removeFromCartByProductId(userId, cartItem.getProductId());
+                    if (cartItem.getId() != null) {
+                        carShoppingCartService.removeFromCart(cartItem.getId());
+                    } else {
+                        carShoppingCartService.removeFromCartByProductId(userId, cartItem.getProductId());
+                    }
                 }
                 log.info("已删除购物车中的商品，用户ID: {}, 订单号: {}", userId, orderInfo.getOrderNo());
             }
@@ -447,6 +487,83 @@ public class ECPayService {
         } catch (Exception e) {
             log.error("创建支付订单异常", e);
             return R.fail("創建支付訂單異常: " + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * 建立卡券支付訂單並回傳金流參數（對接金流，不需地址）
+     */
+    @Transactional
+    public R<Map<String, String>> createCardPaymentOrder(Long userId, CreateCardPaymentForm form) {
+        try {
+            if (form.getCardData() == null || form.getCardData().isEmpty()) {
+                return R.fail("請選擇票券與數量", null);
+            }
+            List<CarOrderDetailEntity> orderDetails = new ArrayList<>();
+            int totalAmount = 0;
+            List<String> itemNameParts = new ArrayList<>();
+            for (CardItem item : form.getCardData()) {
+                if (item.getCardId() == null || item.getQuantity() == null || item.getQuantity() < 1) continue;
+                CarCardEntity card = carCardService.getById(item.getCardId());
+                if (card == null) {
+                    return R.fail("票券不存在，ID：" + item.getCardId(), null);
+                }
+                if (card.getStatus() == null || card.getStatus() != CarCardService.STATUS_ENABLED) {
+                    return R.fail("票券已停用或不可購買：" + card.getCardName(), null);
+                }
+                int price = card.getSalePrice() != null ? card.getSalePrice().intValue() : 0;
+                int qty = item.getQuantity();
+                totalAmount += price * qty;
+                itemNameParts.add(card.getCardName() + " x" + qty);
+                CarOrderDetailEntity detail = new CarOrderDetailEntity();
+                detail.setCardId(card.getId());
+                detail.setProductId(null);
+                detail.setProductName(card.getCardName());
+                detail.setProductAmount(qty);
+                detail.setProductPrice(price);
+                orderDetails.add(detail);
+            }
+            if (orderDetails.isEmpty()) {
+                return R.fail("請選擇至少一項有效票券", null);
+            }
+            String itemName = String.join("#", itemNameParts);
+            if (itemName.length() > 200) {
+                itemName = itemName.substring(0, 197) + "...";
+            }
+            Integer finalAmount = totalAmount;
+            String merchantTradeNo = generateMerchantTradeNo();
+            CarOrderInfoEntity orderInfo = carOrderInfoService.createCardOrder(userId, merchantTradeNo, orderDetails);
+            if (orderInfo == null) {
+                return R.fail("創建卡券訂單失敗", null);
+            }
+            CarPaymentOrderEntity paymentOrder = new CarPaymentOrderEntity();
+            paymentOrder.setMerchantTradeNo(merchantTradeNo);
+            paymentOrder.setUserId(userId);
+            paymentOrder.setTotalAmount(finalAmount);
+            paymentOrder.setItemName(itemName);
+            paymentOrder.setTradeDesc("卡券訂單");
+            paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.PENDING.getCode());
+            paymentOrder.setCreateTime(new Date());
+            paymentOrder.setUpdateTime(new Date());
+            paymentOrder.setDelFlag(false);
+            paymentOrder.setEcpayTradeNo(orderInfo.getOrderNo());
+            int result = paymentOrderMapper.insert(paymentOrder);
+            if (result <= 0) {
+                log.error("保存卡券支付訂單失敗，用戶ID: {}, 金額: {}", userId, finalAmount);
+                return R.fail("創建支付訂單失敗", null);
+            }
+            Map<String, String> paymentParams = ecPayUtils.buildPaymentParams(
+                orderInfo.getId(),
+                merchantTradeNo,
+                "卡券訂單",
+                finalAmount,
+                paymentOrder.getItemName()
+            );
+            log.info("卡券支付訂單創建成功，商戶訂單號: {}, 用戶ID: {}, 金額: {}", merchantTradeNo, userId, finalAmount);
+            return R.ok("支付訂單創建成功", paymentParams);
+        } catch (Exception e) {
+            log.error("創建卡券支付訂單異常", e);
+            return R.fail("創建卡券支付訂單異常: " + e.getMessage(), null);
         }
     }
     
@@ -537,9 +654,13 @@ public class ECPayService {
                 paymentOrder.setPaymentType(dto.getPaymentType());
                 paymentOrder.setPaymentMessage(dto.getRtnMsg());
 
-                logisticsService.createLogisticsByOrderNo(merchantTradeNo);
+                CarOrderInfoEntity orderInfoForLogistics = carOrderInfoService.getOrderByOrderNo(merchantTradeNo);
+                if (orderInfoForLogistics != null && orderInfoForLogistics.getOrderBizType() != null && orderInfoForLogistics.getOrderBizType() == 2) {
+                    carCardDetailService.createDetailsForCardOrder(orderInfoForLogistics.getId());
+                } else {
+                    logisticsService.createLogisticsByOrderNo(merchantTradeNo);
+                }
 
-                
                 // 更新支付订单
                 paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
                 
@@ -736,70 +857,66 @@ public class ECPayService {
                 return false;
             }
             
-            // 查找支付订单
+            // 查找支付訂單
             CarPaymentOrderEntity paymentOrder = paymentOrderMapper.selectByMerchantTradeNo(merchantTradeNo);
             if (paymentOrder == null) {
-                log.error("未找到对应的支付订单，商户订单号: {}", merchantTradeNo);
+                log.error("未找到對應的支付訂單，商戶訂單號: {}", merchantTradeNo);
                 return false;
             }
             
-            // 检查是否已经处理过
-            if (CarPaymentOrderEntity.PaymentStatus.SUCCESS.getCode().equals(paymentOrder.getPaymentStatus()) ||
-                CarPaymentOrderEntity.PaymentStatus.CANCELLED.getCode().equals(paymentOrder.getPaymentStatus())) {
-                log.info("订单状态已确定，无需更新，商户订单号: {}, 当前状态: {}", 
-                        merchantTradeNo, paymentOrder.getPaymentStatus());
-                return true;
-            }
+            boolean paymentAlreadySuccess = CarPaymentOrderEntity.PaymentStatus.SUCCESS.getCode().equals(paymentOrder.getPaymentStatus());
+            boolean paymentAlreadyCancelled = CarPaymentOrderEntity.PaymentStatus.CANCELLED.getCode().equals(paymentOrder.getPaymentStatus());
             
-            // 根据交易状态更新订单
-            boolean updated = false;
             if ("1".equals(tradeStatus)) {
-                // 交易成功
-                paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.SUCCESS.getCode());
-                paymentOrder.setEcpayTradeNo(queryResult.getTradeNo());
-                paymentOrder.setPaymentType(queryResult.getPaymentType());
-                paymentOrder.setPaymentTime(parsePaymentDate(queryResult.getPaymentDate()));
-                paymentOrder.setEcpayStatus("SUCCESS");
-                paymentOrder.setEcpayStatusDesc("支付成功");
-                updated = true;
+                // 查詢結果為已支付：若支付訂單尚未為成功，則先更新支付訂單
+                if (!paymentAlreadySuccess) {
+                    paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.SUCCESS.getCode());
+                    paymentOrder.setEcpayTradeNo(queryResult.getTradeNo());
+                    paymentOrder.setPaymentType(queryResult.getPaymentType());
+                    paymentOrder.setPaymentTime(parsePaymentDate(queryResult.getPaymentDate()));
+                    paymentOrder.setEcpayStatus("SUCCESS");
+                    paymentOrder.setEcpayStatusDesc("支付成功");
+                    paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
+                    log.info("支付訂單狀態更新為支付成功，商戶訂單號: {}", merchantTradeNo);
+                }
                 
-                log.info("订单状态更新为支付成功，商户订单号: {}", merchantTradeNo);
-                
-            } else if ("10200095".equals(tradeStatus)) {
-                // 交易失败
-                paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.FAILED.getCode());
-                paymentOrder.setEcpayStatus("FAILED");
-                paymentOrder.setEcpayStatusDesc("交易失败");
-                updated = true;
-                
-                log.info("订单状态更新为支付失败，商户订单号: {}", merchantTradeNo);
-                
-            } else if ("0".equals(tradeStatus)) {
-                // 未付款，保持待支付状态
-                log.info("订单仍为未付款状态，商户订单号: {}", merchantTradeNo);
-                return true;
-            }
-            
-            if (updated) {
-                // 更新支付订单
-                paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
-                
-                // 更新关联的业务订单状态
-                if (paymentOrder.getEcpayTradeNo() != null) {
-                    CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(paymentOrder.getEcpayTradeNo());
-                    if (orderInfo != null) {
-                        if ("1".equals(tradeStatus)) {
-                            carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAID.getCode());
-                        } else if ("10200095".equals(tradeStatus)) {
-                            carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAYMENT_FAILED.getCode());
+                // 無論支付訂單是否已為成功，都同步業務訂單：由非已支付變為已支付時更新訂單狀態，卡券訂單未生成券碼則生成
+                CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(merchantTradeNo);
+                if (orderInfo != null) {
+                    if (!CarOrderInfoEntity.OrderStatus.PAID.getCode().equals(orderInfo.getOrderStatus())) {
+                        carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAID.getCode());
+                        log.info("業務訂單狀態已更新為已支付，訂單號: {}", orderInfo.getOrderNo());
+                    }
+                    if (orderInfo.getOrderBizType() != null && orderInfo.getOrderBizType() == 2) {
+                        if (!carCardDetailService.hasDetailsForOrder(orderInfo.getId())) {
+                            try {
+                                carCardDetailService.createDetailsForCardOrder(orderInfo.getId());
+                                log.info("卡券訂單已產生票券明細，訂單ID: {}", orderInfo.getId());
+                            } catch (Exception ex) {
+                                log.error("卡券訂單產生票券明細失敗，訂單ID: {}", orderInfo.getId(), ex);
+                            }
+                        } else {
+                            log.debug("卡券訂單已有票券明細，跳過生成，訂單ID: {}", orderInfo.getId());
                         }
-                        
-                        log.info("业务订单状态已同步更新，订单号: {}", orderInfo.getOrderNo());
                     }
                 }
+                return true;
+            } else {
+                if (!paymentAlreadySuccess && !paymentAlreadyCancelled) {
+                    paymentOrder.setPaymentStatus(CarPaymentOrderEntity.PaymentStatus.FAILED.getCode());
+                    paymentOrder.setEcpayStatus("FAILED");
+                    paymentOrder.setEcpayStatusDesc("交易失败");
+                    paymentOrderMapper.updateByPrimaryKeySelective(paymentOrder);
+                }
+                if (paymentOrder.getEcpayTradeNo() != null) {
+                    CarOrderInfoEntity orderInfo = carOrderInfoService.getOrderByOrderNo(paymentOrder.getEcpayTradeNo());
+                    if (orderInfo != null && !CarOrderInfoEntity.OrderStatus.PAYMENT_FAILED.getCode().equals(orderInfo.getOrderStatus())) {
+                        carOrderInfoService.updateOrderStatus(orderInfo.getId(), CarOrderInfoEntity.OrderStatus.PAYMENT_FAILED.getCode());
+                    }
+                }
+                log.info("訂單狀態更新為支付失敗，商戶訂單號: {}", merchantTradeNo);
+                return true;
             }
-            
-            return true;
             
         } catch (Exception e) {
             log.error("根据查询结果更新订单状态异常，商户订单号: {}", merchantTradeNo, e);
