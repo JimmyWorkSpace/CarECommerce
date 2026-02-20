@@ -213,6 +213,9 @@
                                     <li><a class="dropdown-item" href="/my-order/index">
                                         <i class="bi bi-list-ul me-2"></i>我的訂單
                                     </a></li>
+                                    <li><a class="dropdown-item" href="/my-tickets/index">
+                                        <i class="bi bi-ticket-perforated me-2"></i>我的票券
+                                    </a></li>
                                     <li><a class="dropdown-item" href="/appointment/my-appointments">
                                         <i class="bi bi-calendar-check me-2"></i>我的預約
                                     </a></li>

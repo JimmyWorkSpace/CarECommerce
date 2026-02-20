@@ -28,6 +28,8 @@
         <result column="logicStatusCode" property="logicStatusCode" jdbcType="VARCHAR"/>
         <result column="logicMsg" property="logicMsg" jdbcType="VARCHAR"/>
         <result column="logicMsgJson" property="logicMsgJson" jdbcType="LONGVARCHAR"/>
+        <result column="priceId" property="priceId" jdbcType="BIGINT"/>
+        <result column="orderBizType" property="orderBizType" jdbcType="INTEGER"/>
     </resultMap>
 
     <!-- 基础列名 -->
@@ -36,7 +38,7 @@
         orderStatus, receiverCity, receiverDistrict, receiverAddress, receiverName, 
         receiverMobile, receiverZipCode, logicNumber, orderType, CVSStoreID, 
         CVSStoreName, CVSAddress, CVSTelephone, CVSOutSide, logicStatusCode, 
-        logicMsg, logicMsgJson
+        logicMsg, logicMsgJson, priceId, orderBizType
     </sql>
 
     <!-- 插入订单信息 -->

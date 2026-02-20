@@ -32,21 +32,21 @@
                                     <span class="info-label">下單時間：</span>
                                     <span class="info-value">{{ formatDate(order.createTime) }}</span>
                                 </div>
-                                <div class="info-row">
+                                <div v-if="order.orderBizType !== 2" class="info-row">
                                     <span class="info-label">收件人：</span>
                                     <span class="info-value">{{ order.receiverName || '-' }}</span>
                                 </div>
-                                <div class="info-row">
+                                <div v-if="order.orderBizType !== 2" class="info-row">
                                     <span class="info-label">聯繫電話：</span>
                                     <span class="info-value">{{ order.receiverMobile || '-' }}</span>
                                 </div>
-                                <div class="info-row">
+                                <div v-if="order.orderBizType !== 2" class="info-row">
                                     <span class="info-label">收貨地址：</span>
                                     <span class="info-value">{{ order.receiverAddress || '-' }}</span>
                                 </div>
                                 
-                                <!-- 物流狀態顯示（僅已支付訂單顯示） -->
-                                <div v-if="order.orderStatus === 2" class="info-row">
+                                <!-- 物流狀態顯示（僅已支付的一般訂單顯示，卡券訂單不顯示） -->
+                                <div v-if="order.orderStatus === 2 && order.orderBizType !== 2" class="info-row">
                                     <span class="info-label">物流狀態：</span>
                                     <span class="info-value logistics-status" :class="getLogisticsStatusClass(order)">
                                         <i class="bi bi-truck me-1"></i>{{ getLogisticsStatusText(order) }}

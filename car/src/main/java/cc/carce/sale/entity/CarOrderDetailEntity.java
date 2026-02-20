@@ -76,4 +76,10 @@ public class CarOrderDetailEntity {
      */
     @Column(name = "priceId", columnDefinition = "BIGINT(20) COMMENT '价格版本ID'")
     private Long priceId;
+
+    /**
+     * 票券方案ID（卡券訂單時使用，關聯 car_card.id）
+     */
+    @Column(name = "cardId", columnDefinition = "BIGINT(20) COMMENT '票券方案ID'")
+    private Long cardId;
 }

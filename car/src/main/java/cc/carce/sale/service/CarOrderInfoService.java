@@ -81,6 +81,41 @@ public class CarOrderInfoService {
     }
 
     /**
+     * 建立卡券訂單（orderBizType=2，不需地址等收件資訊）
+     */
+    @Transactional
+    public CarOrderInfoEntity createCardOrder(Long userId, String orderNo, List<CarOrderDetailEntity> orderDetails) {
+        try {
+            Integer totalPrice = calculateTotalPrice(orderDetails);
+            CarOrderInfoEntity orderInfo = new CarOrderInfoEntity();
+            orderInfo.setOrderNo(orderNo);
+            orderInfo.setUserId(userId);
+            orderInfo.setTotalPrice(totalPrice);
+            orderInfo.setDelFlag(false);
+            orderInfo.setCreateTime(new Date());
+            orderInfo.setShowOrder(0);
+            orderInfo.setOrderStatus(CarOrderInfoEntity.OrderStatus.UNPAID.getCode());
+            orderInfo.setOrderType(1);
+            orderInfo.setOrderBizType(2); // 卡券訂單
+            // 地址等不需填寫
+            carOrderInfoMapper.insert(orderInfo);
+            for (CarOrderDetailEntity detail : orderDetails) {
+                detail.setOrderId(orderInfo.getId());
+                detail.setDelFlag(false);
+                detail.setCreateTime(new Date());
+                detail.setShowOrder(0);
+                detail.setTotalPrice(detail.getProductPrice() * detail.getProductAmount());
+                carOrderDetailMapper.insert(detail);
+            }
+            log.info("建立卡券訂單成功，訂單號：{}，用戶ID：{}", orderNo, userId);
+            return orderInfo;
+        } catch (Exception e) {
+            log.error("建立卡券訂單失敗，用戶ID：{}", userId, e);
+            throw new RuntimeException("建立卡券訂單失敗：" + e.getMessage());
+        }
+    }
+
+    /**
      * 更新订单信息
      */
     @Transactional
@@ -117,7 +152,11 @@ public class CarOrderInfoService {
      */
     public CarOrderInfoEntity getOrderByOrderNo(String orderNo) {
         try {
-            return carOrderInfoMapper.selectByOrderNo(orderNo);
+            Example example = new Example(CarOrderInfoEntity.class);
+            example.createCriteria()
+                .andEqualTo("orderNo", orderNo)
+                .andEqualTo("delFlag", false);
+            return carOrderInfoMapper.selectOneByExample(example);
         } catch (Exception e) {
             log.error("查询订单失败，订单号：{}", orderNo, e);
             return null;

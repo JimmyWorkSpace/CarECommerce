@@ -1,4 +1,12 @@
 <link href="/css/my-pages.css" rel="stylesheet">
+<style>
+    /* 票券券碼：手機端卡片列表 */
+    @media (max-width: 767.98px) {
+        .card-ticket-list .card-body { font-size: 0.9rem; }
+        .card-ticket-list .small { font-size: 0.75rem; }
+        .card-ticket-list .font-monospace { word-break: break-all; }
+    }
+</style>
 
 <div class="my-page" id="app">
     <div class="container">
@@ -38,8 +46,8 @@
                             </div>
                         </div>
                         
-                        <!-- 收件人信息 -->
-                        <div class="mt-4">
+                        <!-- 收件人信息（卡券訂單 orderBizType=2 不顯示） -->
+                        <div v-if="order.orderBizType !== 2" class="mt-4">
                             <h6 class="mb-3 text-start fw-bold text-primary border-bottom pb-2">
                                 <i class="bi bi-person-fill me-2"></i>收件人資訊
                             </h6>
@@ -113,8 +121,99 @@
                             </div>
                         </div>
                         
-                        <!-- 物流信息 -->
-                        <div class="mt-4" v-if="logisticsInfo.logisticsStatus">
+                        <!-- 票券券碼（已支付且 orderBizType=2 時顯示） -->
+                        <div class="mt-4" v-if="order.orderStatus === 2 && order.orderBizType === 2">
+                            <h6 class="mb-3 text-start fw-bold text-primary border-bottom pb-2">
+                                <i class="bi bi-ticket-perforated me-2"></i>票券券碼
+                            </h6>
+                            <div class="item-info text-start bg-light rounded p-3">
+                                <div v-if="!cardDetails || cardDetails.length === 0" class="text-muted">暫無券碼，請稍後刷新頁面。</div>
+                                <template v-else>
+                                    <!-- 桌面：表格 -->
+                                    <div class="table-responsive d-none d-md-block">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>票券名稱</th>
+                                                    <th>券碼</th>
+                                                    <th>購買時間</th>
+                                                    <th>核銷狀態</th>
+                                                    <th>核銷時間</th>
+                                                    <th>過期時間</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="item in cardDetails" :key="'t-' + item.id">
+                                                    <td>{{ item.cardName || '-' }}</td>
+                                                    <td class="fw-bold font-monospace">{{ item.ticketCode || '-' }}</td>
+                                                    <td>{{ formatDateTime(item.createTime) }}</td>
+                                                    <td>
+                                                        <span class="badge" :class="item.redeemed === 1 ? 'bg-success' : 'bg-secondary'">
+                                                            {{ item.redeemed === 1 ? '已核銷' : '未核銷' }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <template v-if="item.redeemed === 1 && item.redeemedTime">
+                                                            {{ formatDateTime(item.redeemedTime) }}
+                                                        </template>
+                                                        <span v-else class="text-muted">-</span>
+                                                    </td>
+                                                    <td>
+                                                        <template v-if="item.redeemed !== 1 && item.validityEndTime">
+                                                            {{ formatDateTime(item.validityEndTime) }}
+                                                        </template>
+                                                        <span v-else-if="item.redeemed !== 1" class="text-muted">-</span>
+                                                        <span v-else class="text-muted">-</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- 手機：卡片列表 -->
+                                    <div class="d-md-none card-ticket-list">
+                                        <div class="card border mb-2" v-for="item in cardDetails" :key="'c-' + item.id">
+                                            <div class="card-body py-3 px-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span class="text-muted small">票券名稱</span>
+                                                    <span class="fw-bold text-break text-end">{{ item.cardName || '-' }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted small">券碼</span>
+                                                    <span class="fw-bold font-monospace text-break text-end">{{ item.ticketCode || '-' }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted small">購買時間</span>
+                                                    <span class="text-end">{{ formatDateTime(item.createTime) }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted small">核銷狀態</span>
+                                                    <span class="badge" :class="item.redeemed === 1 ? 'bg-success' : 'bg-secondary'">
+                                                        {{ item.redeemed === 1 ? '已核銷' : '未核銷' }}
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted small">核銷時間</span>
+                                                    <span class="text-end">
+                                                        <template v-if="item.redeemed === 1 && item.redeemedTime">{{ formatDateTime(item.redeemedTime) }}</template>
+                                                        <span v-else class="text-muted">-</span>
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="text-muted small">過期時間</span>
+                                                    <span class="text-end">
+                                                        <template v-if="item.redeemed !== 1 && item.validityEndTime">{{ formatDateTime(item.validityEndTime) }}</template>
+                                                        <span v-else class="text-muted">-</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        
+                        <!-- 物流信息（卡券訂單 orderBizType=2 不顯示） -->
+                        <div class="mt-4" v-if="order.orderBizType !== 2 && logisticsInfo.logisticsStatus">
                             <h6 class="mb-3 text-start fw-bold text-primary border-bottom pb-2">
                                 <i class="bi bi-truck-fill me-2"></i>物流資訊
                                 <button type="button" class="btn btn-outline-primary btn-sm ms-2" 
@@ -272,8 +371,8 @@
                                     </div>
                                 </div>
                                 
-                                <!-- 簡單物流信息（當沒有詳細物流信息時顯示） -->
-                            <div class="item-info bg-light rounded p-3" v-else-if="order.logicNumber && !logisticsInfo">
+                                <!-- 簡單物流信息（當沒有詳細物流信息時顯示，卡券訂單不顯示） -->
+                            <div class="item-info bg-light rounded p-3" v-else-if="order.orderBizType !== 2 && order.logicNumber && !logisticsInfo">
                                 <div class="info-row">
                                     <span class="info-label fw-semibold text-muted">
                                         <i class="bi bi-truck me-1"></i>物流單號：
@@ -290,8 +389,8 @@
                                 </div>
                             </div>
                             
-                            <!-- 無物流信息時的提示 -->
-                            <div class="alert alert-info" v-if="!order.logicNumber && order.orderStatus >= 5">
+                            <!-- 無物流信息時的提示（卡券訂單不顯示） -->
+                            <div class="alert alert-info" v-if="order.orderBizType !== 2 && !order.logicNumber && order.orderStatus >= 5">
                                 <i class="bi bi-info-circle me-2"></i>
                                 訂單已發貨，但暫無物流信息，請稍後刷新或聯繫客服。
                             </div>
@@ -422,6 +521,7 @@
         data: {
             order: null,
             orderDetails: [],
+            cardDetails: [],
             ecpayInfo: {},
             logisticsInfo: {},
             isLoading: true,
@@ -487,6 +587,19 @@
                 const date = new Date(dateStr);
                 return date.toLocaleString('zh-CN');
             },
+            // 格式化日期時間為 yyyy-MM-dd HH:mm:ss（票券購買/過期時間等）
+            formatDateTime(dateStr) {
+                if (!dateStr) return '-';
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return '-';
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const h = String(d.getHours()).padStart(2, '0');
+                const min = String(d.getMinutes()).padStart(2, '0');
+                const s = String(d.getSeconds()).padStart(2, '0');
+                return y + '-' + m + '-' + day + ' ' + h + ':' + min + ':' + s;
+            },
             
             // 加載訂單詳情
             loadOrderDetail() {
@@ -511,7 +624,12 @@
                             this.originalOrderStatus = this.order.orderStatus;
                             this.loadOrderDetails(orderId);
                             this.loadECPayInfo(); // 加載綠界支付信息
-                            this.loadLogisticsInfo(); // 加載物流信息
+                            if (this.order.orderBizType !== 2) {
+                                this.loadLogisticsInfo(); // 卡券訂單不查詢物流
+                            }
+                            if (this.order.orderStatus === 2 && this.order.orderBizType === 2) {
+                                this.loadCardDetails(orderId); // 已支付卡券訂單載入券碼
+                            }
                             // 重新啟動狀態檢查
                             //this.stopStatusCheck();
                             //this.startStatusCheck();
@@ -581,11 +699,15 @@
                     });
             },
             
-            // 加載物流信息
+            // 加載物流信息（卡券訂單 orderBizType=2 不查詢）
             loadLogisticsInfo() {
                 let _this = this;
                 if (!this.order || !this.order.orderNo) {
                     console.warn('訂單號為空，無法加載物流信息');
+                    return;
+                }
+                if (this.order.orderBizType === 2) {
+                    console.log('卡券訂單，跳過物流查詢');
                     return;
                 }
                 
@@ -779,32 +901,25 @@
                 
                 console.log('從綠界API檢查訂單狀態:', this.order.orderNo);
                 
-                // 從綠界API查詢訂單狀態
                 axios.post('/ecpay/refresh-status/' + this.order.orderNo)
                 .then(response => {
-                    if (response.data && response.data.code === 200) {
+                    if (response.data && (response.data.code === 1 || response.data.code === 200)) {
                         const result = response.data.data;
-                        const newOrderInfo = result.orderInfo;
-                        const updated = result.updated;
+                        const newOrderInfo = result ? result.orderInfo : null;
                         
-                        console.log('從綠界API獲取到最新訂單狀態:', newOrderInfo ? newOrderInfo.orderStatus : 'unknown');
-                        console.log('訂單狀態是否更新:', updated);
-                        
-                        if (newOrderInfo) {
-                            // 如果訂單狀態發生變化，更新頁面數據
-                            if (newOrderInfo.orderStatus !== this.originalOrderStatus) {
-                                console.log('訂單狀態發生變化，從', this.originalOrderStatus, '變為', newOrderInfo.orderStatus);
+                        if (newOrderInfo && newOrderInfo.orderStatus !== this.originalOrderStatus) {
+                            console.log('訂單狀態發生變化，從', this.originalOrderStatus, '變為', newOrderInfo.orderStatus);
+                            this.originalOrderStatus = newOrderInfo.orderStatus;
+                            if (newOrderInfo.orderStatus === 2) {
+                                this.stopStatusCheck();
+                                this.showSuccess('訂單已支付！正在刷新頁面…');
+                                window.location.reload();
+                                return;
+                            }
+                            if (newOrderInfo.orderStatus === 3 || newOrderInfo.orderStatus === 4) {
+                                this.stopStatusCheck();
+                                this.showSuccess('訂單狀態已更新！');
                                 this.order = newOrderInfo;
-                                this.originalOrderStatus = newOrderInfo.orderStatus;
-                                
-                                // 如果訂單已支付、已取消或已失敗，停止狀態檢查
-                                if (newOrderInfo.orderStatus === 2) {
-                                    this.stopStatusCheck();
-                                    this.showSuccess('訂單狀態已更新為已支付！');
-                                } else if (newOrderInfo.orderStatus === 3 || newOrderInfo.orderStatus === 4) {
-                                    this.stopStatusCheck();
-                                    this.showSuccess('訂單狀態已更新！');
-                                }
                             }
                         }
                     } else {
@@ -813,6 +928,20 @@
                 }).catch(error => {
                     console.error('從綠界API檢查訂單狀態失敗:', error);
                 });
+            },
+            
+            // 加載票券券碼（已支付且 orderBizType=2 時使用）
+            loadCardDetails(orderId) {
+                if (!orderId) return;
+                axios.get('/my-order/card-details?orderId=' + orderId)
+                    .then(response => {
+                        if (response.data && response.data.code === 1 && response.data.data) {
+                            this.cardDetails = response.data.data;
+                        } else {
+                            this.cardDetails = [];
+                        }
+                    })
+                    .catch(() => { this.cardDetails = []; });
             },
             
             // 顯示錯誤信息

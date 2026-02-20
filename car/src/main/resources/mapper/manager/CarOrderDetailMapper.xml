@@ -15,22 +15,23 @@
         <result column="productPrice" property="productPrice" jdbcType="INTEGER"/>
         <result column="totalPrice" property="totalPrice" jdbcType="INTEGER"/>
         <result column="priceId" property="priceId" jdbcType="BIGINT"/>
+        <result column="cardId" property="cardId" jdbcType="BIGINT"/>
     </resultMap>
 
     <!-- 基础列名 -->
     <sql id="Base_Column_List">
         id, orderId, delFlag, createTime, showOrder, productId, productName,
-        productAmount, productPrice, totalPrice, priceId
+        productAmount, productPrice, totalPrice, priceId, cardId
     </sql>
 
     <!-- 插入订单详情 -->
     <insert id="insert" parameterType="cc.carce.sale.entity.CarOrderDetailEntity" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO car_order_detail (
             orderId, delFlag, createTime, showOrder, productId, productName,
-            productAmount, productPrice, totalPrice, priceId
+            productAmount, productPrice, totalPrice, priceId, cardId
         ) VALUES (
             #{orderId}, #{delFlag}, #{createTime}, #{showOrder}, #{productId}, #{productName},
-            #{productAmount}, #{productPrice}, #{totalPrice}, #{priceId}
+            #{productAmount}, #{productPrice}, #{totalPrice}, #{priceId}, #{cardId}
         )
     </insert>
 
@@ -77,6 +78,7 @@
             <if test="productPrice != null">productPrice = #{productPrice},</if>
             <if test="totalPrice != null">totalPrice = #{totalPrice},</if>
             <if test="priceId != null">priceId = #{priceId},</if>
+            <if test="cardId != null">cardId = #{cardId},</if>
         </set>
         WHERE id = #{id} AND delFlag = 0
     </update>

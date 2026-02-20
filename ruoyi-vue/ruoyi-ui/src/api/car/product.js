@@ -100,4 +100,3 @@ export function saveProductPrices(productId, prices) {
     data: prices || []
   })
 }
-

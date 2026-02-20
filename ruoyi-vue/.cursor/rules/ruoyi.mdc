@@ -5,4 +5,5 @@ alwaysApply: true
 
 后台采用若依框架
 数据库层用tkmybatis，优先采用example的写法。xml文件查询结果优先使用resulttype而不是resultmap
+数据库的字段采用大小写驼峰式，与entity相同
 代码中使用繁体中文，台湾的
